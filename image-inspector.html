@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Storage Inspector</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        button.danger {
+            background: #e74c3c;
+        }
+        button.danger:hover {
+            background: #c0392b;
+        }
+        .stats {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .exam-section {
+            margin-top: 30px;
+        }
+        .exam-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .exam-info {
+            flex: 1;
+        }
+        .exam-name {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .exam-details {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        .spinner {
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            font-size: 24px;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Image Storage Inspector</h1>
+        <p class="subtitle">Inspect and manage IndexedDB image storage for exam simulator</p>
+
+        <div>
+            <button onclick="loadStats()">🔄 Refresh Stats</button>
+            <button onclick="showDetails()">📋 Show Details</button>
+            <button onclick="clearOldLocalStorage()" class="danger">🧹 Clear Old localStorage Images</button>
+            <button onclick="clearIndexedDB()" class="danger">🗑️ Clear All IndexedDB</button>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner">⚙️</div>
+            <p>Loading storage data...</p>
+        </div>
+
+        <div id="stats-container"></div>
+        <div id="details-container"></div>
+    </div>
+
+    <script src="image-storage.js"></script>
+    <script>
+        async function loadStats() {
+            const container = document.getElementById('stats-container');
+            const loading = document.getElementById('loading');
+            
+            loading.style.display = 'block';
+            container.innerHTML = '';
+
+            try {
+                await window.imageStorage.ensureReady();
+                const stats = await window.imageStorage.getStorageStats();
+
+                let html = `
+                    <div class="stats">
+                        <h2>Storage Statistics</h2>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Total Images</div>
+                                <div class="stat-value">${stats.totalImages}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Storage Used</div>
+                                <div class="stat-value">${stats.totalSizeMB} MB</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Exams</div>
+                                <div class="stat-value">${Object.keys(stats.exams).length}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if (Object.keys(stats.exams).length > 0) {
+                    html += '<div class="exam-section"><h2>Images by Exam</h2>';
+                    for (const [examId, examStats] of Object.entries(stats.exams)) {
+                        html += `
+                            <div class="exam-card">
+                                <div class="exam-info">
+                                    <div class="exam-name">${examId}</div>
+                                    <div class="exam-details">
+                                        ${examStats.count} images • ${examStats.sizeMB} MB
+                                    </div>
+                                </div>
+                                <button onclick="deleteExamImages('${examId}')" class="danger">Delete</button>
+                            </div>
+                        `;
+                    }
+                    html += '</div>';
+                }
+
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = `<div style="color: red;">Error: ${error.message}</div>`;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        async function showDetails() {
+            const container = document.getElementById('details-container');
+            
+            try {
+                await window.imageStorage.ensureReady();
+                const stats = await window.imageStorage.getStorageStats();
+                
+                let html = '<h2>Detailed Breakdown</h2>';
+                html += '<pre>' + JSON.stringify(stats, null, 2) + '</pre>';
+                
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = `<div style="color: red;">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function deleteExamImages(examId) {
+            if (!confirm(`Delete all images for exam "${examId}"?`)) return;
+            
+            try {
+                const count = await window.imageStorage.deleteExamImages(examId);
+                alert(`Deleted ${count} images for exam ${examId}`);
+                await loadStats();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function clearIndexedDB() {
+            if (!confirm('⚠️ This will DELETE ALL images from IndexedDB. Are you sure?')) return;
+            
+            try {
+                await window.imageStorage.clearAll();
+                alert('✅ All images cleared from IndexedDB');
+                await loadStats();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function clearOldLocalStorage() {
+            let count = 0;
+            const toRemove = [];
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('exam_image_')) {
+                    toRemove.push(key);
+                }
+            }
+            
+            if (toRemove.length === 0) {
+                alert('ℹ️ No old localStorage images found');
+                return;
+            }
+            
+            if (!confirm(`Found ${toRemove.length} old localStorage images. Delete them?`)) return;
+            
+            toRemove.forEach(key => {
+                localStorage.removeItem(key);
+                count++;
+            });
+            
+            alert(`✅ Cleared ${count} old images from localStorage`);
+        }
+
+        // Load stats on page load
+        window.addEventListener('load', () => {
+            loadStats();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Exam Simulator Pro - Universal Exam Practice Platform</title>
+	<link rel="stylesheet" href="style-new.css">
+	<link rel="stylesheet" href="multi-exam-styles.css">
+	<link rel="stylesheet" href="modern-enhancements.css">
+	<link rel="stylesheet" href="homepage-styles.css">
+	<link rel="stylesheet" href="exam-enhancements.css">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+	<!-- Estilos para sistema de imagens -->
+	<style>
+		.image-placeholder {
+			background-color: #f8f9fa;
+			border: 2px dashed #dee2e6;
+			border-radius: 8px;
+			padding: 20px;
+			text-align: center;
+			margin: 15px 0;
+			min-height: 80px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.loading-spinner {
+			color: #6c757d;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 8px;
+			font-size: 14px;
+		}
+
+		.loading-spinner i {
+			font-size: 20px;
+		}
+
+		.image-error {
+			color: #dc3545;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 8px;
+			font-size: 14px;
+		}
+
+		/* Import Progress Modal - Must be above drag overlay */
+		#import-progress-modal {
+			position: fixed !important;
+			top: 0 !important;
+			left: 0 !important;
+			width: 100% !important;
+			height: 100% !important;
+			background: rgba(0, 0, 0, 0.8) !important;
+			display: none;
+			align-items: center !important;
+			justify-content: center !important;
+			z-index: 99999 !important;
+			backdrop-filter: blur(4px) !important;
+			pointer-events: auto !important;
+		}
+
+		#import-progress-modal.active {
+			display: flex !important;
+		}
+
+		.import-progress-content {
+			background: var(--bg-secondary) !important;
+			border-radius: 16px !important;
+			padding: 40px !important;
+			max-width: 500px !important;
+			width: 90% !important;
+			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+			text-align: center !important;
+			animation: slideIn 0.3s ease-out !important;
+			position: relative !important;
+			z-index: 100000 !important;
+		}
+
+		@keyframes slideIn {
+			from {
+				opacity: 0;
+				transform: translateY(-30px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.import-progress-icon {
+			font-size: 48px;
+			color: var(--primary-color);
+			margin-bottom: 20px;
+			animation: pulse 1.5s ease-in-out infinite;
+		}
+
+		@keyframes pulse {
+			0%, 100% { transform: scale(1); opacity: 1; }
+			50% { transform: scale(1.1); opacity: 0.8; }
+		}
+
+		.import-progress-title {
+			font-size: 24px;
+			font-weight: 600;
+			color: var(--text-primary);
+			margin-bottom: 12px;
+		}
+
+		.import-progress-subtitle {
+			font-size: 14px;
+			color: var(--text-secondary);
+			margin-bottom: 30px;
+		}
+
+		.import-progress-bar-container {
+			background: var(--bg-primary);
+			border-radius: 12px;
+			height: 16px;
+			overflow: hidden;
+			margin-bottom: 16px;
+			box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+		}
+
+		.import-progress-bar {
+			height: 100%;
+			background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+			border-radius: 12px;
+			transition: width 0.3s ease;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.import-progress-bar::after {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+			animation: shimmer 1.5s infinite;
+		}
+
+		@keyframes shimmer {
+			0% { transform: translateX(-100%); }
+			100% { transform: translateX(100%); }
+		}
+
+		.import-progress-stats {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			font-size: 14px;
+			color: var(--text-secondary);
+		}
+
+		.import-progress-percentage {
+			font-size: 18px;
+			font-weight: 700;
+			color: var(--primary-color);
+		}
+
+		.import-progress-count {
+			font-weight: 500;
+		}
+
+		.image-error i {
+			font-size: 20px;
+		}
+
+		.question-image {
+			max-width: 100%;
+			height: auto;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+			margin: 15px 0;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		.explanation-image {
+			max-width: 100%;
+			height: auto;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+			margin: 10px 0;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		.question-content img {
+			display: block;
+			margin: 15px auto;
+		}
+        
+		.hotspot-question {
+			background-color: #fff3cd;
+			border: 1px solid #ffeaa7;
+			border-radius: 8px;
+			padding: 15px;
+			margin: 10px 0;
+		}
+        
+		.hotspot-question h5 {
+			color: #856404;
+			margin-bottom: 10px;
+		}
+        
+		.drag-drop-question {
+			background-color: #d4edda;
+			border: 1px solid #c3e6cb;
+			border-radius: 8px;
+			padding: 15px;
+			margin: 10px 0;
+		}
+        
+		.drag-drop-question h5 {
+			color: #155724;
+			margin-bottom: 10px;
+		}
+
+		/* Yes/No Matrix */
+		.yn-matrix { display: grid; gap: 10px; margin: 10px 0; }
+		.yn-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; }
+		.yn-label { font-size: 14px; }
+		.yn-controls { display: flex; gap: 8px; }
+		.yn-btn { padding: 6px 10px; border: 1px solid #ccc; background: #fff; border-radius: 6px; cursor: pointer; }
+		.yn-btn.selected { border-color: #007bff; background: #e7f1ff; }
+		.yn-results { display: grid; gap: 6px; margin-top: 8px; }
+		.yn-result-row { display: flex; justify-content: space-between; font-size: 14px; }
+		.yn-result-row.ok .ans { color: #28a745; }
+		.yn-result-row.bad .ans { color: #dc3545; }
+
+		/* Exam Selection Styles */
+		.exam-selection {
+			display: flex;
+			gap: 20px;
+			justify-content: center;
+			margin: 30px 0;
+			flex-wrap: wrap;
+		}
+
+		.exam-card {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			border-radius: 16px;
+			padding: 30px;
+			color: white;
+			text-align: center;
+			cursor: pointer;
+			transition: transform 0.3s ease, box-shadow 0.3s ease;
+			min-width: 280px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.exam-card:hover {
+			transform: translateY(-8px);
+			box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+		}
+
+		.exam-card.ai900 {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		}
+
+		.exam-card.ai102 {
+			background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+		}
+
+		.exam-card::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(255,255,255,0.1);
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+
+		.exam-card:hover::before {
+			opacity: 1;
+		}
+
+		.exam-icon {
+			font-size: 48px;
+			margin-bottom: 15px;
+			display: block;
+		}
+
+		.exam-title {
+			font-size: 24px;
+			font-weight: bold;
+			margin-bottom: 8px;
+		}
+
+		.exam-subtitle {
+			font-size: 14px;
+			opacity: 0.9;
+			margin-bottom: 20px;
+		}
+
+		.exam-stats {
+			display: flex;
+			justify-content: space-around;
+			margin-top: 20px;
+		}
+
+		.exam-stat {
+			text-align: center;
+		}
+
+		.exam-stat-number {
+			font-size: 18px;
+			font-weight: bold;
+			display: block;
+		}
+
+		.exam-stat-label {
+			font-size: 12px;
+			opacity: 0.8;
+		}
+
+		.exam-badge {
+			position: absolute;
+			top: 15px;
+			right: 15px;
+			background: rgba(255,255,255,0.2);
+			padding: 5px 10px;
+			border-radius: 20px;
+			font-size: 12px;
+			font-weight: bold;
+		}
+
+		.current-exam-indicator {
+			background-color: #28a745;
+			color: white;
+			padding: 4px 12px;
+			border-radius: 12px;
+			font-size: 12px;
+			margin-left: 10px;
+			display: inline-block;
+		}
+
+		/* Import/No Exams Styles */
+		.no-exams-section {
+			text-align: center;
+			padding: 40px 20px;
+		}
+
+		.import-area {
+			max-width: 600px;
+			margin: 0 auto;
+		}
+
+		.import-icon {
+			font-size: 48px;
+			color: #6c757d;
+			margin-bottom: 20px;
+		}
+
+		.drop-zone {
+			border: 2px dashed #dee2e6;
+			border-radius: 12px;
+			padding: 40px 20px;
+			margin: 30px 0;
+			background: #f8f9fa;
+			transition: all 0.3s ease;
+			cursor: pointer;
+		}
+
+		.drop-zone:hover,
+		.drop-zone.dragover {
+			border-color: #007bff;
+			background: #e7f1ff;
+			transform: translateY(-2px);
+		}
+
+		.drop-zone i {
+			font-size: 36px;
+			color: #6c757d;
+			margin-bottom: 15px;
+		}
+
+		.drop-zone.dragover {
+			border-color: #28a745;
+			background: #d4edda;
+		}
+
+		.drop-zone.dragover i {
+			color: #28a745;
+		}
+
+		.import-instructions {
+			background: #f8f9fa;
+			border-radius: 8px;
+			padding: 20px;
+			margin-top: 30px;
+			text-align: left;
+		}
+
+		.import-instructions h4 {
+			margin-bottom: 15px;
+			color: #495057;
+		}
+
+		.import-instructions ol {
+			margin-bottom: 20px;
+		}
+
+		.import-instructions li {
+			margin-bottom: 8px;
+		}
+
+		/* Dynamic exam card variations */
+		.exam-card.custom {
+			background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+		}
+
+		.exam-card.loading {
+			opacity: 0.7;
+			pointer-events: none;
+		}
+
+		.exam-card .exam-delete {
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			background: rgba(220, 53, 69, 0.8);
+			border: none;
+			border-radius: 50%;
+			width: 30px;
+			height: 30px;
+			color: white;
+			cursor: pointer;
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+
+		.exam-card:hover .exam-delete {
+			opacity: 1;
+		}
+	</style>
+	<style>
+		/* Small tweak: show a hint for multi-select */
+		.multi-select-hint { font-size: 12px; color: #6c757d; margin-bottom: 8px; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<!-- Welcome Screen -->
+		<div id="welcome-screen" class="screen active">
+			<div class="theme-controls">
+				<button id="theme-toggle" class="theme-toggle" title="Toggle theme">
+					<i class="fas fa-moon"></i>
+				</button>
+			</div>
+			<section class="home-board">
+				<!-- Hero Header -->
+				<header class="hero-header">
+					<div class="hero-branding">
+						<div class="hero-pill">
+							<i class="fas fa-bolt"></i>
+							Multi-exam workspace
+						</div>
+						<div class="logo">
+							<i class="fas fa-graduation-cap"></i>
+							<h1>Exam Simulator Pro</h1>
+						</div>
+						<p class="hero-subtitle">Import exams, create questions, and track your progress with professional tools.</p>
+					</div>
+					<div class="hero-stats">
+						<div class="stat-card">
+							<i class="fas fa-layer-group stat-icon"></i>
+							<div class="stat-content">
+								<span class="stat-value" id="active-exams-count">0</span>
+								<span class="stat-label">Active Exams</span>
+							</div>
+						</div>
+						<div class="stat-card">
+							<i class="fas fa-question-circle stat-icon"></i>
+							<div class="stat-content">
+								<span class="stat-value" id="total-questions-count">0</span>
+								<span class="stat-label">Questions</span>
+							</div>
+						</div>
+						<div class="stat-card">
+							<i class="fas fa-images stat-icon"></i>
+							<div class="stat-content">
+								<span class="stat-value" id="image-support-flag" class="metric-chip">Auto-detecting</span>
+								<span class="stat-label">Image Support</span>
+							</div>
+						</div>
+					</div>
+				</header>
+
+				<!-- Quick Actions Bar -->
+				<div class="quick-actions">
+					<button id="hero-import-btn" class="action-btn primary" type="button">
+						<i class="fas fa-cloud-arrow-up"></i>
+						<span>Import Exam</span>
+					</button>
+					<a href="editor.html" class="action-btn secondary">
+						<i class="fas fa-pen-ruler"></i>
+						<span>Question Editor</span>
+					</a>
+					<button id="hero-view-progress" class="action-btn ghost" type="button">
+						<i class="fas fa-chart-line"></i>
+						<span>View Progress</span>
+					</button>
+					<button id="hero-manage-exams" class="action-btn ghost" type="button">
+						<i class="fas fa-sliders-h"></i>
+						<span>Manage Exams</span>
+					</button>
+				</div>
+
+				<!-- Main Content Grid -->
+				<div class="content-grid">
+					<div class="main-content">
+						<!-- Exam Library -->
+						<section class="exam-library-section">
+							<div class="section-header">
+								<div>
+									<h2><i class="fas fa-layer-group"></i> Exam Library</h2>
+									<p class="section-subtitle">Select an exam to start practicing</p>
+								</div>
+								<button id="add-exam-btn" class="btn-add-exam" type="button">
+									<i class="fas fa-plus-circle"></i>
+									<span>Add Exam</span>
+								</button>
+							</div>
+							<div id="exam-selection" class="exam-grid"></div>
+						</section>
+
+						<!-- Exam Details Placeholder -->
+						<div id="exam-details-placeholder" class="exam-details-placeholder">
+							<div class="exam-details-header">
+								<div class="exam-details-title-area">
+									<h2>
+										<span id="details-exam-name">AI-900</span>
+										<span class="current-exam-indicator">Selected</span>
+									</h2>
+									<p id="details-exam-subtitle">Microsoft Azure AI Fundamentals</p>
+								</div>
+								<div class="exam-details-actions">
+									<button id="btn-close-details" class="btn-close-details">
+										<i class="fas fa-times"></i>
+										<span>Close</span>
+									</button>
+								</div>
+							</div>
+							
+							<div class="exam-details-content">
+								<!-- Info Cards Section -->
+								<div class="exam-details-section">
+									<h3><i class="fas fa-info-circle"></i> Exam Information</h3>
+									<div class="info-card-container">
+										<div class="info-card">
+											<i class="fas fa-clock"></i>
+											<span id="details-exam-duration">45 minutes</span>
+											<small>Duration</small>
+										</div>
+										<div class="info-card">
+											<i class="fas fa-question-circle"></i>
+											<span id="details-exam-questions">45 questions</span>
+											<small>Questions</small>
+										</div>
+										<div class="info-card">
+											<i class="fas fa-trophy"></i>
+											<span id="details-exam-pass-score">75%</span>
+											<small>Pass Score</small>
+										</div>
+										<div class="info-card">
+											<i class="fas fa-images"></i>
+											<span id="details-exam-images">With Images</span>
+											<small>Visual Content</small>
+										</div>
+									</div>
+								</div>
+
+								<!-- Progress Section -->
+								<div class="exam-details-section">
+									<h3><i class="fas fa-chart-line"></i> Your Progress</h3>
+									<div class="progress-summary">
+										<div class="progress-item">
+											<span class="progress-label">Attempts</span>
+											<span id="details-total-attempts" class="progress-value">0</span>
+										</div>
+										<div class="progress-item">
+											<span class="progress-label">Best Score</span>
+											<span id="details-best-score" class="progress-value">—</span>
+										</div>
+										<div class="progress-item">
+											<span class="progress-label">Pass Rate</span>
+											<span id="details-pass-rate" class="progress-value">—</span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Modules Section (if available) -->
+								<div id="details-modules-section" class="exam-details-section modules-and-resources" style="display: none;">
+									<h3><i class="fas fa-graduation-cap"></i> Exam Coverage</h3>
+									<div class="modules-resources-grid">
+										<div class="modules-section">
+											<h4>Covered Modules:</h4>
+											<ul id="details-modules-list" class="modules-list"></ul>
+										</div>
+										<div class="resources-section">
+											<h4>Study Resources:</h4>
+											<div id="details-resources-list" class="resources-compact"></div>
+										</div>
+									</div>
+								</div>
+
+								<!-- Start Exam Button -->
+								<div class="exam-details-section full-width start-exam-cta">
+									<button id="details-start-exam" class="btn-start-exam">
+										<i class="fas fa-play"></i>
+										<span>Start Exam</span>
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- No Exams Fallback -->
+						<div id="no-exams-section" class="no-exams-section" style="display: none;">
+							<div class="empty-state">
+								<div class="empty-icon">
+									<i class="fas fa-inbox"></i>
+								</div>
+								<h3>No exams yet</h3>
+								<p>Import exam packs or create your own to get started</p>
+								<div id="drop-zone" class="drop-zone-simple">
+									<i class="fas fa-cloud-upload-alt"></i>
+									<p>Drop files here or click to browse</p>
+									<button id="browse-files" class="btn-import">
+										<i class="fas fa-folder-open"></i>
+										<span>Browse Files</span>
+									</button>
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+					<!-- Sidebar - Hidden in new layout -->
+					<aside class="sidebar" style="display: none;">
+						<!-- Preview Card -->
+						<div class="preview-card" id="hero-preview">
+							<div class="preview-header">
+								<span class="status-badge" id="preview-status-pill">
+									<i class="fas fa-hourglass-half"></i>
+									Waiting
+								</span>
+							</div>
+							<h3 id="preview-exam-name">Ready to practice</h3>
+							<p id="preview-exam-subtitle" class="preview-subtitle">Select an exam to track progress</p>
+							
+							<div class="preview-stats">
+								<div class="preview-stat">
+									<span class="stat-label">Last Score</span>
+									<span class="stat-number" id="preview-last-score">—</span>
+									<small id="preview-last-date">No attempts</small>
+								</div>
+								<div class="preview-stat">
+									<span class="stat-label">Best</span>
+									<span class="stat-number" id="preview-best-score">—</span>
+									<small id="preview-best-exam">—</small>
+								</div>
+								<div class="preview-stat">
+									<span class="stat-label">Avg Time</span>
+									<span class="stat-number" id="preview-time-spent">—</span>
+									<small id="preview-pass-rate">—</small>
+								</div>
+							</div>
+							
+							<div class="preview-tags" id="preview-highlights">
+								<span class="tag">Import to begin</span>
+								<span class="tag">Track progress</span>
+								<span class="tag">Detailed stats</span>
+							</div>
+							
+							<button id="preview-action-btn" class="preview-action-btn" type="button">
+								<i class="fas fa-compass"></i>
+								<span>Browse Library</span>
+							</button>
+						</div>
+
+						<!-- Current Exam Info -->
+						<div id="current-exam-info" class="exam-info-card" style="display: none;">
+							<h3>Current Exam: <span id="current-exam-name">AI-900</span> 
+								<span class="current-exam-indicator">Selected</span>
+							</h3>
+							<div class="info-card-container">
+								<div class="info-card">
+									<i class="fas fa-clock"></i>
+									<span id="exam-duration">45 minutes</span>
+									<small>Exam duration</small>
+								</div>
+								<div class="info-card">
+									<i class="fas fa-question-circle"></i>
+									<span id="exam-questions">45 questions</span>
+									<small>Number of questions</small>
+								</div>
+								<div class="info-card">
+									<i class="fas fa-trophy"></i>
+									<span id="exam-pass-score">75%</span>
+									<small>Passing score</small>
+								</div>
+								<div class="info-card">
+									<i class="fas fa-images"></i>
+									<span id="exam-images">With Images</span>
+									<small>Visual content</small>
+								</div>
+							</div>
+						</div>
+
+						<div class="start-exam-cta" style="display: none;">
+							<button id="start-exam" class="btn btn-primary btn-start-exam">
+								<i class="fas fa-play"></i> 
+								<span>Start Exam</span>
+							</button>
+						</div>
+
+						<div id="modules-section" class="modules-and-resources" style="display: none;">
+							<h3><i class="fas fa-graduation-cap"></i> Exam Coverage & Study Resources</h3>
+							<div class="modules-resources-grid">
+								<div class="modules-section">
+									<h4>Covered Modules:</h4>
+									<ul id="modules-list" class="modules-list"></ul>
+								</div>
+								<div class="resources-section">
+									<h4>Study Resources:</h4>
+									<div id="resources-list" class="resources-compact"></div>
+								</div>
+							</div>
+						</div>
+
+						<div id="home-progress-section" class="progress-section">
+							<h3><i class="fas fa-chart-line"></i> Your Progress</h3>
+							<div id="progress-summary" class="progress-summary">
+								<div class="progress-item">
+									<span class="progress-label">Total Attempts</span>
+									<span id="total-attempts" class="progress-value">0</span>
+								</div>
+								<div class="progress-item">
+									<span class="progress-label">Best Score</span>
+									<span id="best-score" class="progress-value">-</span>
+								</div>
+								<div class="progress-item">
+									<span class="progress-label">Pass Rate</span>
+									<span id="pass-rate" class="progress-value">-</span>
+								</div>
+							</div>
+							<div class="progress-actions">
+								<button id="view-progress" class="btn-progress" onclick="showProgressStatistics()">
+									<i class="fas fa-chart-bar"></i> View Detailed Stats
+								</button>
+								<button id="export-progress" class="btn-progress" onclick="exportProgress()">
+									<i class="fas fa-download"></i> Export Progress
+								</button>
+							</div>
+						</div>
+
+						<div class="exam-management-buttons">
+							<button id="manage-exams-btn" class="btn-outline-sm">
+								<i class="fas fa-cog"></i> Manage Exams
+							</button>
+							<a href="editor.html" class="btn-outline-sm">
+								<i class="fas fa-edit"></i> Question Editor
+							</a>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- Exam Screen -->
+		<div id="exam-screen" class="screen">
+			<div class="theme-controls">
+				<button class="theme-toggle" title="Toggle theme">
+					<i class="fas fa-moon theme-icon"></i>
+				</button>
+			</div>
+			<div class="exam-header">
+				<div class="exam-info-header">
+					<span id="current-exam-badge" class="exam-badge">AI-900</span>
+					<button id="switch-exam" class="btn btn-outline-sm">
+						<i class="fas fa-exchange-alt"></i> Switch Exam
+					</button>
+				</div>
+				<div class="exam-progress">
+					<div class="progress-bar">
+						<div id="progress-fill" class="progress-fill"></div>
+					</div>
+					<span id="question-counter">1 / 50</span>
+				</div>
+				<div class="exam-timer">
+					<i class="fas fa-clock"></i>
+					<span id="timer">45:00</span>
+				</div>
+			</div>
+
+			<div class="question-container">
+				<div id="question-number" class="question-number">Question 1</div>
+                
+				<!-- Question Type Indicator -->
+				<div id="question-type-indicator" class="question-type-indicator" style="display: none;">
+					<i class="fas fa-info-circle"></i>
+					<span id="question-type-text">Drag & Drop Question</span>
+				</div>
+                
+				<div id="question-text" class="question-text"></div>
+                
+				<!-- Question Images Container -->
+				<div id="question-images" class="question-images-container"></div>
+                
+				<div id="options-container" class="options-container"></div>
+                
+				<div class="question-controls">
+					<button id="mark-review-btn" class="btn btn-outline">
+						<i class="fas fa-flag"></i> Mark for Review
+					</button>
+					<button id="show-answer-btn" class="btn btn-info">
+						<i class="fas fa-lightbulb"></i> Show Answer
+					</button>
+				</div>
+                
+				<div id="answer-feedback" class="answer-feedback" style="display: none;">
+					<div class="feedback-header">
+						<span class="feedback-status"></span>
+						<button id="close-feedback" class="close-feedback">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+					<div class="feedback-content">
+						<div class="correct-answer"></div>
+						<div class="explanation"></div>
+						<!-- Explanation Images Container -->
+						<div id="explanation-images" class="explanation-images-container"></div>
+					</div>
+				</div>
+                
+				<div class="navigation-buttons">
+					<button id="prev-btn" class="btn btn-secondary" disabled>
+						<i class="fas fa-arrow-left"></i> Previous
+					</button>
+					<button id="next-btn" class="btn btn-primary">
+						Next <i class="fas fa-arrow-right"></i>
+					</button>
+				</div>
+			</div>
+
+			<button id="finish-exam" class="btn btn-warning finish-btn" style="display: none;">
+				<i class="fas fa-check"></i> Finish Exam
+			</button>
+		</div>
+
+		<!-- Results Screen (same as before, but with dynamic exam name) -->
+		<div id="results-screen" class="screen">
+			<div class="theme-controls">
+				<button class="theme-toggle" title="Toggle theme">
+					<i class="fas fa-moon theme-icon"></i>
+				</button>
+			</div>
+            
+			<div class="results-container">
+				<!-- Hero Results Section -->
+				<div class="results-hero">
+					<div class="results-icon">
+						<div id="result-status-icon" class="status-icon">
+							<i class="fas fa-check-circle"></i>
+						</div>
+					</div>
+					<div id="result-status" class="result-status">PASSED</div>
+					<div class="result-subtitle">Congratulations! You have successfully completed the exam.</div>
+					<div class="main-score">
+						<span id="percentage-score" class="score-percentage">85%</span>
+						<span class="score-label">Final Score</span>
+					</div>
+					<div id="exam-name-result" class="exam-name-badge">AI-900</div>
+				</div>
+
+				<!-- Performance Dashboard -->
+				<div class="performance-dashboard">
+					<h3 class="dashboard-title">
+						<i class="fas fa-chart-line"></i>
+						Performance Overview
+					</h3>
+                    
+					<div class="stats-grid-modern">
+						<div class="stat-card-modern correct">
+							<div class="stat-icon">
+								<i class="fas fa-check-circle"></i>
+							</div>
+							<div class="stat-content">
+								<span id="correct-count" class="stat-number">0</span>
+								<span class="stat-label">Correct Answers</span>
+								<div class="stat-bar">
+									<div id="correct-progress" class="stat-progress correct-progress"></div>
+								</div>
+							</div>
+						</div>
+                        
+						<div class="stat-card-modern incorrect">
+							<div class="stat-icon">
+								<i class="fas fa-times-circle"></i>
+							</div>
+							<div class="stat-content">
+								<span id="incorrect-count" class="stat-number">0</span>
+								<span class="stat-label">Incorrect Answers</span>
+								<div class="stat-bar">
+									<div id="incorrect-progress" class="stat-progress incorrect-progress"></div>
+								</div>
+							</div>
+						</div>
+                        
+						<div class="stat-card-modern time">
+							<div class="stat-icon">
+								<i class="fas fa-stopwatch"></i>
+							</div>
+							<div class="stat-content">
+								<span id="time-spent" class="stat-number">25min</span>
+								<span class="stat-label">Time Taken</span>
+								<div class="time-indicator">
+									<span class="time-remaining">20min saved</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Module Performance -->
+				<div class="module-performance">
+					<h3 class="section-title">
+						<i class="fas fa-brain"></i>
+						Module Performance
+					</h3>
+					<div id="module-stats" class="module-stats-grid"></div>
+				</div>
+
+				<!-- Action Buttons -->
+				<div class="results-actions-modern">
+					<button id="restart-exam" class="action-btn restart-btn">
+						<div class="btn-icon">
+							<i class="fas fa-redo-alt"></i>
+						</div>
+						<div class="btn-content">
+							<span class="btn-title">Retake Exam</span>
+							<span class="btn-subtitle">Try again with new questions</span>
+						</div>
+					</button>
+                    
+					<button id="back-to-home" class="action-btn home-btn">
+						<div class="btn-icon">
+							<i class="fas fa-home"></i>
+						</div>
+						<div class="btn-content">
+							<span class="btn-title">Back to Home</span>
+							<span class="btn-subtitle">Return to exam selection</span>
+						</div>
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Exam Config Modal -->
+		<div id="exam-config-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:10000;align-items:center;justify-content:center;">
+			<div style="background:white;border-radius:12px;max-width:600px;width:90%;max-height:80vh;overflow:auto;padding:30px;position:relative;">
+				<button id="close-config-modal" style="position:absolute;top:15px;right:15px;background:transparent;border:none;font-size:24px;cursor:pointer;color:#666;">&times;</button>
+
+				<h2 style="margin-top:0;"><i class="fas fa-cog"></i> Manage Exams</h2>
+				<p style="color:#666;margin-bottom:20px;">Activate or deactivate exams. Deactivated exams remain in your folder but won't appear on the homepage.</p>
+
+				<div id="exam-config-list" style="display:grid;gap:12px;">
+					<!-- Will be populated dynamically -->
+				</div>
+
+				<div style="margin-top:25px;padding-top:20px;border-top:1px solid #eee;">
+					<p style="font-size:12px;color:#999;margin:0;">
+						<i class="fas fa-info-circle"></i> <strong>Hidden</strong> exams remain in storage. <strong>Remove</strong> deletes all data including images and progress.
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Import Progress Modal -->
+	<div id="import-progress-modal">
+		<div class="import-progress-content">
+			<div class="import-progress-icon">
+				<i class="fas fa-cloud-upload-alt"></i>
+			</div>
+			<div class="import-progress-title" id="import-progress-title">Importing Exam...</div>
+			<div class="import-progress-subtitle" id="import-progress-subtitle">Please wait while we process your files</div>
+			<div class="import-progress-bar-container">
+				<div class="import-progress-bar" id="import-progress-bar" style="width: 0%"></div>
+			</div>
+			<div class="import-progress-stats">
+				<span class="import-progress-percentage" id="import-progress-percentage">0%</span>
+				<span class="import-progress-count" id="import-progress-count">0 / 0 images</span>
+			</div>
+		</div>
+	</div>
+
+	<!-- Scripts -->
+	<script src="image-storage.js"></script>
+	<script src="image-loader.js"></script>
+	<script src="exam-manager.js"></script>
+	<script src="exam-loader.js"></script>
+
+	<script src="script-multi-exam.js"></script>
+		<script>
+			// Dynamic Home Page Management
+			class HomePage {
+				constructor() {
+					this.examSelection = document.getElementById('exam-selection');
+					this.noExamsSection = document.getElementById('no-exams-section');
+					this.dropZone = document.getElementById('drop-zone');
+					this.browseButton = document.getElementById('browse-files');
+					this.fileInput = null;
+					this.currentExamInfo = document.getElementById('current-exam-info');
+					this.startExamCta = document.querySelector('.start-exam-cta');
+					this.modulesSection = document.getElementById('modules-section');
+					this.modulesList = document.getElementById('modules-list');
+					this.resourcesList = document.getElementById('resources-list');
+					this.heroImportBtn = document.getElementById('hero-import-btn');
+					this.addExamBtn = document.getElementById('add-exam-btn');
+					this.heroViewProgressBtn = document.getElementById('hero-view-progress');
+					this.heroManageExamsBtn = document.getElementById('hero-manage-exams');
+					this.previewActionBtn = document.getElementById('preview-action-btn');
+					this.previewActionLabel = this.previewActionBtn?.querySelector('span');
+					this.previewExamName = document.getElementById('preview-exam-name');
+					this.previewSubtitle = document.getElementById('preview-exam-subtitle');
+					this.previewStatusPill = document.getElementById('preview-status-pill');
+					this.previewLastScore = document.getElementById('preview-last-score');
+					this.previewLastDate = document.getElementById('preview-last-date');
+					this.previewBestScore = document.getElementById('preview-best-score');
+					this.previewBestExam = document.getElementById('preview-best-exam');
+					this.previewTimeSpent = document.getElementById('preview-time-spent');
+					this.previewPassRate = document.getElementById('preview-pass-rate');
+					this.previewHighlights = document.getElementById('preview-highlights');
+					this.activeExamsCount = document.getElementById('active-exams-count');
+					this.totalQuestionsCount = document.getElementById('total-questions-count');
+					this.imageSupportFlag = document.getElementById('image-support-flag');
+					this.selectedExamId = null;
+					this.availableExams = new Map();
+
+					this.init();
+				}
+
+				async init() {
+					await this.loadAvailableExams();
+					this.setupEventListeners();
+					this.setupConfigModal();
+					this.refreshHeroPreview();
+				}
+
+				async loadAvailableExams() {
+					try {
+						const exams = await window.examManager.detectAvailableExams();
+						this.availableExams = exams;
+						console.log('Detected exams:', exams.size, 'exams');
+						console.log('Exam IDs:', Array.from(exams.keys()));
+						console.log('All window.userExams:', window.userExams ? Object.keys(window.userExams) : []);
+						console.log('Active exams:', window.examManager.getActiveExamIds());
+						this.renderExamCards(exams);
+						this.updateHeroStats(exams);
+						if (this.selectedExamId && !exams.has(this.selectedExamId)) {
+							this.selectedExamId = null;
+						}
+						this.refreshHeroPreview();
+					} catch (error) {
+						console.error('Failed to load exams:', error);
+						this.showNoExamsSection();
+						this.updateHeroStats(new Map());
+					}
+				}
+
+				renderExamCards(exams) {
+					if (exams.size === 0) {
+						this.showNoExamsSection();
+						return;
+					}
+
+					// Hide "No Exams" section and show exam cards
+					this.hideNoExamsSection();
+					this.examSelection.innerHTML = '';
+
+					exams.forEach((examData, examId) => {
+						const card = this.createExamCard(examId, examData);
+						this.examSelection.appendChild(card);
+					});
+
+					// Show compact import button when exams exist
+					this.showCompactImportButton();
+				}
+
+				updateHeroStats(exams) {
+					const activeCount = exams.size;
+					let totalQuestions = 0;
+					let hasImages = false;
+
+					exams.forEach((examData) => {
+						const metadata = examData.metadata || {};
+						totalQuestions += metadata.questionCount || metadata.totalQuestions || 0;
+						if (examData.hasImages) {
+							hasImages = true;
+						}
+					});
+
+					if (this.activeExamsCount) {
+						this.activeExamsCount.textContent = activeCount;
+					}
+					if (this.totalQuestionsCount) {
+						this.totalQuestionsCount.textContent = totalQuestions || '—';
+					}
+					if (this.imageSupportFlag) {
+						this.imageSupportFlag.textContent = hasImages ? 'Images detected' : 'Auto-detecting';
+						this.imageSupportFlag.classList.toggle('has-images', hasImages);
+					}
+				}
+
+				createExamCard(examId, examData) {
+					const metadata = examData.metadata;
+					const questionCount = metadata.questionCount || 45;
+					const totalQuestions = metadata.totalQuestions || questionCount;
+
+					const card = document.createElement('div');
+					card.className = `exam-card ${this.getCardClass(examId)}`;
+					card.dataset.exam = examId;
+
+					card.innerHTML = `
+						<button class="exam-delete" onclick="homepage.deactivateExam('${examId}')" title="Hide exam">
+							<i class="fas fa-eye-slash"></i>
+						</button>
+						<div class="exam-badge">${metadata.badge || 'Custom'}</div>
+						<i class="${metadata.icon || 'fas fa-book'} exam-icon"></i>
+						<div class="exam-title">${metadata.name || examId.toUpperCase()}</div>
+						<div class="exam-subtitle">${metadata.fullName || 'Custom Exam'}</div>
+						<div class="exam-stats">
+							<div class="exam-stat">
+								<span class="exam-stat-number">${questionCount}</span>
+								<span class="exam-stat-label">Questions</span>
+							</div>
+							<div class="exam-stat">
+								<span class="exam-stat-number">${metadata.duration || 45}</span>
+								<span class="exam-stat-label">Minutes</span>
+							</div>
+							<div class="exam-stat">
+								<span class="exam-stat-number">${metadata.passScore || 75}%</span>
+								<span class="exam-stat-label">Pass Score</span>
+							</div>
+						</div>
+						${totalQuestions > questionCount ? `<div class="exam-total-info">From ${totalQuestions} total questions</div>` : ''}
+						${examData.hasImages ? '<div class="exam-feature"><i class="fas fa-images"></i> With Images</div>' : ''}
+					`;
+
+					card.addEventListener('click', (e) => {
+						if (!e.target.closest('.exam-delete')) {
+							this.selectExam(examId);
+						}
+					});
+
+					return card;
+				}
+
+				getCardClass(examId) {
+					if (examId.includes('900')) return 'ai900';
+					if (examId.includes('102')) return 'ai102';
+					return 'custom';
+				}
+
+				selectExam(examId) {
+					// Update the global exam simulator with the selected exam
+					if (window.examSimulator) {
+						window.examSimulator.currentExam = examId;
+
+						// Load exam data into the simulator
+						const examData = window.examManager.getExam(examId);
+						if (examData) {
+							window.examSimulator.examData[examId] = {
+								name: examData.metadata.name,
+								fullName: examData.metadata.fullName,
+								duration: examData.metadata.duration,
+								questionCount: examData.metadata.questionCount,
+								passScore: examData.metadata.passScore,
+								questions: examData.questions,
+								modules: examData.metadata.modules || []
+							};
+						}
+
+						this.selectedExamId = examId;
+						this.highlightSelectedCard(examId);
+						this.showExamDetailsPlaceholder(examId);
+						this.refreshHeroPreview();
+					}
+				}
+
+				showExamInfo(examId) {
+					const examData = window.examManager.getExam(examId);
+					if (!examData) return;
+					const metadata = examData.metadata || {};
+
+					const durationEl = document.getElementById('exam-duration');
+					const questionsEl = document.getElementById('exam-questions');
+					const passScoreEl = document.getElementById('exam-pass-score');
+					const imagesEl = document.getElementById('exam-images');
+
+					document.getElementById('current-exam-name').textContent = metadata.name || examId.toUpperCase();
+					if (durationEl) durationEl.textContent = `${metadata.duration || 45} minutes`;
+					if (questionsEl) questionsEl.textContent = `${metadata.questionCount || examData.questions.length} questions`;
+					if (passScoreEl) passScoreEl.textContent = `${metadata.passScore || 70}%`;
+					if (imagesEl) {
+						imagesEl.textContent = examData.hasImages ? 'Includes images' : 'No images detected';
+						imagesEl.classList.toggle('has-images', !!examData.hasImages);
+					}
+
+					if (this.currentExamInfo) this.currentExamInfo.style.display = 'block';
+					if (this.startExamCta) this.startExamCta.style.display = 'block';
+
+					this.renderModules(metadata.modules);
+					this.renderResources(metadata.resources);
+				}
+
+				renderModules(modules) {
+					if (!this.modulesSection || !this.modulesList) return;
+					if (Array.isArray(modules) && modules.length > 0) {
+						this.modulesSection.style.display = 'block';
+						this.modulesList.innerHTML = modules.map(module => {
+							if (typeof module === 'string') {
+								return `<li><i class="fas fa-check-circle"></i> ${module}</li>`;
+							}
+							const icon = module.icon || 'fas fa-check-circle';
+							const name = module.name || module;
+							return `<li><i class="${icon}"></i> ${name}</li>`;
+						}).join('');
+					} else {
+						this.modulesSection.style.display = 'none';
+						this.modulesList.innerHTML = '';
+					}
+				}
+
+				renderResources(resources) {
+					if (!this.resourcesList) return;
+					if (Array.isArray(resources) && resources.length > 0) {
+						this.resourcesList.innerHTML = resources.map(resource => {
+							const icon = resource.icon || 'fas fa-link';
+							const name = resource.name || 'Reference';
+							const url = resource.url || '#';
+							return `<a href="${url}" target="_blank" rel="noopener" class="resource-link"><i class="${icon}"></i> ${name}</a>`;
+						}).join('');
+					} else {
+						this.resourcesList.innerHTML = '<p class="muted">Add resource links in metadata to show quick shortcuts.</p>';
+					}
+				}
+
+				highlightSelectedCard(examId) {
+					document.querySelectorAll('.exam-card').forEach(card => {
+						card.classList.toggle('selected', card.dataset.exam === examId);
+					});
+				}
+
+				showExamDetailsPlaceholder(examId) {
+					const examData = window.examManager.getExam(examId);
+					if (!examData) return;
+					
+					const metadata = examData.metadata || {};
+					const stats = this.getProgressStats(examId);
+					const placeholder = document.getElementById('exam-details-placeholder');
+					
+					// Populate details
+					document.getElementById('details-exam-name').textContent = metadata.name || examId.toUpperCase();
+					document.getElementById('details-exam-subtitle').textContent = metadata.fullName || 'Practice exam';
+					document.getElementById('details-exam-duration').textContent = `${metadata.duration || 45} min`;
+					document.getElementById('details-exam-questions').textContent = `${metadata.questionCount || examData.questions.length}`;
+					document.getElementById('details-exam-pass-score').textContent = `${metadata.passScore || 70}%`;
+					document.getElementById('details-exam-images').textContent = examData.hasImages ? 'Yes' : 'No';
+					
+					// Populate progress
+					document.getElementById('details-total-attempts').textContent = stats?.attempts || 0;
+					document.getElementById('details-best-score').textContent = stats?.bestScore ? `${stats.bestScore}%` : '—';
+					document.getElementById('details-pass-rate').textContent = stats?.passRate != null ? `${stats.passRate}%` : '—';
+					
+					// Populate modules and resources
+					const modulesSection = document.getElementById('details-modules-section');
+					const modulesList = document.getElementById('details-modules-list');
+					const resourcesList = document.getElementById('details-resources-list');
+					
+					if (metadata.modules && metadata.modules.length > 0) {
+						modulesSection.style.display = 'block';
+						modulesList.innerHTML = metadata.modules.map(module => {
+							if (typeof module === 'string') {
+								return `<li>${module}</li>`;
+							}
+							return `<li>${module.name || module}</li>`;
+						}).join('');
+						
+						if (metadata.resources && metadata.resources.length > 0) {
+							resourcesList.innerHTML = metadata.resources.map(resource => {
+								const icon = resource.icon || 'fas fa-link';
+								const name = resource.name || 'Reference';
+								const url = resource.url || '#';
+								return `<a href="${url}" target="_blank" rel="noopener"><i class="${icon}"></i> ${name}</a>`;
+							}).join('');
+						} else {
+							resourcesList.innerHTML = '<p style="color:#999;font-size:0.9rem;">No resources available</p>';
+						}
+					} else {
+						modulesSection.style.display = 'none';
+					}
+					
+					// Setup start button
+					const startBtn = document.getElementById('details-start-exam');
+					startBtn.onclick = () => {
+						document.getElementById('start-exam')?.click();
+					};
+					
+					// Setup close button
+					const closeBtn = document.getElementById('btn-close-details');
+					closeBtn.onclick = () => {
+						placeholder.classList.remove('visible');
+					};
+					
+					// Show placeholder and scroll
+					placeholder.classList.add('visible');
+					setTimeout(() => {
+						placeholder.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					}, 100);
+				}
+
+				handlePreviewAction() {
+					if (this.selectedExamId) {
+						document.getElementById('start-exam')?.click();
+					} else {
+						this.scrollToExamLibrary();
+					}
+				}
+
+				scrollToExamLibrary() {
+					const library = document.querySelector('.exam-library');
+					if (library) {
+						library.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					}
+				}
+
+				refreshHeroPreview() {
+					if (!this.previewExamName) return;
+					const fallbackExamId = this.getMostRecentExamWithProgress();
+					const examId = this.selectedExamId || fallbackExamId;
+					const examData = examId ? (this.availableExams.get(examId) || window.examManager.getExam(examId)) : null;
+					const metadata = examData?.metadata || {};
+					const stats = examId ? this.getProgressStats(examId) : null;
+
+					if (examData) {
+						this.previewExamName.textContent = metadata.name || examId.toUpperCase();
+						this.previewSubtitle.textContent = metadata.fullName || 'Ready when you are.';
+						if (stats) {
+							this.previewLastScore.textContent = `${stats.lastScore}%`;
+							this.previewLastDate.textContent = stats.lastDate ? `Last attempt ${this.formatRelativeDate(stats.lastDate)}` : 'Recent attempt';
+							this.previewBestScore.textContent = stats.bestScore ? `${stats.bestScore}%` : '—';
+							this.previewBestExam.textContent = `${stats.attempts} attempt${stats.attempts === 1 ? '' : 's'}`;
+							this.previewTimeSpent.textContent = this.formatDuration(stats.avgTime);
+							this.previewPassRate.textContent = stats.passRate != null ? `Pass rate ${stats.passRate}%` : 'Pass rate —';
+							if (this.previewStatusPill) {
+								this.previewStatusPill.innerHTML = stats.passRate >= 70 ? '<i class="fas fa-check"></i> On track' : '<i class="fas fa-flag"></i> Keep practicing';
+								this.previewStatusPill.classList.toggle('success', stats.passRate >= 70);
+								this.previewStatusPill.classList.toggle('warning', stats.passRate >= 70 ? false : !!stats.attempts);
+							}
+						} else {
+							this.previewLastScore.textContent = '—';
+							this.previewLastDate.textContent = 'No attempts yet';
+							this.previewBestScore.textContent = '—';
+							this.previewBestExam.textContent = 'No sessions yet';
+							this.previewTimeSpent.textContent = '—';
+							this.previewPassRate.textContent = 'Pass rate —';
+							if (this.previewStatusPill) {
+								this.previewStatusPill.classList.remove('success', 'warning');
+								this.previewStatusPill.innerHTML = '<i class="fas fa-hourglass-half"></i> Waiting for attempts';
+							}
+						}
+						this.updatePreviewHighlights(metadata, examData);
+					} else {
+						this.previewExamName.textContent = 'You\'re ready to practice';
+						this.previewSubtitle.textContent = 'Import an exam pack or open the editor to get started.';
+						this.previewLastScore.textContent = '—';
+						this.previewLastDate.textContent = 'No attempts yet';
+						this.previewBestScore.textContent = '—';
+						this.previewBestExam.textContent = '—';
+						this.previewTimeSpent.textContent = '—';
+						this.previewPassRate.textContent = 'Pass rate —';
+						if (this.previewStatusPill) {
+							this.previewStatusPill.classList.remove('success', 'warning');
+							this.previewStatusPill.innerHTML = '<i class="fas fa-hourglass-half"></i> Waiting for attempts';
+						}
+						if (this.previewHighlights) {
+							this.previewHighlights.innerHTML = '<span class="flag-chip">Import exams to begin</span><span class="flag-chip">Track progress per exam</span><span class="flag-chip">Detailed analysis unlocked</span>';
+						}
+					}
+
+					if (this.previewActionLabel) {
+						this.previewActionLabel.textContent = this.selectedExamId ? 'Start practice now' : 'Browse exam library';
+					}
+				}
+
+				updatePreviewHighlights(metadata, examData) {
+					if (!this.previewHighlights) return;
+					const chips = [];
+					const questionCount = metadata.questionCount || examData?.questions?.length;
+					const duration = metadata.duration || 0;
+					if (questionCount) chips.push(`${questionCount} questions`);
+					if (duration) chips.push(`${duration} minutes`);
+					if (metadata.modules?.length) chips.push(`${metadata.modules.length} modules`);
+					if (examData?.hasImages) chips.push('Includes images');
+					if (chips.length === 0) chips.push('Import data to unlock stats');
+					this.previewHighlights.innerHTML = chips.map(chip => `<span class="flag-chip">${chip}</span>`).join('');
+				}
+
+				getProgressStats(examId) {
+					try {
+						const raw = localStorage.getItem(`${examId}_progress`);
+						if (!raw) return null;
+						const progress = JSON.parse(raw);
+						if (!progress?.attempts?.length) return null;
+						const attempts = progress.attempts;
+						const lastAttempt = attempts[attempts.length - 1];
+						const avgTime = attempts.reduce((sum, attempt) => sum + (attempt.timeSpent || 0), 0) / attempts.length;
+						const passRate = attempts.length ? Math.round(((progress.totalPassed || 0) / attempts.length) * 100) : null;
+						return {
+							attempts: attempts.length,
+							lastScore: lastAttempt.score,
+							lastDate: lastAttempt.date,
+							bestScore: progress.bestScore || lastAttempt.score,
+							avgTime,
+							passRate
+						};
+					} catch (error) {
+						console.warn('Failed to parse progress stats for', examId, error);
+						return null;
+					}
+				}
+
+				getMostRecentExamWithProgress() {
+					let latestExamId = null;
+					let latestDate = 0;
+
+					for (let i = 0; i < localStorage.length; i++) {
+						const key = localStorage.key(i);
+						if (key && key.endsWith('_progress')) {
+							try {
+								const progress = JSON.parse(localStorage.getItem(key));
+								const attempts = progress?.attempts;
+								if (attempts && attempts.length) {
+									const lastDate = new Date(attempts[attempts.length - 1].date).getTime();
+									if (lastDate > latestDate) {
+										latestDate = lastDate;
+										latestExamId = key.replace('_progress', '');
+									}
+								}
+							} catch (error) {
+								// ignore invalid entries
+							}
+						}
+					}
+
+					return latestExamId;
+				}
+
+				formatRelativeDate(dateString) {
+					if (!dateString) return '';
+					const date = new Date(dateString);
+					if (Number.isNaN(date.getTime())) return '';
+					const diffMs = Date.now() - date.getTime();
+					const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+					if (diffDays <= 0) return 'today';
+					if (diffDays === 1) return 'yesterday';
+					if (diffDays < 7) return `${diffDays} days ago`;
+					return date.toLocaleDateString();
+				}
+
+				formatDuration(minutes) {
+					if (!minutes || Number.isNaN(minutes)) return '—';
+					return `${Math.round(minutes)} min`;
+				}
+
+				showNoExamsSection() {
+					this.examSelection.style.display = 'none';
+					this.noExamsSection.style.display = 'block';
+				}
+
+				hideNoExamsSection() {
+					this.examSelection.style.display = '';
+					this.noExamsSection.style.display = 'none';
+				}
+
+				showCompactImportButton() {
+					// Check if button already exists
+					if (document.getElementById('compact-import-btn')) return;
+
+					// Create compact import button/card
+					const importCard = document.createElement('div');
+					importCard.id = 'compact-import-btn';
+					importCard.className = 'exam-card custom';
+					importCard.style.cssText = 'background:linear-gradient(135deg, #28a745 0%, #20c997 100%);cursor:pointer;min-width:280px;';
+
+					importCard.innerHTML = `
+						<div class="exam-badge">Import</div>
+						<i class="fas fa-cloud-upload-alt exam-icon"></i>
+						<div class="exam-title">Import Exam</div>
+						<div class="exam-subtitle">Add new exam packs</div>
+						<div class="exam-stats">
+							<div class="exam-stat">
+								<span class="exam-stat-label">Drag & Drop</span>
+							</div>
+							<div class="exam-stat">
+								<span class="exam-stat-label">or Browse</span>
+							</div>
+						</div>
+					`;
+
+					// Add click handler
+					importCard.addEventListener('click', () => {
+						this.triggerFileImport();
+					});
+
+				// Add drag & drop to this card too
+				importCard.addEventListener('dragover', (e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					importCard.classList.add('drag-over');
+				});
+
+				importCard.addEventListener('dragleave', (e) => {
+					e.stopPropagation();
+					importCard.classList.remove('drag-over');
+				});
+
+				importCard.addEventListener('drop', (e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					importCard.classList.remove('drag-over');
+					document.body.classList.remove('dragging-file');
+					this.handleFiles(e.dataTransfer.files);
+				});					// Insert as first card
+					this.examSelection.insertBefore(importCard, this.examSelection.firstChild);
+				}
+
+				triggerFileImport() {
+					if (!this.fileInput) {
+						this.fileInput = document.createElement('input');
+						this.fileInput.type = 'file';
+						this.fileInput.accept = '.json,.zip';
+						this.fileInput.multiple = true;
+						this.fileInput.style.display = 'none';
+						document.body.appendChild(this.fileInput);
+					}
+
+					this.fileInput.onchange = (e) => {
+						this.handleFiles(e.target.files);
+					};
+
+					this.fileInput.click();
+				}
+
+				setupEventListeners() {
+					// Drag & Drop on drop zone
+					this.dropZone.addEventListener('dragover', (e) => {
+						e.preventDefault();
+						this.dropZone.classList.add('drag-over');
+					});
+
+					this.dropZone.addEventListener('dragleave', () => {
+						this.dropZone.classList.remove('drag-over');
+					});
+
+					this.dropZone.addEventListener('drop', (e) => {
+						e.preventDefault();
+						this.dropZone.classList.remove('drag-over');
+						this.handleFiles(e.dataTransfer.files);
+					});
+
+					// Global drag & drop (anywhere on page)
+					document.body.addEventListener('dragenter', (e) => {
+						// Only add class if dragging files
+						if (e.dataTransfer && e.dataTransfer.types.includes('Files')) {
+							document.body.classList.add('dragging-file');
+						}
+					});
+
+					document.body.addEventListener('dragover', (e) => {
+						e.preventDefault();
+						e.dataTransfer.dropEffect = 'copy';
+					});
+
+					document.body.addEventListener('dragleave', (e) => {
+						// Only remove if leaving the entire page
+						if (e.target === document.body || !e.relatedTarget) {
+							document.body.classList.remove('dragging-file');
+						}
+					});
+
+					document.body.addEventListener('drop', (e) => {
+						document.body.classList.remove('dragging-file');
+						// Only handle if dropping on body or exam-selection area
+						if (e.target === document.body || e.target.closest('#exam-selection') || e.target.closest('.hero')) {
+							e.preventDefault();
+							this.handleFiles(e.dataTransfer.files);
+						}
+					});
+
+					// Browse files
+					this.browseButton.addEventListener('click', () => {
+						if (!this.fileInput) {
+							this.fileInput = document.createElement('input');
+							this.fileInput.type = 'file';
+							this.fileInput.accept = '.json,.zip';
+							this.fileInput.multiple = true;
+							this.fileInput.style.display = 'none';
+							document.body.appendChild(this.fileInput);
+						}
+
+						this.fileInput.onchange = (e) => {
+							this.handleFiles(e.target.files);
+						};
+
+						this.fileInput.click();
+					});
+
+					// Drop zone click
+					this.dropZone.addEventListener('click', (e) => {
+						if (e.target === this.dropZone || e.target.closest('.drop-zone') && !e.target.closest('button')) {
+							this.browseButton.click();
+						}
+					});
+
+					// Hero action buttons
+					this.heroImportBtn?.addEventListener('click', () => this.triggerFileImport());
+					this.addExamBtn?.addEventListener('click', () => this.triggerFileImport());
+					
+					// Add Exam button drag & drop
+					if (this.addExamBtn) {
+						this.addExamBtn.addEventListener('dragover', (e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							this.addExamBtn.classList.add('drag-over');
+						});
+
+						this.addExamBtn.addEventListener('dragleave', (e) => {
+							e.stopPropagation();
+							this.addExamBtn.classList.remove('drag-over');
+						});
+
+						this.addExamBtn.addEventListener('drop', (e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							this.addExamBtn.classList.remove('drag-over');
+							document.body.classList.remove('dragging-file');
+							this.handleFiles(e.dataTransfer.files);
+						});
+					}
+					
+					// Preview action
+					this.previewActionBtn?.addEventListener('click', () => this.handlePreviewAction());
+					
+					// View progress
+					this.heroViewProgressBtn?.addEventListener('click', () => {
+						if (typeof window.showProgressStatistics === 'function') {
+							window.showProgressStatistics();
+						}
+					});
+					
+					// Manage exams
+					document.getElementById('hero-manage-exams')?.addEventListener('click', () => this.openConfigModal());
+				}
+
+				async handleFiles(files) {
+					for (const file of files) {
+						try {
+							await this.importFile(file);
+						} catch (error) {
+							console.error(`Failed to import ${file.name}:`, error);
+							alert(`Failed to import ${file.name}: ${error.message}`);
+						}
+					}
+
+					// Refresh the exam list
+					await this.loadAvailableExams();
+				}
+
+				async importFile(file) {
+					const fileName = file.name.toLowerCase();
+
+					if (fileName.endsWith('.json')) {
+						await this.importJsonFile(file);
+					} else if (fileName.endsWith('.zip')) {
+						await this.importZipFile(file);
+					} else {
+						throw new Error('Unsupported file type. Please use .json or .zip files.');
+					}
+				}
+
+				async importJsonFile(file) {
+					const text = await file.text();
+					const data = JSON.parse(text);
+
+					// Determine exam ID from filename or data
+					let examId = file.name.replace(/\.(json|zip)$/i, '');
+					if (data.id) {
+						examId = data.id;
+					}
+
+					// Import the exam
+					await window.examManager.importExam(examId, data);
+
+					console.log(`Successfully imported exam: ${examId}`);
+					this.showNotification(`✅ Exam "${examId}" imported successfully!`);
+				}
+
+				async importZipFile(file) {
+					if (!window.JSZip) {
+						throw new Error('ZIP support is unavailable (JSZip not loaded).');
+					}
+
+					this.showImportProgress();
+					const zip = await JSZip.loadAsync(file);
+					const dumpEntry = this.findZipEntry(zip, /(^|\/)dump\.json$/i);
+					if (!dumpEntry) {
+						throw new Error('ZIP file missing dump.json.');
+					}
+
+					const dumpText = await dumpEntry.async('string');
+					const parsedDump = JSON.parse(dumpText);
+					let questions = Array.isArray(parsedDump) ? parsedDump : parsedDump.questions;
+					if (!Array.isArray(questions)) {
+						throw new Error('dump.json must contain an array of questions.');
+					}
+
+					let metadata = null;
+					const metadataEntry = this.findZipEntry(zip, /(^|\/)metadata\.json$/i);
+					if (metadataEntry) {
+						const metadataText = await metadataEntry.async('string');
+						metadata = JSON.parse(metadataText);
+					}
+
+					let examId = (metadata && metadata.id) || this.deriveExamIdFromZip(zip, file.name);
+					if (!examId) {
+						examId = file.name.replace(/\.zip$/i, '');
+					}
+
+				await window.examManager.importExam(examId, { questions, metadata });
+
+				// Extract images from ZIP to local directory
+				console.log(`🔍 Scanning ZIP for images in exam: ${examId}`);
+				const imageFiles = [];
+				
+				zip.forEach((relativePath, entry) => {
+					if (entry.dir) return;
+					const normalized = relativePath.toLowerCase();
+					if (normalized.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i)) {
+						// Handle both forward slash and backslash (Windows ZIP paths)
+						const fileName = relativePath.replace(/\\/g, '/').split('/').pop();
+						imageFiles.push({ fileName, entry });
+					}
+				});
+				
+				console.log(`📊 Found ${imageFiles.length} images in ZIP`);
+
+				if (imageFiles.length > 0 && window.imageStorage) {
+					console.log(`⏳ Storing ${imageFiles.length} images in IndexedDB...`);
+					this.updateImportProgress(0, imageFiles.length, 0);
+					
+					let storedCount = 0;
+					for (const { fileName, entry } of imageFiles) {
+						try {
+							// Extract as base64
+							const base64Data = await entry.async('base64');
+							const extension = fileName.split('.').pop().toLowerCase();
+							const mimeType = {
+								'jpg': 'image/jpeg',
+								'jpeg': 'image/jpeg',
+								'png': 'image/png',
+								'gif': 'image/gif',
+								'svg': 'image/svg+xml',
+								'webp': 'image/webp'
+							}[extension] || 'image/jpeg';
+							
+							await window.imageStorage.storeImage(examId, fileName, base64Data, mimeType);
+							storedCount++;
+							const percentage = (storedCount / imageFiles.length) * 100;
+							this.updateImportProgress(storedCount, imageFiles.length, percentage);
+							console.log(`✅ Stored ${fileName} (${(base64Data.length / 1024).toFixed(1)} KB)`);
+						} catch (err) {
+							console.error(`❌ Failed to store ${fileName}:`, err);
+						}
+					}
+					
+					console.log(`✅ Successfully stored ${storedCount}/${imageFiles.length} images in IndexedDB for ${examId}`);
+					
+					// Keep progress modal visible for a moment to show completion
+					await new Promise(resolve => setTimeout(resolve, 800));
+					this.hideImportProgress();
+					
+					this.showNotification(
+						`✅ Exam "${examId}" imported with ${storedCount} image(s) stored!`,
+						3000
+					);
+				} else if (imageFiles.length > 0) {
+					console.warn('⚠️ ImageStorage not available, images will not be stored');
+					this.hideImportProgress();
+					this.showNotification(`✅ Exam "${examId}" imported (images not stored)`);
+				} else {
+					this.hideImportProgress();
+					this.showNotification(`✅ Exam "${examId}" imported successfully!`);
+				}
+			}				findZipEntry(zip, pattern) {
+					let match = null;
+					zip.forEach((relativePath, entry) => {
+						if (!entry.dir && pattern.test(relativePath)) {
+							if (!match || relativePath.length < match.name.length) {
+								match = entry;
+							}
+						}
+					});
+					return match;
+				}
+
+				deriveExamIdFromZip(zip, fallbackName) {
+					const rootFolders = new Set();
+					zip.forEach((relativePath) => {
+						const normalized = relativePath.replace(/^\/+/, '');
+						const [root] = normalized.split('/');
+						if (root) {
+							rootFolders.add(root);
+						}
+					});
+					if (rootFolders.size === 1) {
+						return Array.from(rootFolders)[0];
+					}
+					return fallbackName ? fallbackName.replace(/\.zip$/i, '') : null;
+				}
+
+				async deleteExam(examId) {
+					// Confirm deletion
+					if (!confirm(`⚠️ Are you sure you want to completely remove exam "${examId}"?\n\nThis will delete:\n- All questions\n- All images\n- All progress\n\nThis action cannot be undone!`)) {
+						return;
+					}
+					
+					// Remove from localStorage (correct keys)
+					localStorage.removeItem(`custom_${examId}_questions`);
+					localStorage.removeItem(`exam_metadata_${examId}`);
+					localStorage.removeItem(`exam_images_list_${examId}`);
+					
+					// Remove from memory
+					if (window.userExams) {
+						delete window.userExams[examId];
+					}
+					
+					// Delete images from IndexedDB
+					if (window.imageStorage) {
+						try {
+							const count = await window.imageStorage.deleteExamImages(examId);
+							console.log(`🗑️ Deleted ${count} images from IndexedDB`);
+						} catch (e) {
+							console.warn(`⚠️ Failed to delete images:`, e.message);
+						}
+					}
+					
+					// Remove from exam manager
+					if (window.examManager && window.examManager.exams) {
+						delete window.examManager.exams[examId];
+					}
+					
+					await this.loadAvailableExams();
+
+					// Show notification
+					this.showNotification(`✅ Exam "${examId}" completely removed!`, 3000);
+					
+					// Refresh modal if it's open
+					const modal = document.getElementById('exam-config-modal');
+					if (modal.style.display === 'flex') {
+						this.openConfigModal();
+					}
+				}
+				
+				async deactivateExam(examId) {
+					window.examManager.deactivateExam(examId);
+					await this.loadAvailableExams();
+					this.showNotification(`Exam "${examId}" hidden from homepage.`, 2000);
+				}
+
+			showNotification(message, duration = 3000) {
+				// Simple notification (you can enhance this later)
+				const notif = document.createElement('div');
+				notif.style.cssText = 'position:fixed;top:20px;right:20px;background:#28a745;color:white;padding:15px 20px;border-radius:8px;z-index:9999;box-shadow:0 4px 6px rgba(0,0,0,0.1);max-width:400px;';
+				notif.textContent = message;
+				document.body.appendChild(notif);
+				setTimeout(() => notif.remove(), duration);
+			}
+
+			showImportProgress() {
+				const modal = document.getElementById('import-progress-modal');
+				if (modal) {
+					modal.classList.add('active');
+					this.updateImportProgress(0, 0, 0);
+					// Remove drag overlay when showing import progress
+					document.body.classList.remove('dragging-file');
+					document.body.classList.add('importing-exam');
+				}
+			}
+
+			hideImportProgress() {
+				const modal = document.getElementById('import-progress-modal');
+				if (modal) {
+					modal.classList.remove('active');
+				}
+				document.body.classList.remove('importing-exam');
+			}
+
+			updateImportProgress(current, total, percentage) {
+				const bar = document.getElementById('import-progress-bar');
+				const percentageText = document.getElementById('import-progress-percentage');
+				const countText = document.getElementById('import-progress-count');
+				const subtitle = document.getElementById('import-progress-subtitle');
+
+				if (bar) bar.style.width = percentage + '%';
+				if (percentageText) percentageText.textContent = Math.round(percentage) + '%';
+				if (countText) countText.textContent = `${current} / ${total} images`;
+
+				if (subtitle) {
+					if (current === 0 && total === 0) {
+						subtitle.textContent = 'Reading ZIP file...';
+					} else if (current < total) {
+						subtitle.textContent = 'Storing images in IndexedDB...';
+					} else {
+						subtitle.textContent = 'Import complete!';
+					}
+				}
+			}				setupConfigModal() {
+					const modal = document.getElementById('exam-config-modal');
+					const openBtn = document.getElementById('manage-exams-btn');
+					const closeBtn = document.getElementById('close-config-modal');
+
+					openBtn.addEventListener('click', () => this.openConfigModal());
+					closeBtn.addEventListener('click', () => this.closeConfigModal());
+
+					// Close on backdrop click
+					modal.addEventListener('click', (e) => {
+						if (e.target === modal) this.closeConfigModal();
+					});
+				}
+
+				openConfigModal() {
+					const modal = document.getElementById('exam-config-modal');
+					const list = document.getElementById('exam-config-list');
+
+					// Get ALL exams (active and inactive)
+					const allExamIds = window.examManager.getAllExamIds();
+
+					list.innerHTML = '';
+
+					if (allExamIds.length === 0) {
+						list.innerHTML = '<p style="text-align:center;color:#999;">No exams found in user-content/exams/</p>';
+					} else {
+						allExamIds.forEach(examId => {
+							const isActive = window.examManager.isExamActive(examId);
+							const examData = window.userExams[examId];
+							const metadata = (examData && examData.metadata) ? examData.metadata : { name: examId, fullName: 'Unknown' };
+							const hasImages = window.examImageFiles && window.examImageFiles[examId];
+							const imageCount = hasImages ? Object.keys(window.examImageFiles[examId]).length : 0;
+
+							const item = document.createElement('div');
+							item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:15px;background:#f8f9fa;border-radius:8px;border:2px solid ' + (isActive ? '#28a745' : '#ddd') + ';';
+
+							item.innerHTML = `
+								<div style="flex:1;">
+									<div style="font-weight:bold;margin-bottom:4px;">${metadata.name || examId}</div>
+									<div style="font-size:12px;color:#666;">${metadata.fullName || 'Custom Exam'}</div>
+									${imageCount > 0 ? `<div style="font-size:11px;color:#28a745;margin-top:4px;"><i class="fas fa-images"></i> ${imageCount} images loaded</div>` : ''}
+								</div>
+								<div style="display:flex;align-items:center;gap:10px;">
+									<label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+										<span style="font-size:13px;color:#666;">${isActive ? 'Active' : 'Hidden'}</span>
+										<input type="checkbox" ${isActive ? 'checked' : ''}
+											onchange="homepage.toggleExamActivation('${examId}', this.checked)"
+											style="width:20px;height:20px;cursor:pointer;">
+									</label>
+									<button onclick="homepage.deleteExam('${examId}')" 
+										style="background:#dc3545;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;"
+										title="Remove exam completely">
+										<i class="fas fa-trash"></i> Remove
+									</button>
+								</div>
+							`;
+
+							list.appendChild(item);
+						});
+					}
+
+					modal.style.display = 'flex';
+				}
+
+				closeConfigModal() {
+					document.getElementById('exam-config-modal').style.display = 'none';
+				}
+
+				async toggleExamActivation(examId, active) {
+					if (active) {
+						window.examManager.activateExam(examId);
+					} else {
+						window.examManager.deactivateExam(examId);
+					}
+
+					// Reload exam cards
+					await this.loadAvailableExams();
+
+					// Update the modal
+					this.openConfigModal();
+				}
+			}
+
+			// Initialize when page loads
+			let homepage;
+			document.addEventListener('DOMContentLoaded', async () => {
+				// Initialize exam images storage
+				if (!window.examImages) {
+					window.examImages = {};
+				}
+				
+				// Wait for exam scripts to load first
+				if (window.examsLoadedPromise) {
+					await window.examsLoadedPromise;
+				}
+				homepage = new HomePage();
+				window.homepage = homepage;
+			});
+		</script>
+</body>
+</html>
+

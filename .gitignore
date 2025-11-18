@@ -1,0 +1,66 @@
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# User content (exclude exam data for distribution)
+user-content/exams/*/
+!user-content/exams/.gitkeep
+
+# Keep structure but ignore content
+user-content/exams/*
+!user-content/exams/README.md
+
+# Private exam backups/zips (keep local only)
+user-content/ai900*/
+user-content/ai102*/
+user-content/ai900*.zip
+user-content/ai102*.zip
+
+# Exam media lives locally only
+images/*
+!images/.gitkeep
+!images/README.md
+
+# Development
+node_modules/
+.env
+.env.local
+
+# Build artifacts
+dist/
+build/
+*.zip
+*.tar.gz
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Test files (if added later)
+coverage/
+.nyc_output/
+
+# Local configuration
+config.local.js
+settings.local.json

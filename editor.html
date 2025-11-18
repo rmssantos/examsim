@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Question Editor - Create & Edit Exams</title>
+  <link rel="stylesheet" href="style-new.css">
+  <link rel="stylesheet" href="multi-exam-styles.css">
+  <link rel="stylesheet" href="modern-enhancements.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); }
+    .editor-container { max-width: 1400px; margin: 0 auto; }
+
+    /* Exam Selection Bar */
+    .exam-selection-bar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .exam-select-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .exam-select-group label {
+      font-weight: 600;
+      color: #1e3c72;
+      white-space: nowrap;
+    }
+
+    .exam-select-group select {
+      flex: 1;
+      padding: 10px 15px;
+      border: 2px solid rgba(30, 60, 114, 0.15);
+      border-radius: 8px;
+      font-size: 14px;
+      min-width: 300px;
+    }
+
+    .exam-actions-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .custom-exam-input {
+      display: flex;
+      gap: 8px;
+      padding: 8px 15px;
+      background: rgba(30, 60, 114, 0.05);
+      border-radius: 8px;
+    }
+
+    .custom-exam-input input {
+      padding: 8px 12px;
+      border: 2px solid rgba(30, 60, 114, 0.15);
+      border-radius: 6px;
+      font-size: 13px;
+      width: 200px;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: #fff;
+      border: none;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid #1e3c72;
+      color: #1e3c72;
+    }
+
+    .btn-outline:hover {
+      background: #1e3c72;
+      color: #fff;
+    }
+
+    /* Split Layout */
+    .split { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
+
+    /* Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .sidebar-header {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-header h3 {
+      margin: 0 0 12px 0;
+      color: #1e3c72;
+      font-size: 16px;
+    }
+
+    .sidebar-header input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid rgba(30, 60, 114, 0.15);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .list {
+      border-radius: 12px;
+      padding: 12px;
+      flex: 1;
+      overflow: auto;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      max-height: calc(100vh - 450px);
+    }
+
+    .list-item {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .list-item:hover {
+      background: linear-gradient(135deg, rgba(227, 242, 253, 0.5), rgba(248, 249, 250, 0.5));
+      transform: translateX(4px);
+    }
+
+    .list-item.active {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      border-left-color: #1e3c72;
+      box-shadow: 0 2px 8px rgba(30, 60, 114, 0.15);
+    }
+
+    .sidebar-footer {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .exam-management h4 {
+      margin: 0 0 12px 0;
+      color: #1e3c72;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .exam-management button {
+      width: 100%;
+      margin-bottom: 8px;
+      justify-content: flex-start;
+      text-align: left;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: #fff;
+      border: none;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+  .right-pane { display: grid; grid-template-rows: 1fr 1fr; gap: 16px; height: calc(100vh - 200px); }
+  .form { border: 1px solid #e1e1e1; border-radius: 10px; padding: 16px; background: #fff; overflow:auto; }
+    .form .row { display: grid; grid-template-columns: 140px 1fr; gap: 10px; margin-bottom: 10px; align-items: start; }
+    .form textarea { min-height: 90px; }
+    .options { display: grid; gap: 6px; }
+    .option-row { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; }
+    .option-row .sequence-order-num {
+      font-weight: 600;
+      color: #1e3c72;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      font-size: 14px;
+    }
+    .option-row.sequence-row {
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip { background: #eef6ff; border: 1px solid #bcdcff; color: #0b60a9; padding: 2px 8px; border-radius: 999px; font-size: 12px; }
+    .small { font-size: 12px; color: #666; }
+    .danger { color: #d9534f; }
+    .success { color: #28a745; }
+    .btn { cursor: pointer; border-radius: 8px; padding: 8px 12px; border: 1px solid #ccc; background: #fff; color: #222; }
+    .btn.primary { background: #2b7cff; border-color: #2b7cff; color: #fff; }
+    .btn.warning { background: #ffd65a; border-color: #e0a800; color: #212529; }
+    .btn.danger { background: #dc3545; border-color: #dc3545; color: #fff; }
+    .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .muted { opacity: .75; }
+    .section-title { margin-top: 10px; font-weight: 600; }
+    input[type="text"], input[type="number"], textarea { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc; }
+    select { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc; }
+    .footer { margin-top: 10px; display:flex; gap:10px; }
+    .pill { display:inline-flex; align-items:center; gap:6px; padding: 4px 8px; border-radius: 999px; border:1px solid #ddd; background:#f8f9fa; font-size:12px; }
+    .pill, .pill:link, .pill:visited { color: #333; text-decoration: none; }
+
+    /* Preview panel */
+  .preview { border: 1px solid #e1e1e1; border-radius: 10px; background: #fff; padding: 16px; overflow:auto; }
+    .preview h3 { margin-top: 0; }
+    .pv-type { display:inline-block; padding: 4px 10px; border-radius: 999px; background:#eef6ff; border:1px solid #bcdcff; color:#0b60a9; font-size:12px; }
+    .pv-question { margin: 10px 0; line-height: 1.5; }
+    .pv-images img { max-width: 100%; height:auto; border:1px solid #ddd; border-radius:8px; margin:8px 0; display:block; }
+    .pv-options { display:grid; gap:8px; margin-top:10px; }
+    .pv-option { border:1px solid #eee; border-radius:8px; padding:8px; display:flex; gap:10px; align-items:center; }
+    .pv-option.correct { border-color:#28a745; background:#ecf9f0; }
+    .pv-letters { font-weight:600; width:20px; text-align:center; }
+    .pv-yn-row { display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center; border-bottom:1px dashed #eee; padding:6px 0; }
+    .pv-yn-ans { font-weight:600; color:#0b60a9; }
+    .pv-seq { font-size: 14px; }
+    .pv-seq strong { color:#0b60a9; }
+    .inline-actions { display:flex; gap:8px; align-items:center; margin-top:6px; }
+  /* Interactive preview widgets */
+  .pv-clickable { cursor: pointer; user-select: none; }
+  .pv-option.selected { background:#eef6ff; border-color:#bcdcff; }
+  .pv-seq-wrap { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+  .pv-col { border:1px dashed #e1e1e1; border-radius:8px; padding:8px; min-height:60px; }
+  .pv-col-title { font-size:12px; color:#666; margin-bottom:6px; }
+  .pv-chip { display:flex; align-items:center; gap:8px; border:1px solid #ddd; border-radius:999px; padding:4px 8px; margin:4px 0; background:#fff; }
+  .pv-chip .x { border:none; background:transparent; color:#888; cursor:pointer; }
+  .pv-dd-wrap { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+  .pv-dd-source, .pv-dd-target { border:1px dashed #e1e1e1; border-radius:8px; padding:8px; min-height:60px; }
+  .pv-dd-title { font-size:12px; color:#666; margin-bottom:6px; }
+  .pv-dd-btn { display:block; width:100%; text-align:left; border:1px solid #ddd; border-radius:8px; padding:6px 8px; margin:4px 0; background:#fff; cursor:pointer; }
+  .pv-dd-chip { display:flex; align-items:center; gap:8px; border:1px solid #ddd; border-radius:8px; padding:6px 8px; margin:4px 0; background:#f8f9fa; }
+  .pv-dd-chip .rm { margin-left:auto; border:none; background:transparent; cursor:pointer; color:#888; }
+  </style>
+</head>
+<body>
+  <div class="editor-container">
+    <h1><i class="fas fa-tools"></i> Question Editor</h1>
+    <p class="muted">Create and edit questions for any exam. Supports multiple choice, drag & drop, sequences, and more. Changes save to your browser and apply instantly.</p>
+
+    <!-- Exam Selection Bar -->
+    <div class="exam-selection-bar">
+      <div class="exam-select-group">
+        <label><i class="fas fa-book"></i> Select Exam</label>
+        <select id="examSelect">
+          <option value="">Loading exams...</option>
+        </select>
+      </div>
+
+      <div class="exam-actions-group">
+        <div class="custom-exam-input">
+          <input id="customExamCode" type="text" placeholder="Custom exam code (e.g., ai102b)"/>
+          <button id="loadCustomExam" class="btn btn-secondary" title="Load custom exam from ./exam-dumps/"><i class="fas fa-folder-open"></i> Load</button>
+          <button id="newExamBtn" class="btn btn-secondary" title="Create a new custom exam"><i class="fas fa-plus-circle"></i> New Exam</button>
+        </div>
+        <a href="index.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to App</a>
+      </div>
+    </div>
+
+    <div class="split">
+      <!-- Sidebar with Questions List -->
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h3><i class="fas fa-list"></i> Questions</h3>
+          <input id="searchInput" type="text" placeholder="Search questions..."/>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+            <select id="filterType" style="padding: 8px; border-radius: 6px; border: 2px solid rgba(30, 60, 114, 0.15); font-size: 13px;">
+              <option value="">All Types</option>
+              <option value="STANDARD">Single Choice</option>
+              <option value="MULTI">Multiple Choice</option>
+              <option value="SEQUENCE">Sequence</option>
+              <option value="DRAG_DROP_SELECT">Drag & Drop</option>
+              <option value="YES_NO_MATRIX">Yes/No Matrix</option>
+            </select>
+            <select id="filterCategory" style="padding: 8px; border-radius: 6px; border: 2px solid rgba(30, 60, 114, 0.15); font-size: 13px;">
+              <option value="">All Categories</option>
+            </select>
+          </div>
+
+          <button id="addNew" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+            <i class="fas fa-plus"></i> New Question
+          </button>
+        </div>
+
+        <div class="list" id="questionList"></div>
+
+        <div class="sidebar-footer">
+          <div class="exam-management">
+            <h4><i class="fas fa-cog"></i> Exam Management</h4>
+            <button id="importJson" class="btn btn-outline" title="Import questions from JSON file">
+              <i class="fas fa-file-import"></i> Import Questions
+            </button>
+            <button id="exportJson" class="btn btn-outline" title="Export all questions to JSON">
+              <i class="fas fa-file-export"></i> Export Questions
+            </button>
+            <button id="clearOverride" class="btn btn-danger" title="Reset all custom changes to original exam">
+              <i class="fas fa-undo"></i> Reset to Original
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="right-pane">
+      <div class="form">
+        <div class="row">
+          <label><i class="fas fa-hashtag"></i> ID</label>
+          <input id="qId" type="number" placeholder="Auto-generated (optional)"/>
+        </div>
+        <div class="row">
+          <label><i class="fas fa-folder"></i> Category</label>
+          <input id="qModule" type="text" placeholder="e.g., Math, Science, History (optional)" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc;"/>
+        </div>
+        <div class="row">
+          <label><i class="fas fa-question-circle"></i> Question Type</label>
+          <select id="qType">
+            <option value="STANDARD">Single Choice (one correct answer)</option>
+            <option value="MULTI">Multiple Choice (select all that apply)</option>
+            <option value="SEQUENCE">Sequence (put in correct order)</option>
+            <option value="DRAG_DROP_SELECT">Drag & Drop (select N items)</option>
+            <option value="YES_NO_MATRIX">Yes/No Matrix (statements)</option>
+          </select>
+        </div>
+        <div class="row">
+          <label><i class="fas fa-pen"></i> Question Text</label>
+          <textarea id="qText" placeholder="Type your question here..." style="min-height: 100px;"></textarea>
+        </div>
+        <div class="row">
+          <label><i class="fas fa-lightbulb"></i> Explanation</label>
+          <textarea id="qExplanation" placeholder="Explain the correct answer (shown after answering)..." style="min-height: 80px;"></textarea>
+        </div>
+
+        <div class="section-title">Images</div>
+        <div class="grid2">
+          <div>
+            <div class="small">Question images (filenames relative to images/, one per line)</div>
+            <textarea id="qImages" placeholder="ai102/ai102_part1_b1_p2_i1.png"></textarea>
+            <div class="inline-actions">
+              <input id="qImgFiles" type="file" accept="image/*" multiple />
+              <button id="qImgUpload" class="btn"><i class="fas fa-upload"></i> Upload</button>
+            </div>
+          </div>
+          <div>
+            <div class="small">Explanation images (filenames relative to images/, one per line)</div>
+            <textarea id="eImages" placeholder="ai102/ai102_part1_b1_p2_i2.png"></textarea>
+            <div class="inline-actions">
+              <input id="eImgFiles" type="file" accept="image/*" multiple />
+              <button id="eImgUpload" class="btn"><i class="fas fa-upload"></i> Upload</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title"><i class="fas fa-list"></i> Answer Options</div>
+        <div id="sequenceHint" style="display:none; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 12px; margin-bottom: 10px; font-size: 0.9rem;">
+          <strong><i class="fas fa-info-circle"></i> SEQUENCE Type:</strong> Use the <strong>Preview panel</strong> below to set the correct order. Click the Up/Down arrows to arrange options in the correct sequence. The order you set there is what students must match.
+        </div>
+        <div id="options" class="options"></div>
+        <div class="footer">
+          <button id="addOption" class="btn primary"><i class="fas fa-plus"></i> Add Option</button>
+          <span id="optionsHelp" class="small" style="color: #6c757d;">Check the boxes next to correct answers</span>
+        </div>
+        <div class="row" style="display: none;"><label>Correct</label><input id="qCorrect" type="text" placeholder="Auto-managed by checkboxes"/></div>
+        <div class="row" id="ddSelectRow" style="display:none;"><label>Select N</label><input id="qDragSelectN" type="number" min="1" placeholder="Required selection count"/></div>
+        <div class="row" id="ynMatrixRow" style="display:none;"><label>Statements</label><textarea id="qStatements" placeholder="One statement per line (Yes/No options auto)"></textarea></div>
+
+        <div class="footer" style="gap: 10px; border-top: 2px solid #e1e1e1; padding-top: 15px; margin-top: 20px;">
+          <button id="save" class="btn primary" style="font-size: 1rem; padding: 10px 20px;"><i class="fas fa-save"></i> Save Changes</button>
+          <button id="deleteCurrent" class="btn danger"><i class="fas fa-trash"></i> Delete Question</button>
+          <span class="small" style="color: #28a745; margin-left: auto;">✓ Auto-saved to browser</span>
+        </div>
+      </div>
+      <div class="preview" id="preview">
+        <h3>Preview</h3>
+        <div id="pvType" class="pv-type">STANDARD</div>
+        <div id="pvQuestion" class="pv-question"></div>
+        <div id="pvQImages" class="pv-images"></div>
+        <div id="pvOptions" class="pv-options"></div>
+        <div id="pvExplanation" class="pv-explanation" style="margin-top:12px;"></div>
+        <div id="pvEImages" class="pv-images"></div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <input id="fileInput" type="file" accept="application/json" style="display:none;" />
+
+  <script src="exam-manager.js"></script>
+  <script src="exam-loader.js"></script>
+  <script>
+    // Initialize dynamic exam list in editor
+    async function initializeEditorExamList() {
+      // Wait for exam data (falls back immediately if loader unavailable)
+      const loadPromise = window.examsLoadedPromise || Promise.resolve();
+      await loadPromise;
+
+      const examSelect = document.getElementById('examSelect');
+
+      try {
+        // Load available exams
+        const exams = await window.examManager.detectAvailableExams();
+
+        // Clear loading option
+        examSelect.innerHTML = '';
+
+        if (exams.size === 0) {
+          examSelect.innerHTML = '<option value="">No exams available</option>';
+          return;
+        }
+
+        let selectedExamId = null;
+
+        // Add available exams
+        exams.forEach((examData, examId) => {
+          const option = document.createElement('option');
+          option.value = examId;
+          option.textContent = `${examData.metadata.name} (${examData.questions.length} questions)`;
+          examSelect.appendChild(option);
+          if (!selectedExamId) {
+            selectedExamId = examId;
+          }
+        });
+
+        // Add custom option
+        const customOption = document.createElement('option');
+        customOption.value = 'custom';
+        customOption.textContent = 'Custom (loaded)';
+        examSelect.appendChild(customOption);
+
+        // Select first detected exam by default
+        if (selectedExamId) {
+          examSelect.value = selectedExamId;
+        }
+
+        document.dispatchEvent(new CustomEvent('editorExamListReady', {
+          detail: { defaultExamId: selectedExamId }
+        }));
+
+      } catch (error) {
+        console.error('Failed to load exams in editor:', error);
+        examSelect.innerHTML = '<option value="">Error loading exams</option>';
+      }
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', initializeEditorExamList);
+  </script>
+  <script src="editor.js"></script>
+</body>
+</html>
