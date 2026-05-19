@@ -1,0 +1,66 @@
+{
+  "id": "sc900",
+  "name": "SC-900",
+  "fullName": "Microsoft Security, Compliance, and Identity Fundamentals",
+  "duration": 45,
+  "questionCount": 50,
+  "totalQuestions": 150,
+  "passScore": 70,
+  "badge": "Fundamentals",
+  "icon": "fas fa-shield-alt",
+  "modules": [
+    {
+      "icon": "fas fa-lock",
+      "name": "Security, Compliance & Identity Concepts"
+    },
+    {
+      "icon": "fas fa-id-card",
+      "name": "Microsoft Entra"
+    },
+    {
+      "icon": "fas fa-shield-alt",
+      "name": "Azure Security"
+    },
+    {
+      "icon": "fas fa-cloud",
+      "name": "Microsoft Defender for Cloud"
+    },
+    {
+      "icon": "fas fa-radar",
+      "name": "Microsoft Sentinel"
+    },
+    {
+      "icon": "fas fa-crosshairs",
+      "name": "Microsoft Defender XDR"
+    },
+    {
+      "icon": "fas fa-clipboard-check",
+      "name": "Service Trust & Privacy"
+    },
+    {
+      "icon": "fas fa-balance-scale",
+      "name": "Microsoft Purview Compliance"
+    },
+    {
+      "icon": "fas fa-archive",
+      "name": "Data Lifecycle & Records"
+    },
+    {
+      "icon": "fas fa-exclamation-triangle",
+      "name": "Risk & Compliance Solutions"
+    }
+  ],
+  "resources": [
+    {
+      "icon": "fas fa-book",
+      "name": "Microsoft Learn SC-900 Study Guide",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/"
+    },
+    {
+      "icon": "fas fa-laptop",
+      "name": "SC-900 Practice Assessment",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/?practice-assessment-type=certification"
+    }
+  ],
+  "hasImages": false
+}

@@ -29,7 +29,7 @@ public-repo/
 │   └── sample_exam.json (non-sensitive example)
 ├── images/
 │   └── placeholders/ (generic artwork free to share)
-├── scripts/ (optional helpers like generate-exam-data-js.py stripped of private paths)
+├── tools/ (optional helpers like generate-exam-data-js.py stripped of private paths)
 ├── src/ (HTML, CSS, JS)
 └── LICENSE
 ```

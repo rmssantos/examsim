@@ -26,13 +26,11 @@ __pycache__/
 *.pyd
 .Python
 
-# User content (exclude exam data for distribution)
-user-content/exams/*/
-!user-content/exams/.gitkeep
-
-# Keep structure but ignore content
+# User content: keep the public educational sample and Pages index; ignore other local packs
 user-content/exams/*
-!user-content/exams/README.md
+!user-content/exams/index.json
+!user-content/exams/sc900/
+!user-content/exams/sc900/**
 
 # Private exam backups/zips (keep local only)
 user-content/*.zip

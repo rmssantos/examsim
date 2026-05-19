@@ -192,9 +192,11 @@ portable/
 ├── index.html
 ├── exam.html
 ├── editor.html
-├── exam-manager.js
-├── image-loader.js
-├── ... (other core files)
+├── assets/
+│   ├── css/
+│   ├── js/
+│   └── vendor/
+├── tools/
 └── user-content/
     ├── README-IMPORT.md
     └── exams/

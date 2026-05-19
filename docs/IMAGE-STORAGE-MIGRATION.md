@@ -29,12 +29,12 @@ When you first load the updated simulator:
 ## Files Added/Modified
 
 ### New Files
-- `image-storage.js` - IndexedDB wrapper for image management
-- `image-inspector.html` - Debug tool to inspect storage
+- `assets/js/image-storage.js` - IndexedDB wrapper for image management
+- `tools/image-inspector.html` - Debug tool to inspect storage
 
 ### Modified Files
 - `index.html` - Updated to use IndexedDB for image extraction
-- `image-loader.js` - Updated to load images from IndexedDB
+- `assets/js/image-loader.js` - Updated to load images from IndexedDB
 
 ## Troubleshooting
 
@@ -48,7 +48,7 @@ When you first load the updated simulator:
 
 ### Inspect Storage
 
-Open `image-inspector.html` in your browser to:
+Open `tools/image-inspector.html` in your browser to:
 - View total images stored
 - See storage usage per exam
 - Delete specific exam images
@@ -73,7 +73,7 @@ await window.imageStorage.getAllExamImages('ai900')
 If you have leftover localStorage images:
 
 **Option 1**: Use Inspector
-1. Open `image-inspector.html`
+1. Open `tools/image-inspector.html`
 2. Click "Clear Old localStorage Images"
 
 **Option 2**: Browser Console
@@ -170,4 +170,4 @@ The slight overhead is worth it for the massive storage increase.
 ---
 
 **Need Help?** 
-Check the browser console for detailed logs, or open `image-inspector.html` to inspect storage.
+Check the browser console for detailed logs, or open `tools/image-inspector.html` to inspect storage.

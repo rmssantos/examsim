@@ -98,7 +98,7 @@ http://localhost:8000/editor.html
 
 ## 📦 Importing Exams
 
-![Importing Exams](importing_and_editing.gif)
+![Importing Exams](assets/media/importing_and_editing.gif)
 
 ### Automatic (Server Mode)
 
@@ -194,7 +194,7 @@ Click "Export Progress" to download:
 
 ## 📝 Creating Questions
 
-![Creating Questions](creating_exam.gif)
+![Creating Questions](assets/media/creating_exam.gif)
 
 ### Using the Editor
 
@@ -352,15 +352,15 @@ localStorage['theme']
 ### For Developers
 - Read [README.md](./README.md) for full documentation
 - Check [CONTRIBUTING.md](./CONTRIBUTING.md) to contribute
-- See [HOW-TO-DISTRIBUTE.md](./HOW-TO-DISTRIBUTE.md) for distribution
-- Use `generate-exam-data-js.py` to convert dumps to JS format
+- See [docs/HOW-TO-DISTRIBUTE.md](docs/HOW-TO-DISTRIBUTE.md) for distribution
+- Use `tools/generate-exam-data-js.py` to convert dumps to JS format
 
 ---
 
 ## 📚 More Resources
 
 - **README.md** - Full documentation with all features
-- **HOW-TO-DISTRIBUTE.md** - Distribution guide
+- **docs/HOW-TO-DISTRIBUTE.md** - Distribution guide
 - **CONTRIBUTING.md** - How to contribute
 - **user-content/README-IMPORT.md** - Detailed import instructions
 - **docs/** - Technical documentation

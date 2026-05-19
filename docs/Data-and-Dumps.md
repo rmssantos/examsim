@@ -400,4 +400,4 @@ No breaking changes. All existing data formats are compatible.
 
 - [README.md](../README.md) - Main documentation
 - [PRIVACY-AND-STORAGE.md](../PRIVACY-AND-STORAGE.md) - Privacy and storage details
-- [HOW-TO-DISTRIBUTE.md](../HOW-TO-DISTRIBUTE.md) - Distribution guide
+- [HOW-TO-DISTRIBUTE.md](HOW-TO-DISTRIBUTE.md) - Distribution guide
