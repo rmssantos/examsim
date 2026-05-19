@@ -110,8 +110,48 @@ this.imageSupportFlag.classList.toggle('has-images', hasImages);
 }
 }
 
+safeIconClass(icon, fallback = 'fas fa-book') {
+const value = String(icon || '').trim();
+return /^[a-zA-Z0-9 _-]+$/.test(value) ? value : fallback;
+}
+
+safeExternalUrl(url) {
+const value = String(url || '').trim();
+if (!value) return '#';
+
+try {
+const parsed = new URL(value, window.location.href);
+return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '#';
+} catch (_) {
+return '#';
+}
+}
+
+createIcon(iconClass, extraClass = '') {
+const icon = document.createElement('i');
+icon.setAttribute('aria-hidden', 'true');
+icon.className = [this.safeIconClass(iconClass), extraClass].filter(Boolean).join(' ');
+return icon;
+}
+
+appendTextElement(parent, tagName, className, text) {
+const element = document.createElement(tagName);
+if (className) element.className = className;
+element.textContent = text;
+parent.appendChild(element);
+return element;
+}
+
+createExamStat(number, label) {
+const stat = document.createElement('div');
+stat.className = 'exam-stat';
+this.appendTextElement(stat, 'span', 'exam-stat-number', number);
+this.appendTextElement(stat, 'span', 'exam-stat-label', label);
+return stat;
+}
+
 createExamCard(examId, examData) {
-const metadata = examData.metadata;
+const metadata = examData.metadata || {};
 const questionCount = metadata.questionCount || 45;
 const totalQuestions = metadata.totalQuestions || questionCount;
 
@@ -119,34 +159,38 @@ const card = document.createElement('div');
 card.className = `exam-card ${this.getCardClass(examId)}`;
 card.dataset.exam = examId;
 
-card.innerHTML = `
-<button class="exam-delete" title="Hide exam">
-	<i aria-hidden="true" class="fas fa-eye-slash"></i>
-</button>
-<div class="exam-badge">${metadata.badge || 'Custom'}</div>
-<i class="${metadata.icon || 'fas fa-book'} exam-icon"></i>
-<div class="exam-title">${metadata.name || examId.toUpperCase()}</div>
-<div class="exam-subtitle">${metadata.fullName || 'Custom Exam'}</div>
-<div class="exam-stats">
-	<div class="exam-stat">
-		<span class="exam-stat-number">${questionCount}</span>
-		<span class="exam-stat-label">Questions</span>
-	</div>
-	<div class="exam-stat">
-		<span class="exam-stat-number">${metadata.duration || 45}</span>
-		<span class="exam-stat-label">Minutes</span>
-	</div>
-	<div class="exam-stat">
-		<span class="exam-stat-number">${metadata.passScore || 75}%</span>
-		<span class="exam-stat-label">Pass Score</span>
-	</div>
-</div>
-${totalQuestions > questionCount ? `<div class="exam-total-info">From ${totalQuestions} total questions</div>` : ''}
-${examData.hasImages ? '<div class="exam-feature"><i aria-hidden="true" class="fas fa-images"></i> With Images</div>' : ''}
-`;
+const deleteBtn = document.createElement('button');
+deleteBtn.className = 'exam-delete';
+deleteBtn.type = 'button';
+deleteBtn.title = 'Hide exam';
+deleteBtn.appendChild(this.createIcon('fas fa-eye-slash'));
+card.appendChild(deleteBtn);
+
+this.appendTextElement(card, 'div', 'exam-badge', metadata.badge || 'Custom');
+card.appendChild(this.createIcon(metadata.icon || 'fas fa-book', 'exam-icon'));
+this.appendTextElement(card, 'div', 'exam-title', metadata.name || examId.toUpperCase());
+this.appendTextElement(card, 'div', 'exam-subtitle', metadata.fullName || 'Custom Exam');
+
+const stats = document.createElement('div');
+stats.className = 'exam-stats';
+stats.appendChild(this.createExamStat(String(questionCount), 'Questions'));
+stats.appendChild(this.createExamStat(String(metadata.duration || 45), 'Minutes'));
+stats.appendChild(this.createExamStat(`${metadata.passScore || 75}%`, 'Pass Score'));
+card.appendChild(stats);
+
+if (totalQuestions > questionCount) {
+this.appendTextElement(card, 'div', 'exam-total-info', `From ${totalQuestions} total questions`);
+}
+
+if (examData.hasImages) {
+const feature = document.createElement('div');
+feature.className = 'exam-feature';
+feature.appendChild(this.createIcon('fas fa-images'));
+feature.appendChild(document.createTextNode(' With Images'));
+card.appendChild(feature);
+}
 
 // Bind deactivate button via addEventListener instead of inline onclick
-const deleteBtn = card.querySelector('.exam-delete');
 if (deleteBtn) {
 deleteBtn.addEventListener('click', (e) => {
 	e.stopPropagation();
@@ -224,14 +268,15 @@ renderModules(modules) {
 if (!this.modulesSection || !this.modulesList) return;
 if (Array.isArray(modules) && modules.length > 0) {
 this.modulesSection.style.display = 'block';
-this.modulesList.innerHTML = modules.map(module => {
-	if (typeof module === 'string') {
-		return `<li><i aria-hidden="true" class="fas fa-check-circle"></i> ${module}</li>`;
-	}
-	const icon = module.icon || 'fas fa-check-circle';
-	const name = module.name || module;
-	return `<li><i class="${icon}"></i> ${name}</li>`;
-}).join('');
+this.modulesList.innerHTML = '';
+modules.forEach(module => {
+const li = document.createElement('li');
+const icon = typeof module === 'string' ? 'fas fa-check-circle' : module.icon || 'fas fa-check-circle';
+const name = typeof module === 'string' ? module : module.name || String(module || '');
+li.appendChild(this.createIcon(icon));
+li.appendChild(document.createTextNode(` ${name}`));
+this.modulesList.appendChild(li);
+});
 } else {
 this.modulesSection.style.display = 'none';
 this.modulesList.innerHTML = '';
@@ -241,14 +286,20 @@ this.modulesList.innerHTML = '';
 renderResources(resources) {
 if (!this.resourcesList) return;
 if (Array.isArray(resources) && resources.length > 0) {
-this.resourcesList.innerHTML = resources.map(resource => {
-	const icon = resource.icon || 'fas fa-link';
-	const name = resource.name || 'Reference';
-	const url = resource.url || '#';
-	return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="resource-link"><i class="${icon}"></i> ${name}</a>`;
-}).join('');
+this.resourcesList.innerHTML = '';
+resources.forEach(resource => {
+const link = document.createElement('a');
+link.href = this.safeExternalUrl(resource.url);
+link.target = '_blank';
+link.rel = 'noopener noreferrer';
+link.className = 'resource-link';
+link.appendChild(this.createIcon(resource.icon || 'fas fa-link'));
+link.appendChild(document.createTextNode(` ${resource.name || 'Reference'}`));
+this.resourcesList.appendChild(link);
+});
 } else {
-this.resourcesList.innerHTML = '<p class="muted">Add resource links in metadata to show quick shortcuts.</p>';
+this.resourcesList.innerHTML = '';
+this.appendTextElement(this.resourcesList, 'p', 'muted', 'Add resource links in metadata to show quick shortcuts.');
 }
 }
 
@@ -286,22 +337,26 @@ const resourcesList = document.getElementById('details-resources-list');
 
 if (metadata.modules && metadata.modules.length > 0) {
 modulesSection.style.display = 'block';
-modulesList.innerHTML = metadata.modules.map(module => {
-	if (typeof module === 'string') {
-		return `<li>${module}</li>`;
-	}
-	return `<li>${module.name || module}</li>`;
-}).join('');
+modulesList.innerHTML = '';
+metadata.modules.forEach(module => {
+const name = typeof module === 'string' ? module : module.name || String(module || '');
+this.appendTextElement(modulesList, 'li', '', name);
+});
 
 if (metadata.resources && metadata.resources.length > 0) {
-	resourcesList.innerHTML = metadata.resources.map(resource => {
-		const icon = resource.icon || 'fas fa-link';
-		const name = resource.name || 'Reference';
-		const url = resource.url || '#';
-		return `<a href="${url}" target="_blank" rel="noopener noreferrer"><i class="${icon}"></i> ${name}</a>`;
-	}).join('');
+	resourcesList.innerHTML = '';
+	metadata.resources.forEach(resource => {
+	const link = document.createElement('a');
+	link.href = this.safeExternalUrl(resource.url);
+	link.target = '_blank';
+	link.rel = 'noopener noreferrer';
+	link.appendChild(this.createIcon(resource.icon || 'fas fa-link'));
+	link.appendChild(document.createTextNode(` ${resource.name || 'Reference'}`));
+	resourcesList.appendChild(link);
+	});
 } else {
-	resourcesList.innerHTML = '<p style="color:#999;font-size:0.9rem;">No resources available</p>';
+	resourcesList.innerHTML = '';
+	this.appendTextElement(resourcesList, 'p', 'muted', 'No resources available');
 }
 } else {
 modulesSection.style.display = 'none';
@@ -360,7 +415,7 @@ if (stats) {
 	this.previewTimeSpent.textContent = this.formatDuration(stats.avgTime);
 	this.previewPassRate.textContent = stats.passRate != null ? `Pass rate ${stats.passRate}%` : 'Pass rate —';
 	if (this.previewStatusPill) {
-		this.previewStatusPill.innerHTML = stats.passRate >= 70 ? '<i aria-hidden="true" class="fas fa-check"></i> On track' : '<i aria-hidden="true" class="fas fa-flag"></i> Keep practicing';
+		this.setStatusPill(stats.passRate >= 70 ? 'fas fa-check' : 'fas fa-flag', stats.passRate >= 70 ? 'On track' : 'Keep practicing');
 		this.previewStatusPill.classList.toggle('success', stats.passRate >= 70);
 		this.previewStatusPill.classList.toggle('warning', stats.passRate >= 70 ? false : !!stats.attempts);
 	}
@@ -373,7 +428,7 @@ if (stats) {
 	this.previewPassRate.textContent = 'Pass rate —';
 	if (this.previewStatusPill) {
 		this.previewStatusPill.classList.remove('success', 'warning');
-		this.previewStatusPill.innerHTML = '<i aria-hidden="true" class="fas fa-hourglass-half"></i> Waiting for attempts';
+		this.setStatusPill('fas fa-hourglass-half', 'Waiting for attempts');
 	}
 }
 this.updatePreviewHighlights(metadata, examData);
@@ -388,10 +443,10 @@ this.previewTimeSpent.textContent = '—';
 this.previewPassRate.textContent = 'Pass rate —';
 if (this.previewStatusPill) {
 	this.previewStatusPill.classList.remove('success', 'warning');
-	this.previewStatusPill.innerHTML = '<i aria-hidden="true" class="fas fa-hourglass-half"></i> Waiting for attempts';
+	this.setStatusPill('fas fa-hourglass-half', 'Waiting for attempts');
 }
 if (this.previewHighlights) {
-	this.previewHighlights.innerHTML = '<span class="flag-chip">Import exams to begin</span><span class="flag-chip">Track progress per exam</span><span class="flag-chip">Detailed analysis unlocked</span>';
+	this.renderPreviewChips(['Import exams to begin', 'Track progress per exam', 'Detailed analysis unlocked']);
 }
 }
 
@@ -410,7 +465,22 @@ if (duration) chips.push(`${duration} minutes`);
 if (metadata.modules?.length) chips.push(`${metadata.modules.length} modules`);
 if (examData?.hasImages) chips.push('Includes images');
 if (chips.length === 0) chips.push('Import data to unlock stats');
-this.previewHighlights.innerHTML = chips.map(chip => `<span class="flag-chip">${chip}</span>`).join('');
+this.renderPreviewChips(chips);
+}
+
+setStatusPill(iconClass, label) {
+if (!this.previewStatusPill) return;
+this.previewStatusPill.innerHTML = '';
+this.previewStatusPill.appendChild(this.createIcon(iconClass));
+this.previewStatusPill.appendChild(document.createTextNode(` ${label}`));
+}
+
+renderPreviewChips(chips) {
+if (!this.previewHighlights) return;
+this.previewHighlights.innerHTML = '';
+chips.forEach(chip => {
+this.appendTextElement(this.previewHighlights, 'span', 'flag-chip', chip);
+});
 }
 
 getProgressStats(examId) {
@@ -959,7 +1029,9 @@ const allExamIds = window.examManager.getAllExamIds();
 list.innerHTML = '';
 
 if (allExamIds.length === 0) {
-list.innerHTML = '<p style="text-align:center;color:#999;">No exams found in user-content/exams/</p>';
+list.innerHTML = '';
+const empty = this.appendTextElement(list, 'p', 'muted', 'No exams found in user-content/exams/');
+empty.classList.add('config-empty-state');
 } else {
 const configFragment = document.createDocumentFragment();
 allExamIds.forEach(examId => {
@@ -972,34 +1044,45 @@ allExamIds.forEach(examId => {
 	const item = document.createElement('div');
 	item.className = 'config-exam-item' + (isActive ? ' active' : '');
 
-	item.innerHTML = `
-		<div style="flex:1;">
-			<div class="config-exam-name">${metadata.name || examId}</div>
-			<div class="config-exam-desc">${metadata.fullName || 'Custom Exam'}</div>
-			${imageCount > 0 ? `<div style="font-size:11px;color:#28a745;margin-top:4px;"><i aria-hidden="true" class="fas fa-images"></i> ${imageCount} images loaded</div>` : ''}
-		</div>
-		<div style="display:flex;align-items:center;gap:10px;">
-			<label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-				<span class="config-exam-desc">${isActive ? 'Active' : 'Hidden'}</span>
-				<input type="checkbox" ${isActive ? 'checked' : ''}
-					style="width:20px;height:20px;cursor:pointer;">
-			</label>
-			<button class="config-delete-btn"
-				style="background:#dc3545;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;"
-				title="Remove exam completely">
-				<i aria-hidden="true" class="fas fa-trash"></i> Remove
-			</button>
-		</div>
-	`;
+	const info = document.createElement('div');
+	info.className = 'config-exam-info';
+	this.appendTextElement(info, 'div', 'config-exam-name', metadata.name || examId);
+	this.appendTextElement(info, 'div', 'config-exam-desc', metadata.fullName || 'Custom Exam');
+	if (imageCount > 0) {
+	const imageInfo = document.createElement('div');
+	imageInfo.className = 'config-exam-images';
+	imageInfo.appendChild(this.createIcon('fas fa-images'));
+	imageInfo.appendChild(document.createTextNode(` ${imageCount} images loaded`));
+	info.appendChild(imageInfo);
+	}
+	item.appendChild(info);
+
+	const actions = document.createElement('div');
+	actions.className = 'config-exam-actions';
+	const label = document.createElement('label');
+	label.className = 'config-exam-toggle';
+	this.appendTextElement(label, 'span', 'config-exam-desc', isActive ? 'Active' : 'Hidden');
+	const checkbox = document.createElement('input');
+	checkbox.type = 'checkbox';
+	checkbox.checked = isActive;
+	label.appendChild(checkbox);
+	actions.appendChild(label);
+
+	const delBtn = document.createElement('button');
+	delBtn.type = 'button';
+	delBtn.className = 'config-delete-btn';
+	delBtn.title = 'Remove exam completely';
+	delBtn.appendChild(this.createIcon('fas fa-trash'));
+	delBtn.appendChild(document.createTextNode(' Remove'));
+	actions.appendChild(delBtn);
+	item.appendChild(actions);
 
 	// Bind event listeners instead of inline onclick/onchange
-	const checkbox = item.querySelector('input[type="checkbox"]');
 	if (checkbox) {
 		checkbox.addEventListener('change', function() {
 			homepage.toggleExamActivation(examId, this.checked);
 		});
 	}
-	const delBtn = item.querySelector('.config-delete-btn');
 	if (delBtn) {
 		delBtn.addEventListener('click', () => homepage.deleteExam(examId));
 	}

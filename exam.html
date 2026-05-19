@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Exam Simulator - Take practice exams with multiple question types and instant feedback">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📝</text></svg>">
@@ -11,7 +10,7 @@
   <link rel="stylesheet" href="multi-exam-styles.css" />
   <link rel="stylesheet" href="modern-enhancements.css" />
   <link rel="stylesheet" href="exam-enhancements.css" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="vendor/fontawesome/css/all.min.css" rel="stylesheet">
 </head>
 <body>
   <div class="theme-controls">
@@ -30,7 +29,7 @@
           </button>
         </div>
         <div class="exam-progress">
-          <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-bar" role="progressbar" aria-label="Exam progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
             <div id="progress-fill" class="progress-fill"></div>
           </div>
           <span id="question-counter">&nbsp;</span>
@@ -46,7 +45,7 @@
 
       <div class="question-container">
         <div id="question-number" class="question-number">Question</div>
-        <div id="question-type-indicator" class="question-type-indicator" style="display:none;">
+        <div id="question-type-indicator" class="question-type-indicator is-hidden">
           <i aria-hidden="true" class="fas fa-info-circle"></i>
           <span id="question-type-text"></span>
         </div>
@@ -61,7 +60,7 @@
             <i aria-hidden="true" class="fas fa-lightbulb"></i> Show Answer
           </button>
         </div>
-        <div id="answer-feedback" class="answer-feedback" style="display: none;">
+        <div id="answer-feedback" class="answer-feedback is-hidden">
           <div class="feedback-header">
             <span class="feedback-status"></span>
             <button id="close-feedback" class="close-feedback" aria-label="Close feedback">
@@ -82,7 +81,7 @@
             Next <i aria-hidden="true" class="fas fa-arrow-right"></i>
           </button>
         </div>
-        <div id="question-navigator" class="question-navigator" style="display:none;">
+        <div id="question-navigator" class="question-navigator is-hidden">
           <div class="nav-grid" id="nav-grid"></div>
           <div class="nav-legend">
             <span class="nav-legend-item"><span class="nav-dot answered"></span> Answered</span>
@@ -97,7 +96,7 @@
         <button id="review-marked-btn" class="btn-review-marked" title="Review marked questions">
           <i aria-hidden="true" class="fas fa-flag"></i> Review Marked
         </button>
-        <button id="finish-exam" class="btn btn-warning finish-btn" style="display: none;">
+        <button id="finish-exam" class="btn btn-warning finish-btn is-hidden">
           <i aria-hidden="true" class="fas fa-check"></i> Finish Exam
         </button>
       </div>
@@ -113,7 +112,7 @@
                 <span id="exam-name-result" class="exam-name-pill">Exam</span>
               </div>
               <div class="summary-visuals">
-                <div class="score-ring" id="scoreRing" style="--score-deg: 0deg;">
+                <div class="score-ring" id="scoreRing">
                   <div class="score-ring-inner">
                     <span id="percentage-score" class="score-percentage">0%</span>
                     <span class="score-label">Final Score</span>

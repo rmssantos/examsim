@@ -90,6 +90,11 @@ class MultiExamSimulator {
         this.bindEvents();
         this.updateProgressDisplay();
 
+        // Exam-only mode bootstrap is owned by exam-init.js when present.
+        if (window.ExamApp?.externalExamBootstrap === true || document.body?.dataset.examInitManaged === 'true') {
+            return;
+        }
+
         // Exam-only mode: if exam param is provided, auto-start in this page
         const params = new URLSearchParams(window.location.search);
         const examParam = params.get('exam');
@@ -519,7 +524,7 @@ class MultiExamSimulator {
             };
             return true;
         } catch (error) {
-            console.warn(`Failed to load exam ${examId} from localStorage:`, error);
+            console.warn('Failed to load exam from localStorage', { examId, error });
             return false;
         }
     }
@@ -550,14 +555,39 @@ class MultiExamSimulator {
         document.getElementById('exam-images').textContent = 'With Images';
     }
 
+    safeIconClass(icon, fallback = 'fas fa-book') {
+        const value = String(icon || '').trim();
+        return /^[a-zA-Z0-9 _-]+$/.test(value) ? value : fallback;
+    }
+
+    safeUrl(url) {
+        const value = String(url || '').trim();
+        if (!value) return null;
+
+        try {
+            const parsed = new URL(value, window.location.href);
+            if (!['http:', 'https:'].includes(parsed.protocol)) return null;
+            return parsed.href;
+        } catch (_) {
+            return null;
+        }
+    }
+
+    appendIcon(parent, iconClass, fallback) {
+        const icon = document.createElement('i');
+        icon.setAttribute('aria-hidden', 'true');
+        icon.className = this.safeIconClass(iconClass, fallback);
+        parent.appendChild(icon);
+    }
+
     updateModulesAndResources(exam) {
         // Update modules list
         const modulesList = document.getElementById('modules-list');
         modulesList.innerHTML = '';
         exam.modules.forEach(module => {
             const li = document.createElement('li');
-            const safeIcon = /^[a-zA-Z0-9 \-]+$/.test(module.icon || '') ? module.icon : 'fas fa-book';
-            li.innerHTML = `<i class="${safeIcon}"></i> ${this.escapeHtml(module.name)}`;
+            this.appendIcon(li, module.icon, 'fas fa-book');
+            li.appendChild(document.createTextNode(` ${module.name || 'Module'}`));
             modulesList.appendChild(li);
         });
 
@@ -565,18 +595,25 @@ class MultiExamSimulator {
         const resourcesList = document.getElementById('resources-list');
         resourcesList.innerHTML = '';
         exam.resources.forEach(resource => {
+            const safeHref = this.safeUrl(resource.url);
+            if (!safeHref) return;
+
             const a = document.createElement('a');
-            a.href = resource.url;
+            a.href = safeHref;
             a.target = '_blank';
             a.rel = 'noopener noreferrer';
             a.className = 'resource-compact';
-            const safeIcon = /^[a-zA-Z0-9 \-]+$/.test(resource.icon || '') ? resource.icon : 'fas fa-link';
-            a.innerHTML = `<i class="${safeIcon}"></i> ${this.escapeHtml(resource.name)}`;
+            this.appendIcon(a, resource.icon, 'fas fa-link');
+            a.appendChild(document.createTextNode(` ${resource.name || 'Resource'}`));
             resourcesList.appendChild(a);
         });
     }
 
     setupKeyboardShortcuts() {
+        if (this._keyHandler) {
+            document.removeEventListener('keydown', this._keyHandler);
+            this._keyHandler = null;
+        }
         this._keyHandler = (e) => {
             // Don't trigger if user is typing in an input
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -626,6 +663,11 @@ class MultiExamSimulator {
         if (!this.currentExam) {
             alert('Please select an exam first.');
             return;
+        }
+
+        if (this._keyHandler) {
+            document.removeEventListener('keydown', this._keyHandler);
+            this._keyHandler = null;
         }
 
         // Ensure dataset is loaded before starting
@@ -1866,97 +1908,78 @@ window.exportProgress = function() {
 };
 
 function showProgressModal(allProgress) {
-    // Create modal overlay
     const modal = document.createElement('div');
     modal.id = 'progress-stats-modal';
     modal.className = 'progress-modal-overlay';
 
-    // Create modal content
     const content = document.createElement('div');
     content.className = 'progress-modal-content';
 
-    // Build HTML content
-    let html = `
-        <button class="progress-modal-close">&times;</button>
-        <h2 class="progress-modal-title">
-            <i class="fas fa-chart-line"></i> Progress Statistics
-        </h2>
-        <div style="display:grid;gap:20px;">
-    `;
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'progress-modal-close';
+    closeBtn.type = 'button';
+    closeBtn.setAttribute('aria-label', 'Close progress statistics');
+    closeBtn.textContent = '×';
+    closeBtn.addEventListener('click', () => modal.remove());
+    content.appendChild(closeBtn);
 
-    // For each exam, show statistics
+    const title = document.createElement('h2');
+    title.className = 'progress-modal-title';
+    title.appendChild(createProgressIcon('fas fa-chart-line'));
+    title.appendChild(document.createTextNode(' Progress Statistics'));
+    content.appendChild(title);
+
+    const list = document.createElement('div');
+    list.style.cssText = 'display:grid;gap:20px;';
+
     Object.entries(allProgress).forEach(([examId, progress]) => {
-        const examName = _escapeHtml(getExamName(examId));
-        const safeExamId = _escapeHtml(examId);
+        const examName = getExamName(examId);
         const attempts = progress.attempts || [];
         const bestScore = progress.bestScore || 0;
         const totalPassed = progress.totalPassed || 0;
         const passRate = attempts.length > 0 ? Math.round((totalPassed / attempts.length) * 100) : 0;
         const avgScore = attempts.length > 0 ? Math.round(attempts.reduce((sum, a) => sum + a.score, 0) / attempts.length) : 0;
-
-        // Calculate recent trend
         const recentAttempts = attempts.slice(-5);
         const trend = calculateTrend(recentAttempts);
 
-        html += `
-            <div style="background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);border-radius:12px;padding:20px;border:2px solid #dee2e6;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
-                    <h3 style="margin:0;color:#1e3c72;font-size:22px;">
-                        <i class="fas fa-graduation-cap"></i> ${examName}
-                    </h3>
-                    <span style="background:${bestScore >= 70 ? '#28a745' : '#dc3545'};color:white;padding:6px 12px;border-radius:20px;font-size:14px;font-weight:bold;">
-                        Best: ${bestScore}%
-                    </span>
-                </div>
+        const card = document.createElement('div');
+        card.style.cssText = 'background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);border-radius:12px;padding:20px;border:2px solid #dee2e6;';
 
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:15px;">
-                    <div style="background:white;padding:15px;border-radius:8px;text-align:center;">
-                        <div style="color:#6c757d;font-size:12px;text-transform:uppercase;margin-bottom:5px;">Attempts</div>
-                        <div style="font-size:24px;font-weight:bold;color:#1e3c72;">${attempts.length}</div>
-                    </div>
-                    <div style="background:white;padding:15px;border-radius:8px;text-align:center;">
-                        <div style="color:#6c757d;font-size:12px;text-transform:uppercase;margin-bottom:5px;">Avg Score</div>
-                        <div style="font-size:24px;font-weight:bold;color:#007bff;">${avgScore}%</div>
-                    </div>
-                    <div style="background:white;padding:15px;border-radius:8px;text-align:center;">
-                        <div style="color:#6c757d;font-size:12px;text-transform:uppercase;margin-bottom:5px;">Pass Rate</div>
-                        <div style="font-size:24px;font-weight:bold;color:#28a745;">${passRate}%</div>
-                    </div>
-                    <div style="background:white;padding:15px;border-radius:8px;text-align:center;">
-                        <div style="color:#6c757d;font-size:12px;text-transform:uppercase;margin-bottom:5px;">Trend</div>
-                        <div style="font-size:24px;font-weight:bold;">${trend}</div>
-                    </div>
-                </div>
+        const header = document.createElement('div');
+        header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;gap:12px;flex-wrap:wrap;';
+        const heading = document.createElement('h3');
+        heading.style.cssText = 'margin:0;color:#1e3c72;font-size:22px;';
+        heading.appendChild(createProgressIcon('fas fa-graduation-cap'));
+        heading.appendChild(document.createTextNode(` ${examName}`));
+        header.appendChild(heading);
 
-                <button data-exam-id="${safeExamId}"
-                    class="view-attempts-btn"
-                    style="width:100%;padding:12px;background:linear-gradient(135deg,#1e3c72,#2a5298);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s ease;">
-                    <i class="fas fa-list"></i> View All Attempts
-                </button>
-            </div>
-        `;
+        const best = document.createElement('span');
+        best.style.cssText = `background:${bestScore >= 70 ? '#28a745' : '#dc3545'};color:white;padding:6px 12px;border-radius:20px;font-size:14px;font-weight:bold;`;
+        best.textContent = `Best: ${bestScore}%`;
+        header.appendChild(best);
+        card.appendChild(header);
+
+        const metrics = document.createElement('div');
+        metrics.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:15px;';
+        metrics.appendChild(createMetricCard('Attempts', String(attempts.length), '#1e3c72'));
+        metrics.appendChild(createMetricCard('Avg Score', `${avgScore}%`, '#007bff'));
+        metrics.appendChild(createMetricCard('Pass Rate', `${passRate}%`, '#28a745'));
+        metrics.appendChild(createMetricCard('Trend', trend, '#1e3c72'));
+        card.appendChild(metrics);
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'view-attempts-btn';
+        button.style.cssText = 'width:100%;padding:12px;background:linear-gradient(135deg,#1e3c72,#2a5298);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s ease;';
+        button.appendChild(createProgressIcon('fas fa-list'));
+        button.appendChild(document.createTextNode(' View All Attempts'));
+        button.addEventListener('click', () => showExamAttempts(examId));
+        card.appendChild(button);
+
+        list.appendChild(card);
     });
 
-    html += `
-        </div>
-    `;
-
-    content.innerHTML = html;
-
-    // Attach event listeners for close button (avoids inline onclick)
-    const closeBtn = content.querySelector('.progress-modal-close');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => modal.remove());
-    }
-
-    // Attach event listeners for view attempts buttons (avoids inline onclick XSS)
-    content.querySelectorAll('.view-attempts-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const eid = btn.getAttribute('data-exam-id');
-            showExamAttempts(eid);
-        });
-    });
-
+    content.appendChild(list);
     modal.appendChild(content);
     document.body.appendChild(modal);
 
@@ -1964,6 +1987,27 @@ function showProgressModal(allProgress) {
     modal.addEventListener('click', (e) => {
         if (e.target === modal) modal.remove();
     });
+}
+
+function createProgressIcon(className) {
+    const icon = document.createElement('i');
+    icon.className = className;
+    icon.setAttribute('aria-hidden', 'true');
+    return icon;
+}
+
+function createMetricCard(label, value, color) {
+    const card = document.createElement('div');
+    card.style.cssText = 'background:white;padding:15px;border-radius:8px;text-align:center;';
+    const labelEl = document.createElement('div');
+    labelEl.style.cssText = 'color:#6c757d;font-size:12px;text-transform:uppercase;margin-bottom:5px;';
+    labelEl.textContent = label;
+    const valueEl = document.createElement('div');
+    valueEl.style.cssText = `font-size:24px;font-weight:bold;color:${color};`;
+    valueEl.textContent = value;
+    card.appendChild(labelEl);
+    card.appendChild(valueEl);
+    return card;
 }
 
 function calculateTrend(attempts) {
@@ -2016,14 +2060,27 @@ window.showExamAttempts = function(examId) {
     const content = document.createElement('div');
     content.className = 'progress-modal-content';
 
-    let html = `
-        <button class="progress-modal-close">&times;</button>
-        <h2 class="progress-modal-title">
-            <i class="fas fa-history"></i> ${getExamName(examId)} - Attempt History
-        </h2>
-        <p style="color:#6c757d;margin-bottom:25px;">All ${attempts.length} attempts sorted by most recent</p>
-        <div style="display:grid;gap:12px;">
-    `;
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'progress-modal-close';
+    closeBtn.type = 'button';
+    closeBtn.setAttribute('aria-label', 'Close attempt history');
+    closeBtn.textContent = '×';
+    closeBtn.addEventListener('click', () => modal.remove());
+    content.appendChild(closeBtn);
+
+    const title = document.createElement('h2');
+    title.className = 'progress-modal-title';
+    title.appendChild(createProgressIcon('fas fa-history'));
+    title.appendChild(document.createTextNode(` ${getExamName(examId)} - Attempt History`));
+    content.appendChild(title);
+
+    const subtitle = document.createElement('p');
+    subtitle.style.cssText = 'color:#6c757d;margin-bottom:25px;';
+    subtitle.textContent = `All ${attempts.length} attempts sorted by most recent`;
+    content.appendChild(subtitle);
+
+    const list = document.createElement('div');
+    list.style.cssText = 'display:grid;gap:12px;';
 
     // Sort by date (most recent first)
     const sortedAttempts = [...attempts].reverse();
@@ -2043,60 +2100,57 @@ window.showExamAttempts = function(examId) {
         const statusIcon = passed ? 'fa-check-circle' : 'fa-times-circle';
         const statusText = passed ? 'PASSED' : 'FAILED';
 
-        html += `
-            <div style="background:${passed ? 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)' : 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)'};
-                border-radius:10px;padding:16px;border:2px solid ${passed ? '#28a745' : '#dc3545'};">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-                    <div>
-                        <div style="font-weight:bold;font-size:16px;color:#212529;margin-bottom:4px;">
-                            <i class="fas fa-clipboard-check"></i> Attempt #${attemptNum}
-                        </div>
-                        <div style="font-size:13px;color:#6c757d;">
-                            <i class="fas fa-calendar-alt"></i> ${dateStr}
-                        </div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:20px;">
-                        <div style="text-align:center;">
-                            <div style="color:#6c757d;font-size:11px;text-transform:uppercase;margin-bottom:3px;">Score</div>
-                            <div style="font-size:28px;font-weight:bold;color:${statusColor};">${attempt.score}%</div>
-                        </div>
-                        <div style="text-align:center;">
-                            <div style="color:#6c757d;font-size:11px;text-transform:uppercase;margin-bottom:3px;">Time</div>
-                            <div style="font-size:20px;font-weight:bold;color:#007bff;">${attempt.timeSpent}min</div>
-                        </div>
-                        <div style="background:${statusColor};color:white;padding:8px 16px;border-radius:20px;font-weight:bold;font-size:13px;">
-                            <i class="fas ${statusIcon}"></i> ${statusText}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+        const card = document.createElement('div');
+        card.style.cssText = `background:${passed ? 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)' : 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)'};border-radius:10px;padding:16px;border:2px solid ${passed ? '#28a745' : '#dc3545'};`;
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;';
+
+        const left = document.createElement('div');
+        const attemptTitle = document.createElement('div');
+        attemptTitle.style.cssText = 'font-weight:bold;font-size:16px;color:#212529;margin-bottom:4px;';
+        attemptTitle.appendChild(createProgressIcon('fas fa-clipboard-check'));
+        attemptTitle.appendChild(document.createTextNode(` Attempt #${attemptNum}`));
+        left.appendChild(attemptTitle);
+
+        const dateLine = document.createElement('div');
+        dateLine.style.cssText = 'font-size:13px;color:#6c757d;';
+        dateLine.appendChild(createProgressIcon('fas fa-calendar-alt'));
+        dateLine.appendChild(document.createTextNode(` ${dateStr}`));
+        left.appendChild(dateLine);
+        row.appendChild(left);
+
+        const right = document.createElement('div');
+        right.style.cssText = 'display:flex;align-items:center;gap:20px;flex-wrap:wrap;';
+        right.appendChild(createAttemptMetric('Score', `${attempt.score}%`, statusColor, '28px'));
+        right.appendChild(createAttemptMetric('Time', `${attempt.timeSpent}min`, '#007bff', '20px'));
+
+        const status = document.createElement('div');
+        status.style.cssText = `background:${statusColor};color:white;padding:8px 16px;border-radius:20px;font-weight:bold;font-size:13px;`;
+        status.appendChild(createProgressIcon(`fas ${statusIcon}`));
+        status.appendChild(document.createTextNode(` ${statusText}`));
+        right.appendChild(status);
+
+        row.appendChild(right);
+        card.appendChild(row);
+        list.appendChild(card);
     });
 
-    html += `
-        </div>
-        <div style="margin-top:20px;text-align:center;">
-            <button class="back-to-overview-btn"
-                style="padding:10px 20px;background:#6c757d;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;">
-                <i class="fas fa-arrow-left"></i> Back to Overview
-            </button>
-        </div>
-    `;
+    content.appendChild(list);
 
-    content.innerHTML = html;
-
-    // Attach event listeners (avoids inline onclick)
-    const closeBtn = content.querySelector('.progress-modal-close');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => modal.remove());
-    }
-    const backBtn = content.querySelector('.back-to-overview-btn');
-    if (backBtn) {
-        backBtn.addEventListener('click', () => {
-            modal.remove();
-            window.showProgressStatistics();
-        });
-    }
+    const footer = document.createElement('div');
+    footer.style.cssText = 'margin-top:20px;text-align:center;';
+    const backBtn = document.createElement('button');
+    backBtn.type = 'button';
+    backBtn.className = 'back-to-overview-btn';
+    backBtn.style.cssText = 'padding:10px 20px;background:#6c757d;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;';
+    backBtn.appendChild(createProgressIcon('fas fa-arrow-left'));
+    backBtn.appendChild(document.createTextNode(' Back to Overview'));
+    backBtn.addEventListener('click', () => {
+        modal.remove();
+        window.showProgressStatistics();
+    });
+    footer.appendChild(backBtn);
+    content.appendChild(footer);
 
     modal.appendChild(content);
     document.body.appendChild(modal);
@@ -2105,3 +2159,17 @@ window.showExamAttempts = function(examId) {
         if (e.target === modal) modal.remove();
     });
 };
+
+function createAttemptMetric(label, value, color, size) {
+    const metric = document.createElement('div');
+    metric.style.cssText = 'text-align:center;';
+    const labelEl = document.createElement('div');
+    labelEl.style.cssText = 'color:#6c757d;font-size:11px;text-transform:uppercase;margin-bottom:3px;';
+    labelEl.textContent = label;
+    const valueEl = document.createElement('div');
+    valueEl.style.cssText = `font-size:${size};font-weight:bold;color:${color};`;
+    valueEl.textContent = value;
+    metric.appendChild(labelEl);
+    metric.appendChild(valueEl);
+    return metric;
+}

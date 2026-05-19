@@ -67,4 +67,5 @@ config.local.js
 settings.local.json
 
 
-.local/.superpowers/
+.local/
+.superpowers/

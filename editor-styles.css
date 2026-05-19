@@ -11,6 +11,16 @@ body {
 
 .editor-container { max-width: 1440px; margin: 0 auto; }
 
+.is-hidden { display: none; }
+
+.editor-full-width-action { width: 100%; margin-top: 8px; }
+
+.editor-help-text { color: #6c757d; }
+
+.editor-save-status { margin-left: auto; }
+
+.editor-preview-explanation { margin-top: 12px; }
+
 /* Header */
 .editor-header {
   display: flex;
@@ -490,7 +500,7 @@ input:focus, textarea:focus, select:focus {
 .pv-option.correct .pv-letters { color: #16a34a; }
 .pv-letters { font-weight: 700; width: 20px; text-align: center; color: #6366f1; }
 .pv-option.selected { background: rgba(99, 102, 241, 0.06); border-color: rgba(99, 102, 241, 0.2); }
-.pv-clickable { cursor: pointer; user-select: none; }
+.pv-clickable { cursor: pointer; -webkit-user-select: none; user-select: none; }
 
 .pv-yn-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; border-bottom: 1px solid #f1f5f9; padding: 6px 0; }
 .pv-yn-ans { font-weight: 600; color: #6366f1; }
