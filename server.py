@@ -36,8 +36,6 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         loopback_origin = f'http://127.0.0.1:{port}'
         if origin == loopback_origin:
             self.send_header('Access-Control-Allow-Origin', loopback_origin)
-        elif origin == 'null':
-            self.send_header('Access-Control-Allow-Origin', 'null')
         elif origin == localhost_origin or not origin:
             self.send_header('Access-Control-Allow-Origin', localhost_origin)
         self.send_header('Access-Control-Allow-Methods', 'GET, PUT, OPTIONS')

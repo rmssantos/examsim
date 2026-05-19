@@ -255,9 +255,13 @@
     }
 
     // Special sections
-    $('#ddSelectRow').style.display = (type === 'DRAG_DROP_SELECT') ? '' : 'none';
+    const ddSelectRow = $('#ddSelectRow');
+    ddSelectRow.classList.toggle('is-hidden', type !== 'DRAG_DROP_SELECT');
+    ddSelectRow.style.display = type === 'DRAG_DROP_SELECT' ? '' : 'none';
     // Hide ynMatrixRow since we now edit statements inline
-    $('#ynMatrixRow').style.display = 'none';
+    const ynMatrixRow = $('#ynMatrixRow');
+    ynMatrixRow.classList.add('is-hidden');
+    ynMatrixRow.style.display = 'none';
     $('#qDragSelectN').value = q.drag_select_required || '';
 
     // Update UI hints for current type

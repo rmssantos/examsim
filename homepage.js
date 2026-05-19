@@ -116,8 +116,11 @@ return /^[a-zA-Z0-9 _-]+$/.test(value) ? value : fallback;
 }
 
 safeExternalUrl(url) {
+const value = String(url || '').trim();
+if (!value) return '#';
+
 try {
-const parsed = new URL(String(url || ''), window.location.href);
+const parsed = new URL(value, window.location.href);
 return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '#';
 } catch (_) {
 return '#';
