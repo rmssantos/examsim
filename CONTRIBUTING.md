@@ -74,6 +74,18 @@ Feature requests are welcome! Please provide:
 - Proposed implementation (if you have ideas)
 - Mock-ups or examples (if applicable)
 
+### Exam Content Corrections
+
+Edits made in the browser editor are local to your browser. They do not update GitHub Pages or change the public exam files for other users.
+
+Use a pull request when you have a concrete correction ready:
+- Export the updated questions from the editor.
+- Replace the relevant `user-content/exams/<exam-id>/dump.json` file.
+- Include related `metadata.json` or image changes if needed.
+- Explain which question IDs changed and why.
+
+Use a GitHub issue when you want to request a correction but do not want to edit JSON yourself. Include the exam ID, question ID, current text, proposed change, and a source or rationale where possible.
+
 ---
 
 ### Contributing Code
@@ -106,8 +118,8 @@ Look for issues labeled:
 
 ```bash
 # Clone the repository
-git clone https://github.com/rmssantos/examsimcreator.git
-cd examsimcreator/portable
+git clone https://github.com/rmssantos/examsim.git
+cd examsim
 
 # Start development server
 python server.py

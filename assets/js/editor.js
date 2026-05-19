@@ -520,7 +520,7 @@
     updatePersistenceHint();
 
     // Gentle toast-ish feedback without blocking
-    notify('✓ Saved to browser! Export to make permanent.');
+    notify('Saved locally in this browser. Open a PR or issue to share changes.');
   }
 
   // Show hint about persisting changes to dump.json
@@ -542,12 +542,12 @@
     const examId = state.exam === 'custom' && state.customCode ? state.customCode : state.exam || 'custom-exam';
     const safeExamId = escapeHtml(examId);
     hint.innerHTML = `
-      <strong><i class="fas fa-info-circle"></i> Want changes beyond this browser?</strong>
+      <strong><i class="fas fa-info-circle"></i> Local edits only</strong>
+      <p style="margin:8px 0 0 0;line-height:1.5;">Saving here changes only this browser. Other users keep seeing the published exam until a repository update is accepted.</p>
       <ol style="margin:8px 0 0 20px;padding:0;line-height:1.6;">
         <li>Click <em>Export Questions</em> to download <code>${safeExamId}_dump_YYYY-MM-DD.json</code>.</li>
-        <li>Copy it over <code>user-content/exams/${safeExamId}/dump.json</code> (create the folder if it doesn't exist).</li>
-        <li>Include any updated <code>metadata.json</code> or images under <code>user-content/exams/${safeExamId}/images/</code>.</li>
-        <li>Refresh the app (F5) or zip the folder and drop it on the home page importer to reuse elsewhere.</li>
+        <li>For a direct contribution, open a pull request replacing <code>user-content/exams/${safeExamId}/dump.json</code>.</li>
+        <li>If you only want to suggest a correction, open a GitHub issue with the question ID and proposed change.</li>
       </ol>
       <small style="opacity:0.8;">Until then, edits live in this browser's localStorage.</small>
     `;

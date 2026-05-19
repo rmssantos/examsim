@@ -79,6 +79,36 @@
 	line-height: 1.4;
 }
 
+.hero-public-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-top: 0.85rem;
+	padding: 0.55rem 0.8rem;
+	border-radius: 10px;
+	background: rgba(20, 184, 166, 0.1);
+	border: 1px solid rgba(20, 184, 166, 0.28);
+	color: #0f766e;
+	font-size: 0.8rem;
+	font-weight: 600;
+	text-decoration: none;
+	width: fit-content;
+	max-width: 100%;
+	transition: all 0.2s ease;
+}
+
+.hero-public-link:hover {
+	background: rgba(20, 184, 166, 0.16);
+	border-color: rgba(20, 184, 166, 0.45);
+	transform: translateY(-1px);
+}
+
+.hero-public-link strong {
+	color: #115e59;
+	font-size: 0.78rem;
+	font-weight: 700;
+}
+
 .hero-stats {
 	display: flex;
 	gap: 0.85rem;
@@ -175,6 +205,19 @@
 	border-color: rgba(30, 60, 114, 0.35);
 	transform: translateY(-2px);
 	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.action-btn.public {
+	background: rgba(20, 184, 166, 0.12);
+	color: #0f766e;
+	border: 1.5px solid rgba(20, 184, 166, 0.35);
+	box-shadow: 0 4px 12px rgba(20, 184, 166, 0.08);
+}
+
+.action-btn.public:hover {
+	background: rgba(20, 184, 166, 0.18);
+	border-color: rgba(20, 184, 166, 0.55);
+	transform: translateY(-2px);
 }
 
 .action-btn.ghost {
@@ -890,6 +933,7 @@
 
 .info-card {
 	background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.9));
+	-webkit-backdrop-filter: blur(10px);
 	backdrop-filter: blur(10px);
 	border: 1px solid rgba(30, 60, 114, 0.08);
 	border-radius: 10px;
@@ -1593,6 +1637,7 @@ body.dragging-file::before {
 	width: 100vw;
 	height: 100vh;
 	background: rgba(0, 0, 0, 0.85);
+	-webkit-backdrop-filter: blur(6px);
 	backdrop-filter: blur(6px);
 	z-index: 9998;
 	pointer-events: none;
@@ -1766,6 +1811,28 @@ body.dragging-file .drop-zone-simple.drag-over,
 .dark-mode .action-btn.secondary:hover {
 	background: rgba(55, 68, 88, 1);
 	border-color: rgba(255, 255, 255, 0.25);
+}
+
+[data-theme="dark"] .hero-public-link,
+.dark-mode .hero-public-link,
+[data-theme="dark"] .action-btn.public,
+.dark-mode .action-btn.public {
+	background: rgba(20, 184, 166, 0.16);
+	border-color: rgba(94, 234, 212, 0.32);
+	color: #99f6e4;
+}
+
+[data-theme="dark"] .hero-public-link strong,
+.dark-mode .hero-public-link strong {
+	color: #ccfbf1;
+}
+
+[data-theme="dark"] .hero-public-link:hover,
+.dark-mode .hero-public-link:hover,
+[data-theme="dark"] .action-btn.public:hover,
+.dark-mode .action-btn.public:hover {
+	background: rgba(20, 184, 166, 0.24);
+	border-color: rgba(94, 234, 212, 0.48);
 }
 
 [data-theme="dark"] .action-btn.ghost,
@@ -1996,6 +2063,7 @@ body.dragging-file .drop-zone-simple.drag-over,
 	gap: 0.625rem;
 	padding: 0.75rem 1.25rem;
 	background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.9));
+	-webkit-backdrop-filter: blur(15px);
 	backdrop-filter: blur(15px);
 	border-radius: 50px;
 	border: 1.5px solid rgba(30, 60, 114, 0.12);
@@ -2079,6 +2147,7 @@ body.dragging-file .drop-zone-simple.drag-over,
 
 .progress-item {
 	background: rgba(255, 255, 255, 0.95);
+	-webkit-backdrop-filter: blur(10px);
 	backdrop-filter: blur(10px);
 	padding: 0.9rem;
 	border-radius: 10px;
@@ -2169,6 +2238,7 @@ body.dragging-file .drop-zone-simple.drag-over,
 	padding: 0.625rem 1.25rem;
 	border: 2px solid rgba(30, 60, 114, 0.2);
 	background: rgba(255, 255, 255, 0.95);
+	-webkit-backdrop-filter: blur(10px);
 	backdrop-filter: blur(10px);
 	color: var(--text);
 	border-radius: 12px;
