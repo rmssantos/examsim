@@ -14,7 +14,15 @@ import json
 import re
 
 PORT = 8000
+HOST = "127.0.0.1"
 DIRECTORY = Path(__file__).parent
+ALLOWED_IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.svg', '.webp'}
+
+def safe_join_under(root, *parts):
+    root_path = Path(root).resolve()
+    target = root_path.joinpath(*parts).resolve()
+    target.relative_to(root_path)
+    return target
 
 class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -22,25 +30,44 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     def end_headers(self):
         # Only allow requests from the same origin (localhost)
-        origin = self.headers.get('Origin', '')
+        origin = (self.headers.get('Origin', '') or '').replace('\r', '').replace('\n', '')
         port = self.server.server_address[1]
-        allowed_origins = [
-            f'http://localhost:{port}',
-            f'http://127.0.0.1:{port}',
-            'null'  # for file:// protocol
-        ]
-        if origin in allowed_origins or not origin:
-            self.send_header('Access-Control-Allow-Origin', origin or f'http://localhost:{port}')
-        else:
+        localhost_origin = f'http://localhost:{port}'
+        loopback_origin = f'http://127.0.0.1:{port}'
+        if origin == loopback_origin:
+            self.send_header('Access-Control-Allow-Origin', loopback_origin)
+        elif origin == 'null':
             self.send_header('Access-Control-Allow-Origin', 'null')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        elif origin == localhost_origin or not origin:
+            self.send_header('Access-Control-Allow-Origin', localhost_origin)
+        self.send_header('Access-Control-Allow-Methods', 'GET, PUT, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
         super().end_headers()
 
+    def send_json(self, status, payload):
+        self.send_response(status)
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.end_headers()
+        self.wfile.write(json.dumps(payload).encode('utf-8'))
+
     def do_OPTIONS(self):
         self.send_response(200)
         self.end_headers()
+
+    def do_GET(self):
+        parsed = urlparse(self.path)
+        if parsed.path == '/user-content/exams/index.json':
+            exams_root = DIRECTORY / 'user-content' / 'exams'
+            exam_dirs = []
+            if exams_root.exists():
+                for child in sorted(exams_root.iterdir(), key=lambda item: item.name.lower()):
+                    if child.is_dir() and re.fullmatch(r'[A-Za-z0-9_\-]+', child.name) and (child / 'dump.json').is_file():
+                        exam_dirs.append(child.name)
+            self.send_json(200, exam_dirs)
+            return
+
+        super().do_GET()
 
     def do_PUT(self):
         parsed = urlparse(self.path)
@@ -58,47 +85,57 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
         # Basic sanitization to avoid path traversal
         if not exam or not re.fullmatch(r'[A-Za-z0-9_\-]+', exam):
-            self.send_response(400)
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(json.dumps({'error': 'Invalid exam id'}).encode('utf-8'))
+            self.send_json(400, {'error': 'Invalid exam id'})
             return
 
-        safe_name = os.path.basename(name)
-        if not safe_name:
-            self.send_response(400)
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(json.dumps({'error': 'Invalid filename'}).encode('utf-8'))
+        safe_name = os.path.basename(name.replace('\\', '/'))
+        if (
+            not safe_name or
+            safe_name != name or
+            safe_name.startswith('.') or
+            not re.fullmatch(r'[A-Za-z0-9_. -]+', safe_name)
+        ):
+            self.send_json(400, {'error': 'Invalid filename'})
             return
 
-        content_length = int(self.headers.get('Content-Length') or 0)
+        extension = Path(safe_name).suffix.lower()
+        if extension not in ALLOWED_IMAGE_EXTENSIONS:
+            self.send_json(400, {'error': 'Unsupported image extension'})
+            return
+
+        try:
+            content_length = int(self.headers.get('Content-Length') or 0)
+        except ValueError:
+            self.send_json(400, {'error': 'Invalid content length'})
+            return
+
         max_size = 50 * 1024 * 1024  # 50 MB
+        if content_length <= 0:
+            self.send_json(400, {'error': 'Empty upload'})
+            return
+
         if content_length > max_size:
-            self.send_response(413)
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(json.dumps({'error': 'File too large. Maximum size is 50 MB.'}).encode('utf-8'))
+            self.send_json(413, {'error': 'File too large. Maximum size is 50 MB.'})
             return
         data = self.rfile.read(content_length) if content_length > 0 else b''
 
-        dest_dir = DIRECTORY / 'user-content' / 'exams' / exam / 'images'
+        try:
+            base_exam_dir = safe_join_under(DIRECTORY / 'user-content' / 'exams', exam)
+            dest_dir = safe_join_under(base_exam_dir, 'images')
+            dest_path = safe_join_under(dest_dir, safe_name)
+        except ValueError:
+            self.send_json(400, {'error': 'Invalid upload path'})
+            return
+
         dest_dir.mkdir(parents=True, exist_ok=True)
-        dest_path = dest_dir / safe_name
 
         try:
             dest_path.write_bytes(data)
-        except Exception as e:
-            self.send_response(500)
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(json.dumps({'error': str(e)}).encode('utf-8'))
+        except OSError:
+            self.send_json(500, {'error': 'Could not save uploaded image'})
             return
 
-        self.send_response(200)
-        self.send_header('Content-Type', 'application/json; charset=utf-8')
-        self.end_headers()
-        self.wfile.write(json.dumps({'filename': safe_name}).encode('utf-8'))
+        self.send_json(200, {'filename': safe_name})
 
     def log_message(self, format, *args):
         # Custom log format
@@ -111,21 +148,21 @@ def main():
     print("Exam Simulator - Local Server")
     print("=" * 60)
     print(f"Serving from: {DIRECTORY}")
-    print(f"Server running at: http://localhost:{PORT}")
+    print(f"Server running at: http://{HOST}:{PORT}")
     print("=" * 60)
     print("\nOpening browser...")
     print("\nPress Ctrl+C to stop the server\n")
 
     # Try to open browser
     try:
-        webbrowser.open(f"http://localhost:{PORT}/")
+        webbrowser.open(f"http://{HOST}:{PORT}/")
     except:
         print("Could not open browser automatically")
-        print(f"Please open: http://localhost:{PORT}/")
+        print(f"Please open: http://{HOST}:{PORT}/")
 
     # Start server
     socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", PORT), MyHTTPRequestHandler) as httpd:
+    with socketserver.TCPServer((HOST, PORT), MyHTTPRequestHandler) as httpd:
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:

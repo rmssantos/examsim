@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<link rel="preconnect" href="https://cdnjs.cloudflare.com">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="Exam Simulator - Practice for certification exams with interactive questions, timed tests, and detailed results">
 	<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📝</text></svg>">
@@ -12,8 +11,8 @@
 	<link rel="stylesheet" href="modern-enhancements.css">
 	<link rel="stylesheet" href="homepage-styles.css">
 	<link rel="stylesheet" href="exam-enhancements.css">
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<link href="vendor/fontawesome/css/all.min.css" rel="stylesheet">
+	<script src="vendor/jszip/jszip.min.js" defer></script>
 
 	<link rel="stylesheet" href="index-inline.css">
 </head>
@@ -169,7 +168,7 @@
 								</div>
 
 								<!-- Modules Section (if available) -->
-								<div id="details-modules-section" class="exam-details-section modules-and-resources" style="display: none;">
+								<div id="details-modules-section" class="exam-details-section modules-and-resources is-hidden">
 									<h3><i aria-hidden="true" class="fas fa-graduation-cap"></i> Exam Coverage</h3>
 									<div class="modules-resources-grid">
 										<div class="modules-section">
@@ -194,7 +193,7 @@
 						</div>
 
 						<!-- No Exams Fallback -->
-						<div id="no-exams-section" class="no-exams-section" style="display: none;">
+						<div id="no-exams-section" class="no-exams-section is-hidden">
 							<div class="empty-state">
 								<div class="empty-icon">
 									<i aria-hidden="true" class="fas fa-inbox"></i>
@@ -215,7 +214,7 @@
 					</div>
 
 					<!-- Sidebar - Hidden in new layout -->
-					<aside class="sidebar" style="display: none;">
+					<aside class="sidebar is-hidden">
 						<!-- Preview Card -->
 						<div class="preview-card" id="hero-preview">
 							<div class="preview-header">
@@ -258,7 +257,7 @@
 						</div>
 
 						<!-- Current Exam Info -->
-						<div id="current-exam-info" class="exam-info-card" style="display: none;">
+						<div id="current-exam-info" class="exam-info-card is-hidden">
 							<h3>Current Exam: <span id="current-exam-name">—</span>
 								<span class="current-exam-indicator">Selected</span>
 							</h3>
@@ -286,14 +285,14 @@
 							</div>
 						</div>
 
-						<div class="start-exam-cta" style="display: none;">
+						<div class="start-exam-cta is-hidden">
 							<button id="start-exam" class="btn btn-primary btn-start-exam">
 								<i aria-hidden="true" class="fas fa-play"></i> 
 								<span>Start Exam</span>
 							</button>
 						</div>
 
-						<div id="modules-section" class="modules-and-resources" style="display: none;">
+						<div id="modules-section" class="modules-and-resources is-hidden">
 							<h3><i aria-hidden="true" class="fas fa-graduation-cap"></i> Exam Coverage & Study Resources</h3>
 							<div class="modules-resources-grid">
 								<div class="modules-section">
@@ -361,7 +360,7 @@
 					</button>
 				</div>
 				<div class="exam-progress">
-					<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+					<div class="progress-bar" role="progressbar" aria-label="Exam progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
 						<div id="progress-fill" class="progress-fill"></div>
 					</div>
 					<span id="question-counter">1 / 50</span>
@@ -379,7 +378,7 @@
 				<div id="question-number" class="question-number">Question 1</div>
                 
 				<!-- Question Type Indicator -->
-				<div id="question-type-indicator" class="question-type-indicator" style="display: none;">
+				<div id="question-type-indicator" class="question-type-indicator is-hidden">
 					<i aria-hidden="true" class="fas fa-info-circle"></i>
 					<span id="question-type-text">Drag & Drop Question</span>
 				</div>
@@ -400,7 +399,7 @@
 					</button>
 				</div>
                 
-				<div id="answer-feedback" class="answer-feedback" style="display: none;">
+				<div id="answer-feedback" class="answer-feedback is-hidden">
 					<div class="feedback-header">
 						<span class="feedback-status"></span>
 						<button id="close-feedback" class="close-feedback" aria-label="Close feedback">
@@ -423,7 +422,7 @@
 						Next <i aria-hidden="true" class="fas fa-arrow-right"></i>
 					</button>
 				</div>
-				<div id="question-navigator" class="question-navigator" style="display:none;">
+				<div id="question-navigator" class="question-navigator is-hidden">
 					<div class="nav-grid" id="nav-grid"></div>
 					<div class="nav-legend">
 						<span class="nav-legend-item"><span class="nav-dot answered"></span> Answered</span>
@@ -438,7 +437,7 @@
 				<button id="review-marked-btn" class="btn-review-marked" title="Review marked questions">
 					<i aria-hidden="true" class="fas fa-flag"></i> Review Marked
 				</button>
-				<button id="finish-exam" class="btn btn-warning finish-btn" style="display: none;">
+				<button id="finish-exam" class="btn btn-warning finish-btn is-hidden">
 					<i aria-hidden="true" class="fas fa-check"></i> Finish Exam
 				</button>
 			</div>
@@ -582,7 +581,7 @@
 			<div class="import-progress-title" id="import-progress-title">Importing Exam...</div>
 			<div class="import-progress-subtitle" id="import-progress-subtitle">Please wait while we process your files</div>
 			<div class="import-progress-bar-container">
-				<div class="import-progress-bar" id="import-progress-bar" style="width: 0%"></div>
+				<div class="import-progress-bar" id="import-progress-bar"></div>
 			</div>
 			<div class="import-progress-stats">
 				<span class="import-progress-percentage" id="import-progress-percentage">0%</span>

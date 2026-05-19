@@ -1,4 +1,8 @@
 // Close exam tab or navigate to homepage
+window.ExamApp = window.ExamApp || {};
+window.ExamApp.externalExamBootstrap = true;
+document.body.dataset.examInitManaged = 'true';
+
 function closeExamTab() {
   // Try to close the tab (works if opened via window.open)
   window.close();
@@ -51,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.warn(`⚠️ No images found for exam "${examId}". Please re-import the ZIP file.`);
         const warningBanner = document.createElement('div');
         warningBanner.className = 'image-warning-banner';
-        warningBanner.innerHTML = '⚠️ Images not loaded! Please go back to homepage and re-import the exam ZIP file.';
+        warningBanner.textContent = '⚠️ Images not loaded! Please go back to homepage and re-import the exam ZIP file.';
         document.body.appendChild(warningBanner);
       }
     } catch (e) {

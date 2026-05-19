@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Exam Simulator - Inspect and manage stored exam images">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📝</text></svg>">
@@ -115,6 +114,9 @@
             padding: 40px;
             color: #7f8c8d;
         }
+        .is-hidden {
+            display: none;
+        }
         .spinner {
             animation: spin 1s linear infinite;
             display: inline-block;
@@ -138,7 +140,7 @@
             <button onclick="clearIndexedDB()" class="danger">🗑️ Clear All IndexedDB</button>
         </div>
 
-        <div id="loading" class="loading" style="display: none;">
+        <div id="loading" class="loading is-hidden">
             <div class="spinner">⚙️</div>
             <p>Loading storage data...</p>
         </div>

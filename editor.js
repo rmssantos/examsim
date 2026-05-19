@@ -667,17 +667,13 @@
       const reader = new FileReader();
       reader.onload = () => {
         try {
-          const data = JSON.parse(reader.result);
-          if (!Array.isArray(data)) throw new Error('JSON must be an array of questions');
-          // Validate that each item has the required fields
-          for (let i = 0; i < data.length; i++) {
-            const item = data[i];
-            if (!item || typeof item.id === 'undefined' || typeof item.question === 'undefined' ||
-                !Array.isArray(item.options) || typeof item.correct === 'undefined') {
-              throw new Error(`Question at index ${i} is missing required fields (id, question, options, correct)`);
-            }
+          const parsed = JSON.parse(reader.result);
+          const questions = Array.isArray(parsed) ? parsed : (Array.isArray(parsed?.questions) ? parsed.questions : null);
+          if (!questions) throw new Error('JSON must be an array of questions or an object with a questions array');
+          if (window.examManager && !window.examManager.validateExamData(questions)) {
+            throw new Error('Invalid question format for one or more questions');
           }
-          state.items = data;
+          state.items = questions;
           applyFilter();
           state.currentIndex = 0;
           renderList();
