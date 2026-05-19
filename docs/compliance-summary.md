@@ -9,13 +9,13 @@ This document captures the lifecycle of the recent AI-102 and AI-900 data restor
 | AI-102 exam pack | Rebuilt complete folder structure (`dump.json`, `metadata.json`, `images/`, and supporting ZIP) using known-good backups. | ✅ Restored and validated successfully. | Stored under `user-content/ai102/` with matching metadata timestamps.
 | AI-900 exam pack | Recreated metadata, normalized JSON encoding (converted from Windows-1252 to UTF-8), and regenerated archive. | ✅ Import now succeeds without encoding errors. | Lives under `user-content/ai900/`; easiest to verify via in-app import and preview widgets.
 | Image support | Ensured each exam folder includes `images/` tree with mirrored structure, enabling in-app previews without broken references. | ✅ Verified via preview hero card and image loader scripting. | Continue to keep binary image assets outside of public distributions.
-| Homepage UX alignment | Increased container width (+50%) and reorganized hero + library layout to clearly surface compliance-relevant CTAs (import, manage, preview). | ✅ Layout now highlights provenance and import steps, improving audit traceability. | See `index.html` and `homepage-styles.css` for implementation details.
+| Homepage UX alignment | Increased container width (+50%) and reorganized hero + library layout to clearly surface compliance-relevant CTAs (import, manage, preview). | ✅ Layout now highlights provenance and import steps, improving audit traceability. | See `index.html` and `assets/css/homepage-styles.css` for implementation details.
 
 ## Validation Checklist
 
 - ✅ Manual import test for AI-102 pack (JSON and ZIP) using the on-page drag & drop flow.
 - ✅ Manual import test for AI-900 pack after UTF-8 conversion.
-- ✅ Image inspection via `image-loader.js` logging; no missing references detected.
+- ✅ Image inspection via `assets/js/image-loader.js` logging; no missing references detected.
 - ✅ Hero preview card populated from restored metadata (exam name, attempts, timestamps).
 - ✅ `user-content` remains excluded from version control to avoid leaking private dumps.
 

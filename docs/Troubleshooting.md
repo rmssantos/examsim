@@ -2,7 +2,7 @@
 
 First question blank or counter flash 1/50
 - Ensure exam.html defers start until AI‑102 is ready (ai102QuestionsReady) or data is already present.
-- Confirm `exam-loader.js` finishes before `script-multi-exam.js` so question banks exist.
+- Confirm `assets/js/exam-loader.js` finishes before `assets/js/script-multi-exam.js` so question banks exist.
 
 Only 5 AI‑102 questions
 - Verify ai102_dump.js/json are present under portable/dumps
@@ -18,7 +18,7 @@ Custom exam not loading
 - Launch with exam.html?exam=custom&code=<code>
 
 High contrast answer colors missing
-- Confirm portable/multi-exam-styles.css is included and not overridden by theme
+- Confirm `assets/css/multi-exam-styles.css` is included and not overridden by theme
 
 Data mismatch or duplicates
 - Clear localStorage to remove stale overrides

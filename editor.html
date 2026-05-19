@@ -6,8 +6,8 @@
   <meta name="description" content="Exam Simulator - Create and edit exam questions with the built-in editor">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📝</text></svg>">
   <title>Question Editor - Create & Edit Exams</title>
-  <link href="vendor/fontawesome/css/all.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="editor-styles.css">
+  <link href="assets/vendor/fontawesome/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/editor-styles.css">
 </head>
 <body>
   <div class="editor-container">
@@ -173,9 +173,9 @@
 
   <input id="fileInput" class="is-hidden" type="file" accept="application/json" aria-label="Import exam JSON file" />
 
-  <script src="utils.js"></script>
-  <script src="exam-manager.js"></script>
-  <script src="exam-loader.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/exam-manager.js"></script>
+  <script src="assets/js/exam-loader.js"></script>
   <script>
     // Initialize dynamic exam list in editor
     async function initializeEditorExamList() {
@@ -258,6 +258,6 @@
       initializeEditorExamList();
     });
   </script>
-  <script src="editor.js"></script>
+  <script src="assets/js/editor.js"></script>
 </body>
 </html>

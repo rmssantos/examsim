@@ -157,15 +157,13 @@ portable/
 ├── editor.html             # Question editor
 ├── server.py               # Development server
 │
-├── exam-manager.js         # Exam detection & management
-├── exam-loader.js          # Dynamic exam loading
-├── image-loader.js         # Image handling system
-├── script-multi-exam.js    # Main exam logic
-├── editor.js               # Editor functionality
+├── assets/
+│   ├── css/                # Stylesheets
+│   ├── js/                 # Browser runtime scripts
+│   ├── media/              # Documentation/demo media
+│   └── vendor/             # Vendored offline dependencies
 │
-├── style-new.css           # Core styles
-├── modern-enhancements.css # Modern UI styles
-├── multi-exam-styles.css   # Multi-exam support
+├── tools/                  # Local utilities and diagnostics
 │
 ├── user-content/
 │   └── exams/              # User exam data
@@ -178,11 +176,11 @@ portable/
 
 | File | Purpose |
 |------|---------|
-| `exam-manager.js` | Detects exams, manages activation state |
-| `exam-loader.js` | Loads exam data from folders/localStorage |
-| `script-multi-exam.js` | Exam logic, timer, navigation, scoring |
-| `image-loader.js` | Resolves and loads images |
-| `editor.js` | Question editor functionality |
+| `assets/js/exam-manager.js` | Detects exams, manages activation state |
+| `assets/js/exam-loader.js` | Loads exam data from folders/localStorage |
+| `assets/js/script-multi-exam.js` | Exam logic, timer, navigation, scoring |
+| `assets/js/image-loader.js` | Resolves and loads images |
+| `assets/js/editor.js` | Question editor functionality |
 
 ---
 

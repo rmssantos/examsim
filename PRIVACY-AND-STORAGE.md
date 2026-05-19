@@ -358,8 +358,8 @@ User → Browser localStorage
 # You'll see ONLY:
 GET /index.html
 GET /exam.html
-GET /script-multi-exam.js
-GET /style-new.css
+GET /assets/js/script-multi-exam.js
+GET /assets/css/style-new.css
 GET /images/question1.jpg
 
 # You will NOT see:

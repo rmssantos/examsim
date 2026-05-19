@@ -42,19 +42,19 @@ The **Exam Simulator** is a self-contained, browser-based exam practice platform
 
 ### ⚠️ Content Safety & Licensing
 
-- **No official dumps are stored in this repo.** The portable folder is safe to make public because it only ships the simulator code, docs, and empty drop-zones.
+- **No official dumps are stored in this repo.** The public SC-900 pack is educational sample content for learning and UI validation, not an official exam dump.
 - **Licensed exam content must live in a private location** (private Git repo, encrypted drive, SharePoint, etc.). Drag/drop or copy them locally when you study.
 - **Recommended workflow:**
   1. Keep this sanitized repo public for the simulator.
   2. Maintain a private repo or storage bucket that contains your proprietary exam packs (e.g., `my-exam-pack.zip`).
   3. When teammates need the full kit, give them (a) the public simulator zip and (b) secure links to the private exam packs.
-- `.gitignore` already blocks `user-content/exams/*` and all `images/` assets so sensitive files can’t be re-committed by accident.
+- `.gitignore` keeps the public `sc900` educational sample and `user-content/exams/index.json`, while blocking other local exam packs and loose `images/` assets by default.
 
 ---
 
 ## 🚀 Quick Start
 
-![Creating an Exam](creating_exam.gif)
+![Creating an Exam](assets/media/creating_exam.gif)
 
 ### Option 0: Portable Zip (Zero Install)
 
@@ -115,23 +115,19 @@ portable/
 ├── index.html              # Main homepage (exam selection)
 ├── exam.html               # Exam simulator
 ├── editor.html             # Question editor
-├── image-inspector.html    # Image inspection utility
 ├── server.py               # Local HTTP server
-├── exam-manager.js         # Exam detection and management
-├── exam-loader.js          # Dynamic exam loading
-├── image-loader.js         # Image handling
-├── image-storage.js        # Image storage system
-├── script-multi-exam.js    # Main exam logic
-├── editor.js               # Editor functionality
-├── style-new.css           # Core styles
-├── exam-enhancements.css   # Compact exam UI styles
-├── homepage-styles.css     # Homepage specific styles
-├── modern-enhancements.css # Modern UI enhancements
-├── multi-exam-styles.css   # Multi-exam support
-├── creating_exam.gif       # Demo GIF for documentation
-├── importing_and_editing.gif # Demo GIF for documentation
-├── generate-exam-data-js.py # Generate exam-data.js from dumps
+├── assets/
+│   ├── css/                # App stylesheets
+│   ├── js/                 # Browser runtime scripts
+│   ├── media/              # Documentation/demo media
+│   └── vendor/             # Vendored offline dependencies
+├── tools/
+│   ├── image-inspector.html
+│   └── generate-exam-data-js.py
 ├── docs/                   # Documentation folder
+│   ├── css-architecture.md
+│   ├── HOW-TO-DISTRIBUTE.md
+│   ├── IMAGE-STORAGE-MIGRATION.md
 │   ├── compliance-summary.md
 │   ├── Data-and-Dumps.md
 │   ├── public-repo-plan.md
@@ -142,8 +138,9 @@ portable/
 └── user-content/
     ├── README-IMPORT.md    # Import instructions
     ├── imports/            # Temporary import staging area
-    └── exams/              # User exam content (empty by default)
-        └── .gitkeep
+    └── exams/              # Public sample + local/imported exam packs
+      ├── index.json      # Static exam index for GitHub Pages
+      └── sc900/          # Educational sample exam
 ```
 
 ---
@@ -170,7 +167,7 @@ portable/
 
 ## 📦 Importing Exams
 
-![Importing and Editing Exams](importing_and_editing.gif)
+![Importing and Editing Exams](assets/media/importing_and_editing.gif)
 
 ### Method 1: Automatic Detection (Server Mode Only)
 
@@ -528,7 +525,19 @@ exam-pack/
 zip -r my-exam-pack.zip dump.json metadata.json images/
 ```
 
-**See [HOW-TO-DISTRIBUTE.md](./HOW-TO-DISTRIBUTE.md) for detailed distribution guide.**
+**See [docs/HOW-TO-DISTRIBUTE.md](docs/HOW-TO-DISTRIBUTE.md) for detailed distribution guide.**
+
+### GitHub Pages Hosting
+
+This project can be hosted on GitHub Pages because the runtime is static HTML, CSS, JavaScript, localStorage, and IndexedDB. The public SC-900 pack is listed in `user-content/exams/index.json` so Pages can load it without the local Python server.
+
+Recommended public URL after Pages is enabled from `master` / root:
+
+```text
+https://rmssantos.github.io/examsim/
+```
+
+Keep proprietary or licensed exam packs outside the public repo; users can still import private `.json` or `.zip` packs locally in the browser.
 
 ### Share with Your Team (GitHub-Ready)
 
@@ -581,7 +590,7 @@ python server.py
 
 - **README.md** (this file) - Main documentation
 - **QUICKSTART.md** - Quick start guide
-- **HOW-TO-DISTRIBUTE.md** - Distribution guide
+- **docs/HOW-TO-DISTRIBUTE.md** - Distribution guide
 - **user-content/README-IMPORT.md** - Import instructions
 - **docs/** - Additional technical documentation
 
