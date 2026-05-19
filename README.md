@@ -214,8 +214,10 @@ You can also drop `.zip` exam packs. The simulator will read `dump.json`/`metada
    - Sequence ordering
    - Y/N matrices
 4. Add images, explanations, and metadata
-5. Save (auto-syncs to `localStorage` and `window.userExams`)
-6. Export as JSON to share
+5. Save local changes (auto-syncs to this browser's `localStorage` and `window.userExams`)
+6. Export as JSON to share or prepare a repository contribution
+
+Editor saves are local to the current browser. They do not change the public GitHub Pages site or affect other users. To make a correction available to everyone, export the updated JSON and open a pull request. If you only want to request a correction, open a GitHub issue with the exam ID, question ID, and suggested change.
 
 ### Question Types Supported
 
@@ -531,13 +533,13 @@ zip -r my-exam-pack.zip dump.json metadata.json images/
 
 This project can be hosted on GitHub Pages because the runtime is static HTML, CSS, JavaScript, localStorage, and IndexedDB. The public SC-900 pack is listed in `user-content/exams/index.json` so Pages can load it without the local Python server.
 
-Recommended public URL after Pages is enabled from `master` / root:
+Public site:
 
 ```text
 https://rmssantos.github.io/examsim/
 ```
 
-Keep proprietary or licensed exam packs outside the public repo; users can still import private `.json` or `.zip` packs locally in the browser.
+Keep proprietary or licensed exam packs outside the public repo; users can still import private `.json` or `.zip` packs locally in the browser. Browser edits remain local. Public content changes should go through a pull request, or through a GitHub issue if the contributor is only proposing a change.
 
 ### Share with Your Team (GitHub-Ready)
 
@@ -563,6 +565,7 @@ Contributions are welcome! Here's how you can help:
 - Include browser version and OS
 - Provide console logs (F12 → Console)
 - Describe steps to reproduce
+- For exam content corrections, include the exam ID, question ID, current text, and proposed correction
 
 ### Submitting Pull Requests
 1. Fork the repository
@@ -570,6 +573,8 @@ Contributions are welcome! Here's how you can help:
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+Use pull requests for concrete fixes to public exam content, metadata, documentation, or app code. Use issues for requests, unclear corrections, or cases where you cannot prepare the JSON change yourself.
 
 ### Development Setup
 ```bash
