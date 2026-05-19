@@ -520,7 +520,7 @@
     updatePersistenceHint();
 
     // Gentle toast-ish feedback without blocking
-    notify('Saved locally in this browser. Open a PR or issue to share changes.');
+    notify('Saved locally in this browser. Open a PR to publish changes, or an issue to request a correction.');
   }
 
   // Show hint about persisting changes to dump.json
@@ -547,7 +547,7 @@
       <ol style="margin:8px 0 0 20px;padding:0;line-height:1.6;">
         <li>Click <em>Export Questions</em> to download <code>${safeExamId}_dump_YYYY-MM-DD.json</code>.</li>
         <li>For a direct contribution, open a pull request replacing <code>user-content/exams/${safeExamId}/dump.json</code>.</li>
-        <li>If you only want to suggest a correction, open a GitHub issue with the question ID and proposed change.</li>
+        <li>If you only want to suggest a correction, open a GitHub issue with exam ID <code>${safeExamId}</code>, question ID, current text, and proposed correction.</li>
       </ol>
       <small style="opacity:0.8;">Until then, edits live in this browser's localStorage.</small>
     `;

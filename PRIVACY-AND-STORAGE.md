@@ -3,7 +3,7 @@
 ## 🔒 Critical Information: Your Data Stays Local
 
 ### TL;DR
-**ALL user data is stored ONLY in the user's browser `localStorage`. Nothing is sent to the server. Each user's data is completely isolated and private.**
+**ALL user data is stored ONLY in the user's browser storage (`localStorage` and IndexedDB for image data). Nothing is sent to the server. Each user's data is completely isolated and private.**
 
 Editing and saving questions in the browser changes only that user's local copy. To publish exam corrections for everyone, export the updated JSON and open a pull request; to request a correction without editing JSON, open a GitHub issue.
 
