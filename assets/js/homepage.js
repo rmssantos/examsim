@@ -38,9 +38,29 @@ this.init();
 
 async init() {
 await this.loadAvailableExams();
+this.placeDetailsPanel();
 this.setupEventListeners();
 this.setupConfigModal();
 this.refreshHeroPreview();
+}
+
+placeDetailsPanel(examId = null) {
+const detailsPanel = document.getElementById('exam-details-placeholder');
+const librarySection = document.querySelector('.exam-library-section');
+if (!detailsPanel || !librarySection || !this.examSelection) return;
+
+if (examId) {
+	const selectedCard = Array.from(this.examSelection.querySelectorAll('.exam-card'))
+		.find(card => card.dataset.exam === examId);
+	if (selectedCard) {
+		selectedCard.insertAdjacentElement('afterend', detailsPanel);
+		return;
+	}
+}
+
+if (detailsPanel.parentElement !== librarySection) {
+	librarySection.insertBefore(detailsPanel, this.examSelection);
+}
 }
 
 async loadAvailableExams() {
@@ -72,6 +92,10 @@ return;
 
 // Hide "No Exams" section and show exam cards
 this.hideNoExamsSection();
+const detailsPanel = document.getElementById('exam-details-placeholder');
+if (detailsPanel?.parentElement === this.examSelection) {
+	detailsPanel.remove();
+}
 this.examSelection.innerHTML = '';
 
 const fragment = document.createDocumentFragment();
@@ -80,6 +104,7 @@ const card = this.createExamCard(examId, examData);
 fragment.appendChild(card);
 });
 this.examSelection.appendChild(fragment);
+this.placeDetailsPanel();
 
 // Show compact import button when exams exist
 this.showCompactImportButton();
@@ -182,6 +207,18 @@ if (totalQuestions > questionCount) {
 this.appendTextElement(card, 'div', 'exam-total-info', `From ${totalQuestions} total questions`);
 }
 
+const startButton = document.createElement('button');
+startButton.type = 'button';
+startButton.className = 'exam-card-start';
+startButton.appendChild(this.createIcon('fas fa-play'));
+startButton.appendChild(document.createTextNode(' Start'));
+startButton.addEventListener('click', (e) => {
+	e.stopPropagation();
+	this.selectedExamId = examId;
+	this.startSelectedExam();
+});
+card.appendChild(startButton);
+
 if (examData.hasImages) {
 const feature = document.createElement('div');
 feature.className = 'exam-feature';
@@ -226,7 +263,8 @@ if (examData) {
 		questionCount: examData.metadata.questionCount,
 		passScore: examData.metadata.passScore,
 		questions: examData.questions,
-		modules: examData.metadata.modules || []
+		modules: examData.metadata.modules || [],
+		resources: examData.metadata.resources || []
 	};
 }
 }
@@ -316,6 +354,7 @@ if (!examData) return;
 const metadata = examData.metadata || {};
 const stats = this.getProgressStats(examId);
 const placeholder = document.getElementById('exam-details-placeholder');
+this.placeDetailsPanel(examId);
 
 // Populate details
 document.getElementById('details-exam-name').textContent = metadata.name || examId.toUpperCase();
@@ -365,7 +404,7 @@ modulesSection.style.display = 'none';
 // Setup start button
 const startBtn = document.getElementById('details-start-exam');
 startBtn.onclick = () => {
-document.getElementById('start-exam')?.click();
+this.startSelectedExam();
 };
 
 // Setup close button
@@ -374,7 +413,7 @@ closeBtn.onclick = () => {
 placeholder.classList.remove('visible');
 };
 
-// Show placeholder and scroll
+// Show placeholder and keep the details panel close to the selected card.
 placeholder.classList.add('visible');
 setTimeout(() => {
 placeholder.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -383,10 +422,24 @@ placeholder.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
 handlePreviewAction() {
 if (this.selectedExamId) {
-document.getElementById('start-exam')?.click();
+this.startSelectedExam();
 } else {
 this.scrollToExamLibrary();
 }
+}
+
+startSelectedExam() {
+if (!this.selectedExamId) {
+	alert('Please select an exam first.');
+	return;
+}
+
+const simulator = window.ExamApp?.examSimulator || window.examSimulator;
+if (simulator?.currentExam !== this.selectedExamId) {
+	this.selectExam(this.selectedExamId);
+}
+
+window.open(`exam.html?exam=${encodeURIComponent(this.selectedExamId)}`, '_blank');
 }
 
 scrollToExamLibrary() {
@@ -568,7 +621,7 @@ if (document.getElementById('compact-import-btn')) return;
 const importCard = document.createElement('div');
 importCard.id = 'compact-import-btn';
 importCard.className = 'exam-card custom';
-importCard.style.cssText = 'background:linear-gradient(135deg, #28a745 0%, #20c997 100%);cursor:pointer;min-width:280px;';
+importCard.style.cssText = 'cursor:pointer;';
 
 importCard.innerHTML = `
 <div class="exam-badge">Import</div>
