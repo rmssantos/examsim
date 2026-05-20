@@ -1446,6 +1446,29 @@ body.dragging-file #compact-import-btn.drag-over .exam-icon {
 	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
+.exam-card-start {
+	align-self: flex-start;
+	margin-top: 0.15rem;
+	border: 0;
+	border-radius: 8px;
+	padding: 0.48rem 0.75rem;
+	background: rgba(255, 255, 255, 0.94);
+	color: #0f172a;
+	font-size: 0.82rem;
+	font-weight: 700;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	box-shadow: 0 8px 16px rgba(15, 23, 42, 0.14);
+	transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.exam-card-start:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 10px 20px rgba(15, 23, 42, 0.18);
+}
+
 #compact-import-btn {
 	border: 1.5px dashed rgba(32, 201, 151, 0.6);
 	background: linear-gradient(135deg, rgba(32, 201, 151, 0.2), rgba(17, 153, 142, 0.12));
@@ -2558,4 +2581,303 @@ body.dragging-file .drop-zone-simple.drag-over,
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
+}
+
+/* ===== Visual Refresh: Landing Flow ===== */
+.home-board {
+	max-width: 1120px;
+	border-radius: 14px;
+	padding: 1.25rem;
+	gap: 1rem;
+	box-shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
+}
+
+.hero-header {
+	align-items: flex-start;
+	padding-bottom: 0.9rem;
+	gap: 1.5rem;
+}
+
+.hero-branding .logo {
+	margin-bottom: 0.35rem;
+}
+
+.hero-branding h1 {
+	font-size: 1.35rem;
+}
+
+.hero-subtitle {
+	max-width: 56ch;
+}
+
+.hero-public-link {
+	border-radius: 8px;
+	padding: 0.45rem 0.7rem;
+}
+
+.hero-stats {
+	align-items: stretch;
+}
+
+.stat-card {
+	min-width: 104px;
+	border-radius: 8px;
+	padding: 0.7rem 0.85rem;
+	box-shadow: none;
+}
+
+.quick-actions {
+	gap: 0.55rem;
+}
+
+.action-btn,
+.btn-add-exam {
+	border-radius: 8px;
+	box-shadow: none;
+}
+
+.main-content {
+	gap: 1rem;
+}
+
+.exam-library-section {
+	padding: 1.1rem;
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.72);
+}
+
+.section-header {
+	margin-bottom: 1rem;
+	align-items: center;
+}
+
+.exam-grid {
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: 0.9rem;
+}
+
+.exam-card {
+	min-height: 160px;
+	border-radius: 10px;
+	padding: 1rem;
+	box-shadow: none;
+	border-color: rgba(15, 23, 42, 0.08);
+}
+
+.exam-card:hover,
+.exam-card.selected {
+	transform: translateY(-2px);
+	box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
+}
+
+#compact-import-btn {
+	min-height: 160px;
+	background: rgba(20, 184, 166, 0.08) !important;
+	border: 1.5px dashed rgba(20, 184, 166, 0.5);
+	color: var(--text);
+}
+
+#compact-import-btn .exam-icon,
+#compact-import-btn .exam-title,
+#compact-import-btn .exam-subtitle,
+#compact-import-btn .exam-stat-label {
+	color: #0f766e;
+	text-shadow: none;
+}
+
+#compact-import-btn .exam-card-start {
+	display: none;
+}
+
+.exam-details-placeholder {
+	margin-top: 0;
+	padding: 1rem;
+	border-radius: 12px;
+	border-width: 1px;
+	box-shadow: 0 16px 32px rgba(15, 23, 42, 0.1);
+	scroll-margin-top: 24px;
+}
+
+.exam-details-header {
+	align-items: center;
+	gap: 1rem;
+	margin-bottom: 0.85rem;
+	padding-bottom: 0.85rem;
+}
+
+.exam-details-title-area h2 {
+	font-size: 1.15rem;
+	line-height: 1.2;
+}
+
+.exam-details-title-area p {
+	font-size: 0.84rem;
+}
+
+.exam-details-actions {
+	flex-shrink: 0;
+	gap: 0.5rem;
+}
+
+#details-start-exam.btn-start-exam,
+.btn-start-exam-inline {
+	width: auto !important;
+	min-width: 0 !important;
+	margin: 0 !important;
+	padding: 0.62rem 1rem !important;
+	border-radius: 8px !important;
+	font-size: 0.88rem !important;
+	line-height: 1 !important;
+	letter-spacing: 0 !important;
+	text-transform: none !important;
+	flex-direction: row !important;
+	box-shadow: 0 8px 18px rgba(30, 60, 114, 0.18) !important;
+}
+
+#details-start-exam.btn-start-exam i,
+.btn-start-exam-inline i {
+	font-size: 0.9rem !important;
+}
+
+.btn-close-details {
+	border-radius: 8px;
+	padding: 0.58rem 0.78rem;
+	border-width: 1px;
+}
+
+.exam-details-content {
+	grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+	gap: 0.85rem;
+}
+
+.exam-details-section {
+	padding: 0.85rem;
+	border-radius: 10px;
+}
+
+.exam-details-section h3 {
+	font-size: 0.9rem;
+	margin-bottom: 0.7rem;
+}
+
+.exam-details-section .info-card-container {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 0.5rem;
+}
+
+.exam-details-section .info-card {
+	padding: 0.62rem;
+	border-radius: 8px;
+	box-shadow: none;
+}
+
+.exam-details-section .info-card i {
+	font-size: 1rem;
+}
+
+.exam-details-section .info-card > span {
+	font-size: 0.88rem;
+}
+
+.exam-details-section .info-card small {
+	font-size: 0.62rem;
+}
+
+.progress-summary {
+	gap: 0.55rem;
+	margin-bottom: 0;
+}
+
+.progress-item {
+	padding: 0.7rem;
+	border-radius: 8px;
+	box-shadow: none;
+}
+
+.modules-resources-grid {
+	gap: 0.7rem;
+}
+
+.modules-list,
+.resources-compact {
+	gap: 0.42rem;
+}
+
+.modules-list li,
+.resources-compact a {
+	padding: 0.48rem 0.65rem;
+	border-radius: 7px;
+	font-size: 0.82rem;
+}
+
+[data-theme="dark"] #compact-import-btn,
+.dark-mode #compact-import-btn {
+	background: rgba(20, 184, 166, 0.12) !important;
+	border-color: rgba(94, 234, 212, 0.38);
+}
+
+[data-theme="dark"] #compact-import-btn .exam-icon,
+[data-theme="dark"] #compact-import-btn .exam-title,
+[data-theme="dark"] #compact-import-btn .exam-subtitle,
+[data-theme="dark"] #compact-import-btn .exam-stat-label,
+.dark-mode #compact-import-btn .exam-icon,
+.dark-mode #compact-import-btn .exam-title,
+.dark-mode #compact-import-btn .exam-subtitle,
+.dark-mode #compact-import-btn .exam-stat-label {
+	color: #99f6e4;
+}
+
+[data-theme="dark"] .exam-card-start,
+.dark-mode .exam-card-start {
+	background: rgba(15, 23, 42, 0.82);
+	color: #e5e7eb;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 900px) {
+	.exam-details-header {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+
+	.exam-details-actions {
+		width: 100%;
+	}
+
+	#details-start-exam.btn-start-exam,
+	.btn-start-exam-inline {
+		flex: 1;
+		justify-content: center;
+	}
+
+	.exam-details-content {
+		grid-template-columns: 1fr;
+	}
+
+	.exam-details-section .info-card-container {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 520px) {
+	.home-board {
+		padding: 0.85rem;
+	}
+
+	.hero-public-link {
+		align-items: flex-start;
+		flex-direction: column;
+		gap: 0.2rem;
+	}
+
+	.exam-details-actions {
+		flex-direction: column;
+	}
+
+	#details-start-exam.btn-start-exam,
+	.btn-start-exam-inline,
+	.btn-close-details {
+		width: 100% !important;
+		justify-content: center;
+	}
 }

@@ -38,9 +38,20 @@ this.init();
 
 async init() {
 await this.loadAvailableExams();
+this.placeDetailsPanel();
 this.setupEventListeners();
 this.setupConfigModal();
 this.refreshHeroPreview();
+}
+
+placeDetailsPanel() {
+const detailsPanel = document.getElementById('exam-details-placeholder');
+const librarySection = document.querySelector('.exam-library-section');
+if (!detailsPanel || !librarySection || !this.examSelection) return;
+
+if (detailsPanel.parentElement !== librarySection) {
+	librarySection.insertBefore(detailsPanel, this.examSelection);
+}
 }
 
 async loadAvailableExams() {
@@ -181,6 +192,18 @@ card.appendChild(stats);
 if (totalQuestions > questionCount) {
 this.appendTextElement(card, 'div', 'exam-total-info', `From ${totalQuestions} total questions`);
 }
+
+const startButton = document.createElement('button');
+startButton.type = 'button';
+startButton.className = 'exam-card-start';
+startButton.appendChild(this.createIcon('fas fa-play'));
+startButton.appendChild(document.createTextNode(' Start'));
+startButton.addEventListener('click', (e) => {
+	e.stopPropagation();
+	this.selectedExamId = examId;
+	this.startSelectedExam();
+});
+card.appendChild(startButton);
 
 if (examData.hasImages) {
 const feature = document.createElement('div');
@@ -365,7 +388,7 @@ modulesSection.style.display = 'none';
 // Setup start button
 const startBtn = document.getElementById('details-start-exam');
 startBtn.onclick = () => {
-document.getElementById('start-exam')?.click();
+this.startSelectedExam();
 };
 
 // Setup close button
@@ -374,7 +397,7 @@ closeBtn.onclick = () => {
 placeholder.classList.remove('visible');
 };
 
-// Show placeholder and scroll
+// Show placeholder and keep the details panel close to the selected card.
 placeholder.classList.add('visible');
 setTimeout(() => {
 placeholder.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -383,10 +406,15 @@ placeholder.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
 handlePreviewAction() {
 if (this.selectedExamId) {
-document.getElementById('start-exam')?.click();
+this.startSelectedExam();
 } else {
 this.scrollToExamLibrary();
 }
+}
+
+startSelectedExam() {
+if (!this.selectedExamId) return;
+window.location.href = `exam.html?exam=${encodeURIComponent(this.selectedExamId)}`;
 }
 
 scrollToExamLibrary() {
@@ -568,7 +596,7 @@ if (document.getElementById('compact-import-btn')) return;
 const importCard = document.createElement('div');
 importCard.id = 'compact-import-btn';
 importCard.className = 'exam-card custom';
-importCard.style.cssText = 'background:linear-gradient(135deg, #28a745 0%, #20c997 100%);cursor:pointer;min-width:280px;';
+importCard.style.cssText = 'cursor:pointer;';
 
 importCard.innerHTML = `
 <div class="exam-badge">Import</div>
