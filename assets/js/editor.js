@@ -52,7 +52,7 @@
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) return parsed;
       }
-    } catch(e){ console.warn('Failed to parse override', e); }
+    } catch(e){ window.ExamApp.warn('Failed to parse override', e); }
     return loadMaster(exam);
   }
 
@@ -197,7 +197,7 @@
         const row = document.createElement('div');
         row.className = 'option-row yn-matrix-row';
         row.innerHTML = `
-          <input type="text" data-idx="${idx}" class="stmt-text" value="${stmt.replace(/"/g,'&quot;')}" placeholder="Statement ${idx + 1}">
+          <input type="text" data-idx="${idx}" class="stmt-text" value="${escapeHtml(stmt)}" placeholder="Statement ${idx + 1}">
           <div class="yn-radio-group">
             <label class="yn-radio"><input type="radio" name="yn-${idx}" data-idx="${idx}" value="0" class="yn-correct"> Yes</label>
             <label class="yn-radio"><input type="radio" name="yn-${idx}" data-idx="${idx}" value="1" class="yn-correct"> No</label>
@@ -224,13 +224,13 @@
           // For SEQUENCE: show order number + text (no checkbox)
           row.innerHTML = `
             <span class="sequence-order-num">${idx + 1}.</span>
-            <input type="text" data-idx="${idx}" class="opt-text" value="${opt.replace(/"/g,'&quot;')}">
+            <input type="text" data-idx="${idx}" class="opt-text" value="${escapeHtml(opt)}">
             <button type="button" class="btn danger opt-del" data-idx="${idx}"><i class="fas fa-trash"></i></button>
           `;
         } else {
           // For other types: show checkbox + text
           row.innerHTML = `
-            <input type="text" data-idx="${idx}" class="opt-text" value="${opt.replace(/"/g,'&quot;')}">
+            <input type="text" data-idx="${idx}" class="opt-text" value="${escapeHtml(opt)}">
             <label class="small"><input type="checkbox" class="opt-correct" data-idx="${idx}"> Correct</label>
             <button type="button" class="btn danger opt-del" data-idx="${idx}"><i class="fas fa-trash"></i></button>
           `;
@@ -354,6 +354,7 @@
     }
 
     renderPreview(q);
+    updateValidationPanel(q);
   }
 
   function syncFromForm(){
@@ -402,6 +403,8 @@
     } else {
       delete q.statements;
     }
+
+    updateValidationPanel(q);
   }
 
   function addOption(){
@@ -487,17 +490,23 @@
   function saveAll(){
     syncFromForm();
     const examId = state.exam === 'custom' && state.customCode ? state.customCode : state.exam;
+    if (!examId) { notify('Select or load an exam first'); return; }
+    if (!window.ExamApp.isSafeExamId(examId)) { notify('Invalid exam id'); return; }
+    const validation = window.ExamApp.validateExamData(state.items);
+    if (!validation.valid) {
+      notify(`Cannot save: ${validation.errors[0]}`);
+      return;
+    }
     const key = `custom_${examId}_questions`;
 
-    if (!examId) { notify('Select or load an exam first'); return; }
-
-    console.log('Saving to localStorage:', key);
-    console.log('Exam ID:', examId);
-    console.log('Number of questions:', state.items.length);
-    console.log('Current question:', state.filtered[state.currentIndex]);
+    window.ExamApp.log('Saving to localStorage:', key);
+    window.ExamApp.log('Exam ID:', examId);
+    window.ExamApp.log('Number of questions:', state.items.length);
+    window.ExamApp.log('Current question:', state.filtered[state.currentIndex]);
 
     // Save to localStorage
     localStorage.setItem(key, JSON.stringify(state.items));
+    window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.exams, examId);
 
     // Also update window.userExams so changes are immediately available
     if (!window.userExams) window.userExams = {};
@@ -511,7 +520,7 @@
       localStorage.setItem(`exam_metadata_${examId}`, JSON.stringify(window.userExams[examId].metadata));
     }
 
-    console.log('✅ Saved successfully to localStorage and window.userExams');
+    window.ExamApp.log('✅ Saved successfully to localStorage and window.userExams');
 
     // Mark as saved and update hash
     state.hasUnsavedChanges = false;
@@ -668,14 +677,19 @@
     fileInput.onchange = (e) => {
       const file = e.target.files[0];
       if (!file) return;
+      if (file.size > window.ExamApp.EXAM_LIMITS.maxJsonBytes) {
+        alert(`Invalid JSON: file is too large. Maximum size is ${Math.round(window.ExamApp.EXAM_LIMITS.maxJsonBytes / 1024 / 1024)} MB.`);
+        return;
+      }
       const reader = new FileReader();
       reader.onload = () => {
         try {
           const parsed = JSON.parse(reader.result);
           const questions = Array.isArray(parsed) ? parsed : (Array.isArray(parsed?.questions) ? parsed.questions : null);
           if (!questions) throw new Error('JSON must be an array of questions or an object with a questions array');
-          if (window.examManager && !window.examManager.validateExamData(questions)) {
-            throw new Error('Invalid question format for one or more questions');
+          const validation = window.ExamApp.validateExamData(questions);
+          if (!validation.valid) {
+            throw new Error(validation.errors.slice(0, 3).join('; '));
           }
           state.items = questions;
           applyFilter();
@@ -824,6 +838,28 @@
   }
 
   // ------- Preview -------
+  function appendTextWithLineBreaks(parent, value) {
+    const lines = String(value || '').split(/\\n|\n/);
+    lines.forEach((line, index) => {
+      if (index > 0) parent.appendChild(document.createElement('br'));
+      parent.appendChild(document.createTextNode(line));
+    });
+  }
+
+  function createTextSpan(className, value) {
+    const span = document.createElement('span');
+    if (className) span.className = className;
+    span.textContent = value;
+    return span;
+  }
+
+  function appendTitle(parent, className, value) {
+    const title = document.createElement('div');
+    title.className = className;
+    title.textContent = value;
+    parent.appendChild(title);
+  }
+
   function renderPreview(q){
     // Helper to map option index => letter
     const letter = (i) => String.fromCharCode(65 + i);
@@ -838,13 +874,18 @@
     pvType.textContent = type;
 
     // Render question text with simple markdown image stripping (images shown separately)
-    const stripMdImages = (t) => escapeHtml((t||'').replace(/!\[[^\]]*\]\([^\)]+\)/g, '')).replace(/\n/g,'<br>');
-    pvQuestion.innerHTML = stripMdImages(q.question || '');
+    const stripMdImages = (t) => String(t || '').replace(/!\[[^\]]*\]\([^\)]+\)/g, '');
+    pvQuestion.replaceChildren();
+    appendTextWithLineBreaks(pvQuestion, stripMdImages(q.question || ''));
 
     // Question images
     pvQImages.innerHTML = '';
     if (Array.isArray(q.question_images) && q.question_images.length){
       q.question_images.forEach(im => {
+        if (!window.ExamApp.isSafeImageFileName(im.filename)) {
+          pvQImages.appendChild(warn(`Invalid image filename: ${im.filename}`));
+          return;
+        }
         const img = document.createElement('img');
         img.src = `./images/${im.filename}`;
         img.alt = 'Question image';
@@ -880,11 +921,12 @@
       const order = base;
       const col = document.createElement('div');
       col.className = 'pv-col';
-      col.innerHTML = `<div class="pv-col-title">Order from top to bottom</div>`;
+      appendTitle(col, 'pv-col-title', 'Order from top to bottom');
       order.forEach((idx, pos) => {
         const row = document.createElement('div');
         row.className = 'pv-chip';
-        row.innerHTML = `<span>${pos+1}.</span><span>${escapeHtml((q.options||[])[idx])}</span>`;
+        row.appendChild(createTextSpan('', `${pos + 1}.`));
+        row.appendChild(createTextSpan('', (q.options || [])[idx] || ''));
         const up = document.createElement('button'); up.textContent = '↑'; up.className = 'x'; up.disabled = pos === 0;
         const down = document.createElement('button'); down.textContent = '↓'; down.className = 'x'; down.disabled = pos === order.length - 1;
         up.addEventListener('click', () => {
@@ -909,14 +951,15 @@
       if (type === 'DRAG_DROP_SELECT') {
         const required = q.drag_select_required || (Array.isArray(q.correct) ? q.correct.length : 0) || 2;
         const wrap = document.createElement('div'); wrap.className = 'pv-dd-wrap';
-        const src = document.createElement('div'); src.className = 'pv-dd-source'; src.innerHTML = `<div class="pv-dd-title">Options</div>`;
-        const tgt = document.createElement('div'); tgt.className = 'pv-dd-target'; tgt.innerHTML = `<div class="pv-dd-title">Your selections (max ${required})</div>`;
+        const src = document.createElement('div'); src.className = 'pv-dd-source'; appendTitle(src, 'pv-dd-title', 'Options');
+        const tgt = document.createElement('div'); tgt.className = 'pv-dd-target'; appendTitle(tgt, 'pv-dd-title', `Your selections (max ${required})`);
         const sel = Array.isArray(q.correct) ? q.correct.slice() : [];
         // Source buttons for non-selected
         (q.options||[]).forEach((opt, idx) => {
           if (!sel.includes(idx)){
             const btn = document.createElement('button'); btn.type='button'; btn.className='pv-dd-btn';
-            btn.innerHTML = `<span class="pv-letters">${letter(idx)}</span> ${escapeHtml(opt)}`;
+            btn.appendChild(createTextSpan('pv-letters', letter(idx)));
+            btn.appendChild(document.createTextNode(` ${opt}`));
             // Click to add
             btn.addEventListener('click', ()=>{ if (sel.length < required){ sel.push(idx); q.correct=sel; renderPreview(q); }});
             // Drag support
@@ -931,8 +974,10 @@
         // Target chips
         sel.forEach((idx) => {
           const chip = document.createElement('div'); chip.className='pv-dd-chip';
-          chip.innerHTML = `<span class="pv-letters">${letter(idx)}</span> <span>${escapeHtml((q.options||[])[idx])}</span>`;
-          const rm = document.createElement('button'); rm.className='rm'; rm.innerHTML='×';
+          chip.appendChild(createTextSpan('pv-letters', letter(idx)));
+          chip.appendChild(document.createTextNode(' '));
+          chip.appendChild(createTextSpan('', (q.options || [])[idx] || ''));
+          const rm = document.createElement('button'); rm.className='rm'; rm.textContent='×';
           rm.addEventListener('click', ()=>{ const pos=sel.indexOf(idx); if (pos>=0){ sel.splice(pos,1); q.correct=sel; renderPreview(q); }});
           chip.appendChild(rm);
           tgt.appendChild(chip);
@@ -961,7 +1006,10 @@
           const div = document.createElement('div');
           div.className = 'pv-option pv-clickable';
           if (corr.includes(idx)) div.classList.add('selected');
-          div.innerHTML = `<span class="pv-letters">${letter(idx)}</span><div>${escapeHtml(opt)}</div>`;
+          div.appendChild(createTextSpan('pv-letters', letter(idx)));
+          const optionText = document.createElement('div');
+          optionText.textContent = opt;
+          div.appendChild(optionText);
           div.addEventListener('click', ()=>{
             if (isMulti) {
               const a = Array.isArray(q.correct) ? q.correct.slice() : [];
@@ -977,10 +1025,21 @@
     }
 
     // Explanation
-    pvExplanation.innerHTML = q.explanation ? `<strong>Explanation:</strong><br>${stripMdImages(q.explanation)}` : '';
+    pvExplanation.replaceChildren();
+    if (q.explanation) {
+      const label = document.createElement('strong');
+      label.textContent = 'Explanation:';
+      pvExplanation.appendChild(label);
+      pvExplanation.appendChild(document.createElement('br'));
+      appendTextWithLineBreaks(pvExplanation, stripMdImages(q.explanation));
+    }
     pvEImages.innerHTML = '';
     if (Array.isArray(q.explanation_images) && q.explanation_images.length){
       q.explanation_images.forEach(im => {
+        if (!window.ExamApp.isSafeImageFileName(im.filename)) {
+          pvEImages.appendChild(warn(`Invalid image filename: ${im.filename}`));
+          return;
+        }
         const img = document.createElement('img');
         img.src = `./images/${im.filename}`;
         img.alt = 'Explanation image';
@@ -1083,6 +1142,25 @@
   }
 
   // Helper function to show/hide UI hints based on question type
+  function updateValidationPanel(question) {
+    const panel = $('#editorValidation');
+    const text = $('#editorValidationText');
+    if (!panel || !text || !question) return;
+
+    const result = window.ExamApp.validateExamData([question]);
+    panel.classList.remove('editor-validation-ok', 'editor-validation-warning', 'editor-validation-error');
+    if (!result.valid) {
+      panel.classList.add('editor-validation-error');
+      text.textContent = result.errors[0] || 'Question needs attention';
+    } else if (result.warnings.length > 0) {
+      panel.classList.add('editor-validation-warning');
+      text.textContent = result.warnings[0];
+    } else {
+      panel.classList.add('editor-validation-ok');
+      text.textContent = 'Question is valid';
+    }
+  }
+
   function updateUIHints(type) {
     const sequenceHint = $('#sequenceHint');
     const optionsHelp = $('#optionsHelp');
@@ -1173,6 +1251,7 @@
     const debouncedSyncAndPreview = debounce(() => {
       syncFromForm();
       renderPreview(state.filtered[state.currentIndex]);
+      updateValidationPanel(state.filtered[state.currentIndex]);
     }, 150);
 
     ['#qText', '#qExplanation', '#qImages', '#eImages', '#qCorrect', '#qDragSelectN', '#qStatements'].forEach(sel => {
@@ -1185,9 +1264,16 @@
       const files = Array.from(inputEl.files||[]);
       if (!files.length) return;
       const exam = state.exam;
+      if (!window.ExamApp.isSafeExamId(exam)) { notify('Invalid exam id'); return; }
       const results = [];
       for (const f of files){
         try {
+          if (!window.ExamApp.isSafeImageFileName(f.name)) {
+            throw new Error('Unsupported image filename or type');
+          }
+          if (f.size > window.ExamApp.EXAM_LIMITS.maxImageBytes) {
+            throw new Error(`Image exceeds ${Math.round(window.ExamApp.EXAM_LIMITS.maxImageBytes / 1024 / 1024)} MB`);
+          }
           const url = `/__upload_images?exam=${encodeURIComponent(exam)}&name=${encodeURIComponent(f.name)}`;
           const res = await fetch(url, { method: 'PUT', body: f });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -1212,6 +1298,7 @@
     $('#loadCustomExam')?.addEventListener('click', async()=>{
       const code = ($('#customExamCode').value||'').trim();
       if (!code) { notify('Enter an exam code'); return; }
+      if (!window.ExamApp.isSafeExamId(code)) { notify('Invalid exam code'); return; }
       try {
         const resp = await fetch(`./exam-dumps/${encodeURIComponent(code)}.json`);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -1233,6 +1320,7 @@
     $('#newExamBtn')?.addEventListener('click', ()=>{
       const code = ($('#customExamCode').value||'').trim();
       if (!code) { notify('Enter a code in the field first'); return; }
+      if (!window.ExamApp.isSafeExamId(code)) { notify('Invalid exam code'); return; }
       state.exam = 'custom';
       state.customCode = code;
       $('#examSelect').value = 'custom';

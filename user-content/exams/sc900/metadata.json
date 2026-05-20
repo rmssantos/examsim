@@ -6,6 +6,8 @@
   "questionCount": 50,
   "totalQuestions": 150,
   "passScore": 70,
+  "language": "en",
+  "schemaVersion": "1.1",
   "badge": "Fundamentals",
   "icon": "fas fa-shield-alt",
   "modules": [
@@ -62,5 +64,80 @@
       "url": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/?practice-assessment-type=certification"
     }
   ],
-  "hasImages": false
+  "hasImages": false,
+  "contentReview": {
+    "lastReviewed": "2026-05-20",
+    "reviewCadence": "quarterly",
+    "sourceOfTruth": "Microsoft Learn certification page and practice assessment",
+    "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/",
+    "reviewScope": [
+      "schema validation",
+      "module coverage mapping",
+      "official objective alignment"
+    ],
+    "notes": "Question bank validated structurally against the simulator schema. Product naming and objective alignment should be reviewed quarterly."
+  },
+  "objectiveDomains": [
+    {
+      "code": "SCI-1",
+      "name": "Describe the concepts of security, compliance, and identity",
+      "weightRange": "10-15%",
+      "source": "Microsoft Learn SC-900 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/",
+      "mappedModules": [
+        "Security, Compliance & Identity Concepts",
+        "Service Trust & Privacy"
+      ]
+    },
+    {
+      "code": "SCI-2",
+      "name": "Describe the capabilities of Microsoft Entra",
+      "weightRange": "25-30%",
+      "source": "Microsoft Learn SC-900 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/",
+      "mappedModules": [
+        "Microsoft Entra"
+      ]
+    },
+    {
+      "code": "SCI-3",
+      "name": "Describe the capabilities of Microsoft security solutions",
+      "weightRange": "35-40%",
+      "source": "Microsoft Learn SC-900 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/",
+      "mappedModules": [
+        "Azure Security",
+        "Microsoft Defender for Cloud",
+        "Microsoft Sentinel",
+        "Microsoft Defender XDR"
+      ]
+    },
+    {
+      "code": "SCI-4",
+      "name": "Describe the capabilities of Microsoft compliance solutions",
+      "weightRange": "25-30%",
+      "source": "Microsoft Learn SC-900 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/",
+      "mappedModules": [
+        "Microsoft Purview Compliance",
+        "Data Lifecycle & Records",
+        "Risk & Compliance Solutions"
+      ]
+    }
+  ],
+  "coverageReview": {
+    "method": "Modules mapped to official SC-900 objective domains; individual question-level mapping is optional future metadata.",
+    "observedModuleCounts": {
+      "Microsoft Entra": 41,
+      "Security, Compliance & Identity Concepts": 19,
+      "Azure Security": 18,
+      "Microsoft Defender XDR": 18,
+      "Microsoft Purview Compliance": 14,
+      "Microsoft Defender for Cloud": 10,
+      "Microsoft Sentinel": 10,
+      "Risk & Compliance Solutions": 10,
+      "Data Lifecycle & Records": 6,
+      "Service Trust & Privacy": 4
+    }
+  }
 }

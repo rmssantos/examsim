@@ -8,6 +8,7 @@ class TimerManager {
     }
 
     start(totalSeconds, onTick, onExpire) {
+        this.stop();
         this.remainingTime = totalSeconds;
         this.timer = setInterval(() => {
             this.remainingTime--;
@@ -63,7 +64,7 @@ class QuestionNavigator {
 
     toggle() {
         const nav = document.getElementById('question-navigator');
-        if (nav) nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+        if (nav) window.ExamApp.setElementHidden(nav, !nav.hidden && !nav.classList.contains('is-hidden'));
     }
 }
 
@@ -98,7 +99,7 @@ class MultiExamSimulator {
         // Exam-only mode: if exam param is provided, auto-start in this page
         const params = new URLSearchParams(window.location.search);
         const examParam = params.get('exam');
-        if (examParam && examParam !== 'custom') {
+        if (examParam && examParam !== 'custom' && window.ExamApp.isSafeExamId(examParam)) {
             // Load exam dynamically from window.userExams or localStorage
             if (!this.examData[examParam]) {
                 const loaded = this.loadExamFromRuntime(examParam);
@@ -124,7 +125,7 @@ class MultiExamSimulator {
         // Auto-refresh question banks if overrides change (even across tabs)
         window.addEventListener('storage', (ev) => {
             if (ev.key && ev.key.startsWith('custom_') && ev.key.endsWith('_questions')) {
-                console.log('Detected override change in storage. Reloading question banks.');
+                window.ExamApp.log('Detected override change in storage. Reloading question banks.');
                 this.loadQuestions();
             }
         });
@@ -138,7 +139,7 @@ class MultiExamSimulator {
 
     // Helper: check if a user's answer is correct for any question type
     isAnswerCorrect(question, userAnswer) {
-        const type = question.question_type || 'SINGLE';
+        const type = window.ExamApp.normalizeQuestionType(question);
 
         if (type === 'SEQUENCE') {
             if (!Array.isArray(userAnswer)) return false;
@@ -245,7 +246,8 @@ class MultiExamSimulator {
         const q = JSON.parse(JSON.stringify(question));
         if (!Array.isArray(q.options) || q.options.length === 0) return q;
         // Do not randomize for special types to avoid breaking semantics
-        if (q.question_type === 'SEQUENCE' || q.question_type === 'YES_NO_MATRIX' || q.question_type === 'DRAG_DROP_SELECT') {
+        const questionType = window.ExamApp.normalizeQuestionType(q);
+        if (questionType === 'SEQUENCE' || questionType === 'YES_NO_MATRIX' || questionType === 'DRAG_DROP_SELECT') {
             return q;
         }
         const optionMap = q.options.map((opt, idx) => ({ opt, originalIndex: idx }));
@@ -273,16 +275,17 @@ class MultiExamSimulator {
         // Apply localStorage overrides for any loaded exam
         for (const examId of Object.keys(this.examData)) {
             try {
+                if (!window.ExamApp.isSafeExamId(examId)) continue;
                 const overrideRaw = localStorage.getItem(`custom_${examId}_questions`);
                 if (overrideRaw) {
                     const parsed = JSON.parse(overrideRaw);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                        console.log(`Using local override for ${examId} questions`);
+                    if (Array.isArray(parsed) && parsed.length > 0 && window.ExamApp.validateExamData(parsed).valid) {
+                        window.ExamApp.log(`Using local override for ${examId} questions`);
                         this.examData[examId].questions = parsed;
                     }
                 }
             } catch (e) {
-                console.warn(`Failed to parse custom_${examId}_questions override:`, e);
+                window.ExamApp.warn(`Failed to parse custom_${examId}_questions override:`, e);
             }
         }
 
@@ -290,7 +293,7 @@ class MultiExamSimulator {
         for (const [id, data] of Object.entries(this.examData)) {
             summary[id] = data.questions.length;
         }
-        console.log('Loaded questions:', summary);
+        window.ExamApp.log('Loaded questions:', summary);
     }
 
     bindEvents() {
@@ -400,6 +403,10 @@ class MultiExamSimulator {
         const examParam = params.get('exam');
         const code = params.get('code');
         if (examParam === 'custom' && code) {
+            if (!window.ExamApp.isSafeExamId(code)) {
+                alert('Invalid custom exam code.');
+                return false;
+            }
             const getMeta = (questions) => {
                 // 1) Prefer existing metadata
                 try {
@@ -433,7 +440,7 @@ class MultiExamSimulator {
                 const raw = localStorage.getItem(`custom_${code}_questions`);
                 if (raw) {
                     const data = JSON.parse(raw);
-                    if (Array.isArray(data) && data.length) {
+                    if (Array.isArray(data) && data.length && window.ExamApp.validateExamData(data).valid) {
                         const meta = getMeta(data);
                         this.examData['custom'] = {
                             name: meta.name || code.toUpperCase(),
@@ -455,7 +462,7 @@ class MultiExamSimulator {
                 const resp = await fetch(`./exam-dumps/${encodeURIComponent(code)}.json`);
                 if (resp.ok) {
                     const data = await resp.json();
-                    if (Array.isArray(data) && data.length) {
+                    if (Array.isArray(data) && data.length && window.ExamApp.validateExamData(data).valid) {
                         const meta = getMeta(data);
                         this.examData['custom'] = {
                             name: meta.name || code.toUpperCase(),
@@ -480,11 +487,11 @@ class MultiExamSimulator {
     // Load an arbitrary exam by ID from window.userExams or localStorage.
     // Returns true if the exam was loaded into this.examData.
     loadExamFromRuntime(examId) {
-        if (!examId) return false;
+        if (!window.ExamApp.isSafeExamId(examId)) return false;
 
         // Prefer in-memory exams (server mode auto-detection)
         const fromMemory = window.userExams && window.userExams[examId];
-        if (fromMemory && Array.isArray(fromMemory.questions) && fromMemory.questions.length > 0) {
+        if (fromMemory && Array.isArray(fromMemory.questions) && fromMemory.questions.length > 0 && window.ExamApp.validateExamData(fromMemory.questions, fromMemory.metadata).valid) {
             const metadata = fromMemory.metadata || {};
             this.examData[examId] = {
                 name: metadata.name || examId.toUpperCase(),
@@ -504,7 +511,7 @@ class MultiExamSimulator {
             const raw = localStorage.getItem(`custom_${examId}_questions`);
             if (!raw) return false;
             const questions = JSON.parse(raw);
-            if (!Array.isArray(questions) || questions.length === 0) return false;
+            if (!Array.isArray(questions) || questions.length === 0 || !window.ExamApp.validateExamData(questions).valid) return false;
             let metadata = {};
             try {
                 const metaRaw = localStorage.getItem(`exam_metadata_${examId}`);
@@ -524,7 +531,7 @@ class MultiExamSimulator {
             };
             return true;
         } catch (error) {
-            console.warn('Failed to load exam from localStorage', { examId, error });
+            window.ExamApp.warn('Failed to load exam from localStorage', { examId, error });
             return false;
         }
     }
@@ -544,7 +551,7 @@ class MultiExamSimulator {
         // Update modules and resources
         this.updateModulesAndResources(exam);
 
-        console.log(`Selected exam: ${examType}`, exam);
+        window.ExamApp.log(`Selected exam: ${examType}`, exam);
     }
 
     updateExamInfo(exam) {
@@ -722,6 +729,8 @@ class MultiExamSimulator {
         // Update progress bar
         const progress = ((index + 1) / questions.length) * 100;
         document.getElementById('progress-fill').style.width = `${progress}%`;
+        const progressBar = document.querySelector('.progress-bar');
+        if (progressBar) progressBar.setAttribute('aria-valuenow', String(Math.round(progress)));
 
         // Show question type indicator
         this.showQuestionTypeIndicator(question);
@@ -734,8 +743,8 @@ class MultiExamSimulator {
 
     // Update navigation buttons
         document.getElementById('prev-btn').disabled = index === 0;
-        document.getElementById('next-btn').style.display = index === questions.length - 1 ? 'none' : 'block';
-        document.getElementById('finish-exam').style.display = index === questions.length - 1 ? 'block' : 'none';
+        window.ExamApp.setElementHidden(document.getElementById('next-btn'), index === questions.length - 1);
+        window.ExamApp.setElementHidden(document.getElementById('finish-exam'), index !== questions.length - 1);
 
         // Update mark for review button
         const isMarked = this.markedForReview.has(index);
@@ -769,21 +778,23 @@ class MultiExamSimulator {
         // Only show indicator for special question types (not STANDARD or MULTI)
         // MULTI already has the "Select all that apply" hint
         const specialTypes = {
-            'DRAG_DROP': { text: 'Drag & Drop', icon: 'fas fa-arrows-alt' },
-            'DRAG_DROP_SELECT': { text: 'Select Items', icon: 'fas fa-hand-pointer' },
-            'HOTSPOT': { text: 'Hotspot', icon: 'fas fa-crosshairs' },
-            'SEQUENCE': { text: 'Ordering', icon: 'fas fa-sort-amount-down' },
-            'YES_NO_MATRIX': { text: 'Yes / No', icon: 'fas fa-th-list' }
+            'DRAG_DROP_SELECT': { text: 'Select Items', icon: 'fas fa-hand-pointer', className: 'drag_drop_select' },
+            'SEQUENCE': { text: 'Ordering', icon: 'fas fa-sort-amount-down', className: 'sequence' },
+            'YES_NO_MATRIX': { text: 'Yes / No', icon: 'fas fa-th-list', className: 'yes_no_matrix' }
         };
 
-        const type = specialTypes[question.question_type];
+        const type = specialTypes[window.ExamApp.normalizeQuestionType(question)];
 
         if (type) {
-            typeText.innerHTML = `<i aria-hidden="true" class="${type.icon}"></i> ${type.text}`;
-            indicator.style.display = 'block';
-            indicator.className = `question-type-indicator ${question.question_type.toLowerCase()}`;
+            typeText.replaceChildren();
+            const icon = document.createElement('i');
+            icon.setAttribute('aria-hidden', 'true');
+            icon.className = type.icon;
+            typeText.append(icon, document.createTextNode(` ${type.text}`));
+            window.ExamApp.setElementHidden(indicator, false);
+            indicator.className = `question-type-indicator ${type.className}`;
         } else {
-            indicator.style.display = 'none';
+            window.ExamApp.setElementHidden(indicator, true);
         }
     }
 
@@ -821,6 +832,9 @@ class MultiExamSimulator {
                         } else if (filename.includes('\\')) {
                             filename = filename.split('\\').pop();
                         }
+                        if (!window.ExamApp.isSafeImageFileName(filename)) {
+                            throw new Error('Invalid image filename');
+                        }
                         
                         // Use imageLoader to get image from IndexedDB first, then filesystem
                         const imagePath = await window.imageLoader.loadImage(filename);
@@ -852,7 +866,7 @@ class MultiExamSimulator {
                         
                         imageWrapper.appendChild(img);
                     } catch (error) {
-                        console.warn(`Failed to load image: ${imageInfo.filename}`, error);
+                        window.ExamApp.warn(`Failed to load image: ${imageInfo.filename}`, error);
                         imageWrapper.innerHTML = `
                             <div class="image-error">
                                 <i class="fas fa-exclamation-triangle"></i>
@@ -904,6 +918,9 @@ class MultiExamSimulator {
                         } else if (filename.includes('\\')) {
                             filename = filename.split('\\').pop();
                         }
+                        if (!window.ExamApp.isSafeImageFileName(filename)) {
+                            throw new Error('Invalid image filename');
+                        }
                         
                         // Use imageLoader to get image from IndexedDB first, then filesystem
                         const imagePath = await window.imageLoader.loadImage(filename);
@@ -934,7 +951,7 @@ class MultiExamSimulator {
                         
                         imageWrapper.appendChild(img);
                     } catch (error) {
-                        console.warn(`Failed to load image: ${imageInfo.filename}`, error);
+                        window.ExamApp.warn(`Failed to load image: ${imageInfo.filename}`, error);
                         imageWrapper.innerHTML = `
                             <div class="image-error">
                                 <i class="fas fa-exclamation-triangle"></i>
@@ -993,9 +1010,10 @@ class MultiExamSimulator {
         const container = document.getElementById('options-container');
         container.innerHTML = '';
 
-        const isSequence = (question.question_type === 'SEQUENCE');
-    const isYesNoMatrix = (question.question_type === 'YES_NO_MATRIX');
-    const isDragSelect = (question.question_type === 'DRAG_DROP_SELECT');
+        const questionType = window.ExamApp.normalizeQuestionType(question);
+        const isSequence = (questionType === 'SEQUENCE');
+    const isYesNoMatrix = (questionType === 'YES_NO_MATRIX');
+    const isDragSelect = (questionType === 'DRAG_DROP_SELECT');
     const isMulti = Array.isArray(question.correct) && !isSequence && !isYesNoMatrix && !isDragSelect;
 
         if (isSequence) {
@@ -1312,9 +1330,10 @@ class MultiExamSimulator {
     const question = this.getCurrentQuestions()[this.currentQuestionIndex];
     const userAnswer = this.selectedAnswers[this.currentQuestionIndex];
     const correctAnswer = question.correct;
-    const isSequence = (question.question_type === 'SEQUENCE');
-    const isYesNoMatrix = (question.question_type === 'YES_NO_MATRIX');
-    const isDragSelect = (question.question_type === 'DRAG_DROP_SELECT');
+    const questionType = window.ExamApp.normalizeQuestionType(question);
+    const isSequence = (questionType === 'SEQUENCE');
+    const isYesNoMatrix = (questionType === 'YES_NO_MATRIX');
+    const isDragSelect = (questionType === 'DRAG_DROP_SELECT');
     const isMulti = Array.isArray(correctAnswer) && !isSequence && !isYesNoMatrix && !isDragSelect;
 
         const isCorrect = this.isAnswerCorrect(question, userAnswer);
@@ -1353,7 +1372,9 @@ class MultiExamSimulator {
         // Display explanation images
         this.displayExplanationImages(question);
         
-        feedback.style.display = 'block';
+        feedback.setAttribute('role', 'status');
+        feedback.setAttribute('aria-live', 'polite');
+        window.ExamApp.setElementHidden(feedback, false);
         
         // Update option styles to show correct/incorrect (skip for sequence type)
     if (!isSequence && !isYesNoMatrix && !isDragSelect) {
@@ -1382,7 +1403,7 @@ class MultiExamSimulator {
     }
 
     closeFeedback() {
-        document.getElementById('answer-feedback').style.display = 'none';
+        window.ExamApp.setElementHidden(document.getElementById('answer-feedback'), true);
         // Reset option styles for standard choices only
         document.querySelectorAll('.option').forEach(option => {
             option.classList.remove('correct', 'incorrect', 'user-selected', 'correct-answer', 'incorrect-answer');
@@ -1598,8 +1619,9 @@ class MultiExamSimulator {
             const question = questions[index];
             const userAnswer = this.selectedAnswers[index];
             const correctAnswer = question.correct;
-            const isSequence = (question.question_type === 'SEQUENCE');
-            const isYesNoMatrix = (question.question_type === 'YES_NO_MATRIX');
+            const questionType = window.ExamApp.normalizeQuestionType(question);
+            const isSequence = (questionType === 'SEQUENCE');
+            const isYesNoMatrix = (questionType === 'YES_NO_MATRIX');
 
             const isCorrect = this.isAnswerCorrect(question, userAnswer);
             const wasAnswered = userAnswer !== undefined && userAnswer !== null && (Array.isArray(userAnswer) ? userAnswer.length > 0 : true);
@@ -1702,9 +1724,10 @@ class MultiExamSimulator {
         
         try {
             localStorage.setItem(examKey, JSON.stringify(progress));
+            window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.progress, this.currentExam);
         } catch (e) {
             if (e.name === 'QuotaExceededError' || e.code === 22) {
-                console.warn('localStorage quota exceeded, progress not saved');
+                window.ExamApp.warn('localStorage quota exceeded, progress not saved');
                 alert('Storage is full. Your progress could not be saved. Please clear some old exam data and try again.');
             } else {
                 throw e;
@@ -1732,11 +1755,10 @@ class MultiExamSimulator {
             let bestScoreOverall = 0;
             let totalPassed = 0;
 
-            // Check all exams in localStorage
-            const len1 = localStorage.length;
-            for (let i = 0; i < len1; i++) {
-                const key = localStorage.key(i);
-                if (key && key.endsWith('_progress')) {
+            const progressExamIds = window.ExamApp.getRegistry(window.ExamApp.STORAGE_KEYS.progress);
+            if (progressExamIds.length > 0) {
+                progressExamIds.forEach((examId) => {
+                    const key = `${examId}_progress`;
                     try {
                         const progress = JSON.parse(localStorage.getItem(key));
                         if (progress && progress.attempts) {
@@ -1746,6 +1768,21 @@ class MultiExamSimulator {
                         }
                     } catch (e) {
                         // Skip invalid progress data
+                    }
+                });
+            } else {
+                const len1 = localStorage.length;
+                for (let i = 0; i < len1; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.endsWith('_progress')) {
+                        try {
+                            const progress = JSON.parse(localStorage.getItem(key));
+                            if (progress && progress.attempts) {
+                                totalAttempts += progress.attempts.length;
+                                bestScoreOverall = Math.max(bestScoreOverall, progress.bestScore || 0);
+                                totalPassed += progress.totalPassed || 0;
+                            }
+                        } catch (e) {}
                     }
                 }
             }
@@ -1774,8 +1811,11 @@ class MultiExamSimulator {
     showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(screen => {
             screen.classList.remove('active');
+            window.ExamApp.setElementHidden(screen, true);
         });
-        document.getElementById(screenId).classList.add('active');
+        const target = document.getElementById(screenId);
+        target.classList.add('active');
+        window.ExamApp.setElementHidden(target, false);
     }
 
     toggleTheme() {
@@ -1833,21 +1873,30 @@ window.showProgressStatistics = function() {
     let totalAttempts = 0;
     let totalExams = 0;
 
-    // Check all possible exam IDs in localStorage
-    const len2 = localStorage.length;
-    for (let i = 0; i < len2; i++) {
-        const key = localStorage.key(i);
-        if (key && key.endsWith('_progress')) {
-            const examId = key.replace('_progress', '');
+    const progressExamIds = window.ExamApp.getRegistry(window.ExamApp.STORAGE_KEYS.progress);
+    const collect = (examId) => {
+        if (!window.ExamApp.isSafeExamId(examId)) return;
             try {
-                const progress = JSON.parse(localStorage.getItem(key));
+                const progress = JSON.parse(localStorage.getItem(`${examId}_progress`));
                 if (progress && progress.attempts && progress.attempts.length > 0) {
                     allProgress[examId] = progress;
                     totalAttempts += progress.attempts.length;
                     totalExams++;
+                    window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.progress, examId);
                 }
             } catch (e) {
-                console.warn(`Failed to parse progress for ${examId}:`, e);
+                window.ExamApp.warn(`Failed to parse progress for ${examId}:`, e);
+            }
+    };
+
+    if (progressExamIds.length > 0) {
+        progressExamIds.forEach(collect);
+    } else {
+        const len2 = localStorage.length;
+        for (let i = 0; i < len2; i++) {
+            const key = localStorage.key(i);
+            if (key && key.endsWith('_progress')) {
+                collect(key.replace('_progress', ''));
             }
         }
     }
@@ -1865,18 +1914,28 @@ window.exportProgress = function() {
     // Gather all progress data
     const allProgress = {};
 
-    const len3 = localStorage.length;
-    for (let i = 0; i < len3; i++) {
-        const key = localStorage.key(i);
-        if (key && key.endsWith('_progress')) {
-            const examId = key.replace('_progress', '');
+    const progressExamIds = window.ExamApp.getRegistry(window.ExamApp.STORAGE_KEYS.progress);
+    const collect = (examId) => {
+        if (!window.ExamApp.isSafeExamId(examId)) return;
             try {
-                const progress = JSON.parse(localStorage.getItem(key));
+                const progress = JSON.parse(localStorage.getItem(`${examId}_progress`));
                 if (progress) {
                     allProgress[examId] = progress;
+                    window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.progress, examId);
                 }
             } catch (e) {
-                console.warn(`Failed to parse progress for ${examId}:`, e);
+                window.ExamApp.warn(`Failed to parse progress for ${examId}:`, e);
+            }
+    };
+
+    if (progressExamIds.length > 0) {
+        progressExamIds.forEach(collect);
+    } else {
+        const len3 = localStorage.length;
+        for (let i = 0; i < len3; i++) {
+            const key = localStorage.key(i);
+            if (key && key.endsWith('_progress')) {
+                collect(key.replace('_progress', ''));
             }
         }
     }

@@ -29,7 +29,14 @@ document.addEventListener('DOMContentLoaded', async function() {
   const params = new URLSearchParams(window.location.search);
   const examId = params.get('exam') || '';
 
-  console.log(`📚 Loading exam: ${examId}`);
+  if (!window.ExamApp.isSafeExamId(examId)) {
+    console.error(`❌ Invalid exam id: ${examId}`);
+    alert('Invalid exam id. Please select an exam from the homepage.');
+    closeExamTab();
+    return;
+  }
+
+  window.ExamApp.log(`📚 Loading exam: ${examId}`);
 
   // Set image loader to current exam
   if (window.imageLoader) {
@@ -50,16 +57,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
       const imageCount = await window.imageStorage.getExamImageCount(examId);
       if (imageCount > 0) {
-        console.log(`✅ ${imageCount} images available in IndexedDB for ${examId}`);
+        window.ExamApp.log(`✅ ${imageCount} images available in IndexedDB for ${examId}`);
       } else {
-        console.warn(`⚠️ No images found for exam "${examId}". Please re-import the ZIP file.`);
+        window.ExamApp.warn(`⚠️ No images found for exam "${examId}". Please re-import the ZIP file.`);
         const warningBanner = document.createElement('div');
         warningBanner.className = 'image-warning-banner';
         warningBanner.textContent = '⚠️ Images not loaded! Please go back to homepage and re-import the exam ZIP file.';
         document.body.appendChild(warningBanner);
       }
     } catch (e) {
-      console.warn('Could not check image count:', e);
+      window.ExamApp.warn('Could not check image count:', e);
     }
   }
 
@@ -94,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         modules: metadata.modules || []
       };
 
-      console.log(`✅ Loaded ${examData.questions.length} questions for ${examId}`);
+      window.ExamApp.log(`✅ Loaded ${examData.questions.length} questions for ${examId}`);
       window.examSimulator.startExam();
     }
   } else {

@@ -1,31 +1,46 @@
-// Função para carregar e cachear imagens locais
+// Load and cache local images
 // escapeHtml is now provided by utils.js
 
 class ImageLoader {
     static MAX_CACHE_SIZE = 100;
 
     constructor() {
-        this.baseUrl = './images/'; // Fallback para imagens antigas
+        this.baseUrl = './images/'; // Fallback for legacy images
         this.userContentBaseUrl = './user-content/exams/'; // Nova estrutura
         this.currentExam = null; // Will be set by exam loader
         this.cache = new Map();
         this.loadingPromises = new Map();
     }
 
+    revokeCachedUrl(value) {
+        if (typeof value === 'string' && value.startsWith('blob:')) {
+            URL.revokeObjectURL(value);
+        }
+    }
+
+    clearCache() {
+        this.cache.forEach((value) => this.revokeCachedUrl(value));
+        this.cache.clear();
+    }
+
     // Set current exam for dynamic path resolution
     setCurrentExam(examId) {
-        this.currentExam = examId;
-        console.log(`ImageLoader: Current exam set to ${examId}`);
+        this.currentExam = window.ExamApp.isSafeExamId(examId) ? examId : null;
+        window.ExamApp.log(`ImageLoader: Current exam set to ${examId}`);
     }
 
     async loadImage(filename) {
+        if (!window.ExamApp.isSafeImageFileName(filename)) {
+            window.ExamApp.warn(`Invalid image filename: ${filename}`);
+            return null;
+        }
         const cacheKey = this.currentExam ? `${this.currentExam}::${filename}` : filename;
         // Se já está em cache, retornar
         if (this.cache.has(cacheKey)) {
             return this.cache.get(cacheKey);
         }
 
-        // Se já está sendo carregada, esperar o promise existente
+        // If it is already loading, reuse the existing promise
         if (this.loadingPromises.has(cacheKey)) {
             return this.loadingPromises.get(cacheKey);
         }
@@ -39,6 +54,7 @@ class ImageLoader {
             // Evict oldest entry if cache is full
             if (this.cache.size >= ImageLoader.MAX_CACHE_SIZE) {
                 const oldestKey = this.cache.keys().next().value;
+                this.revokeCachedUrl(this.cache.get(oldestKey));
                 this.cache.delete(oldestKey);
             }
             this.cache.set(cacheKey, imagePath);
@@ -46,7 +62,7 @@ class ImageLoader {
             return imagePath;
         } catch (error) {
             this.loadingPromises.delete(cacheKey);
-            console.warn(`Falha ao carregar imagem: ${filename}`, error);
+            window.ExamApp.warn(`Failed to load image: ${filename}`, error);
             return null;
         }
     }
@@ -55,18 +71,18 @@ class ImageLoader {
         // Try IndexedDB first (persists between tabs)
         if (window.imageStorage && this.currentExam) {
             try {
-                const dataUrl = await window.imageStorage.getImage(this.currentExam, filename);
-                if (dataUrl) {
-                    console.log(`✓ Loaded ${filename} from IndexedDB`);
-                    return dataUrl;
+                const imageUrl = await window.imageStorage.getImage(this.currentExam, filename);
+                if (imageUrl) {
+                    window.ExamApp.log(`✓ Loaded ${filename} from IndexedDB`);
+                    return imageUrl;
                 }
             } catch (err) {
-                console.warn(`⚠️ Failed to load ${filename} from IndexedDB:`, err);
+                window.ExamApp.warn(`⚠️ Failed to load ${filename} from IndexedDB:`, err);
             }
         }
         
         // If not found, images need to be imported
-        console.warn(`⚠️ Image "${filename}" not found. Please re-import the exam ZIP file.`);
+        window.ExamApp.warn(`⚠️ Image "${filename}" not found. Please re-import the exam ZIP file.`);
 
         // Fallback to file system loading
         return new Promise((resolve, reject) => {
@@ -99,13 +115,13 @@ class ImageLoader {
         });
     }
 
-    // Pré-carrega uma lista de imagens
+    // Preload a list of images
     async preloadImages(imageList) {
-        console.log(`Pré-carregando ${imageList.length} imagens...`);
+        window.ExamApp.log(`Preloading ${imageList.length} images...`);
         
         const promises = imageList.map(filename => 
             this.loadImage(filename).catch(error => {
-                console.warn(`Falha ao pré-carregar ${filename}:`, error);
+                window.ExamApp.warn(`Failed to preload ${filename}:`, error);
                 return null;
             })
         );
@@ -113,14 +129,14 @@ class ImageLoader {
         const results = await Promise.all(promises);
         const loaded = results.filter(result => result !== null).length;
         
-        console.log(`✓ ${loaded}/${imageList.length} imagens pré-carregadas`);
+        window.ExamApp.log(`✓ ${loaded}/${imageList.length} images preloaded`);
         return loaded;
     }
 }
 
-// Função para renderizar uma imagem na questão
+// Render an image inside a question
 function renderQuestionImage(imageFilename, altText = '', className = 'question-image') {
-    if (!imageFilename) return '';
+    if (!window.ExamApp.isSafeImageFileName(imageFilename)) return '';
 
     // Create a placeholder that will be replaced with actual image
     const placeholderId = `img-placeholder-${Math.random().toString(36).substr(2, 9)}`;
@@ -142,17 +158,27 @@ function renderQuestionImage(imageFilename, altText = '', className = 'question-
             
             placeholder.replaceWith(img);
         } catch (error) {
-            console.warn(`Failed to load image: ${imageFilename}`, error);
-            placeholder.innerHTML = `<div class="image-error" style="color: #dc3545; text-align: center; padding: 20px; font-size: 14px;"><i class="fas fa-exclamation-triangle" style="font-size: 20px; margin-bottom: 8px;"></i><div>Image not available: ${escapeHtml(imageFilename)}</div></div>`;
+            window.ExamApp.warn(`Failed to load image: ${imageFilename}`, error);
+            const errorBox = document.createElement('div');
+            errorBox.className = 'image-error';
+            errorBox.style.cssText = 'color: #dc3545; text-align: center; padding: 20px; font-size: 14px;';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-exclamation-triangle';
+            icon.style.cssText = 'font-size: 20px; margin-bottom: 8px;';
+            const message = document.createElement('div');
+            message.textContent = `Image not available: ${imageFilename}`;
+            errorBox.appendChild(icon);
+            errorBox.appendChild(message);
+            placeholder.replaceChildren(errorBox);
         }
     }, 0);
 
     return `<div id="${placeholderId}" class="image-placeholder"><div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i><div>Loading image...</div></div></div>`;
 }
 
-// Função para processar texto da questão e renderizar imagens
+// Process question text and render image placeholders
 function processQuestionContent(content) {
-    // Regex para encontrar referências de imagem no formato ![](images/filename.jpg)
+    // Match image references in the format ![](images/filename.jpg)
     const imageRegex = /!\[([^\]]*)\]\(images\/([^)]+)\)/g;
     
     return content.replace(imageRegex, (match, altText, filename) => {
@@ -160,12 +186,12 @@ function processQuestionContent(content) {
     });
 }
 
-// Inicializar o carregador de imagens
+// Initialize the image loader
 window.ExamApp = window.ExamApp || {};
 window.ExamApp.imageLoader = new ImageLoader();
 window.imageLoader = window.ExamApp.imageLoader; // backwards compat
 
-// CSS para os componentes de imagem
+// CSS for image components
 const imageStyles = `
 <style>
 .image-placeholder {
@@ -227,9 +253,9 @@ if (document.head) {
     document.head.insertAdjacentHTML('beforeend', imageStyles);
 }
 
-// Função para inicializar o sistema de imagens
+// Initialize the image system
 async function initializeImageSystem() {
-    console.log('✓ Sistema de imagens inicializado (modo local)');
+    window.ExamApp.log('✓ Image system initialized (local mode)');
     return Promise.resolve();
 }
 
@@ -238,7 +264,7 @@ async function clearExamImages(examId) {
     if (window.imageStorage) {
         const count = await window.imageStorage.deleteExamImages(examId);
         if (window.imageLoader) {
-            window.imageLoader.cache.clear(); // Clear memory cache
+            window.imageLoader.clearCache();
         }
         return count;
     }
@@ -249,7 +275,7 @@ async function clearExamImages(examId) {
 async function getImageStorageStats() {
     if (window.imageStorage) {
         const stats = await window.imageStorage.getStorageStats();
-        console.log('📊 Image Storage Stats:', stats);
+        window.ExamApp.log('📊 Image Storage Stats:', stats);
         return stats;
     }
     return { totalImages: 0, totalSizeMB: '0.00', exams: {} };
@@ -272,3 +298,7 @@ window.clearExamImages = window.ExamApp.clearExamImages; // backwards compat
 
 window.ExamApp.getImageStorageStats = getImageStorageStats;
 window.getImageStorageStats = window.ExamApp.getImageStorageStats; // backwards compat
+
+window.addEventListener('beforeunload', () => {
+    if (window.imageLoader) window.imageLoader.clearCache();
+});

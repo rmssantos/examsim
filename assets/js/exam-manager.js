@@ -19,7 +19,7 @@ class ExamManager {
             const config = localStorage.getItem('exam_activation_config');
             this.examConfig = config ? JSON.parse(config) : {};
         } catch (error) {
-            console.warn('Failed to load exam config:', error);
+            window.ExamApp.warn('Failed to load exam config:', error);
             this.examConfig = {};
         }
     }
@@ -35,29 +35,32 @@ class ExamManager {
 
     // Check if exam is active
     isExamActive(examId) {
+        if (!window.ExamApp.isSafeExamId(examId)) return false;
         // Default to true if not in config (auto-activate new exams)
         return this.examConfig[examId] !== false;
     }
 
     // Activate exam
     activateExam(examId) {
+        if (!window.ExamApp.isSafeExamId(examId)) return;
         this.examConfig[examId] = true;
         this.saveExamConfig();
-        console.log(`✓ Exam ${examId} activated`);
+        window.ExamApp.log(`✓ Exam ${examId} activated`);
     }
 
     // Deactivate exam
     deactivateExam(examId) {
+        if (!window.ExamApp.isSafeExamId(examId)) return;
         this.examConfig[examId] = false;
         this.saveExamConfig();
-        console.log(`✗ Exam ${examId} deactivated`);
+        window.ExamApp.log(`✗ Exam ${examId} deactivated`);
     }
 
     // Get all exam IDs (active and inactive)
     getAllExamIds() {
         const allExams = [];
         if (window.userExams) {
-            allExams.push(...Object.keys(window.userExams));
+            allExams.push(...Object.keys(window.userExams).filter((id) => window.ExamApp.isSafeExamId(id)));
         }
         return allExams;
     }
@@ -77,16 +80,17 @@ class ExamManager {
 
             for (const examDir of examDirs) {
                 try {
+                    if (!window.ExamApp.isSafeExamId(examDir)) continue;
                     const examData = await this.loadExamData(examDir);
                     if (examData) {
                         this.availableExams.set(examDir, examData);
                     }
                 } catch (error) {
-                    console.warn(`Failed to load exam data for ${examDir}:`, error);
+                    window.ExamApp.warn(`Failed to load exam data for ${examDir}:`, error);
                 }
             }
         } catch (error) {
-            console.warn('Failed to detect exams:', error);
+            window.ExamApp.warn('Failed to detect exams:', error);
         }
 
         return this.availableExams;
@@ -101,7 +105,7 @@ class ExamManager {
         // Only include ACTIVE exams
         if (window.userExams) {
             const allExams = Object.keys(window.userExams);
-            const activeExams = allExams.filter(id => this.isExamActive(id));
+            const activeExams = allExams.filter(id => window.ExamApp.isSafeExamId(id) && this.isExamActive(id));
             foundExams.push(...activeExams);
         }
 
@@ -116,6 +120,7 @@ class ExamManager {
     // Load exam data from directory
     async loadExamData(examId) {
         try {
+            if (!window.ExamApp.isSafeExamId(examId)) return null;
             // Try to load from user-content first
             let examData = await this.loadFromUserContent(examId);
 
@@ -158,7 +163,7 @@ class ExamManager {
                 };
             }
         } catch (error) {
-            console.warn(`Failed to load ${examId} from user-content:`, error);
+            window.ExamApp.warn(`Failed to load ${examId} from user-content:`, error);
         }
         return null;
     }
@@ -173,14 +178,14 @@ class ExamManager {
                 return { questions };
             }
         } catch (error) {
-            console.warn(`Failed to load ${examId} from localStorage:`, error);
+            window.ExamApp.warn(`Failed to load ${examId} from localStorage:`, error);
         }
         return null;
     }
 
     // Get custom exams from localStorage
     getCustomExamsFromStorage() {
-        const customExams = [];
+        const customExams = window.ExamApp.getRegistry(window.ExamApp.STORAGE_KEYS.exams);
         try {
             const len = localStorage.length;
             for (let i = 0; i < len; i++) {
@@ -188,13 +193,14 @@ class ExamManager {
                 if (key && key.startsWith('custom_') && key.endsWith('_questions')) {
                     const examId = key.replace('custom_', '').replace('_questions', '');
                     if (examId) {
-                        customExams.push(examId);
+                        if (window.ExamApp.isSafeExamId(examId) && !customExams.includes(examId)) customExams.push(examId);
                     }
                 }
             }
         } catch (error) {
-            console.warn('Error reading custom exams from localStorage:', error);
+            window.ExamApp.warn('Error reading custom exams from localStorage:', error);
         }
+        window.ExamApp.setRegistry(window.ExamApp.STORAGE_KEYS.exams, customExams);
         return customExams;
     }
 
@@ -241,6 +247,12 @@ class ExamManager {
     // Import exam from file/data (supports both array and object formats)
     async importExam(examId, examData, imageFiles = null) {
         try {
+            const safeExamId = window.ExamApp.normalizeExamId(examId);
+            if (!safeExamId) {
+                throw new Error('Invalid exam id. Use letters, numbers, hyphens or underscores.');
+            }
+            examId = safeExamId;
+
             // Normalize data format
             let questions, metadata;
 
@@ -257,13 +269,15 @@ class ExamManager {
             }
 
             // Validate
-            if (!this.validateExamData(questions)) {
-                throw new Error('Invalid question format');
+            const validation = window.ExamApp.validateExamData(questions, metadata);
+            if (!validation.valid) {
+                throw new Error(`Invalid question format: ${validation.errors.slice(0, 3).join('; ')}`);
             }
 
             // Store in localStorage with special marker
             const storageKey = `custom_${examId}_questions`;
             localStorage.setItem(storageKey, JSON.stringify(questions));
+            window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.exams, examId);
 
             // Generate and store metadata
             const metadataKey = `exam_metadata_${examId}`;
@@ -283,7 +297,7 @@ class ExamManager {
             // Re-detect exams
             await this.detectAvailableExams();
 
-            console.log(`✅ Successfully imported exam: ${examId} (${questions.length} questions)`);
+            window.ExamApp.log(`✅ Successfully imported exam: ${examId} (${questions.length} questions)`);
             return true;
         } catch (error) {
             console.error('Failed to import exam:', error);
@@ -306,36 +320,17 @@ class ExamManager {
             return false;
         }
 
-        // Check if questions have required fields
-        return questions.every(q => {
-            if (!q.hasOwnProperty('id') || !q.hasOwnProperty('question') || !q.hasOwnProperty('correct')) {
-                return false;
-            }
-
-            // YES_NO_MATRIX uses statements instead of options
-            if (q.question_type === 'YES_NO_MATRIX') {
-                return Array.isArray(q.statements) && Array.isArray(q.correct) &&
-                    q.statements.length === q.correct.length &&
-                    q.correct.every(c => c === 0 || c === 1);
-            }
-
-            // All other types require options
-            if (!Array.isArray(q.options)) return false;
-
-            // Validate that correct index is within bounds of options
-            if (Array.isArray(q.correct)) {
-                return q.correct.every(i => Number.isInteger(i) && i >= 0 && i < q.options.length);
-            } else {
-                return Number.isInteger(q.correct) && q.correct >= 0 && q.correct < q.options.length;
-            }
-        });
+        return window.ExamApp.validateExamData(questions).valid;
     }
 
     // Delete exam
     deleteExam(examId) {
         try {
+            if (!window.ExamApp.isSafeExamId(examId)) return false;
             localStorage.removeItem(`custom_${examId}_questions`);
             localStorage.removeItem(`exam_metadata_${examId}`);
+            window.ExamApp.removeFromRegistry(window.ExamApp.STORAGE_KEYS.exams, examId);
+            window.ExamApp.removeFromRegistry(window.ExamApp.STORAGE_KEYS.progress, examId);
             this.availableExams.delete(examId);
             return true;
         } catch (error) {

@@ -12,7 +12,7 @@ class ImageStorage {
 
     async init() {
         if (!window.indexedDB) {
-            console.warn('IndexedDB not available, image storage disabled');
+            window.ExamApp.warn('IndexedDB not available, image storage disabled');
             return;
         }
 
@@ -26,7 +26,7 @@ class ImageStorage {
 
             request.onsuccess = () => {
                 this.db = request.result;
-                console.log('✅ IndexedDB initialized successfully');
+                window.ExamApp.log('✅ IndexedDB initialized successfully');
                 resolve(this.db);
             };
 
@@ -37,7 +37,7 @@ class ImageStorage {
                 if (!db.objectStoreNames.contains(this.storeName)) {
                     const objectStore = db.createObjectStore(this.storeName, { keyPath: 'key' });
                     objectStore.createIndex('examId', 'examId', { unique: false });
-                    console.log('📦 Created IndexedDB object store for images');
+                    window.ExamApp.log('📦 Created IndexedDB object store for images');
                 }
             };
         });
@@ -50,22 +50,50 @@ class ImageStorage {
     }
 
     async storeImage(examId, fileName, base64Data, mimeType = 'image/jpeg') {
+        const blob = this.base64ToBlob(base64Data, mimeType);
+        return this.storeImageBlob(examId, fileName, blob, mimeType);
+    }
+
+    base64ToBlob(base64Data, mimeType) {
+        const binary = atob(String(base64Data || ''));
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        return new Blob([bytes], { type: mimeType });
+    }
+
+    async storeImageBlob(examId, fileName, blob, mimeType = blob?.type || 'image/jpeg') {
         await this.ensureReady();
+        if (!window.ExamApp.isSafeExamId(examId)) {
+            throw new Error('Invalid exam id');
+        }
+        if (!window.ExamApp.isSafeImageFileName(fileName)) {
+            throw new Error('Invalid image filename');
+        }
+        if (!window.ExamApp.EXAM_LIMITS.allowedImageMimeTypes.includes(mimeType)) {
+            throw new Error('Unsupported image MIME type');
+        }
+        if (!(blob instanceof Blob)) {
+            throw new Error('Invalid image blob');
+        }
+        if (blob.size > window.ExamApp.EXAM_LIMITS.maxImageBytes) {
+            throw new Error('Image is too large');
+        }
         
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([this.storeName], 'readwrite');
             const objectStore = transaction.objectStore(this.storeName);
             
             const key = `${examId}_${fileName}`;
-            const dataUrl = `data:${mimeType};base64,${base64Data}`;
             
             const record = {
                 key: key,
                 examId: examId,
                 fileName: fileName,
-                dataUrl: dataUrl,
+                blob: blob,
                 mimeType: mimeType,
-                size: base64Data.length,
+                size: blob.size,
                 timestamp: Date.now()
             };
             
@@ -84,6 +112,9 @@ class ImageStorage {
 
     async getImage(examId, fileName) {
         await this.ensureReady();
+        if (!window.ExamApp.isSafeExamId(examId) || !window.ExamApp.isSafeImageFileName(fileName)) {
+            return null;
+        }
         
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([this.storeName], 'readonly');
@@ -94,7 +125,11 @@ class ImageStorage {
             
             request.onsuccess = () => {
                 if (request.result) {
-                    resolve(request.result.dataUrl);
+                    if (request.result.blob instanceof Blob) {
+                        resolve(URL.createObjectURL(request.result.blob));
+                    } else {
+                        resolve(request.result.dataUrl || null);
+                    }
                 } else {
                     resolve(null);
                 }
@@ -109,6 +144,7 @@ class ImageStorage {
 
     async deleteExamImages(examId) {
         await this.ensureReady();
+        if (!window.ExamApp.isSafeExamId(examId)) return 0;
         
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([this.storeName], 'readwrite');
@@ -125,7 +161,7 @@ class ImageStorage {
                     deletedCount++;
                     cursor.continue();
                 } else {
-                    console.log(`🗑️ Deleted ${deletedCount} images for exam: ${examId}`);
+                    window.ExamApp.log(`🗑️ Deleted ${deletedCount} images for exam: ${examId}`);
                     resolve(deletedCount);
                 }
             };
@@ -234,7 +270,7 @@ class ImageStorage {
             const request = objectStore.clear();
             
             request.onsuccess = () => {
-                console.log('🗑️ Cleared all images from IndexedDB');
+                window.ExamApp.log('🗑️ Cleared all images from IndexedDB');
                 resolve();
             };
             
