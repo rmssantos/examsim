@@ -44,10 +44,19 @@ this.setupConfigModal();
 this.refreshHeroPreview();
 }
 
-placeDetailsPanel() {
+placeDetailsPanel(examId = null) {
 const detailsPanel = document.getElementById('exam-details-placeholder');
 const librarySection = document.querySelector('.exam-library-section');
 if (!detailsPanel || !librarySection || !this.examSelection) return;
+
+if (examId) {
+	const selectedCard = Array.from(this.examSelection.querySelectorAll('.exam-card'))
+		.find(card => card.dataset.exam === examId);
+	if (selectedCard) {
+		selectedCard.insertAdjacentElement('afterend', detailsPanel);
+		return;
+	}
+}
 
 if (detailsPanel.parentElement !== librarySection) {
 	librarySection.insertBefore(detailsPanel, this.examSelection);
@@ -83,6 +92,10 @@ return;
 
 // Hide "No Exams" section and show exam cards
 this.hideNoExamsSection();
+const detailsPanel = document.getElementById('exam-details-placeholder');
+if (detailsPanel?.parentElement === this.examSelection) {
+	detailsPanel.remove();
+}
 this.examSelection.innerHTML = '';
 
 const fragment = document.createDocumentFragment();
@@ -91,6 +104,7 @@ const card = this.createExamCard(examId, examData);
 fragment.appendChild(card);
 });
 this.examSelection.appendChild(fragment);
+this.placeDetailsPanel();
 
 // Show compact import button when exams exist
 this.showCompactImportButton();
@@ -249,7 +263,8 @@ if (examData) {
 		questionCount: examData.metadata.questionCount,
 		passScore: examData.metadata.passScore,
 		questions: examData.questions,
-		modules: examData.metadata.modules || []
+		modules: examData.metadata.modules || [],
+		resources: examData.metadata.resources || []
 	};
 }
 }
@@ -339,6 +354,7 @@ if (!examData) return;
 const metadata = examData.metadata || {};
 const stats = this.getProgressStats(examId);
 const placeholder = document.getElementById('exam-details-placeholder');
+this.placeDetailsPanel(examId);
 
 // Populate details
 document.getElementById('details-exam-name').textContent = metadata.name || examId.toUpperCase();
@@ -413,8 +429,17 @@ this.scrollToExamLibrary();
 }
 
 startSelectedExam() {
-if (!this.selectedExamId) return;
-window.location.href = `exam.html?exam=${encodeURIComponent(this.selectedExamId)}`;
+if (!this.selectedExamId) {
+	alert('Please select an exam first.');
+	return;
+}
+
+const simulator = window.ExamApp?.examSimulator || window.examSimulator;
+if (simulator?.currentExam !== this.selectedExamId) {
+	this.selectExam(this.selectedExamId);
+}
+
+window.open(`exam.html?exam=${encodeURIComponent(this.selectedExamId)}`, '_blank');
 }
 
 scrollToExamLibrary() {

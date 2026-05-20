@@ -2698,6 +2698,10 @@ body.dragging-file .drop-zone-simple.drag-over,
 	scroll-margin-top: 24px;
 }
 
+.exam-grid > .exam-details-placeholder {
+	grid-column: 1 / -1;
+}
+
 .exam-details-header {
 	align-items: center;
 	gap: 1rem;
