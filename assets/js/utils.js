@@ -24,7 +24,15 @@ window.ExamApp.EXAM_LIMITS = Object.freeze({
     allowedImageMimeTypes: Object.freeze(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
 });
 
-window.ExamApp.DEBUG = new URLSearchParams(window.location.search).has('debug') || localStorage.getItem('exam_debug') === 'true';
+function safeGetLocalStorage(key) {
+    try {
+        return localStorage.getItem(key);
+    } catch (_) {
+        return null;
+    }
+}
+
+window.ExamApp.DEBUG = new URLSearchParams(window.location.search).has('debug') || safeGetLocalStorage('exam_debug') === 'true';
 window.ExamApp.log = function log(...args) {
     if (window.ExamApp.DEBUG) console.log(...args);
 };

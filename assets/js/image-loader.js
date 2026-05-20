@@ -1,11 +1,11 @@
-// Função para carregar e cachear imagens locais
+// Load and cache local images
 // escapeHtml is now provided by utils.js
 
 class ImageLoader {
     static MAX_CACHE_SIZE = 100;
 
     constructor() {
-        this.baseUrl = './images/'; // Fallback para imagens antigas
+        this.baseUrl = './images/'; // Fallback for legacy images
         this.userContentBaseUrl = './user-content/exams/'; // Nova estrutura
         this.currentExam = null; // Will be set by exam loader
         this.cache = new Map();
@@ -40,7 +40,7 @@ class ImageLoader {
             return this.cache.get(cacheKey);
         }
 
-        // Se já está sendo carregada, esperar o promise existente
+        // If it is already loading, reuse the existing promise
         if (this.loadingPromises.has(cacheKey)) {
             return this.loadingPromises.get(cacheKey);
         }
@@ -62,7 +62,7 @@ class ImageLoader {
             return imagePath;
         } catch (error) {
             this.loadingPromises.delete(cacheKey);
-            window.ExamApp.warn(`Falha ao carregar imagem: ${filename}`, error);
+            window.ExamApp.warn(`Failed to load image: ${filename}`, error);
             return null;
         }
     }
@@ -115,13 +115,13 @@ class ImageLoader {
         });
     }
 
-    // Pré-carrega uma lista de imagens
+    // Preload a list of images
     async preloadImages(imageList) {
-        window.ExamApp.log(`Pré-carregando ${imageList.length} imagens...`);
+        window.ExamApp.log(`Preloading ${imageList.length} images...`);
         
         const promises = imageList.map(filename => 
             this.loadImage(filename).catch(error => {
-                window.ExamApp.warn(`Falha ao pré-carregar ${filename}:`, error);
+                window.ExamApp.warn(`Failed to preload ${filename}:`, error);
                 return null;
             })
         );
@@ -129,12 +129,12 @@ class ImageLoader {
         const results = await Promise.all(promises);
         const loaded = results.filter(result => result !== null).length;
         
-        window.ExamApp.log(`✓ ${loaded}/${imageList.length} imagens pré-carregadas`);
+        window.ExamApp.log(`✓ ${loaded}/${imageList.length} images preloaded`);
         return loaded;
     }
 }
 
-// Função para renderizar uma imagem na questão
+// Render an image inside a question
 function renderQuestionImage(imageFilename, altText = '', className = 'question-image') {
     if (!window.ExamApp.isSafeImageFileName(imageFilename)) return '';
 
@@ -176,9 +176,9 @@ function renderQuestionImage(imageFilename, altText = '', className = 'question-
     return `<div id="${placeholderId}" class="image-placeholder"><div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i><div>Loading image...</div></div></div>`;
 }
 
-// Função para processar texto da questão e renderizar imagens
+// Process question text and render image placeholders
 function processQuestionContent(content) {
-    // Regex para encontrar referências de imagem no formato ![](images/filename.jpg)
+    // Match image references in the format ![](images/filename.jpg)
     const imageRegex = /!\[([^\]]*)\]\(images\/([^)]+)\)/g;
     
     return content.replace(imageRegex, (match, altText, filename) => {
@@ -186,12 +186,12 @@ function processQuestionContent(content) {
     });
 }
 
-// Inicializar o carregador de imagens
+// Initialize the image loader
 window.ExamApp = window.ExamApp || {};
 window.ExamApp.imageLoader = new ImageLoader();
 window.imageLoader = window.ExamApp.imageLoader; // backwards compat
 
-// CSS para os componentes de imagem
+// CSS for image components
 const imageStyles = `
 <style>
 .image-placeholder {
@@ -253,9 +253,9 @@ if (document.head) {
     document.head.insertAdjacentHTML('beforeend', imageStyles);
 }
 
-// Função para inicializar o sistema de imagens
+// Initialize the image system
 async function initializeImageSystem() {
-    window.ExamApp.log('✓ Sistema de imagens inicializado (modo local)');
+    window.ExamApp.log('✓ Image system initialized (local mode)');
     return Promise.resolve();
 }
 

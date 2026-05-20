@@ -246,7 +246,8 @@ class MultiExamSimulator {
         const q = JSON.parse(JSON.stringify(question));
         if (!Array.isArray(q.options) || q.options.length === 0) return q;
         // Do not randomize for special types to avoid breaking semantics
-        if (q.question_type === 'SEQUENCE' || q.question_type === 'YES_NO_MATRIX' || q.question_type === 'DRAG_DROP_SELECT') {
+        const questionType = window.ExamApp.normalizeQuestionType(q);
+        if (questionType === 'SEQUENCE' || questionType === 'YES_NO_MATRIX' || questionType === 'DRAG_DROP_SELECT') {
             return q;
         }
         const optionMap = q.options.map((opt, idx) => ({ opt, originalIndex: idx }));
@@ -777,14 +778,12 @@ class MultiExamSimulator {
         // Only show indicator for special question types (not STANDARD or MULTI)
         // MULTI already has the "Select all that apply" hint
         const specialTypes = {
-            'DRAG_DROP': { text: 'Drag & Drop', icon: 'fas fa-arrows-alt' },
-            'DRAG_DROP_SELECT': { text: 'Select Items', icon: 'fas fa-hand-pointer' },
-            'HOTSPOT': { text: 'Hotspot', icon: 'fas fa-crosshairs' },
-            'SEQUENCE': { text: 'Ordering', icon: 'fas fa-sort-amount-down' },
-            'YES_NO_MATRIX': { text: 'Yes / No', icon: 'fas fa-th-list' }
+            'DRAG_DROP_SELECT': { text: 'Select Items', icon: 'fas fa-hand-pointer', className: 'drag_drop_select' },
+            'SEQUENCE': { text: 'Ordering', icon: 'fas fa-sort-amount-down', className: 'sequence' },
+            'YES_NO_MATRIX': { text: 'Yes / No', icon: 'fas fa-th-list', className: 'yes_no_matrix' }
         };
 
-        const type = specialTypes[question.question_type];
+        const type = specialTypes[window.ExamApp.normalizeQuestionType(question)];
 
         if (type) {
             typeText.replaceChildren();
@@ -793,7 +792,7 @@ class MultiExamSimulator {
             icon.className = type.icon;
             typeText.append(icon, document.createTextNode(` ${type.text}`));
             window.ExamApp.setElementHidden(indicator, false);
-            indicator.className = `question-type-indicator ${question.question_type.toLowerCase()}`;
+            indicator.className = `question-type-indicator ${type.className}`;
         } else {
             window.ExamApp.setElementHidden(indicator, true);
         }
@@ -1011,9 +1010,10 @@ class MultiExamSimulator {
         const container = document.getElementById('options-container');
         container.innerHTML = '';
 
-        const isSequence = (question.question_type === 'SEQUENCE');
-    const isYesNoMatrix = (question.question_type === 'YES_NO_MATRIX');
-    const isDragSelect = (question.question_type === 'DRAG_DROP_SELECT');
+        const questionType = window.ExamApp.normalizeQuestionType(question);
+        const isSequence = (questionType === 'SEQUENCE');
+    const isYesNoMatrix = (questionType === 'YES_NO_MATRIX');
+    const isDragSelect = (questionType === 'DRAG_DROP_SELECT');
     const isMulti = Array.isArray(question.correct) && !isSequence && !isYesNoMatrix && !isDragSelect;
 
         if (isSequence) {
@@ -1330,9 +1330,10 @@ class MultiExamSimulator {
     const question = this.getCurrentQuestions()[this.currentQuestionIndex];
     const userAnswer = this.selectedAnswers[this.currentQuestionIndex];
     const correctAnswer = question.correct;
-    const isSequence = (question.question_type === 'SEQUENCE');
-    const isYesNoMatrix = (question.question_type === 'YES_NO_MATRIX');
-    const isDragSelect = (question.question_type === 'DRAG_DROP_SELECT');
+    const questionType = window.ExamApp.normalizeQuestionType(question);
+    const isSequence = (questionType === 'SEQUENCE');
+    const isYesNoMatrix = (questionType === 'YES_NO_MATRIX');
+    const isDragSelect = (questionType === 'DRAG_DROP_SELECT');
     const isMulti = Array.isArray(correctAnswer) && !isSequence && !isYesNoMatrix && !isDragSelect;
 
         const isCorrect = this.isAnswerCorrect(question, userAnswer);
@@ -1618,8 +1619,9 @@ class MultiExamSimulator {
             const question = questions[index];
             const userAnswer = this.selectedAnswers[index];
             const correctAnswer = question.correct;
-            const isSequence = (question.question_type === 'SEQUENCE');
-            const isYesNoMatrix = (question.question_type === 'YES_NO_MATRIX');
+            const questionType = window.ExamApp.normalizeQuestionType(question);
+            const isSequence = (questionType === 'SEQUENCE');
+            const isYesNoMatrix = (questionType === 'YES_NO_MATRIX');
 
             const isCorrect = this.isAnswerCorrect(question, userAnswer);
             const wasAnswered = userAnswer !== undefined && userAnswer !== null && (Array.isArray(userAnswer) ? userAnswer.length > 0 : true);
