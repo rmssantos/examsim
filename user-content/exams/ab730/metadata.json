@@ -4,7 +4,7 @@
   "fullName": "Microsoft Certified: AI Business Professional",
   "duration": 45,
   "questionCount": 50,
-  "totalQuestions": 50,
+  "totalQuestions": 120,
   "passScore": 70,
   "language": "en",
   "schemaVersion": "1.1",
@@ -109,12 +109,12 @@
   "coverageReview": {
     "method": "Modules mapped to the published AB-730 objective domains and official AB-730T00 learning path.",
     "observedModuleCounts": {
-      "Generative AI Fundamentals": 8,
-      "Responsible AI and Data Protection": 6,
-      "Prompting and Conversation Management": 11,
-      "Copilot Agents and Extensibility": 8,
-      "Business Content Creation": 9,
-      "Data, Meetings, and Collaboration": 8
+      "Generative AI Fundamentals": 18,
+      "Responsible AI and Data Protection": 16,
+      "Prompting and Conversation Management": 25,
+      "Copilot Agents and Extensibility": 20,
+      "Business Content Creation": 21,
+      "Data, Meetings, and Collaboration": 20
     }
   }
 }

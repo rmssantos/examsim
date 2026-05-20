@@ -48,11 +48,11 @@ Course AB-730T00 maps to the learning path "Transform business workflows with ge
 
 The local dump is original study content based on the public objective domains and training topics above. It does not copy Microsoft exam questions or practice assessment items. The question distribution targets the published weights while keeping the simulator session size at 50 questions.
 
-Proposed module distribution for 50 questions:
+Expanded module distribution for 120 total questions, with simulator sessions remaining at 50 questions:
 
-- Generative AI Fundamentals: 8
-- Responsible AI and Data Protection: 6
-- Prompting and Conversation Management: 11
-- Copilot Agents and Extensibility: 8
-- Business Content Creation: 9
-- Data, Meetings, and Collaboration: 8
+- Generative AI Fundamentals: 18
+- Responsible AI and Data Protection: 16
+- Prompting and Conversation Management: 25
+- Copilot Agents and Extensibility: 20
+- Business Content Creation: 21
+- Data, Meetings, and Collaboration: 20

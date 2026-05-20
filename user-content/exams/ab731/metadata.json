@@ -4,7 +4,7 @@
   "fullName": "Microsoft Certified: AI Transformation Leader",
   "duration": 45,
   "questionCount": 50,
-  "totalQuestions": 50,
+  "totalQuestions": 120,
   "passScore": 70,
   "language": "en",
   "schemaVersion": "1.1",
@@ -109,12 +109,12 @@
   "coverageReview": {
     "method": "Modules mapped to the published AB-731 objective domains and official AB-731T00 learning paths.",
     "observedModuleCounts": {
-      "Generative AI Business Value": 10,
-      "Solution Design, Prompting, Grounding, and Data": 9,
-      "Microsoft Copilot and Microsoft 365 AI": 9,
-      "Microsoft Foundry and Azure AI Services": 9,
-      "Responsible AI Governance": 7,
-      "Adoption, Licensing, and Change Strategy": 6
+      "Generative AI Business Value": 23,
+      "Solution Design, Prompting, Grounding, and Data": 22,
+      "Microsoft Copilot and Microsoft 365 AI": 22,
+      "Microsoft Foundry and Azure AI Services": 23,
+      "Responsible AI Governance": 16,
+      "Adoption, Licensing, and Change Strategy": 14
     }
   }
 }
