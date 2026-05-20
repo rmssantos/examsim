@@ -67,10 +67,10 @@ async loadAvailableExams() {
 try {
 const exams = await window.examManager.detectAvailableExams();
 this.availableExams = exams;
-console.log('Detected exams:', exams.size, 'exams');
-console.log('Exam IDs:', Array.from(exams.keys()));
-console.log('All window.userExams:', window.userExams ? Object.keys(window.userExams) : []);
-console.log('Active exams:', window.examManager.getActiveExamIds());
+window.ExamApp.log('Detected exams:', exams.size, 'exams');
+window.ExamApp.log('Exam IDs:', Array.from(exams.keys()));
+window.ExamApp.log('All window.userExams:', window.userExams ? Object.keys(window.userExams) : []);
+window.ExamApp.log('Active exams:', window.examManager.getActiveExamIds());
 this.renderExamCards(exams);
 this.updateHeroStats(exams);
 if (this.selectedExamId && !exams.has(this.selectedExamId)) {
@@ -117,7 +117,7 @@ let hasImages = false;
 
 exams.forEach((examData) => {
 const metadata = examData.metadata || {};
-totalQuestions += metadata.questionCount || metadata.totalQuestions || 0;
+totalQuestions += metadata.totalQuestions || metadata.questionCount || 0;
 if (examData.hasImages) {
 	hasImages = true;
 }
@@ -555,7 +555,7 @@ return {
 	passRate
 };
 } catch (error) {
-console.warn('Failed to parse progress stats for', examId, error);
+window.ExamApp.warn('Failed to parse progress stats for', examId, error);
 return null;
 }
 }
@@ -563,20 +563,34 @@ return null;
 getMostRecentExamWithProgress() {
 let latestExamId = null;
 let latestDate = 0;
+const updateLatest = (examId, progress) => {
+const attempts = progress?.attempts;
+if (attempts && attempts.length) {
+	const lastDate = new Date(attempts[attempts.length - 1].date).getTime();
+	if (lastDate > latestDate) {
+		latestDate = lastDate;
+		latestExamId = examId;
+	}
+}
+};
+
+const registry = window.ExamApp.getRegistry(window.ExamApp.STORAGE_KEYS.progress);
+if (registry.length > 0) {
+registry.forEach((examId) => {
+	try {
+		updateLatest(examId, JSON.parse(localStorage.getItem(`${examId}_progress`)));
+	} catch (_) {}
+});
+return latestExamId;
+}
 
 for (let i = 0; i < localStorage.length; i++) {
 const key = localStorage.key(i);
 if (key && key.endsWith('_progress')) {
 	try {
-		const progress = JSON.parse(localStorage.getItem(key));
-		const attempts = progress?.attempts;
-		if (attempts && attempts.length) {
-			const lastDate = new Date(attempts[attempts.length - 1].date).getTime();
-			if (lastDate > latestDate) {
-				latestDate = lastDate;
-				latestExamId = key.replace('_progress', '');
-			}
-		}
+		const examId = key.replace('_progress', '');
+		updateLatest(examId, JSON.parse(localStorage.getItem(key)));
+		window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.progress, examId);
 	} catch (error) {
 		// ignore invalid entries
 	}
@@ -798,6 +812,7 @@ for (const file of files) {
 try {
 	await this.importFile(file);
 } catch (error) {
+	this.hideImportProgress();
 	console.error(`Failed to import ${file.name}:`, error);
 	alert(`Failed to import ${file.name}: ${error.message}`);
 }
@@ -809,10 +824,17 @@ await this.loadAvailableExams();
 
 async importFile(file) {
 const fileName = file.name.toLowerCase();
+const limits = window.ExamApp.EXAM_LIMITS;
 
 if (fileName.endsWith('.json')) {
+if (file.size > limits.maxJsonBytes) {
+throw new Error(`JSON file is too large. Maximum size is ${Math.round(limits.maxJsonBytes / 1024 / 1024)} MB.`);
+}
 await this.importJsonFile(file);
 } else if (fileName.endsWith('.zip')) {
+if (file.size > limits.maxZipBytes) {
+throw new Error(`ZIP file is too large. Maximum size is ${Math.round(limits.maxZipBytes / 1024 / 1024)} MB.`);
+}
 await this.importZipFile(file);
 } else {
 throw new Error('Unsupported file type. Please use .json or .zip files.');
@@ -828,11 +850,15 @@ let examId = file.name.replace(/\.(json|zip)$/i, '');
 if (data.id) {
 examId = data.id;
 }
+examId = window.ExamApp.normalizeExamId(examId);
+if (!examId) {
+throw new Error('Invalid exam id. Use letters, numbers, hyphens or underscores.');
+}
 
 // Import the exam
 await window.examManager.importExam(examId, data);
 
-console.log(`Successfully imported exam: ${examId}`);
+window.ExamApp.log(`Successfully imported exam: ${examId}`);
 this.showNotification(`✅ Exam "${examId}" imported successfully!`);
 }
 
@@ -866,55 +892,67 @@ let examId = (metadata && metadata.id) || this.deriveExamIdFromZip(zip, file.nam
 if (!examId) {
 examId = file.name.replace(/\.zip$/i, '');
 }
+examId = window.ExamApp.normalizeExamId(examId);
+if (!examId) {
+throw new Error('Invalid exam id. Use letters, numbers, hyphens or underscores.');
+}
 
 await window.examManager.importExam(examId, { questions, metadata });
 
 // Extract images from ZIP to local directory
-console.log(`🔍 Scanning ZIP for images in exam: ${examId}`);
+window.ExamApp.log(`🔍 Scanning ZIP for images in exam: ${examId}`);
 const imageFiles = [];
+let totalImageBytes = 0;
+const limits = window.ExamApp.EXAM_LIMITS;
 
 zip.forEach((relativePath, entry) => {
 if (entry.dir) return;
 const normalized = relativePath.toLowerCase();
-if (normalized.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i)) {
+if (normalized.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
 // Handle both forward slash and backslash (Windows ZIP paths)
 const fileName = relativePath.replace(/\\/g, '/').split('/').pop();
+if (!window.ExamApp.isSafeImageFileName(fileName)) return;
+const imageBytes = entry._data?.uncompressedSize || 0;
+if (imageBytes > limits.maxImageBytes) {
+throw new Error(`Image ${fileName} is too large. Maximum size is ${Math.round(limits.maxImageBytes / 1024 / 1024)} MB.`);
+}
+totalImageBytes += imageBytes;
 imageFiles.push({ fileName, entry });
 }
 });
 
-console.log(`📊 Found ${imageFiles.length} images in ZIP`);
+if (imageFiles.length > limits.maxImages) {
+throw new Error(`ZIP contains too many images. Maximum is ${limits.maxImages}.`);
+}
+if (totalImageBytes > limits.maxTotalImageBytes) {
+throw new Error(`ZIP images are too large in total. Maximum is ${Math.round(limits.maxTotalImageBytes / 1024 / 1024)} MB.`);
+}
+
+window.ExamApp.log(`📊 Found ${imageFiles.length} images in ZIP`);
 
 if (imageFiles.length > 0 && window.imageStorage) {
-console.log(`⏳ Storing ${imageFiles.length} images in IndexedDB...`);
+window.ExamApp.log(`⏳ Storing ${imageFiles.length} images in IndexedDB...`);
 this.updateImportProgress(0, imageFiles.length, 0);
 
 let storedCount = 0;
 for (const { fileName, entry } of imageFiles) {
 try {
-	// Extract as base64
-	const base64Data = await entry.async('base64');
 	const extension = fileName.split('.').pop().toLowerCase();
-	const mimeType = {
-		'jpg': 'image/jpeg',
-		'jpeg': 'image/jpeg',
-		'png': 'image/png',
-		'gif': 'image/gif',
-		'svg': 'image/svg+xml',
-		'webp': 'image/webp'
-	}[extension] || 'image/jpeg';
+	const mimeType = window.ExamApp.getImageMimeType(fileName);
+	if (!mimeType) throw new Error(`Unsupported image type: ${extension}`);
+	const blob = await entry.async('blob');
 	
-	await window.imageStorage.storeImage(examId, fileName, base64Data, mimeType);
+	await window.imageStorage.storeImageBlob(examId, fileName, blob, mimeType);
 	storedCount++;
 	const percentage = (storedCount / imageFiles.length) * 100;
 	this.updateImportProgress(storedCount, imageFiles.length, percentage);
-	console.log(`✅ Stored ${fileName} (${(base64Data.length / 1024).toFixed(1)} KB)`);
+	window.ExamApp.log(`Stored ${fileName} (${(blob.size / 1024).toFixed(1)} KB)`);
 } catch (err) {
 	console.error(`❌ Failed to store ${fileName}:`, err);
 }
 }
 
-console.log(`✅ Successfully stored ${storedCount}/${imageFiles.length} images in IndexedDB for ${examId}`);
+window.ExamApp.log(`Successfully stored ${storedCount}/${imageFiles.length} images in IndexedDB for ${examId}`);
 
 // Keep progress modal visible for a moment to show completion
 await new Promise(resolve => setTimeout(resolve, 800));
@@ -925,7 +963,7 @@ this.showNotification(
 3000
 );
 } else if (imageFiles.length > 0) {
-console.warn('⚠️ ImageStorage not available, images will not be stored');
+window.ExamApp.warn('⚠️ ImageStorage not available, images will not be stored');
 this.hideImportProgress();
 this.showNotification(`✅ Exam "${examId}" imported (images not stored)`);
 } else {
@@ -963,6 +1001,10 @@ return fallbackName ? fallbackName.replace(/\.zip$/i, '') : null;
 }
 
 async deleteExam(examId) {
+if (!window.ExamApp.isSafeExamId(examId)) {
+this.showNotification('Invalid exam id.', 2000);
+return;
+}
 // Confirm deletion
 if (!confirm(`⚠️ Are you sure you want to completely remove exam "${examId}"?\n\nThis will delete:\n- All questions\n- All images\n- All progress\n\nThis action cannot be undone!`)) {
 return;
@@ -972,6 +1014,8 @@ return;
 localStorage.removeItem(`custom_${examId}_questions`);
 localStorage.removeItem(`exam_metadata_${examId}`);
 localStorage.removeItem(`exam_images_list_${examId}`);
+window.ExamApp.removeFromRegistry(window.ExamApp.STORAGE_KEYS.exams, examId);
+window.ExamApp.removeFromRegistry(window.ExamApp.STORAGE_KEYS.progress, examId);
 
 // Remove from memory
 if (window.userExams) {
@@ -982,9 +1026,9 @@ delete window.userExams[examId];
 if (window.imageStorage) {
 try {
 	const count = await window.imageStorage.deleteExamImages(examId);
-	console.log(`🗑️ Deleted ${count} images from IndexedDB`);
+	window.ExamApp.log(`🗑️ Deleted ${count} images from IndexedDB`);
 } catch (e) {
-	console.warn(`⚠️ Failed to delete images:`, e.message);
+	window.ExamApp.warn(`⚠️ Failed to delete images:`, e.message);
 }
 }
 
@@ -1006,6 +1050,7 @@ this.openConfigModal();
 }
 
 async deactivateExam(examId) {
+if (!window.ExamApp.isSafeExamId(examId)) return;
 window.examManager.deactivateExam(examId);
 await this.loadAvailableExams();
 this.showNotification(`Exam "${examId}" hidden from homepage.`, 2000);

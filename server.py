@@ -16,7 +16,19 @@ import re
 PORT = 8000
 HOST = "127.0.0.1"
 DIRECTORY = Path(__file__).parent
-ALLOWED_IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.svg', '.webp'}
+ALLOWED_IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10 MB
+
+def looks_like_supported_image(extension, data):
+    if extension in {'.jpg', '.jpeg'}:
+        return data.startswith(b'\xff\xd8\xff')
+    if extension == '.png':
+        return data.startswith(b'\x89PNG\r\n\x1a\n')
+    if extension == '.gif':
+        return data.startswith((b'GIF87a', b'GIF89a'))
+    if extension == '.webp':
+        return len(data) >= 12 and data[:4] == b'RIFF' and data[8:12] == b'WEBP'
+    return False
 
 def safe_join_under(root, *parts):
     root_path = Path(root).resolve()
@@ -40,6 +52,7 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header('Access-Control-Allow-Origin', localhost_origin)
         self.send_header('Access-Control-Allow-Methods', 'GET, PUT, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.send_header('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'")
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
         super().end_headers()
 
@@ -107,15 +120,18 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json(400, {'error': 'Invalid content length'})
             return
 
-        max_size = 50 * 1024 * 1024  # 50 MB
         if content_length <= 0:
             self.send_json(400, {'error': 'Empty upload'})
             return
 
-        if content_length > max_size:
-            self.send_json(413, {'error': 'File too large. Maximum size is 50 MB.'})
+        if content_length > MAX_UPLOAD_SIZE:
+            self.send_json(413, {'error': 'File too large. Maximum size is 10 MB.'})
             return
         data = self.rfile.read(content_length) if content_length > 0 else b''
+
+        if not looks_like_supported_image(extension, data):
+            self.send_json(400, {'error': 'Invalid image content'})
+            return
 
         try:
             base_exam_dir = safe_join_under(DIRECTORY / 'user-content' / 'exams', exam)

@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="Exam Simulator - Practice for certification exams with interactive questions, timed tests, and detailed results">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 	<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📝</text></svg>">
 	<title>Exam Simulator Pro - Universal Exam Practice Platform</title>
 	<link rel="stylesheet" href="assets/css/style-new.css">
@@ -352,7 +353,7 @@
 		</div>
 
 		<!-- Exam Screen -->
-		<div id="exam-screen" class="screen">
+		<div id="exam-screen" class="screen" hidden aria-hidden="true">
 			<div class="theme-controls">
 				<button class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
 					<i aria-hidden="true" class="fas fa-moon theme-icon"></i>
@@ -384,7 +385,7 @@
 				<div id="question-number" class="question-number">Question 1</div>
                 
 				<!-- Question Type Indicator -->
-				<div id="question-type-indicator" class="question-type-indicator is-hidden">
+				<div id="question-type-indicator" class="question-type-indicator is-hidden" hidden aria-hidden="true">
 					<i aria-hidden="true" class="fas fa-info-circle"></i>
 					<span id="question-type-text">Drag & Drop Question</span>
 				</div>
@@ -405,7 +406,7 @@
 					</button>
 				</div>
                 
-				<div id="answer-feedback" class="answer-feedback is-hidden">
+				<div id="answer-feedback" class="answer-feedback is-hidden" hidden aria-hidden="true" role="status" aria-live="polite">
 					<div class="feedback-header">
 						<span class="feedback-status"></span>
 						<button id="close-feedback" class="close-feedback" aria-label="Close feedback">
@@ -428,7 +429,7 @@
 						Next <i aria-hidden="true" class="fas fa-arrow-right"></i>
 					</button>
 				</div>
-				<div id="question-navigator" class="question-navigator is-hidden">
+				<div id="question-navigator" class="question-navigator is-hidden" hidden aria-hidden="true">
 					<div class="nav-grid" id="nav-grid"></div>
 					<div class="nav-legend">
 						<span class="nav-legend-item"><span class="nav-dot answered"></span> Answered</span>
@@ -443,14 +444,14 @@
 				<button id="review-marked-btn" class="btn-review-marked" title="Review marked questions">
 					<i aria-hidden="true" class="fas fa-flag"></i> Review Marked
 				</button>
-				<button id="finish-exam" class="btn btn-warning finish-btn is-hidden">
+				<button id="finish-exam" class="btn btn-warning finish-btn is-hidden" hidden aria-hidden="true">
 					<i aria-hidden="true" class="fas fa-check"></i> Finish Exam
 				</button>
 			</div>
 		</div>
 
 		<!-- Results Screen (same as before, but with dynamic exam name) -->
-		<div id="results-screen" class="screen">
+		<div id="results-screen" class="screen" hidden aria-hidden="true">
 			<div class="theme-controls">
 				<button class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
 					<i aria-hidden="true" class="fas fa-moon theme-icon"></i>

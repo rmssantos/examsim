@@ -267,6 +267,19 @@ function getExam(examId) {
 
 ---
 
+### Language and UI Text
+
+The default application UI language is English. Keep new labels, buttons, validation messages, and browser-facing copy in English unless a dedicated localization dictionary is introduced for that screen.
+
+Portuguese is welcome in issues, discussions, review notes, and local reports. Exam content should use the language chosen for that exam pack and state it in `metadata.json` when the content is not English.
+
+When adding user-facing text:
+- Keep operational UI copy short and consistent with the existing English interface.
+- Do not mix English and Portuguese in the same screen unless it is part of exam content.
+- If a feature needs both languages, add a small i18n dictionary instead of hard-coding two parallel strings.
+
+---
+
 ### CSS
 
 - Use kebab-case for class names
