@@ -186,7 +186,9 @@ return stat;
 createExamCard(examId, examData) {
 const metadata = examData.metadata || {};
 const questionCount = metadata.questionCount || 45;
-const totalQuestions = metadata.totalQuestions || questionCount;
+const declaredTotalQuestions = Number(metadata.totalQuestions);
+const hasDeclaredTotalQuestions = Number.isFinite(declaredTotalQuestions) && Number.isInteger(declaredTotalQuestions) && declaredTotalQuestions > 0;
+const totalQuestions = hasDeclaredTotalQuestions ? declaredTotalQuestions : questionCount;
 
 const card = document.createElement('div');
 card.className = `exam-card ${this.getCardClass(examId)}`;
@@ -211,8 +213,11 @@ stats.appendChild(this.createExamStat(String(metadata.duration || 45), 'Minutes'
 stats.appendChild(this.createExamStat(`${metadata.passScore || 75}%`, 'Pass Score'));
 card.appendChild(stats);
 
-if (totalQuestions > questionCount) {
-this.appendTextElement(card, 'div', 'exam-total-info', `From ${totalQuestions} total questions`);
+if (hasDeclaredTotalQuestions) {
+const totalLabel = totalQuestions > questionCount
+	? `From ${totalQuestions} total questions`
+	: `${totalQuestions} total questions in dump`;
+this.appendTextElement(card, 'div', 'exam-total-info', totalLabel);
 }
 
 const startButton = document.createElement('button');
@@ -253,7 +258,12 @@ return card;
 }
 
 getCardClass(examId) {
-return 'custom';
+const cardClasses = {
+	sc900: 'exam-sc900',
+	ab730: 'exam-ab730',
+	ab731: 'exam-ab731'
+};
+return cardClasses[String(examId || '').toLowerCase()] || 'custom';
 }
 
 selectExam(examId) {
