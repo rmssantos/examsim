@@ -31,6 +31,10 @@ user-content/exams/*
 !user-content/exams/index.json
 !user-content/exams/sc900/
 !user-content/exams/sc900/**
+!user-content/exams/ab730/
+!user-content/exams/ab730/**
+!user-content/exams/ab731/
+!user-content/exams/ab731/**
 
 # Private exam backups/zips (keep local only)
 user-content/*.zip

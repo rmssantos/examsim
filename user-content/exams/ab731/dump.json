@@ -1,0 +1,702 @@
+[
+  {
+    "id": 1,
+    "module": "Generative AI Business Value",
+    "question": "A business leader wants to prioritize AI initiatives for the next quarter. Which criterion is most useful for selecting the first pilot?",
+    "options": [
+      "A measurable business outcome, available data, manageable risk, and a clear process owner",
+      "The most experimental technology regardless of business need",
+      "The use case with the least executive visibility",
+      "A process that no team understands"
+    ],
+    "correct": 0,
+    "explanation": "Strong AI pilots connect to measurable value, have usable data and ownership, and can be delivered with acceptable risk.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 2,
+    "module": "Generative AI Business Value",
+    "question": "Which outcomes are valid business-value measures for a generative AI initiative?",
+    "options": [
+      "Reduced cycle time for a business process",
+      "Improved customer response quality",
+      "Higher employee productivity on repeatable tasks",
+      "More AI usage without any connection to business results"
+    ],
+    "correct": [0, 1, 2],
+    "explanation": "Business value should connect to measurable outcomes such as time saved, quality, satisfaction, revenue, risk reduction, or productivity, not usage alone.",
+    "question_type": "MULTI"
+  },
+  {
+    "id": 3,
+    "module": "Generative AI Business Value",
+    "question": "For each statement about generative AI value, indicate whether it is correct.",
+    "statements": [
+      "Generative AI can support automation and scale knowledge work.",
+      "Every business problem should be solved with a generative AI solution.",
+      "Reliability and bias should be considered when evaluating AI opportunities.",
+      "ROI can include both cost reduction and new value creation."
+    ],
+    "correct": [0, 1, 0, 0],
+    "explanation": "Generative AI can create value but is not the right answer for every problem. Leaders should consider reliability, bias, costs, and measurable outcomes.",
+    "question_type": "YES_NO_MATRIX"
+  },
+  {
+    "id": 4,
+    "module": "Generative AI Business Value",
+    "question": "Which scenario best demonstrates a high-value generative AI opportunity?",
+    "options": [
+      "A support team spends hours summarizing cases and can use AI to draft consistent summaries for human review.",
+      "A team wants to use AI because competitors mention AI in marketing.",
+      "A process is already fully automated, error-free, and low cost.",
+      "A leader wants to remove all human accountability from decisions."
+    ],
+    "correct": 0,
+    "explanation": "High-value opportunities often involve repetitive knowledge work, measurable time savings, quality improvement, and human review for accountability.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 5,
+    "module": "Generative AI Business Value",
+    "question": "Arrange the steps for evaluating a potential AI use case.",
+    "options": [
+      "Assess risk, data readiness, and responsible AI requirements",
+      "Define the business problem and desired outcome",
+      "Run a pilot and measure results",
+      "Select the AI capability that fits the use case"
+    ],
+    "correct": [1, 0, 3, 2],
+    "explanation": "Start with the business problem, assess readiness and risk, choose the right capability, then pilot and measure outcomes.",
+    "question_type": "SEQUENCE"
+  },
+  {
+    "id": 6,
+    "module": "Generative AI Business Value",
+    "question": "What is a key difference between generative AI and traditional predictive AI?",
+    "options": [
+      "Generative AI creates new content or responses, while predictive AI commonly forecasts or classifies outcomes.",
+      "Generative AI never uses models.",
+      "Traditional predictive AI always writes documents.",
+      "Generative AI cannot be used in business workflows."
+    ],
+    "correct": 0,
+    "explanation": "Generative AI creates text, images, summaries, and other content. Predictive AI is often used for classification, forecasting, and scoring.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 7,
+    "module": "Generative AI Business Value",
+    "question": "Which cost drivers should leaders consider for generative AI solutions?",
+    "options": [
+      "Token usage and model choice",
+      "Integration and operational support",
+      "Human review and governance effort",
+      "The color of the application icon"
+    ],
+    "correct": [0, 1, 2],
+    "explanation": "Cost drivers include consumption, model selection, implementation, operations, governance, and review processes. Visual styling is not a core AI cost driver.",
+    "question_type": "MULTI"
+  },
+  {
+    "id": 8,
+    "module": "Generative AI Business Value",
+    "question": "A leader wants to justify an AI investment. Which metric is weakest by itself?",
+    "options": [
+      "Number of AI prompts submitted",
+      "Hours saved per month",
+      "Reduction in case handling time",
+      "Improvement in customer satisfaction"
+    ],
+    "correct": 0,
+    "explanation": "Prompt volume alone does not prove value. It should be connected to outcomes such as time saved, quality, satisfaction, or revenue impact.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 9,
+    "module": "Generative AI Business Value",
+    "question": "Which risk is most associated with using generative AI to summarize complex policy documents?",
+    "options": [
+      "The summary may omit nuance or fabricate unsupported details.",
+      "The policy automatically becomes legally invalid.",
+      "The AI model permanently changes the source policy.",
+      "The organization no longer needs governance."
+    ],
+    "correct": 0,
+    "explanation": "Summaries can omit nuance or include unsupported claims, so source verification and human review are required.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 10,
+    "module": "Generative AI Business Value",
+    "question": "What should a leader do when an AI pilot shows productivity gains but inconsistent output quality?",
+    "options": [
+      "Improve prompts, grounding, review criteria, and training before scaling",
+      "Scale immediately to all departments",
+      "Ignore the quality issue because productivity improved",
+      "Cancel every AI initiative permanently"
+    ],
+    "correct": 0,
+    "explanation": "Leaders should address quality through better design, grounding, governance, and enablement before broad rollout.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 11,
+    "module": "Solution Design, Prompting, Grounding, and Data",
+    "question": "What is retrieval-augmented generation (RAG) intended to improve?",
+    "options": [
+      "Grounding model responses in relevant retrieved information",
+      "Replacing all organizational security controls",
+      "Eliminating the need for source data quality",
+      "Guaranteeing that every answer is correct"
+    ],
+    "correct": 0,
+    "explanation": "RAG retrieves relevant information and uses it to ground generation. It improves relevance but still requires data quality, security, and validation.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 12,
+    "module": "Solution Design, Prompting, Grounding, and Data",
+    "question": "Which data factors affect the success of an AI solution?",
+    "options": [
+      "Data quality",
+      "Representativeness of datasets",
+      "Access permissions and sensitivity",
+      "Whether the file name is short"
+    ],
+    "correct": [0, 1, 2],
+    "explanation": "AI solutions depend on quality, representative, relevant, and properly governed data. File-name length is not a core success factor.",
+    "question_type": "MULTI"
+  },
+  {
+    "id": 13,
+    "module": "Solution Design, Prompting, Grounding, and Data",
+    "question": "For each statement about prompting and grounding, indicate whether it is correct.",
+    "statements": [
+      "Clear prompts can improve answer usefulness.",
+      "Grounding can help reduce generic or unsupported responses.",
+      "Prompt engineering removes the need for secure data handling.",
+      "Representative data helps avoid misleading AI outputs."
+    ],
+    "correct": [0, 0, 1, 0],
+    "explanation": "Prompting and grounding improve relevance, but they do not replace secure data handling. Representative data matters for reliable outcomes.",
+    "question_type": "YES_NO_MATRIX"
+  },
+  {
+    "id": 14,
+    "module": "Solution Design, Prompting, Grounding, and Data",
+    "question": "When is machine learning likely to add value in a business solution?",
+    "options": [
+      "When patterns in historical data can support prediction, classification, or optimization",
+      "When there is no data and no business objective",
+      "When all decisions must be random",
+      "When the organization wants to avoid measuring outcomes"
+    ],
+    "correct": 0,
+    "explanation": "Machine learning is useful when data patterns can support predictions, classifications, recommendations, or optimizations tied to business outcomes.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 15,
+    "module": "Solution Design, Prompting, Grounding, and Data",
+    "question": "Arrange the lifecycle of a machine learning solution at a high level.",
+    "options": [
+      "Monitor and improve the solution",
+      "Prepare and validate data",
+      "Define the business problem",
+      "Train, test, and deploy the model"
+    ],
+    "correct": [2, 1, 3, 0],
+    "explanation": "A high-level ML lifecycle starts with the problem, prepares data, trains/tests/deploys, and then monitors and improves over time.",
+    "question_type": "SEQUENCE"
+  },
+  {
+    "id": 16,
+    "module": "Solution Design, Prompting, Grounding, and Data",
+    "question": "A business wants a chatbot to answer policy questions using approved internal documents. Which design principle is most important?",
+    "options": [
+      "Ground responses in approved policy sources with appropriate access controls",
+      "Allow the bot to answer from unsupported memory",
+      "Expose every policy to every employee regardless of role",
+      "Avoid testing with real user scenarios"
+    ],
+    "correct": 0,
+    "explanation": "Policy assistants should use approved sources, permission-aware retrieval, and testing for realistic questions.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 17,
+    "module": "Solution Design, Prompting, Grounding, and Data",
+    "question": "Which security considerations should be part of AI solution design?",
+    "options": [
+      "Application security",
+      "Data security",
+      "Authentication and authorization",
+      "Unrestricted anonymous access to all sources"
+    ],
+    "correct": [0, 1, 2],
+    "explanation": "AI systems must consider application security, data protection, identity, authentication, and authorization. Unrestricted access is unsafe.",
+    "question_type": "MULTI"
+  },
+  {
+    "id": 18,
+    "module": "Solution Design, Prompting, Grounding, and Data",
+    "question": "Which choice best describes a fine-tuned model?",
+    "options": [
+      "A model further trained or adapted for a more specific task or domain",
+      "A model that has never been trained",
+      "A model that cannot use business data",
+      "A model used only for charts"
+    ],
+    "correct": 0,
+    "explanation": "Fine-tuning adapts a pretrained model for a more specific task or domain. Leaders should compare this with alternatives such as prompting and grounding.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 19,
+    "module": "Solution Design, Prompting, Grounding, and Data",
+    "question": "A generative AI solution produces different answers for similar prompts. What should leaders evaluate first?",
+    "options": [
+      "Prompt clarity, grounding sources, expected variability, and validation criteria",
+      "The office floor plan",
+      "Whether users have dark mode enabled",
+      "The font size in the UI"
+    ],
+    "correct": 0,
+    "explanation": "Variability can be affected by prompts, context, model behavior, and validation approach. Leaders should define quality and reliability expectations.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 20,
+    "module": "Microsoft Copilot and Microsoft 365 AI",
+    "question": "Which scenario best maps to Microsoft 365 Copilot?",
+    "options": [
+      "An employee needs help summarizing Teams meetings, drafting Word documents, and analyzing Excel data.",
+      "A developer needs to manage low-level network routing tables.",
+      "A warehouse needs a physical robot arm controller.",
+      "A company wants to replace identity governance with no sign-in."
+    ],
+    "correct": 0,
+    "explanation": "Microsoft 365 Copilot is designed to help users work across Microsoft 365 apps and data, including meetings, documents, email, presentations, and spreadsheets.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 21,
+    "module": "Microsoft Copilot and Microsoft 365 AI",
+    "question": "Which capabilities are associated with Microsoft Copilot and Microsoft 365 Copilot experiences?",
+    "options": [
+      "Chat experiences for work assistance",
+      "Copilot support in Microsoft 365 apps",
+      "Extensibility through Copilot Studio or related frameworks",
+      "Automatic removal of all governance requirements"
+    ],
+    "correct": [0, 1, 2],
+    "explanation": "Copilot experiences include chat, app-integrated assistance, and extensibility options. Governance remains necessary.",
+    "question_type": "MULTI"
+  },
+  {
+    "id": 22,
+    "module": "Microsoft Copilot and Microsoft 365 AI",
+    "question": "For each statement about Microsoft 365 Copilot, indicate whether it is correct.",
+    "statements": [
+      "Copilot can help map business processes to AI-assisted workflows.",
+      "Copilot Studio can be used to extend or customize Copilot experiences.",
+      "Copilot should be used to bypass data access permissions.",
+      "Microsoft Graph can help provide work context for Microsoft 365 experiences."
+    ],
+    "correct": [0, 0, 1, 0],
+    "explanation": "Copilot can support workflows and extensibility, and Microsoft Graph provides relevant work context. It should not bypass permissions.",
+    "question_type": "YES_NO_MATRIX"
+  },
+  {
+    "id": 23,
+    "module": "Microsoft Copilot and Microsoft 365 AI",
+    "question": "When should an organization consider extending Copilot rather than only buying a standard experience?",
+    "options": [
+      "When the business process needs organization-specific knowledge, actions, or integration beyond standard capabilities",
+      "When no business process has been identified",
+      "When users do not need repeatable assistance",
+      "When the goal is to avoid governance"
+    ],
+    "correct": 0,
+    "explanation": "Build/buy/extend decisions depend on whether standard capabilities satisfy the business process or whether custom knowledge, actions, or integrations are required.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 24,
+    "module": "Microsoft Copilot and Microsoft 365 AI",
+    "question": "Which use case is best suited for Researcher or Analyst-style assistance?",
+    "options": [
+      "Synthesizing information, finding patterns, and helping prepare analysis for a business decision",
+      "Replacing legal sign-off for a merger",
+      "Disabling data security labels",
+      "Provisioning physical servers"
+    ],
+    "correct": 0,
+    "explanation": "Research and analysis assistance helps synthesize information and reason over business questions, while sensitive decisions still require accountable review.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 25,
+    "module": "Microsoft Copilot and Microsoft 365 AI",
+    "question": "Arrange a build-buy-extend decision flow for a Copilot solution.",
+    "options": [
+      "Use standard Copilot capabilities if they meet the need",
+      "Identify the business process and expected outcome",
+      "Extend or build when specific knowledge, actions, or integrations are required",
+      "Evaluate governance, support, and adoption requirements"
+    ],
+    "correct": [1, 0, 2, 3],
+    "explanation": "Start with the business process, prefer standard capabilities when adequate, extend or build when needed, and evaluate governance and adoption.",
+    "question_type": "SEQUENCE"
+  },
+  {
+    "id": 26,
+    "module": "Microsoft Copilot and Microsoft 365 AI",
+    "question": "A leader wants to reduce risk while rolling out Microsoft 365 Copilot. Which approach is best?",
+    "options": [
+      "Start with targeted scenarios, prepare data and permissions, train users, and monitor outcomes",
+      "Enable every feature for all users with no training",
+      "Ignore user feedback during adoption",
+      "Avoid measuring impact"
+    ],
+    "correct": 0,
+    "explanation": "A targeted rollout with data readiness, training, measurement, and feedback reduces risk and improves adoption.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 27,
+    "module": "Microsoft Copilot and Microsoft 365 AI",
+    "question": "Which business process is a strong candidate for Copilot assistance?",
+    "options": [
+      "Recurring creation of project updates from meetings, files, and task notes",
+      "A process with no digital information and no owner",
+      "A process where all outputs must remain unreviewed",
+      "An activity unrelated to Microsoft 365 or knowledge work"
+    ],
+    "correct": 0,
+    "explanation": "Copilot is well suited to recurring knowledge work that uses Microsoft 365 context and benefits from summarization, drafting, and analysis.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 28,
+    "module": "Microsoft Copilot and Microsoft 365 AI",
+    "question": "What role does Microsoft Graph play in Microsoft 365 AI experiences?",
+    "options": [
+      "It helps connect Microsoft 365 data and relationships that can provide relevant work context, subject to permissions.",
+      "It replaces all identity controls.",
+      "It stores physical network cables.",
+      "It guarantees every generated answer is accurate."
+    ],
+    "correct": 0,
+    "explanation": "Microsoft Graph helps surface work context and relationships across Microsoft 365 while respecting permissions. It does not replace governance or guarantee correctness.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 29,
+    "module": "Microsoft Foundry and Azure AI Services",
+    "question": "Which scenario best fits Microsoft Foundry and Foundry Tools?",
+    "options": [
+      "A business needs to build or evaluate AI-powered solutions using models, Azure AI services, and secure enterprise capabilities.",
+      "A user only needs to rewrite one email in Outlook.",
+      "A team wants to print paper forms faster.",
+      "A manager wants to avoid all AI governance."
+    ],
+    "correct": 0,
+    "explanation": "Foundry and Foundry Tools support building, selecting, grounding, evaluating, and operating AI solutions beyond simple individual productivity tasks.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 30,
+    "module": "Microsoft Foundry and Azure AI Services",
+    "question": "Which Azure AI or Foundry capabilities can support business AI solutions?",
+    "options": [
+      "Azure AI Search for retrieval scenarios",
+      "Azure Vision for image analysis scenarios",
+      "Document Intelligence or language capabilities for extracting and processing content",
+      "A policy to publish all sensitive data publicly"
+    ],
+    "correct": [0, 1, 2],
+    "explanation": "Azure AI services and Foundry Tools include search, vision, language, document, and model capabilities that can support secure business solutions.",
+    "question_type": "MULTI"
+  },
+  {
+    "id": 31,
+    "module": "Microsoft Foundry and Azure AI Services",
+    "question": "For each Foundry-related statement, indicate whether it is correct.",
+    "statements": [
+      "Foundry can help organizations select models for business needs.",
+      "Foundry scenarios should consider scalability and security.",
+      "Foundry eliminates the need to evaluate AI outputs.",
+      "Foundry Tools can support prebuilt AI capabilities for common tasks."
+    ],
+    "correct": [0, 0, 1, 0],
+    "explanation": "Foundry supports model and solution work, but evaluation, security, and governance remain important.",
+    "question_type": "YES_NO_MATRIX"
+  },
+  {
+    "id": 32,
+    "module": "Microsoft Foundry and Azure AI Services",
+    "question": "A retailer wants to extract information from invoices and route exceptions for review. Which capability area is most relevant?",
+    "options": [
+      "Document intelligence and workflow integration",
+      "Manual copy-paste only",
+      "A social media scheduling tool",
+      "Physical badge printing"
+    ],
+    "correct": 0,
+    "explanation": "Document extraction and workflow integration are relevant for processing invoices and routing exceptions.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 33,
+    "module": "Microsoft Foundry and Azure AI Services",
+    "question": "Which factor is most important when matching an AI model to a business need?",
+    "options": [
+      "Task requirements, quality expectations, latency, cost, security, and available grounding data",
+      "The model name that sounds most impressive",
+      "The color of the model provider logo",
+      "The oldest available model regardless of capability"
+    ],
+    "correct": 0,
+    "explanation": "Model selection should consider task fit, quality, performance, cost, security, and data needs.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 34,
+    "module": "Microsoft Foundry and Azure AI Services",
+    "question": "Arrange the steps for selecting an AI approach with Foundry Tools.",
+    "options": [
+      "Compare model or service options",
+      "Define the business task and constraints",
+      "Pilot, evaluate, and monitor outcomes",
+      "Identify grounding, data, and security needs"
+    ],
+    "correct": [1, 3, 0, 2],
+    "explanation": "Start with task and constraints, identify data and security requirements, compare options, then pilot and evaluate.",
+    "question_type": "SEQUENCE"
+  },
+  {
+    "id": 35,
+    "module": "Microsoft Foundry and Azure AI Services",
+    "question": "A business wants to search a large knowledge base and generate grounded answers. Which combination is most relevant?",
+    "options": [
+      "Azure AI Search with a generative model in a retrieval-augmented pattern",
+      "A disconnected spreadsheet with no search index",
+      "A manual-only email inbox",
+      "An ungoverned public folder with sensitive data"
+    ],
+    "correct": 0,
+    "explanation": "Azure AI Search can retrieve relevant content for grounded generation in RAG-style solutions.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 36,
+    "module": "Microsoft Foundry and Azure AI Services",
+    "question": "Why is evaluation important before scaling a Foundry-based AI solution?",
+    "options": [
+      "It helps measure quality, safety, relevance, and business outcome performance.",
+      "It removes the need for user training.",
+      "It guarantees no future monitoring is needed.",
+      "It bypasses security review."
+    ],
+    "correct": 0,
+    "explanation": "Evaluation helps determine whether the solution is accurate, safe, relevant, secure, and valuable enough to scale.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 37,
+    "module": "Microsoft Foundry and Azure AI Services",
+    "question": "Which business need is best served by Azure Vision capabilities?",
+    "options": [
+      "Analyzing image content for a quality inspection workflow",
+      "Summarizing a Teams meeting transcript",
+      "Scheduling a recurring prompt in Copilot Chat",
+      "Renaming a Word document"
+    ],
+    "correct": 0,
+    "explanation": "Vision capabilities are used for image analysis scenarios such as inspection, classification, extraction, and visual understanding.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 38,
+    "module": "Responsible AI Governance",
+    "question": "Which group is best suited to guide cross-functional AI oversight?",
+    "options": [
+      "An AI council with business, technology, security, privacy, legal, and risk stakeholders",
+      "One individual acting without governance",
+      "Only the marketing team regardless of use case",
+      "A group with no decision rights or accountability"
+    ],
+    "correct": 0,
+    "explanation": "An AI council should bring together cross-functional stakeholders to guide strategy, oversight, risk, and alignment.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 39,
+    "module": "Responsible AI Governance",
+    "question": "Which principles are part of responsible AI governance?",
+    "options": [
+      "Fairness",
+      "Reliability and safety",
+      "Privacy and security",
+      "Intentional opacity with no accountability"
+    ],
+    "correct": [0, 1, 2],
+    "explanation": "Responsible AI includes fairness, reliability, safety, privacy, security, inclusiveness, transparency, and accountability.",
+    "question_type": "MULTI"
+  },
+  {
+    "id": 40,
+    "module": "Responsible AI Governance",
+    "question": "For each governance statement, indicate whether it is correct.",
+    "statements": [
+      "AI governance should define acceptable use and escalation paths.",
+      "Responsible AI only matters after a solution is deployed at scale.",
+      "Privacy, security, and legal requirements should be considered during planning.",
+      "Transparency helps users understand when and how AI is used."
+    ],
+    "correct": [0, 1, 0, 0],
+    "explanation": "Responsible governance starts during planning and includes acceptable use, escalation, privacy, security, legal review, and transparency.",
+    "question_type": "YES_NO_MATRIX"
+  },
+  {
+    "id": 41,
+    "module": "Responsible AI Governance",
+    "question": "A department wants to use AI to screen customer complaints for escalation. What governance concern is most important?",
+    "options": [
+      "Fairness, reliability, explainability, and human review for high-impact decisions",
+      "Choosing the longest project name",
+      "Avoiding any measurement of model quality",
+      "Removing all escalation rules"
+    ],
+    "correct": 0,
+    "explanation": "Screening and escalation can affect customers, so fairness, reliability, transparency, and human oversight matter.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 42,
+    "module": "Responsible AI Governance",
+    "question": "What is the best way to handle a generative AI use case involving confidential data?",
+    "options": [
+      "Classify the data, confirm access controls, minimize unnecessary exposure, and review compliance requirements",
+      "Paste all confidential data into public tools",
+      "Disable auditing",
+      "Assume confidentiality has no effect on AI design"
+    ],
+    "correct": 0,
+    "explanation": "Confidential data requires classification, access control, minimization, monitoring, and compliance review.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 43,
+    "module": "Responsible AI Governance",
+    "question": "Arrange the steps for establishing an AI governance program.",
+    "options": [
+      "Monitor usage, incidents, and outcomes",
+      "Define principles, policies, and risk criteria",
+      "Create a cross-functional AI council",
+      "Approve and prioritize use cases based on value and risk"
+    ],
+    "correct": [2, 1, 3, 0],
+    "explanation": "A governance program starts with accountable oversight, defines policies, prioritizes use cases, and monitors usage and outcomes.",
+    "question_type": "SEQUENCE"
+  },
+  {
+    "id": 44,
+    "module": "Responsible AI Governance",
+    "question": "Why should an organization document AI decision rights?",
+    "options": [
+      "To clarify who can approve, deploy, monitor, and retire AI solutions",
+      "To avoid accountability",
+      "To make all decisions informal",
+      "To prevent risk teams from participating"
+    ],
+    "correct": 0,
+    "explanation": "Decision rights clarify accountability for approval, deployment, monitoring, risk acceptance, and retirement.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 45,
+    "module": "Adoption, Licensing, and Change Strategy",
+    "question": "Which action best supports organization-wide AI adoption?",
+    "options": [
+      "Create an adoption team, identify champions, train users, and measure business outcomes",
+      "Buy licenses without communication or training",
+      "Ignore security and privacy concerns",
+      "Block all feedback after rollout"
+    ],
+    "correct": 0,
+    "explanation": "Successful adoption requires people, process, training, champions, communication, measurement, and risk management.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 46,
+    "module": "Adoption, Licensing, and Change Strategy",
+    "question": "Which barriers commonly affect AI adoption?",
+    "options": [
+      "Low trust in AI output",
+      "Unclear use cases",
+      "Lack of training and change support",
+      "Perfect data readiness in every department"
+    ],
+    "correct": [0, 1, 2],
+    "explanation": "Common barriers include trust, unclear value, poor data readiness, lack of enablement, risk concerns, and insufficient leadership support.",
+    "question_type": "MULTI"
+  },
+  {
+    "id": 47,
+    "module": "Adoption, Licensing, and Change Strategy",
+    "question": "For each adoption statement, indicate whether it is correct.",
+    "statements": [
+      "An AI champions program can help scale practical usage patterns.",
+      "Licensing and cost models should be reviewed before broad rollout.",
+      "Training is unnecessary if the tool has a chat interface.",
+      "Adoption planning should consider security, privacy, and data impacts."
+    ],
+    "correct": [0, 0, 1, 0],
+    "explanation": "Champions, licensing review, training, and risk planning all support adoption. Chat interfaces still require enablement and guidance.",
+    "question_type": "YES_NO_MATRIX"
+  },
+  {
+    "id": 48,
+    "module": "Adoption, Licensing, and Change Strategy",
+    "question": "A leader must choose between pay-as-you-go and prepaid Azure AI service models. What should drive the decision?",
+    "options": [
+      "Expected usage pattern, budget predictability, scalability needs, and cost governance",
+      "The option with the longest name",
+      "A decision made without usage estimates",
+      "Avoiding cost monitoring"
+    ],
+    "correct": 0,
+    "explanation": "Subscription model choice should consider demand, predictability, budget, scalability, and governance.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 49,
+    "module": "Adoption, Licensing, and Change Strategy",
+    "question": "Arrange the steps for scaling AI adoption after a successful pilot.",
+    "options": [
+      "Expand training, support, and champions",
+      "Use pilot evidence to refine the business case",
+      "Monitor outcomes, risks, and user feedback",
+      "Roll out to prioritized groups with governance controls"
+    ],
+    "correct": [1, 3, 0, 2],
+    "explanation": "Use evidence to refine the business case, roll out to prioritized groups, support users with training and champions, and monitor outcomes and risks.",
+    "question_type": "SEQUENCE"
+  },
+  {
+    "id": 50,
+    "module": "Adoption, Licensing, and Change Strategy",
+    "question": "Which licensing consideration is most relevant when planning Microsoft 365 Copilot adoption?",
+    "options": [
+      "Which users and scenarios need Copilot capabilities and how costs align with expected value",
+      "Whether all employees must receive the same license immediately",
+      "Whether license planning can ignore business priorities",
+      "Whether AI governance can be skipped after licenses are purchased"
+    ],
+    "correct": 0,
+    "explanation": "Licensing should map to user groups, scenarios, expected value, budget, and rollout plans. It should not ignore governance or business priorities.",
+    "question_type": "STANDARD"
+  }
+]

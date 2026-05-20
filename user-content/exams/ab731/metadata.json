@@ -1,0 +1,120 @@
+{
+  "id": "ab731",
+  "name": "AB-731",
+  "fullName": "Microsoft Certified: AI Transformation Leader",
+  "duration": 45,
+  "questionCount": 50,
+  "totalQuestions": 50,
+  "passScore": 70,
+  "language": "en",
+  "schemaVersion": "1.1",
+  "badge": "AI Leader",
+  "icon": "fas fa-chess-king",
+  "modules": [
+    {
+      "icon": "fas fa-lightbulb",
+      "name": "Generative AI Business Value"
+    },
+    {
+      "icon": "fas fa-diagram-project",
+      "name": "Solution Design, Prompting, Grounding, and Data"
+    },
+    {
+      "icon": "fas fa-users-gear",
+      "name": "Microsoft Copilot and Microsoft 365 AI"
+    },
+    {
+      "icon": "fas fa-cloud",
+      "name": "Microsoft Foundry and Azure AI Services"
+    },
+    {
+      "icon": "fas fa-scale-balanced",
+      "name": "Responsible AI Governance"
+    },
+    {
+      "icon": "fas fa-people-arrows",
+      "name": "Adoption, Licensing, and Change Strategy"
+    }
+  ],
+  "resources": [
+    {
+      "icon": "fas fa-book",
+      "name": "AB-731 Study Guide",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-731"
+    },
+    {
+      "icon": "fas fa-graduation-cap",
+      "name": "AI Transformation Leader certification page",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/ai-transformation-leader/"
+    },
+    {
+      "icon": "fas fa-route",
+      "name": "Drive AI transformation in your organization",
+      "url": "https://learn.microsoft.com/en-us/training/courses/ab-731t00/"
+    },
+    {
+      "icon": "fas fa-laptop",
+      "name": "AB-731 Practice Assessment",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/ai-transformation-leader/practice/assessment?assessment-type=practice&assessmentId=13027212&practice-assessment-type=certification"
+    }
+  ],
+  "hasImages": false,
+  "contentReview": {
+    "lastReviewed": "2026-05-20",
+    "reviewCadence": "quarterly",
+    "sourceOfTruth": "Microsoft Learn AB-731 study guide and certification page",
+    "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-731",
+    "reviewScope": [
+      "official study guide objectives",
+      "training path coverage",
+      "schema validation"
+    ],
+    "notes": "Original practice content based on public Microsoft Learn objectives. It does not reproduce Microsoft exam or practice assessment questions."
+  },
+  "objectiveDomains": [
+    {
+      "code": "AB731-1",
+      "name": "Identify the business value of generative AI solutions",
+      "weightRange": "35-40%",
+      "source": "Microsoft Learn AB-731 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-731",
+      "mappedModules": [
+        "Generative AI Business Value",
+        "Solution Design, Prompting, Grounding, and Data"
+      ]
+    },
+    {
+      "code": "AB731-2",
+      "name": "Identify benefits, capabilities, and opportunities for Microsoft's AI apps and services",
+      "weightRange": "35-40%",
+      "source": "Microsoft Learn AB-731 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-731",
+      "mappedModules": [
+        "Microsoft Copilot and Microsoft 365 AI",
+        "Microsoft Foundry and Azure AI Services"
+      ]
+    },
+    {
+      "code": "AB731-3",
+      "name": "Identify an implementation and adoption strategy for Microsoft's AI apps and services",
+      "weightRange": "20-25%",
+      "source": "Microsoft Learn AB-731 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-731",
+      "mappedModules": [
+        "Responsible AI Governance",
+        "Adoption, Licensing, and Change Strategy"
+      ]
+    }
+  ],
+  "coverageReview": {
+    "method": "Modules mapped to the published AB-731 objective domains and official AB-731T00 learning paths.",
+    "observedModuleCounts": {
+      "Generative AI Business Value": 10,
+      "Solution Design, Prompting, Grounding, and Data": 9,
+      "Microsoft Copilot and Microsoft 365 AI": 9,
+      "Microsoft Foundry and Azure AI Services": 9,
+      "Responsible AI Governance": 7,
+      "Adoption, Licensing, and Change Strategy": 6
+    }
+  }
+}
