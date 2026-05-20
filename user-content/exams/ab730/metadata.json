@@ -1,0 +1,120 @@
+{
+  "id": "ab730",
+  "name": "AB-730",
+  "fullName": "Microsoft Certified: AI Business Professional",
+  "duration": 45,
+  "questionCount": 50,
+  "totalQuestions": 50,
+  "passScore": 70,
+  "language": "en",
+  "schemaVersion": "1.1",
+  "badge": "AI Business",
+  "icon": "fas fa-briefcase",
+  "modules": [
+    {
+      "icon": "fas fa-brain",
+      "name": "Generative AI Fundamentals"
+    },
+    {
+      "icon": "fas fa-shield-alt",
+      "name": "Responsible AI and Data Protection"
+    },
+    {
+      "icon": "fas fa-comments",
+      "name": "Prompting and Conversation Management"
+    },
+    {
+      "icon": "fas fa-robot",
+      "name": "Copilot Agents and Extensibility"
+    },
+    {
+      "icon": "fas fa-file-alt",
+      "name": "Business Content Creation"
+    },
+    {
+      "icon": "fas fa-chart-line",
+      "name": "Data, Meetings, and Collaboration"
+    }
+  ],
+  "resources": [
+    {
+      "icon": "fas fa-book",
+      "name": "AB-730 Study Guide",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-730"
+    },
+    {
+      "icon": "fas fa-graduation-cap",
+      "name": "AI Business Professional certification page",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/ai-business-professional/"
+    },
+    {
+      "icon": "fas fa-route",
+      "name": "Transform business workflows with generative AI",
+      "url": "https://learn.microsoft.com/en-us/training/paths/transform-business-workflows-with-ai/"
+    },
+    {
+      "icon": "fas fa-laptop",
+      "name": "AB-730 Practice Assessment",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/ai-business-professional/practice/assessment?assessment-type=practice&assessmentId=650120434&practice-assessment-type=certification"
+    }
+  ],
+  "hasImages": false,
+  "contentReview": {
+    "lastReviewed": "2026-05-20",
+    "reviewCadence": "quarterly",
+    "sourceOfTruth": "Microsoft Learn AB-730 study guide and certification page",
+    "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-730",
+    "reviewScope": [
+      "official study guide objectives",
+      "training path coverage",
+      "schema validation"
+    ],
+    "notes": "Original practice content based on public Microsoft Learn objectives. It does not reproduce Microsoft exam or practice assessment questions."
+  },
+  "objectiveDomains": [
+    {
+      "code": "AB730-1",
+      "name": "Understand generative AI fundamentals",
+      "weightRange": "25-30%",
+      "source": "Microsoft Learn AB-730 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-730",
+      "mappedModules": [
+        "Generative AI Fundamentals",
+        "Responsible AI and Data Protection"
+      ]
+    },
+    {
+      "code": "AB730-2",
+      "name": "Manage prompts and conversations by using AI",
+      "weightRange": "35-40%",
+      "source": "Microsoft Learn AB-730 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-730",
+      "mappedModules": [
+        "Prompting and Conversation Management",
+        "Copilot Agents and Extensibility"
+      ]
+    },
+    {
+      "code": "AB730-3",
+      "name": "Draft and analyze business content by using AI",
+      "weightRange": "25-30%",
+      "source": "Microsoft Learn AB-730 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-730",
+      "mappedModules": [
+        "Business Content Creation",
+        "Data, Meetings, and Collaboration"
+      ]
+    }
+  ],
+  "coverageReview": {
+    "method": "Modules mapped to the published AB-730 objective domains and official AB-730T00 learning path.",
+    "observedModuleCounts": {
+      "Generative AI Fundamentals": 8,
+      "Responsible AI and Data Protection": 6,
+      "Prompting and Conversation Management": 11,
+      "Copilot Agents and Extensibility": 8,
+      "Business Content Creation": 9,
+      "Data, Meetings, and Collaboration": 8
+    }
+  }
+}

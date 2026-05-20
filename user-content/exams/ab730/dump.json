@@ -1,0 +1,702 @@
+[
+  {
+    "id": 1,
+    "module": "Generative AI Fundamentals",
+    "question": "A finance analyst asks Microsoft 365 Copilot to summarize a quarterly report and compare it with last quarter. Which factor most directly shapes the answer Copilot can produce?",
+    "options": [
+      "The user's accessible work content and the current app context",
+      "All documents stored anywhere in the tenant",
+      "Only public web data indexed by search engines",
+      "The operating system installed on the user's device"
+    ],
+    "correct": 0,
+    "explanation": "Copilot responses are grounded in the user's prompt, current app context, and content the user is permitted to access. It does not automatically use every tenant document or rely only on public web data.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 2,
+    "module": "Generative AI Fundamentals",
+    "question": "Which statements describe appropriate expectations for generative AI in Microsoft 365?",
+    "options": [
+      "It can draft, summarize, transform, and reason over content.",
+      "It can replace all human review for high-impact decisions.",
+      "Its results can vary depending on prompt quality and available context.",
+      "It can create new content from patterns learned in data."
+    ],
+    "correct": [0, 2, 3],
+    "explanation": "Generative AI can create and transform content, and output quality depends heavily on prompt and grounding context. Human review remains important, especially for sensitive or high-impact work.",
+    "question_type": "MULTI"
+  },
+  {
+    "id": 3,
+    "module": "Generative AI Fundamentals",
+    "question": "For each statement about Copilot context, indicate whether it is correct.",
+    "statements": [
+      "Copilot can use the active document as context when working in an app such as Word.",
+      "Copilot ignores the user's permissions when grounding responses in work data.",
+      "Web data can influence answers when web grounding is available and appropriate.",
+      "More relevant context usually helps Copilot produce a more useful response."
+    ],
+    "correct": [0, 1, 0, 0],
+    "explanation": "Copilot can use app context and relevant accessible content. It respects permissions and may use web grounding when available. Relevant context usually improves response quality.",
+    "question_type": "YES_NO_MATRIX"
+  },
+  {
+    "id": 4,
+    "module": "Generative AI Fundamentals",
+    "question": "Which scenario best fits a Copilot Chat experience rather than an agent experience?",
+    "options": [
+      "A user asks a one-time question to summarize a policy and draft an email response.",
+      "A department needs a reusable assistant with curated knowledge and suggested prompts.",
+      "A team wants a role-specific tool shared with members for a repeatable process.",
+      "A business unit needs configured instructions and knowledge sources for ongoing use."
+    ],
+    "correct": 0,
+    "explanation": "A chat experience is best for flexible, ad hoc assistance. Agents are better when the organization needs reusable behavior, knowledge, instructions, and sharing for repeatable workflows.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 5,
+    "module": "Generative AI Fundamentals",
+    "question": "Arrange the usual flow for using Copilot to produce a reliable business answer.",
+    "options": [
+      "Review and verify the output",
+      "Provide task, context, and constraints",
+      "Refine the prompt or ask follow-up questions",
+      "Use the answer in the business workflow"
+    ],
+    "correct": [1, 2, 0, 3],
+    "explanation": "Start with a clear prompt and relevant constraints, refine through follow-up, verify the result, and then use it in the workflow.",
+    "question_type": "SEQUENCE"
+  },
+  {
+    "id": 6,
+    "module": "Generative AI Fundamentals",
+    "question": "What is the best description of grounding in a Copilot response?",
+    "options": [
+      "Connecting the prompt to relevant data or context so the response is more specific and useful",
+      "Disabling all organizational data access before generating a response",
+      "Training a new model for every prompt",
+      "Converting every answer into a spreadsheet"
+    ],
+    "correct": 0,
+    "explanation": "Grounding provides relevant context, such as files, meetings, chats, or web data, so the model can produce an answer tied to the task rather than a generic response.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 7,
+    "module": "Generative AI Fundamentals",
+    "question": "Which Copilot capability is most useful when a user needs help turning a rough idea into a first version of a document?",
+    "options": [
+      "Draft generation from a prompt",
+      "Device encryption",
+      "Mailbox retention policy creation",
+      "Network packet inspection"
+    ],
+    "correct": 0,
+    "explanation": "Copilot can generate a first draft from a prompt. Security, retention, and network features are important, but they do not directly create a document draft.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 8,
+    "module": "Generative AI Fundamentals",
+    "question": "A user wants Copilot to compare content across a Word file and a PowerPoint deck. What should the user do first?",
+    "options": [
+      "Reference or open the relevant files so Copilot has the right context",
+      "Ask Copilot to use every file in the organization",
+      "Remove all file names from the prompt",
+      "Disable citations to simplify the answer"
+    ],
+    "correct": 0,
+    "explanation": "Referencing the relevant files or working in the correct app context helps Copilot use the right information and reduces ambiguity.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 9,
+    "module": "Responsible AI and Data Protection",
+    "question": "Which risk is best described as a plausible-sounding but incorrect AI-generated answer?",
+    "options": [
+      "Fabrication",
+      "Single sign-on",
+      "Data residency",
+      "Version history"
+    ],
+    "correct": 0,
+    "explanation": "A fabrication is an output that sounds confident or plausible but is wrong or unsupported. Users should verify important AI-generated claims.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 10,
+    "module": "Responsible AI and Data Protection",
+    "question": "Which actions help reduce risk when using Copilot with sensitive business content?",
+    "options": [
+      "Avoid entering unnecessary confidential details into prompts.",
+      "Verify outputs before sharing them externally.",
+      "Share generated summaries without checking source accuracy.",
+      "Use only content the user is permitted to access."
+    ],
+    "correct": [0, 1, 3],
+    "explanation": "Good practice includes minimizing sensitive input, verifying outputs, and using authorized content. Generated summaries should be reviewed before sharing.",
+    "question_type": "MULTI"
+  },
+  {
+    "id": 11,
+    "module": "Responsible AI and Data Protection",
+    "question": "A user suspects Copilot summarized a contract incorrectly. What is the best next step?",
+    "options": [
+      "Check citations or source content and perform human review before acting",
+      "Assume the output is correct because it was generated by AI",
+      "Delete the source document",
+      "Forward the summary to the customer immediately"
+    ],
+    "correct": 0,
+    "explanation": "High-value or sensitive outputs should be verified against source material. Human review remains essential for contracts, compliance, and other consequential content.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 12,
+    "module": "Responsible AI and Data Protection",
+    "question": "For each statement about responsible AI practices, indicate whether it is correct.",
+    "statements": [
+      "Users should review AI output for bias and missing context.",
+      "AI-generated answers should always be treated as authoritative legal advice.",
+      "Prompt injection can attempt to override the intended task or instructions.",
+      "Data protection controls can limit what Copilot can use in a response."
+    ],
+    "correct": [0, 1, 0, 0],
+    "explanation": "Responsible AI includes human review, awareness of prompt injection, and respecting data protection. AI output is not automatically authoritative legal advice.",
+    "question_type": "YES_NO_MATRIX"
+  },
+  {
+    "id": 13,
+    "module": "Responsible AI and Data Protection",
+    "question": "Which prompt is safest when asking Copilot to draft a public announcement?",
+    "options": [
+      "Use approved public product details and avoid unpublished financial figures.",
+      "Include confidential acquisition plans so the draft is more specific.",
+      "Ask Copilot to invent customer quotes.",
+      "Paste a private HR record to personalize the announcement."
+    ],
+    "correct": 0,
+    "explanation": "A safe prompt uses approved, appropriate context and avoids unnecessary sensitive or confidential data.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 14,
+    "module": "Responsible AI and Data Protection",
+    "question": "What is over-reliance in the context of generative AI?",
+    "options": [
+      "Accepting AI output without appropriate judgment, verification, or accountability",
+      "Using AI to create a first draft",
+      "Requesting citations from Copilot",
+      "Refining a prompt after the first answer"
+    ],
+    "correct": 0,
+    "explanation": "Over-reliance occurs when users depend on AI output without applying expertise, checking sources, or considering risk.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 15,
+    "module": "Prompting and Conversation Management",
+    "question": "Which prompt is most likely to produce a useful Copilot response?",
+    "options": [
+      "Draft a 200-word customer email explaining the delivery delay, use an empathetic tone, and include the three mitigation steps in this file.",
+      "Write something about the delay.",
+      "Make it good.",
+      "Do my work."
+    ],
+    "correct": 0,
+    "explanation": "Effective prompts specify the task, audience, tone, format, constraints, and relevant context.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 16,
+    "module": "Prompting and Conversation Management",
+    "question": "Which prompt components are usually helpful for Microsoft 365 Copilot?",
+    "options": [
+      "Goal or task",
+      "Relevant context or source material",
+      "Desired format or tone",
+      "Ambiguous instructions with no success criteria"
+    ],
+    "correct": [0, 1, 2],
+    "explanation": "Clear goals, context, and output expectations help Copilot produce better responses. Ambiguous prompts are less reliable.",
+    "question_type": "MULTI"
+  },
+  {
+    "id": 17,
+    "module": "Prompting and Conversation Management",
+    "question": "A manager wants a weekly reminder to ask Copilot for a summary of project risks. Which prompt-management capability best fits this need?",
+    "options": [
+      "Schedule a prompt",
+      "Delete a chat",
+      "Rename a conversation",
+      "Disable prompt history"
+    ],
+    "correct": 0,
+    "explanation": "Scheduling a prompt supports recurring work where a user wants Copilot to run or remind them on a planned cadence.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 18,
+    "module": "Prompting and Conversation Management",
+    "question": "Arrange the prompt refinement process after Copilot gives an incomplete answer.",
+    "options": [
+      "Ask a focused follow-up with missing constraints",
+      "Review the answer for gaps",
+      "Use the improved output if it passes verification",
+      "Add or reference better source material"
+    ],
+    "correct": [1, 3, 0, 2],
+    "explanation": "First identify gaps, then improve context, ask a focused follow-up, and use the answer only after verification.",
+    "question_type": "SEQUENCE"
+  },
+  {
+    "id": 19,
+    "module": "Prompting and Conversation Management",
+    "question": "A user needs to reuse a strong prompt with teammates. Which action is most appropriate?",
+    "options": [
+      "Share the prompt if it contains no sensitive information and is useful to the team",
+      "Paste confidential customer data into the prompt before sharing it",
+      "Rename the prompt to hide its purpose",
+      "Delete the prompt after each use so no one can learn from it"
+    ],
+    "correct": 0,
+    "explanation": "Prompts can be shared when they are reusable and safe. Sensitive data should not be embedded in shared prompts.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 20,
+    "module": "Prompting and Conversation Management",
+    "question": "For each conversation-management statement, indicate whether it is correct.",
+    "statements": [
+      "Renaming a chat can make previous work easier to find.",
+      "Deleting a chat is useful when a conversation is no longer needed.",
+      "Adding a conversation to a notebook can help organize related work.",
+      "A user should rely on old chats even when business context has changed."
+    ],
+    "correct": [0, 0, 0, 1],
+    "explanation": "Conversation organization features help users manage work. Old chats may become stale when context changes and should be reviewed carefully.",
+    "question_type": "YES_NO_MATRIX"
+  },
+  {
+    "id": 21,
+    "module": "Prompting and Conversation Management",
+    "question": "Which prompt should a sales user choose to get an executive-ready summary from meeting notes?",
+    "options": [
+      "Summarize these notes into five executive bullets, include decisions, risks, and owners, and keep confidential pricing out of the summary.",
+      "Summarize this.",
+      "Make a report but do not use any context.",
+      "Invent missing decisions if the notes are unclear."
+    ],
+    "correct": 0,
+    "explanation": "The best prompt defines format, content priorities, and safety constraints. It does not ask Copilot to invent unsupported information.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 22,
+    "module": "Prompting and Conversation Management",
+    "question": "What is the main benefit of referencing a specific file in a Copilot prompt?",
+    "options": [
+      "It grounds the answer in the intended source material.",
+      "It lets Copilot ignore access permissions.",
+      "It guarantees the answer is legally approved.",
+      "It permanently changes the file."
+    ],
+    "correct": 0,
+    "explanation": "Referencing a file helps Copilot use the right source material. It does not bypass permissions, provide legal approval, or alter content by itself.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 23,
+    "module": "Prompting and Conversation Management",
+    "question": "Which follow-up is best when Copilot gives a summary that is too long?",
+    "options": [
+      "Rewrite the summary in three bullets for a VP audience and keep each bullet under 20 words.",
+      "Wrong answer.",
+      "Make it shorter somehow.",
+      "Ignore the source and create a new version from memory."
+    ],
+    "correct": 0,
+    "explanation": "A focused follow-up gives specific constraints for length, audience, and format.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 24,
+    "module": "Prompting and Conversation Management",
+    "question": "Which resource is most appropriate to reference when asking Copilot to draft a project status update?",
+    "options": [
+      "The current project plan, recent meeting notes, and risk register",
+      "An unrelated marketing brochure",
+      "A random public blog post",
+      "A private HR complaint file"
+    ],
+    "correct": 0,
+    "explanation": "The most useful sources are relevant, authorized, and directly connected to the task.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 25,
+    "module": "Copilot Agents and Extensibility",
+    "question": "When should a team consider creating a Copilot agent instead of using a one-time chat?",
+    "options": [
+      "When the team needs repeatable assistance with configured knowledge, instructions, and suggested prompts",
+      "When the user only needs a single quick rewrite",
+      "When the organization wants to avoid defining a process",
+      "When no one else should be able to reuse the workflow"
+    ],
+    "correct": 0,
+    "explanation": "Agents are useful for repeatable workflows where curated knowledge, instructions, settings, and sharing provide value.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 26,
+    "module": "Copilot Agents and Extensibility",
+    "question": "Which capabilities are commonly configured when creating a Copilot agent?",
+    "options": [
+      "Instructions that define how the agent should behave",
+      "Knowledge sources the agent can use",
+      "Suggested prompts that guide users",
+      "A requirement that the agent ignore organizational policy"
+    ],
+    "correct": [0, 1, 2],
+    "explanation": "Agents can be configured with instructions, knowledge, capabilities, and suggested prompts. They should not be designed to ignore policy.",
+    "question_type": "MULTI"
+  },
+  {
+    "id": 27,
+    "module": "Copilot Agents and Extensibility",
+    "question": "A user needs a prebuilt assistant for a common task and does not need custom knowledge. What should they check first?",
+    "options": [
+      "Agent Store",
+      "Device Manager",
+      "DNS settings",
+      "Printer queue"
+    ],
+    "correct": 0,
+    "explanation": "The Agent Store is the appropriate place to look for existing agents before creating a new one.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 28,
+    "module": "Copilot Agents and Extensibility",
+    "question": "For each statement about Copilot agents, indicate whether it is correct.",
+    "statements": [
+      "Agents can be created from templates for common scenarios.",
+      "Agents can include configured knowledge to improve task relevance.",
+      "Agents are always private and cannot be shared with team members.",
+      "Agent instructions help shape the response style and task behavior."
+    ],
+    "correct": [0, 0, 1, 0],
+    "explanation": "Agents can use templates, configured knowledge, and instructions. Sharing may be available depending on configuration and policy.",
+    "question_type": "YES_NO_MATRIX"
+  },
+  {
+    "id": 29,
+    "module": "Copilot Agents and Extensibility",
+    "question": "Which agent configuration best supports a HR policy assistant?",
+    "options": [
+      "Connect approved HR policy documents as knowledge and provide instructions to cite relevant policy sections.",
+      "Ask the agent to answer from memory without source material.",
+      "Give the agent unrelated sales scripts as knowledge.",
+      "Configure the agent to reveal restricted employee records."
+    ],
+    "correct": 0,
+    "explanation": "A policy assistant should use approved policy knowledge, clear instructions, and safe handling of restricted information.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 30,
+    "module": "Copilot Agents and Extensibility",
+    "question": "Arrange the high-level steps for creating a simple business agent.",
+    "options": [
+      "Configure instructions and knowledge",
+      "Test responses with representative prompts",
+      "Choose a template or start a new agent",
+      "Share with the intended audience if approved"
+    ],
+    "correct": [2, 0, 1, 3],
+    "explanation": "A sensible flow is to choose the starting point, configure behavior and knowledge, test with realistic prompts, and share when approved.",
+    "question_type": "SEQUENCE"
+  },
+  {
+    "id": 31,
+    "module": "Copilot Agents and Extensibility",
+    "question": "A team wants an agent to help answer questions about a product launch plan. What is the most important knowledge source to include?",
+    "options": [
+      "The approved launch plan and related FAQs",
+      "A generic article about project management",
+      "A private document from another team with no relevance",
+      "An empty knowledge source"
+    ],
+    "correct": 0,
+    "explanation": "Agents are most useful when grounded in relevant, approved sources for the task.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 32,
+    "module": "Copilot Agents and Extensibility",
+    "question": "What should a user do before sharing a newly created agent with teammates?",
+    "options": [
+      "Test it with common prompts and verify it uses approved sources safely",
+      "Share it immediately without reviewing the output",
+      "Remove all instructions so behavior is unpredictable",
+      "Add sensitive data to suggested prompts"
+    ],
+    "correct": 0,
+    "explanation": "Testing and verification reduce the risk of poor answers, unsafe disclosure, or misalignment with the intended workflow.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 33,
+    "module": "Business Content Creation",
+    "question": "A marketing specialist wants Copilot to create a first draft of a campaign brief. What should the prompt include?",
+    "options": [
+      "Audience, objective, key messages, tone, length, and approved source material",
+      "Only the word campaign",
+      "A request to invent customer testimonials",
+      "Private employee records for personalization"
+    ],
+    "correct": 0,
+    "explanation": "Business drafts improve when prompts include audience, goal, constraints, tone, and appropriate grounding material.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 34,
+    "module": "Business Content Creation",
+    "question": "Which tasks are good fits for drafting business content with Microsoft 365 Copilot?",
+    "options": [
+      "Create a first draft from a prompt.",
+      "Generate a management summary from an existing document.",
+      "Move insights from one Microsoft 365 app into another format.",
+      "Approve final legal language without review."
+    ],
+    "correct": [0, 1, 2],
+    "explanation": "Copilot can draft, summarize, and transform content. Final approval for legal or sensitive language still requires human review.",
+    "question_type": "MULTI"
+  },
+  {
+    "id": 35,
+    "module": "Business Content Creation",
+    "question": "A user has a long strategy document and needs a concise management summary. Which Copilot request is best?",
+    "options": [
+      "Summarize this document for executives in six bullets, focusing on goals, risks, decisions, and next steps.",
+      "Make this shorter.",
+      "Rewrite it with no source references and add new claims.",
+      "Translate it into a spreadsheet without preserving meaning."
+    ],
+    "correct": 0,
+    "explanation": "The best request names the audience, format, and priorities for the summary.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 36,
+    "module": "Business Content Creation",
+    "question": "For each statement about document generation, indicate whether it is correct.",
+    "statements": [
+      "Copilot can help generate a new document from a prompt.",
+      "Copilot can help create a draft from an existing document.",
+      "Copilot output should be reviewed before external publication.",
+      "Copilot eliminates the need for subject-matter expertise."
+    ],
+    "correct": [0, 0, 0, 1],
+    "explanation": "Copilot supports drafting and transformation, but people still provide expertise and review final content.",
+    "question_type": "YES_NO_MATRIX"
+  },
+  {
+    "id": 37,
+    "module": "Business Content Creation",
+    "question": "Which instruction helps Copilot adapt a document for a different audience?",
+    "options": [
+      "Rewrite this for a nontechnical executive audience and keep the tone concise and business-focused.",
+      "Rewrite this somehow.",
+      "Ignore the audience and add more jargon.",
+      "Remove all business context."
+    ],
+    "correct": 0,
+    "explanation": "Audience, tone, and purpose are important constraints when adapting content.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 38,
+    "module": "Business Content Creation",
+    "question": "A project manager wants to reuse meeting decisions in a PowerPoint status deck. Which Copilot use case best matches?",
+    "options": [
+      "Move data and insights between Microsoft 365 apps",
+      "Disable collaboration features",
+      "Delete the transcript",
+      "Create a new identity provider"
+    ],
+    "correct": 0,
+    "explanation": "Copilot can help transform information from meetings or documents into content for another Microsoft 365 app, such as a presentation.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 39,
+    "module": "Business Content Creation",
+    "question": "Which prompt best requests image generation for a business presentation?",
+    "options": [
+      "Create a professional image concept for a slide about secure AI adoption, using a clean corporate style and no real customer logos.",
+      "Make any image using confidential customer screenshots.",
+      "Generate a trademarked logo for a partner company.",
+      "Use private employee photos without permission."
+    ],
+    "correct": 0,
+    "explanation": "A safe business image prompt describes purpose and style while avoiding sensitive, private, or trademark-infringing material.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 40,
+    "module": "Business Content Creation",
+    "question": "Arrange the steps for responsibly using Copilot to draft external customer communication.",
+    "options": [
+      "Send or publish after approval",
+      "Provide approved facts and desired tone",
+      "Generate a draft",
+      "Review for accuracy, sensitivity, and policy alignment"
+    ],
+    "correct": [1, 2, 3, 0],
+    "explanation": "Use approved facts, generate the draft, review carefully, then send only after appropriate approval.",
+    "question_type": "SEQUENCE"
+  },
+  {
+    "id": 41,
+    "module": "Business Content Creation",
+    "question": "What should a user do if Copilot creates a summary that omits an important risk?",
+    "options": [
+      "Ask a follow-up that explicitly requests risks and verify against the source material",
+      "Assume the risk is not important",
+      "Delete the source material",
+      "Publish the summary unchanged"
+    ],
+    "correct": 0,
+    "explanation": "Prompt refinement and verification help correct omissions before the output is used.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 42,
+    "module": "Data, Meetings, and Collaboration",
+    "question": "A team wants Copilot to summarize a Teams meeting. Which information is most useful to include in the requested output?",
+    "options": [
+      "Decisions, action items, owners, due dates, and unresolved questions",
+      "Only the meeting title",
+      "Unrelated emails from another project",
+      "A fictional list of decisions"
+    ],
+    "correct": 0,
+    "explanation": "Meeting summaries are most actionable when they capture decisions, action items, owners, deadlines, and open questions.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 43,
+    "module": "Data, Meetings, and Collaboration",
+    "question": "Which tasks are aligned with analyzing and visualizing data using Microsoft 365 Copilot?",
+    "options": [
+      "Identify trends in a spreadsheet.",
+      "Explain key drivers behind a change in metrics.",
+      "Create a chart or summary view from available data.",
+      "Guarantee that source data contains no errors."
+    ],
+    "correct": [0, 1, 2],
+    "explanation": "Copilot can help analyze trends, explain drivers, and create summaries or visualizations. It cannot guarantee source data quality.",
+    "question_type": "MULTI"
+  },
+  {
+    "id": 44,
+    "module": "Data, Meetings, and Collaboration",
+    "question": "For each statement about Copilot Pages and collaboration, indicate whether it is correct.",
+    "statements": [
+      "Copilot Pages can help teams work with AI-generated content collaboratively.",
+      "Collaborative AI content should still be reviewed for accuracy.",
+      "Copilot Pages are intended to replace all team communication channels.",
+      "Shared AI-generated work should avoid unnecessary sensitive information."
+    ],
+    "correct": [0, 0, 1, 0],
+    "explanation": "Copilot Pages can support collaboration, but they do not replace all communication. Accuracy and sensitivity review remain important.",
+    "question_type": "YES_NO_MATRIX"
+  },
+  {
+    "id": 45,
+    "module": "Data, Meetings, and Collaboration",
+    "question": "A user asks Copilot to analyze sales data. What should they do if the spreadsheet contains missing values?",
+    "options": [
+      "Acknowledge the data quality issue and ask Copilot to identify how it affects the analysis",
+      "Hide the missing values from reviewers",
+      "Ask Copilot to invent missing sales figures",
+      "Assume missing values never affect analysis"
+    ],
+    "correct": 0,
+    "explanation": "Data quality matters. Missing values should be identified and considered when interpreting Copilot-assisted analysis.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 46,
+    "module": "Data, Meetings, and Collaboration",
+    "question": "What is the best use of Copilot memory and instructions?",
+    "options": [
+      "Help tailor future assistance to stable preferences and working style where supported",
+      "Store passwords for future prompts",
+      "Bypass organizational data policies",
+      "Automatically approve all generated content"
+    ],
+    "correct": 0,
+    "explanation": "Memory and instructions can help personalize assistance, but they should not store secrets, bypass policies, or replace approval.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 47,
+    "module": "Data, Meetings, and Collaboration",
+    "question": "Which prompt best asks Copilot to analyze a spreadsheet for a leadership update?",
+    "options": [
+      "Identify the top three revenue trends, show possible causes, and create a concise summary for leadership with a chart suggestion.",
+      "Look at this data.",
+      "Find something interesting and invent numbers if needed.",
+      "Ignore the data quality issues."
+    ],
+    "correct": 0,
+    "explanation": "The best prompt specifies the analysis goal, desired output, audience, and treatment of data quality.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 48,
+    "module": "Data, Meetings, and Collaboration",
+    "question": "Arrange a responsible workflow for using Copilot after a meeting.",
+    "options": [
+      "Share the reviewed summary with attendees",
+      "Generate a meeting summary",
+      "Verify action items and owners",
+      "Ask for decisions, risks, and unresolved questions"
+    ],
+    "correct": [1, 3, 2, 0],
+    "explanation": "Generate a summary, refine it to include key meeting outcomes, verify owners and actions, then share the reviewed version.",
+    "question_type": "SEQUENCE"
+  },
+  {
+    "id": 49,
+    "module": "Data, Meetings, and Collaboration",
+    "question": "A user wants to compare customer feedback themes from several documents. Which approach is best?",
+    "options": [
+      "Reference the relevant documents and ask Copilot to group themes, cite examples, and flag uncertainty.",
+      "Ask Copilot to guess themes without documents.",
+      "Use unrelated financial forecasts as context.",
+      "Remove examples so no one can verify the themes."
+    ],
+    "correct": 0,
+    "explanation": "Referencing the correct documents and asking for examples and uncertainty helps make the analysis more transparent and useful.",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": 50,
+    "module": "Data, Meetings, and Collaboration",
+    "question": "Which collaboration practice best supports safe use of Copilot-generated content?",
+    "options": [
+      "Clearly label drafts, invite review, and keep sensitive details limited to authorized collaborators",
+      "Treat every draft as final",
+      "Share all generated content publicly by default",
+      "Remove source context so reviewers cannot check it"
+    ],
+    "correct": 0,
+    "explanation": "Safe collaboration means treating AI output as draft material, reviewing it, and sharing sensitive information only with authorized people.",
+    "question_type": "STANDARD"
+  }
+]
