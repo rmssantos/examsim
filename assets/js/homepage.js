@@ -37,11 +37,19 @@ this.init();
 }
 
 async init() {
+this.updateLocalOnlyLinks();
 await this.loadAvailableExams();
 this.placeDetailsPanel();
 this.setupEventListeners();
 this.setupConfigModal();
 this.refreshHeroPreview();
+}
+
+updateLocalOnlyLinks() {
+const isPublicPages = window.location.hostname === 'rmssantos.github.io';
+document.querySelectorAll('.local-only-public-link').forEach((element) => {
+	window.ExamApp.setElementHidden(element, isPublicPages);
+});
 }
 
 placeDetailsPanel(examId = null) {
