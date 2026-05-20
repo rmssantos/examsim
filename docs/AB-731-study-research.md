@@ -55,11 +55,11 @@ Course AB-731T00 maps to three learning paths:
 
 The local dump is original study content based on the public objective domains and training topics above. It does not copy Microsoft exam questions or practice assessment items. The question distribution targets the published weights while keeping the simulator session size at 50 questions.
 
-Proposed module distribution for 50 questions:
+Expanded module distribution for 120 total questions, with simulator sessions remaining at 50 questions:
 
-- Generative AI Business Value: 10
-- Solution Design, Prompting, Grounding, and Data: 9
-- Microsoft Copilot and Microsoft 365 AI: 9
-- Microsoft Foundry and Azure AI Services: 9
-- Responsible AI Governance: 7
-- Adoption, Licensing, and Change Strategy: 6
+- Generative AI Business Value: 23
+- Solution Design, Prompting, Grounding, and Data: 22
+- Microsoft Copilot and Microsoft 365 AI: 22
+- Microsoft Foundry and Azure AI Services: 23
+- Responsible AI Governance: 16
+- Adoption, Licensing, and Change Strategy: 14
