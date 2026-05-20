@@ -402,6 +402,18 @@ margin-bottom: 8px;
 }
 
 /* Dynamic exam card variations */
+.exam-card.exam-sc900 {
+background: linear-gradient(135deg, #0f4c81 0%, #137c8b 100%);
+}
+
+.exam-card.exam-ab730 {
+background: linear-gradient(135deg, #0f766e 0%, #16a34a 100%);
+}
+
+.exam-card.exam-ab731 {
+background: linear-gradient(135deg, #92400e 0%, #be123c 100%);
+}
+
 .exam-card.custom {
 background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
 }
@@ -471,6 +483,21 @@ opacity: 1;
 [data-theme="dark"] .exam-card.custom,
 .dark-mode .exam-card.custom {
     background: linear-gradient(135deg, #5b21b6 0%, #be185d 100%);
+}
+
+[data-theme="dark"] .exam-card.exam-sc900,
+.dark-mode .exam-card.exam-sc900 {
+    background: linear-gradient(135deg, #0b335f 0%, #0f5f6c 100%);
+}
+
+[data-theme="dark"] .exam-card.exam-ab730,
+.dark-mode .exam-card.exam-ab730 {
+    background: linear-gradient(135deg, #115e59 0%, #15803d 100%);
+}
+
+[data-theme="dark"] .exam-card.exam-ab731,
+.dark-mode .exam-card.exam-ab731 {
+    background: linear-gradient(135deg, #78350f 0%, #9f1239 100%);
 }
 
 /* Config/Manage Exams Modal */
