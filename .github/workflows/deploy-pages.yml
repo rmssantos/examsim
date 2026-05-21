@@ -2,7 +2,7 @@ name: Deploy GitHub Pages
 
 on:
   push:
-    branches: [master]
+    branches: [main, master]
   workflow_dispatch:
 
 permissions:
@@ -36,15 +36,17 @@ jobs:
             exit 1
           fi
           python - <<'PY'
+            import json
           import os
           from pathlib import Path
 
           path = Path('assets/js/analytics.js')
           text = path.read_text(encoding='utf-8')
-          connection_string = os.environ['APPINSIGHTS_CONNECTION_STRING']
-          if '__APPINSIGHTS_CONNECTION_STRING__' not in text:
+            placeholder = "'__APPINSIGHTS_CONNECTION_STRING__'"
+            connection_string_literal = json.dumps(os.environ['APPINSIGHTS_CONNECTION_STRING'])
+            if placeholder not in text:
               raise SystemExit('analytics placeholder not found')
-          path.write_text(text.replace('__APPINSIGHTS_CONNECTION_STRING__', connection_string), encoding='utf-8')
+            path.write_text(text.replace(placeholder, connection_string_literal), encoding='utf-8')
           PY
 
       - name: Upload artifact
