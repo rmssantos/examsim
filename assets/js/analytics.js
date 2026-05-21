@@ -85,6 +85,17 @@
         return String(window.location.pathname || '').replace(/[^/A-Za-z0-9_.-]/g, '').slice(0, 120) || '/';
     }
 
+    function currentPageUrl() {
+        try {
+            const url = new URL(window.location.href);
+            url.search = '';
+            url.hash = '';
+            return url.toString().slice(0, 500);
+        } catch (_) {
+            return currentPath();
+        }
+    }
+
     function normalizeString(value, maxLength = 80) {
         return String(value ?? '')
             .replace(/[\r\n\t]+/g, ' ')
@@ -196,6 +207,31 @@
         };
     }
 
+    function buildPageViewEnvelope(properties = {}, measurements = {}) {
+        const instrumentationKey = connection.InstrumentationKey;
+        const pageName = pageNameFromPath();
+        return {
+            time: new Date().toISOString(),
+            iKey: instrumentationKey,
+            name: `Microsoft.ApplicationInsights.${instrumentationKey}.Pageview`,
+            tags: {
+                'ai.cloud.role': 'github-pages',
+                'ai.operation.name': pageName
+            },
+            data: {
+                baseType: 'PageviewData',
+                baseData: {
+                    ver: 2,
+                    name: pageName,
+                    url: currentPageUrl(),
+                    duration: '00:00:00.000',
+                    properties: sanitizeProperties({ ...defaultProperties(), ...properties }),
+                    measurements: sanitizeMeasurements(measurements)
+                }
+            }
+        };
+    }
+
     function sendEnvelope(envelope) {
         if (!isEnabled()) return false;
 
@@ -220,7 +256,7 @@
     }
 
     function trackPageView() {
-        return trackEvent('page_view');
+        return sendEnvelope(buildPageViewEnvelope());
     }
 
     function trackExamStarted(examId, details = {}) {
@@ -423,7 +459,8 @@
             scoreBucket,
             durationBucket,
             fileSizeBucket,
-            buildEnvelope
+            buildEnvelope,
+            buildPageViewEnvelope
         })
     });
 
