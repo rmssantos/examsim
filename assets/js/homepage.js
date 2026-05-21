@@ -484,7 +484,7 @@ this.previewSubtitle.textContent = metadata.fullName || 'Ready when you are.';
 if (stats) {
 	this.previewLastScore.textContent = `${stats.lastScore}%`;
 	this.previewLastDate.textContent = stats.lastDate ? `Last attempt ${this.formatRelativeDate(stats.lastDate)}` : 'Recent attempt';
-	this.previewBestScore.textContent = stats.bestScore ? `${stats.bestScore}%` : '—';
+	this.previewBestScore.textContent = stats.bestScore != null ? `${stats.bestScore}%` : '—';
 	this.previewBestExam.textContent = `${stats.attempts} attempt${stats.attempts === 1 ? '' : 's'}`;
 	this.previewTimeSpent.textContent = this.formatDuration(stats.avgTime);
 	this.previewPassRate.textContent = stats.passRate != null ? `Pass rate ${stats.passRate}%` : 'Pass rate —';
@@ -577,7 +577,7 @@ const bestScore = document.getElementById('details-best-score');
 const passRate = document.getElementById('details-pass-rate');
 
 if (attempts) attempts.textContent = stats?.attempts || 0;
-if (bestScore) bestScore.textContent = stats?.bestScore ? `${stats.bestScore}%` : '—';
+if (bestScore) bestScore.textContent = stats?.bestScore != null ? `${stats.bestScore}%` : '—';
 if (passRate) passRate.textContent = stats?.passRate != null ? `${stats.passRate}%` : '—';
 }
 
@@ -623,7 +623,7 @@ return {
 	attempts: attempts.length,
 	lastScore: lastAttempt.score,
 	lastDate: lastAttempt.date,
-	bestScore: progress.bestScore || lastAttempt.score,
+	bestScore: progress.bestScore ?? lastAttempt.score,
 	avgTime,
 	passRate
 };
