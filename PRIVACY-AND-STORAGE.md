@@ -25,6 +25,8 @@ The public GitHub Pages deployment (`rmssantos.github.io/examsim`) sends limited
 - Import started/completed/failed counts
 - Progress export and editor import/export actions
 
+In Application Insights, page visits are recorded as native page views (`pageViews`). Product actions such as exam starts/completions and imports are recorded as custom events (`customEvents`).
+
 **Collected event properties:**
 - Public bundled exam ID (`ab730`, `ab731`, or `sc900`) or generic `imported`
 - Pass/fail result
