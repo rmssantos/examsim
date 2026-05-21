@@ -1842,7 +1842,7 @@ class MultiExamSimulator {
             const progress = JSON.parse(localStorage.getItem(examKey) || '{"attempts": [], "bestScore": 0, "totalPassed": 0}');
 
             document.getElementById('total-attempts').textContent = progress.attempts.length;
-            document.getElementById('best-score').textContent = progress.bestScore ? `${progress.bestScore}%` : '-';
+            document.getElementById('best-score').textContent = progress.attempts.length > 0 ? `${progress.bestScore || 0}%` : '-';
 
             const passRate = progress.attempts.length > 0 ?
                 Math.round((progress.totalPassed / progress.attempts.length) * 100) : 0;
@@ -1890,7 +1890,7 @@ class MultiExamSimulator {
             const passRateEl = document.getElementById('pass-rate');
 
             if (totalAttemptsEl) totalAttemptsEl.textContent = totalAttempts;
-            if (bestScoreEl) bestScoreEl.textContent = bestScoreOverall > 0 ? `${bestScoreOverall}%` : '-';
+            if (bestScoreEl) bestScoreEl.textContent = totalAttempts > 0 ? `${bestScoreOverall}%` : '-';
 
             const passRate = totalAttempts > 0 ? Math.round((totalPassed / totalAttempts) * 100) : 0;
             if (passRateEl) passRateEl.textContent = totalAttempts > 0 ? `${passRate}%` : '-';

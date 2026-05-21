@@ -32,6 +32,7 @@ this.totalQuestionsCount = document.getElementById('total-questions-count');
 this.imageSupportFlag = document.getElementById('image-support-flag');
 this.selectedExamId = null;
 this.availableExams = new Map();
+this.progressRefreshTimer = null;
 
 this.init();
 }
@@ -42,7 +43,8 @@ await this.loadAvailableExams();
 this.placeDetailsPanel();
 this.setupEventListeners();
 this.setupConfigModal();
-this.refreshHeroPreview();
+this.setupProgressRefreshListeners();
+this.refreshProgressUI();
 }
 
 updateLocalOnlyLinks() {
@@ -482,7 +484,7 @@ this.previewSubtitle.textContent = metadata.fullName || 'Ready when you are.';
 if (stats) {
 	this.previewLastScore.textContent = `${stats.lastScore}%`;
 	this.previewLastDate.textContent = stats.lastDate ? `Last attempt ${this.formatRelativeDate(stats.lastDate)}` : 'Recent attempt';
-	this.previewBestScore.textContent = stats.bestScore ? `${stats.bestScore}%` : '—';
+	this.previewBestScore.textContent = stats.bestScore != null ? `${stats.bestScore}%` : '—';
 	this.previewBestExam.textContent = `${stats.attempts} attempt${stats.attempts === 1 ? '' : 's'}`;
 	this.previewTimeSpent.textContent = this.formatDuration(stats.avgTime);
 	this.previewPassRate.textContent = stats.passRate != null ? `Pass rate ${stats.passRate}%` : 'Pass rate —';
@@ -527,6 +529,58 @@ this.previewActionLabel.textContent = this.selectedExamId ? 'Start practice now'
 }
 }
 
+setupProgressRefreshListeners() {
+window.addEventListener('storage', (event) => {
+if (event.storageArea === localStorage && this.isProgressStorageKey(event.key)) {
+	this.scheduleProgressRefresh();
+}
+});
+
+window.addEventListener('progress-updated', () => this.scheduleProgressRefresh());
+window.addEventListener('focus', () => this.scheduleProgressRefresh());
+window.addEventListener('pageshow', () => this.scheduleProgressRefresh());
+document.addEventListener('visibilitychange', () => {
+if (!document.hidden) this.scheduleProgressRefresh();
+});
+}
+
+isProgressStorageKey(key) {
+return key === null || key === window.ExamApp.STORAGE_KEYS.progress || String(key).endsWith('_progress');
+}
+
+scheduleProgressRefresh() {
+if (this.progressRefreshTimer) clearTimeout(this.progressRefreshTimer);
+this.progressRefreshTimer = setTimeout(() => {
+	this.progressRefreshTimer = null;
+	this.refreshProgressUI();
+}, 50);
+}
+
+refreshProgressUI() {
+if (typeof window.examSimulator?.updateProgressDisplay === 'function') {
+	window.examSimulator.updateProgressDisplay();
+}
+
+this.refreshSelectedExamProgress();
+this.refreshHeroPreview();
+}
+
+refreshSelectedExamProgress() {
+if (!this.selectedExamId) return;
+
+const placeholder = document.getElementById('exam-details-placeholder');
+if (!placeholder?.classList.contains('visible')) return;
+
+const stats = this.getProgressStats(this.selectedExamId);
+const attempts = document.getElementById('details-total-attempts');
+const bestScore = document.getElementById('details-best-score');
+const passRate = document.getElementById('details-pass-rate');
+
+if (attempts) attempts.textContent = stats?.attempts || 0;
+if (bestScore) bestScore.textContent = stats?.bestScore != null ? `${stats.bestScore}%` : '—';
+if (passRate) passRate.textContent = stats?.passRate != null ? `${stats.passRate}%` : '—';
+}
+
 updatePreviewHighlights(metadata, examData) {
 if (!this.previewHighlights) return;
 const chips = [];
@@ -569,7 +623,7 @@ return {
 	attempts: attempts.length,
 	lastScore: lastAttempt.score,
 	lastDate: lastAttempt.date,
-	bestScore: progress.bestScore || lastAttempt.score,
+	bestScore: progress.bestScore ?? lastAttempt.score,
 	avgTime,
 	passRate
 };
