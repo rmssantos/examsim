@@ -1,0 +1,59 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Inject analytics connection string
+        env:
+          APPINSIGHTS_CONNECTION_STRING: ${{ secrets.EXAMSIM_APPINSIGHTS_CONNECTION_STRING }}
+        run: |
+          if [ -z "$APPINSIGHTS_CONNECTION_STRING" ]; then
+            echo "Missing EXAMSIM_APPINSIGHTS_CONNECTION_STRING secret" >&2
+            exit 1
+          fi
+          python - <<'PY'
+            import json
+          import os
+          from pathlib import Path
+
+          path = Path('assets/js/analytics.js')
+          text = path.read_text(encoding='utf-8')
+            placeholder = "'__APPINSIGHTS_CONNECTION_STRING__'"
+            connection_string_literal = json.dumps(os.environ['APPINSIGHTS_CONNECTION_STRING'])
+            if placeholder not in text:
+              raise SystemExit('analytics placeholder not found')
+            path.write_text(text.replace(placeholder, connection_string_literal), encoding='utf-8')
+          PY
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
