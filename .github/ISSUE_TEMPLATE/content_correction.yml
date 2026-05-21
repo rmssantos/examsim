@@ -1,0 +1,62 @@
+name: Exam content correction
+description: Request a correction to public sample/study content without posting private dumps.
+title: "Content: "
+labels: [content]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this only for content already present in the public repository or original study content you are allowed to share. Do not paste official exam questions, proprietary dumps, private ZIPs, or licensed training material.
+
+  - type: input
+    id: exam_id
+    attributes:
+      label: Exam ID
+      placeholder: sc900, ab730, ab731
+    validations:
+      required: true
+
+  - type: input
+    id: question_id
+    attributes:
+      label: Question ID
+      description: Use the question id from the JSON file or editor.
+      placeholder: ab731-q042
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: What needs correction?
+      description: Describe the issue without copying official exam material.
+      placeholder: The explanation references an outdated product name.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed correction
+      description: Provide the wording or data change you recommend, using content you are allowed to share.
+    validations:
+      required: true
+
+  - type: textarea
+    id: source
+    attributes:
+      label: Source or rationale
+      description: Link to public documentation or explain the reasoning.
+      placeholder: Public Microsoft Learn page, product documentation, or objective domain reference.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: licensing
+    attributes:
+      label: Licensing confirmation
+      options:
+        - label: I am not posting proprietary exam content, official exam questions, or licensed dump material.
+          required: true
+        - label: The proposed correction is based on public documentation, original wording, or content I am allowed to share.
+          required: true
