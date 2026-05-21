@@ -3,7 +3,9 @@
 ## 🔒 Critical Information: Your Data Stays Local
 
 ### TL;DR
-**ALL user data is stored ONLY in the user's browser storage (`localStorage` and IndexedDB for image data). Nothing is sent to the server. Each user's data is completely isolated and private.**
+**Exam content, answers, progress, imports, and images stay in the user's browser storage (`localStorage` and IndexedDB for image data). Each user's study data is isolated and private.**
+
+The public GitHub Pages version uses aggregate analytics to understand visits and exam usage. It does not collect question text, answers, imported files, filenames, personal study data, names, emails, or a persistent visitor ID. Local/offline use does not send analytics.
 
 Editing and saving questions in the browser changes only that user's local copy. To publish exam corrections for everyone, export the updated JSON and open a pull request; to request a correction without editing JSON, open a GitHub issue.
 
@@ -12,6 +14,34 @@ Editing and saving questions in the browser changes only that user's local copy.
 ---
 
 ## How It Works
+
+### Online Analytics
+
+The public GitHub Pages deployment (`rmssantos.github.io/examsim`) sends limited aggregate events to Azure Application Insights / Azure Monitor. Analytics is enabled by default for the online site only and is not initialized on `localhost`, `127.0.0.1`, private self-hosted URLs, or `file://`.
+
+**Collected events:**
+- Page views for the home, exam, and editor pages
+- Exam started and exam completed counts
+- Import started/completed/failed counts
+- Progress export and editor import/export actions
+
+**Collected event properties:**
+- Public bundled exam ID (`ab730`, `ab731`, or `sc900`) or generic `imported`
+- Pass/fail result
+- Score bucket (`0-49`, `50-69`, `70-89`, `90-100`)
+- Duration bucket (`<5m`, `5-15m`, `15-30m`, `30m+`)
+- Question count and coarse file size/type buckets for imports
+
+**Not collected:**
+- Names, emails, or account identifiers
+- Persistent visitor IDs or custom session IDs
+- Question text, options, answers, explanations, or selected responses
+- Imported exam IDs, imported exam content, ZIP contents, filenames, or browser storage exports
+- Local progress history beyond aggregate completion events
+
+Analytics can be turned off from the small **Privacy settings** control on the online site. The preference is stored in `localStorage['exam_analytics_opt_out'] = 'true'` in that browser.
+
+The analytics workspace is configured with 30-day retention.
 
 ### Server Role
 The server ONLY serves static files:
@@ -23,7 +53,7 @@ The server ONLY serves static files:
 **The server does NOT:**
 - ❌ Store user data
 - ❌ Receive uploaded dumps
-- ❌ Track users
+- ❌ Track users in local/self-hosted mode
 - ❌ Share data between users
 - ❌ Send any data anywhere
 

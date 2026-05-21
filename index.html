@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="Exam Simulator - Practice for certification exams with interactive questions, timed tests, and detailed results">
-	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.applicationinsights.azure.com; object-src 'none'; base-uri 'self'; form-action 'self'">
 	<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📝</text></svg>">
 	<title>Exam Simulator Pro - Universal Exam Practice Platform</title>
 	<link rel="stylesheet" href="assets/css/style-new.css">
@@ -605,6 +605,7 @@
 
 	<!-- Scripts -->
 	<script src="assets/js/utils.js"></script>
+	<script src="assets/js/analytics.js"></script>
 	<script src="assets/js/image-storage.js"></script>
 	<script src="assets/js/image-loader.js"></script>
 	<script src="assets/js/exam-manager.js"></script>

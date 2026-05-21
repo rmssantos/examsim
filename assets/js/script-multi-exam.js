@@ -792,6 +792,10 @@ class MultiExamSimulator {
     this.setupKeyboardShortcuts();
     this.showQuestion(0);
 
+    window.ExamApp?.analytics?.trackExamStarted(this.currentExam, {
+        questionCount: this.activeQuestions.length
+    });
+
         // Switch to exam screen
         this.showScreen('exam-screen');
     }
@@ -1698,6 +1702,13 @@ class MultiExamSimulator {
 
         // Save progress
         this.saveProgress(score, passed, timeSpent);
+
+        window.ExamApp?.analytics?.trackExamCompleted(this.currentExam, {
+            score,
+            passed,
+            timeSpent,
+            questionCount: total
+        });
     }
 
     generateDetailedReview(page = 0) {
@@ -2074,6 +2085,8 @@ window.exportProgress = function() {
     } else {
         alert('Progress data exported successfully!');
     }
+
+    window.ExamApp?.analytics?.trackEvent('export_progress');
 };
 
 function showProgressModal(allProgress) {

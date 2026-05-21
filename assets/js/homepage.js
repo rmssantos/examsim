@@ -882,11 +882,14 @@ document.getElementById('hero-manage-exams')?.addEventListener('click', () => th
 
 async handleFiles(files) {
 for (const file of files) {
+window.ExamApp?.analytics?.trackImportStarted(file);
 try {
 	await this.importFile(file);
+	window.ExamApp?.analytics?.trackImportCompleted(file);
 } catch (error) {
 	this.hideImportProgress();
 	console.error(`Failed to import ${file.name}:`, error);
+	window.ExamApp?.analytics?.trackImportFailed(file, error.name || 'import_error');
 	window.showCustomAlert('Import Failed', `Failed to import ${file.name}: ${error.message}`, 'error');
 }
 }

@@ -612,6 +612,7 @@
 
     // Show success message with instructions
     showExportInstructions(examId, filename);
+    window.ExamApp?.analytics?.trackEvent('editor_export_questions');
   }
 
   function showExportInstructions(examId, filename){
@@ -696,6 +697,7 @@
           state.currentIndex = 0;
           renderList();
           renderForm();
+          window.ExamApp?.analytics?.trackEvent('editor_import_questions');
         } catch(err){
           alert('Invalid JSON: ' + err.message);
         }
