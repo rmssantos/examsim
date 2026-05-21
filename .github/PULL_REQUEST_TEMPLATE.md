@@ -1,6 +1,6 @@
 ## Summary
 
--
+<!-- Briefly describe what changed and why. -->
 
 ## Type of Change
 
@@ -28,8 +28,8 @@
 
 ## Validation
 
--
+<!-- List commands, browser checks, screenshots, or explain why validation is not needed. -->
 
 ## Notes for Reviewers
 
--
+<!-- Highlight risky files, follow-up work, or anything reviewers should focus on. -->
