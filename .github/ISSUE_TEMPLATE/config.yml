@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security issue
+    url: https://github.com/rmssantos/examsim/security/advisories/new
+    about: Please do not report suspected vulnerabilities in public issues. Use GitHub private vulnerability reporting when available.
+  - name: Privacy and storage model
+    url: https://github.com/rmssantos/examsim/blob/HEAD/PRIVACY-AND-STORAGE.md
+    about: Learn what is stored locally in the browser and what is never uploaded.

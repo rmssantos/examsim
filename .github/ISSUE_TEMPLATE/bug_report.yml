@@ -1,0 +1,93 @@
+name: Bug report
+description: Report a reproducible problem with the simulator.
+title: "Bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Exam Simulator. Please do not attach proprietary exam packs, official exam dumps, private ZIP files, or personal browser storage exports.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong?
+      placeholder: The homepage progress card does not update after finishing an exam.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the exact steps needed to trigger the issue.
+      placeholder: |
+        1. Start the local server with python server.py
+        2. Open index.html
+        3. Start AB-731
+        4. Finish the exam
+        5. Return to the homepage
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: The progress card updates immediately.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      placeholder: The progress card remains stale until the page is refreshed.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: How are you running the app?
+      options:
+        - Local Python server
+        - Static file:// mode
+        - GitHub Pages
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: Chrome 125, Edge 125, Firefox 126, Safari 17
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: Windows 11, macOS 14, Ubuntu 24.04
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Console errors
+      description: Paste relevant browser console errors. Remove private paths, exam content, and personal data.
+      render: text
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Content safety
+      options:
+        - label: I did not attach proprietary exam packs, official dumps, or private browser storage exports.
+          required: true
+        - label: I removed personal data and private file paths from logs/screenshots.
+          required: true

@@ -1,0 +1,59 @@
+name: Feature request
+description: Suggest a focused improvement to the simulator.
+title: "Feature: "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for product ideas, UX improvements, accessibility requests, or workflow enhancements. Please keep exam content and licensed materials out of public issues.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or workflow
+      description: What are you trying to do, and what is painful today?
+      placeholder: I want to review only questions I got wrong across multiple attempts.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior you would like to see.
+      placeholder: Add a filtered review mode that shows missed questions by exam and module.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Optional. Mention workarounds or other designs you considered.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Homepage and exam library
+        - Exam practice flow
+        - Question editor
+        - Import/export
+        - Images and storage
+        - Accessibility
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Project constraints
+      options:
+        - label: This request should preserve offline-first behavior.
+          required: true
+        - label: This request does not require adding proprietary or official exam content to the public repository.
+          required: true
