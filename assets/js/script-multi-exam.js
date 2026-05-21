@@ -625,39 +625,123 @@ class MultiExamSimulator {
             // Don't trigger if user is typing in an input
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-            switch(e.key) {
-                case 'ArrowLeft':
+            const questions = this.getCurrentQuestions();
+            const question = questions[this.currentQuestionIndex];
+            if (!question) return;
+            const questionType = window.ExamApp.normalizeQuestionType(question);
+
+            // Left/Right arrows for navigation
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                this.previousQuestion();
+                return;
+            }
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                this.nextQuestion();
+                return;
+            }
+            if (e.key === 'm' || e.key === 'M') {
+                this.toggleMarkForReviewShortcut();
+                return;
+            }
+
+            // Number/Letter keys mapping
+            let keyIndex = -1;
+            if (['1', 'a', 'A'].includes(e.key)) keyIndex = 0;
+            else if (['2', 'b', 'B'].includes(e.key)) keyIndex = 1;
+            else if (['3', 'c', 'C'].includes(e.key)) keyIndex = 2;
+            else if (['4', 'd', 'D'].includes(e.key)) keyIndex = 3;
+
+            if (questionType === 'SEQUENCE') {
+                const order = this.selectedAnswers[this.currentQuestionIndex] || [];
+                if (keyIndex !== -1 && keyIndex < order.length) {
+                    // Focus this sequence item position
+                    this.focusedSequencePos = keyIndex;
+                    const items = document.querySelectorAll('#options-container .sequence-item');
+                    items.forEach((item, idx) => {
+                        item.classList.toggle('keyboard-focused', idx === this.focusedSequencePos);
+                    });
+                } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
                     e.preventDefault();
-                    this.previousQuestion();
-                    break;
-                case 'ArrowRight':
+                    const items = document.querySelectorAll('#options-container .sequence-item');
+                    const currentItem = items[this.focusedSequencePos];
+                    if (currentItem) {
+                        if (e.key === 'ArrowUp') {
+                            const upBtn = currentItem.querySelector('.up');
+                            if (upBtn && !upBtn.disabled) {
+                                upBtn.click();
+                                this.focusedSequencePos = Math.max(0, this.focusedSequencePos - 1);
+                            }
+                        } else {
+                            const downBtn = currentItem.querySelector('.down');
+                            if (downBtn && !downBtn.disabled) {
+                                downBtn.click();
+                                this.focusedSequencePos = Math.min(items.length - 1, this.focusedSequencePos + 1);
+                            }
+                        }
+                        // Re-apply focus style after DOM update (render)
+                        setTimeout(() => {
+                            const newItems = document.querySelectorAll('#options-container .sequence-item');
+                            newItems.forEach((item, idx) => {
+                                item.classList.toggle('keyboard-focused', idx === this.focusedSequencePos);
+                            });
+                        }, 0);
+                    }
+                }
+            } else if (questionType === 'YES_NO_MATRIX') {
+                const rows = document.querySelectorAll('#options-container .yn-matrix .yn-row');
+                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
                     e.preventDefault();
-                    this.nextQuestion();
-                    break;
-                case 'a': case 'A': case '1':
-                    this.selectOptionByIndex(0);
-                    break;
-                case 'b': case 'B': case '2':
-                    this.selectOptionByIndex(1);
-                    break;
-                case 'c': case 'C': case '3':
-                    this.selectOptionByIndex(2);
-                    break;
-                case 'd': case 'D': case '4':
-                    this.selectOptionByIndex(3);
-                    break;
-                case 'm': case 'M':
-                    this.toggleMarkForReviewShortcut();
-                    break;
+                    if (rows.length > 0) {
+                        rows[this.focusedMatrixRow]?.classList.remove('keyboard-focused');
+                        if (e.key === 'ArrowUp') {
+                            this.focusedMatrixRow = Math.max(0, this.focusedMatrixRow - 1);
+                        } else {
+                            this.focusedMatrixRow = Math.min(rows.length - 1, this.focusedMatrixRow + 1);
+                        }
+                        rows[this.focusedMatrixRow]?.classList.add('keyboard-focused');
+                    }
+                } else {
+                    // Check for Yes/No selection on the focused row
+                    const currentRow = rows[this.focusedMatrixRow];
+                    if (currentRow) {
+                        if (['1', 'a', 'A', 'y', 'Y'].includes(e.key)) {
+                            const yesBtn = currentRow.querySelector('.yn-btn.yes');
+                            if (yesBtn) yesBtn.click();
+                        } else if (['2', 'b', 'B', 'n', 'N'].includes(e.key)) {
+                            const noBtn = currentRow.querySelector('.yn-btn.no');
+                            if (noBtn) noBtn.click();
+                        }
+                    }
+                }
+            } else {
+                // DRAG_DROP_SELECT, RADIO, CHECKBOX
+                if (keyIndex !== -1) {
+                    this.selectOptionByIndex(keyIndex);
+                }
             }
         };
         document.addEventListener('keydown', this._keyHandler);
     }
 
     selectOptionByIndex(index) {
-        const options = document.querySelectorAll('#options-container .option input');
-        if (options[index]) {
-            options[index].click();
+        const question = this.getCurrentQuestions()[this.currentQuestionIndex];
+        const questionType = window.ExamApp.normalizeQuestionType(question);
+        if (questionType === 'DRAG_DROP_SELECT') {
+            // Find if the option is already selected (in the target area)
+            const rmBtn = document.querySelector(`.ddselect-target .chip-remove[data-option-index="${index}"]`);
+            if (rmBtn) {
+                rmBtn.click();
+            } else {
+                const addBtn = document.querySelector(`.ddselect-source .ddselect-btn[data-option-index="${index}"]`);
+                if (addBtn) addBtn.click();
+            }
+        } else {
+            const options = document.querySelectorAll('#options-container .option input');
+            if (options[index]) {
+                options[index].click();
+            }
         }
     }
 
@@ -717,6 +801,8 @@ class MultiExamSimulator {
         if (index < 0 || index >= questions.length) return;
 
         this.currentQuestionIndex = index;
+        this.focusedSequencePos = 0;
+        this.focusedMatrixRow = 0;
     const question = questions[index];
 
         // Update question display
@@ -1121,6 +1207,11 @@ class MultiExamSimulator {
 
                     sequenceList.appendChild(item);
                 });
+
+                const items = sequenceList.querySelectorAll('.sequence-item');
+                if (items[this.focusedSequencePos]) {
+                    items[this.focusedSequencePos].classList.add('keyboard-focused');
+                }
             };
 
             render();
@@ -1196,6 +1287,11 @@ class MultiExamSimulator {
             };
             statements.forEach((s, i) => table.appendChild(renderRow(i, s)));
             container.appendChild(table);
+
+            const rows = table.querySelectorAll('.yn-row');
+            if (rows[this.focusedMatrixRow]) {
+                rows[this.focusedMatrixRow].classList.add('keyboard-focused');
+            }
             return;
         }
 
@@ -1232,6 +1328,7 @@ class MultiExamSimulator {
                         const btn = document.createElement('button');
                         btn.type = 'button';
                         btn.className = 'ddselect-btn';
+                        btn.dataset.optionIndex = idx;
                         btn.innerHTML = `<span class="option-letter">${String.fromCharCode(65 + idx)}</span><span class="option-text">${this.escapeHtml(opt)}</span>`;
                         btn.addEventListener('click', () => {
                             if (sel.length < required && !sel.includes(idx)) {
@@ -1250,6 +1347,7 @@ class MultiExamSimulator {
                     const rm = document.createElement('button');
                     rm.type = 'button';
                     rm.className = 'chip-remove';
+                    rm.dataset.optionIndex = idx;
                     rm.innerHTML = '<i class="fas fa-times"></i>';
                     rm.addEventListener('click', () => {
                         const i = sel.indexOf(idx);
@@ -1902,7 +2000,11 @@ window.showProgressStatistics = function() {
     }
 
     if (totalExams === 0) {
-        alert('No progress data found. Complete some exams first!');
+        if (typeof window.showCustomAlert === 'function') {
+            window.showCustomAlert('No Progress Found', 'Complete some exams first to start tracking your progress!', 'info');
+        } else {
+            alert('No progress data found. Complete some exams first!');
+        }
         return;
     }
 
@@ -1941,7 +2043,11 @@ window.exportProgress = function() {
     }
 
     if (Object.keys(allProgress).length === 0) {
-        alert('No progress data to export.');
+        if (typeof window.showCustomAlert === 'function') {
+            window.showCustomAlert('No Progress to Export', 'There is no progress history to export at this time.', 'info');
+        } else {
+            alert('No progress data to export.');
+        }
         return;
     }
 
@@ -1963,7 +2069,11 @@ window.exportProgress = function() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    alert('Progress data exported successfully!');
+    if (typeof window.showCustomAlert === 'function') {
+        window.showCustomAlert('Export Complete', 'Your progress history has been successfully exported.', 'success');
+    } else {
+        alert('Progress data exported successfully!');
+    }
 };
 
 function showProgressModal(allProgress) {
@@ -2081,15 +2191,6 @@ function calculateTrend(attempts) {
     return '➖';
 }
 
-function _escapeHtml(value) {
-    return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-
 function getExamName(examId) {
     if (window.userExams && window.userExams[examId] && window.userExams[examId].metadata) {
         return window.userExams[examId].metadata.name || examId.toUpperCase();
@@ -2103,7 +2204,11 @@ window.showExamAttempts = function(examId) {
     const attempts = progress.attempts || [];
 
     if (attempts.length === 0) {
-        alert('No attempts found for this exam.');
+        if (typeof window.showCustomAlert === 'function') {
+            window.showCustomAlert('No Attempts', 'You haven\'t started this exam yet.', 'info');
+        } else {
+            alert('No attempts found for this exam.');
+        }
         return;
     }
 

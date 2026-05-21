@@ -5,7 +5,7 @@ class ImageStorage {
     constructor() {
         this.dbName = 'ExamImagesDB';
         this.storeName = 'images';
-        this.version = 1;
+        this.version = 2;
         this.db = null;
         this.initPromise = this.init();
     }
@@ -32,12 +32,45 @@ class ImageStorage {
 
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
+                const transaction = event.target.transaction;
                 
-                // Create object store if it doesn't exist
+                // Create images store if it doesn't exist
                 if (!db.objectStoreNames.contains(this.storeName)) {
                     const objectStore = db.createObjectStore(this.storeName, { keyPath: 'key' });
                     objectStore.createIndex('examId', 'examId', { unique: false });
                     window.ExamApp.log('📦 Created IndexedDB object store for images');
+                }
+
+                // Create image_metadata store if it doesn't exist
+                const metadataStoreName = 'image_metadata';
+                if (!db.objectStoreNames.contains(metadataStoreName)) {
+                    const metadataStore = db.createObjectStore(metadataStoreName, { keyPath: 'key' });
+                    metadataStore.createIndex('examId', 'examId', { unique: false });
+                    window.ExamApp.log('📦 Created IndexedDB object store for image metadata');
+
+                    // If we are upgrading from version 1, migrate existing records
+                    if (event.oldVersion === 1) {
+                        const imagesStore = transaction.objectStore(this.storeName);
+                        const requestCursor = imagesStore.openCursor();
+                        requestCursor.onsuccess = (e) => {
+                            const cursor = e.target.result;
+                            if (cursor) {
+                                const record = cursor.value;
+                                const metadataRecord = {
+                                    key: record.key,
+                                    examId: record.examId,
+                                    fileName: record.fileName,
+                                    mimeType: record.mimeType,
+                                    size: record.size,
+                                    timestamp: record.timestamp || Date.now()
+                                };
+                                metadataStore.put(metadataRecord);
+                                cursor.continue();
+                            } else {
+                                window.ExamApp.log('✅ Migrated image metadata to new store');
+                            }
+                        };
+                    }
                 }
             };
         });
@@ -82,30 +115,42 @@ class ImageStorage {
         }
         
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.storeName], 'readwrite');
-            const objectStore = transaction.objectStore(this.storeName);
+            const transaction = this.db.transaction([this.storeName, 'image_metadata'], 'readwrite');
+            const imagesStore = transaction.objectStore(this.storeName);
+            const metadataStore = transaction.objectStore('image_metadata');
             
             const key = `${examId}_${fileName}`;
+            const timestamp = Date.now();
             
-            const record = {
+            const imageRecord = {
                 key: key,
                 examId: examId,
                 fileName: fileName,
                 blob: blob,
                 mimeType: mimeType,
                 size: blob.size,
-                timestamp: Date.now()
+                timestamp: timestamp
+            };
+
+            const metadataRecord = {
+                key: key,
+                examId: examId,
+                fileName: fileName,
+                mimeType: mimeType,
+                size: blob.size,
+                timestamp: timestamp
             };
             
-            const request = objectStore.put(record);
+            imagesStore.put(imageRecord);
+            metadataStore.put(metadataRecord);
             
-            request.onsuccess = () => {
+            transaction.oncomplete = () => {
                 resolve(key);
             };
             
-            request.onerror = () => {
-                console.error(`❌ Failed to store image ${fileName}:`, request.error);
-                reject(request.error);
+            transaction.onerror = () => {
+                console.error(`❌ Failed to store image ${fileName}:`, transaction.error);
+                reject(transaction.error);
             };
         });
     }
@@ -145,29 +190,43 @@ class ImageStorage {
     async deleteExamImages(examId) {
         await this.ensureReady();
         if (!window.ExamApp.isSafeExamId(examId)) return 0;
-        
+
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.storeName], 'readwrite');
-            const objectStore = transaction.objectStore(this.storeName);
-            const index = objectStore.index('examId');
-            
-            const request = index.openCursor(IDBKeyRange.only(examId));
+            const transaction = this.db.transaction([this.storeName, 'image_metadata'], 'readwrite');
+            const imagesStore = transaction.objectStore(this.storeName);
+            const metadataStore = transaction.objectStore('image_metadata');
+
+            const indexImages = imagesStore.index('examId');
+            const indexMetadata = metadataStore.index('examId');
+
             let deletedCount = 0;
-            
-            request.onsuccess = (event) => {
+
+            const reqImages = indexImages.openCursor(IDBKeyRange.only(examId));
+            reqImages.onsuccess = (event) => {
                 const cursor = event.target.result;
                 if (cursor) {
                     cursor.delete();
                     deletedCount++;
                     cursor.continue();
-                } else {
-                    window.ExamApp.log(`🗑️ Deleted ${deletedCount} images for exam: ${examId}`);
-                    resolve(deletedCount);
                 }
             };
-            
-            request.onerror = () => {
-                reject(request.error);
+
+            const reqMetadata = indexMetadata.openCursor(IDBKeyRange.only(examId));
+            reqMetadata.onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    cursor.delete();
+                    cursor.continue();
+                }
+            };
+
+            transaction.oncomplete = () => {
+                window.ExamApp.log(`🗑️ Deleted ${deletedCount} images for exam: ${examId}`);
+                resolve(deletedCount);
+            };
+
+            transaction.onerror = () => {
+                reject(transaction.error);
             };
         });
     }
@@ -176,8 +235,8 @@ class ImageStorage {
         await this.ensureReady();
         
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.storeName], 'readonly');
-            const objectStore = transaction.objectStore(this.storeName);
+            const transaction = this.db.transaction(['image_metadata'], 'readonly');
+            const objectStore = transaction.objectStore('image_metadata');
             const index = objectStore.index('examId');
             
             const request = index.count(IDBKeyRange.only(examId));
@@ -216,8 +275,8 @@ class ImageStorage {
         await this.ensureReady();
 
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.storeName], 'readonly');
-            const objectStore = transaction.objectStore(this.storeName);
+            const transaction = this.db.transaction(['image_metadata'], 'readonly');
+            const objectStore = transaction.objectStore('image_metadata');
 
             const stats = {
                 totalImages: 0,
@@ -264,18 +323,20 @@ class ImageStorage {
         await this.ensureReady();
         
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.storeName], 'readwrite');
-            const objectStore = transaction.objectStore(this.storeName);
+            const transaction = this.db.transaction([this.storeName, 'image_metadata'], 'readwrite');
+            const imagesStore = transaction.objectStore(this.storeName);
+            const metadataStore = transaction.objectStore('image_metadata');
             
-            const request = objectStore.clear();
+            imagesStore.clear();
+            metadataStore.clear();
             
-            request.onsuccess = () => {
-                window.ExamApp.log('🗑️ Cleared all images from IndexedDB');
+            transaction.oncomplete = () => {
+                window.ExamApp.log('🗑️ Cleared all images and metadata from IndexedDB');
                 resolve();
             };
             
-            request.onerror = () => {
-                reject(request.error);
+            transaction.onerror = () => {
+                reject(transaction.error);
             };
         });
     }

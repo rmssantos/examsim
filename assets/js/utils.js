@@ -264,3 +264,104 @@ window.ExamApp.validateExamData = function validateExamData(questions, metadata 
 };
 
 window.escapeHtml = escapeHtml;
+
+// Premium custom alert modal replacement for native alert()
+window.showCustomAlert = function(titleText, messageText, type = 'info') {
+    // Remove existing modal if any
+    const existing = document.getElementById('custom-alert-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'custom-alert-modal';
+    modal.className = 'progress-modal-overlay';
+    modal.style.zIndex = '11000'; // above everything
+
+    const content = document.createElement('div');
+    content.className = 'progress-modal-content custom-alert-animate';
+    content.style.maxWidth = '400px';
+    content.style.textAlign = 'center';
+    content.style.padding = '30px';
+    content.style.borderRadius = '16px';
+    content.style.boxShadow = '0 20px 50px rgba(0, 0, 0, 0.3)';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'progress-modal-close';
+    closeBtn.type = 'button';
+    closeBtn.innerHTML = '&times;';
+    closeBtn.addEventListener('click', () => modal.remove());
+    content.appendChild(closeBtn);
+
+    const iconWrapper = document.createElement('div');
+    iconWrapper.style.fontSize = '3.5rem';
+    iconWrapper.style.marginBottom = '20px';
+
+    const icon = document.createElement('i');
+    if (type === 'error') {
+        icon.className = 'fas fa-exclamation-circle';
+        iconWrapper.style.color = '#ef4444';
+        iconWrapper.style.textShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
+    } else if (type === 'success') {
+        icon.className = 'fas fa-check-circle';
+        iconWrapper.style.color = '#10b981';
+        iconWrapper.style.textShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+    } else if (type === 'warning') {
+        icon.className = 'fas fa-exclamation-triangle';
+        iconWrapper.style.color = '#f59e0b';
+        iconWrapper.style.textShadow = '0 4px 12px rgba(245, 158, 11, 0.3)';
+    } else {
+        icon.className = 'fas fa-info-circle';
+        iconWrapper.style.color = '#3b82f6';
+        iconWrapper.style.textShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+    }
+
+    iconWrapper.appendChild(icon);
+    content.appendChild(iconWrapper);
+
+    const title = document.createElement('h3');
+    title.style.margin = '0 0 10px 0';
+    title.style.fontSize = '1.3rem';
+    title.style.fontWeight = '700';
+    title.textContent = titleText;
+    content.appendChild(title);
+
+    const desc = document.createElement('p');
+    desc.style.margin = '0 0 24px 0';
+    desc.style.fontSize = '0.95rem';
+    desc.style.lineHeight = '1.5';
+    desc.style.color = 'var(--text-light, #64748b)';
+    desc.textContent = messageText;
+    content.appendChild(desc);
+
+    const actionBtn = document.createElement('button');
+    actionBtn.type = 'button';
+    actionBtn.style.padding = '10px 24px';
+    actionBtn.style.background = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
+    actionBtn.style.color = 'white';
+    actionBtn.style.border = 'none';
+    actionBtn.style.borderRadius = '8px';
+    actionBtn.style.fontSize = '0.9rem';
+    actionBtn.style.fontWeight = '600';
+    actionBtn.style.cursor = 'pointer';
+    actionBtn.style.transition = 'all 0.2s ease';
+    actionBtn.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.2)';
+    actionBtn.textContent = 'Got it';
+    actionBtn.addEventListener('click', () => modal.remove());
+
+    // Add hover effect
+    actionBtn.addEventListener('mouseover', () => {
+        actionBtn.style.transform = 'translateY(-1px)';
+        actionBtn.style.boxShadow = '0 6px 16px rgba(59, 130, 246, 0.3)';
+    });
+    actionBtn.addEventListener('mouseout', () => {
+        actionBtn.style.transform = 'translateY(0)';
+        actionBtn.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.2)';
+    });
+
+    content.appendChild(actionBtn);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+};

@@ -227,99 +227,7 @@ margin-bottom: 10px;
 .yn-result-row.ok .ans { color: #28a745; }
 .yn-result-row.bad .ans { color: #dc3545; }
 
-/* Exam Selection Styles */
-.exam-selection {
-display: flex;
-gap: 20px;
-justify-content: center;
-margin: 30px 0;
-flex-wrap: wrap;
-}
-
-.exam-card {
-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-border-radius: 16px;
-padding: 30px;
-color: white;
-text-align: center;
-cursor: pointer;
-transition: transform 0.3s ease, box-shadow 0.3s ease;
-min-width: 280px;
-position: relative;
-overflow: hidden;
-}
-
-.exam-card:hover {
-transform: translateY(-8px);
-box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-}
-
-
-.exam-card::before {
-content: '';
-position: absolute;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-background: rgba(255,255,255,0.1);
-opacity: 0;
-transition: opacity 0.3s ease;
-}
-
-.exam-card:hover::before {
-opacity: 1;
-}
-
-.exam-icon {
-font-size: 48px;
-margin-bottom: 15px;
-display: block;
-}
-
-.exam-title {
-font-size: 24px;
-font-weight: bold;
-margin-bottom: 8px;
-}
-
-.exam-subtitle {
-font-size: 14px;
-opacity: 0.9;
-margin-bottom: 20px;
-}
-
-.exam-stats {
-display: flex;
-justify-content: space-around;
-margin-top: 20px;
-}
-
-.exam-stat {
-text-align: center;
-}
-
-.exam-stat-number {
-font-size: 18px;
-font-weight: bold;
-display: block;
-}
-
-.exam-stat-label {
-font-size: 12px;
-opacity: 0.8;
-}
-
-.exam-badge {
-position: absolute;
-top: 15px;
-right: 15px;
-background: rgba(255,255,255,0.2);
-padding: 5px 10px;
-border-radius: 20px;
-font-size: 12px;
-font-weight: bold;
-}
+/* Exam Selection Styles - Obsolete layout rules removed, using homepage-styles.css instead */
 
 .current-exam-indicator {
 background-color: #28a745;
@@ -423,24 +331,6 @@ opacity: 0.7;
 pointer-events: none;
 }
 
-.exam-card .exam-delete {
-position: absolute;
-top: 10px;
-left: 10px;
-background: rgba(220, 53, 69, 0.8);
-border: none;
-border-radius: 50%;
-width: 30px;
-height: 30px;
-color: white;
-cursor: pointer;
-opacity: 0;
-transition: opacity 0.3s ease;
-}
-
-.exam-card:hover .exam-delete {
-opacity: 1;
-}
 /* Small tweak: show a hint for multi-select */
 .multi-select-hint { font-size: 12px; color: #6c757d; margin-bottom: 8px; }
 
@@ -578,3 +468,185 @@ opacity: 1;
 .dark-mode .config-exam-item.active { border-color: #22c55e; }
 [data-theme="dark"] .config-exam-desc,
 .dark-mode .config-exam-desc { color: #94a3b8; }
+
+/* Custom switch toggle styles for Manage Exams */
+.config-exam-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.config-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 4px 8px;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .config-toggle-wrapper,
+.dark-mode .config-toggle-wrapper {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.config-switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.config-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.config-slider {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #cbd5e1;
+    transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 20px;
+}
+
+.config-slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.config-switch input:checked + .config-slider {
+    background-color: #10b981;
+}
+
+.config-switch input:checked + .config-slider:before {
+    transform: translateX(18px);
+}
+
+[data-theme="dark"] .config-slider,
+.dark-mode .config-slider {
+    background-color: #475569;
+}
+
+.config-toggle-status {
+    font-size: 11px;
+    font-weight: 700;
+    color: #475569;
+    min-width: 42px;
+    text-align: center;
+    user-select: none;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+[data-theme="dark"] .config-toggle-status,
+.dark-mode .config-toggle-status {
+    color: #94a3b8;
+}
+
+/* Custom premium styles for Remove button in Manage Exams */
+.config-delete-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1.5px solid rgba(239, 68, 68, 0.2);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.config-delete-btn:hover {
+    background: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.config-delete-btn:active {
+    transform: translateY(0);
+}
+
+.config-delete-btn i {
+    font-size: 11px;
+}
+
+[data-theme="dark"] .config-delete-btn,
+.dark-mode .config-delete-btn {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .config-delete-btn:hover,
+.dark-mode .config-delete-btn:hover {
+    background: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
+}
+
+/* Make item itself look better */
+.config-exam-item {
+    transition: all 0.25s ease;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.config-exam-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .config-exam-item,
+.dark-mode .config-exam-item {
+    background: rgba(30, 41, 59, 0.6);
+    border-color: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.config-exam-item.active {
+    border-color: rgba(16, 185, 129, 0.35);
+}
+
+[data-theme="dark"] .config-exam-item.active,
+.dark-mode .config-exam-item.active {
+    border-color: rgba(16, 185, 129, 0.45);
+}
+
+/* Animations for premium alerts */
+@keyframes modalScaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.custom-alert-animate {
+    animation: modalScaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}

@@ -198,6 +198,7 @@ const deleteBtn = document.createElement('button');
 deleteBtn.className = 'exam-delete';
 deleteBtn.type = 'button';
 deleteBtn.title = 'Hide exam';
+deleteBtn.setAttribute('aria-label', 'Hide exam');
 deleteBtn.appendChild(this.createIcon('fas fa-eye-slash'));
 card.appendChild(deleteBtn);
 
@@ -448,7 +449,7 @@ this.scrollToExamLibrary();
 
 startSelectedExam() {
 if (!this.selectedExamId) {
-	alert('Please select an exam first.');
+	window.showCustomAlert('Select an Exam', 'Please select an exam card from the library before proceeding.', 'warning');
 	return;
 }
 
@@ -832,7 +833,7 @@ try {
 } catch (error) {
 	this.hideImportProgress();
 	console.error(`Failed to import ${file.name}:`, error);
-	alert(`Failed to import ${file.name}: ${error.message}`);
+	window.showCustomAlert('Import Failed', `Failed to import ${file.name}: ${error.message}`, 'error');
 }
 }
 
@@ -1175,14 +1176,30 @@ allExamIds.forEach(examId => {
 
 	const actions = document.createElement('div');
 	actions.className = 'config-exam-actions';
+
+	const toggleWrapper = document.createElement('div');
+	toggleWrapper.className = 'config-toggle-wrapper';
+
 	const label = document.createElement('label');
-	label.className = 'config-exam-toggle';
-	this.appendTextElement(label, 'span', 'config-exam-desc', isActive ? 'Active' : 'Hidden');
+	label.className = 'config-switch';
+
 	const checkbox = document.createElement('input');
 	checkbox.type = 'checkbox';
 	checkbox.checked = isActive;
+
+	const slider = document.createElement('span');
+	slider.className = 'config-slider';
+
 	label.appendChild(checkbox);
-	actions.appendChild(label);
+	label.appendChild(slider);
+
+	const statusText = document.createElement('span');
+	statusText.className = 'config-toggle-status';
+	statusText.textContent = isActive ? 'Active' : 'Hidden';
+
+	toggleWrapper.appendChild(label);
+	toggleWrapper.appendChild(statusText);
+	actions.appendChild(toggleWrapper);
 
 	const delBtn = document.createElement('button');
 	delBtn.type = 'button';
