@@ -1704,8 +1704,30 @@ class MultiExamSimulator {
             );
             const finishButton = createButton('exam-confirm-btn primary', 'fas fa-check', 'Finish Exam');
 
+            const appShell = document.querySelector('.container');
+            const hadAriaHidden = appShell?.hasAttribute('aria-hidden') || false;
+            const previousAriaHidden = appShell?.getAttribute('aria-hidden');
+            const supportsInert = Boolean(appShell && 'inert' in appShell);
+            const previousInert = supportsInert ? appShell.inert : false;
+
+            if (appShell) {
+                appShell.setAttribute('aria-hidden', 'true');
+                if (supportsInert) appShell.inert = true;
+            }
+
+            const getFocusableElements = () => Array.from(dialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+                .filter(element => !element.disabled && element.getAttribute('aria-hidden') !== 'true');
+
             const close = (returnFocus = true) => {
                 document.removeEventListener('keydown', handleKeydown);
+                if (appShell) {
+                    if (hadAriaHidden) {
+                        appShell.setAttribute('aria-hidden', previousAriaHidden);
+                    } else {
+                        appShell.removeAttribute('aria-hidden');
+                    }
+                    if (supportsInert) appShell.inert = previousInert;
+                }
                 overlay.remove();
                 if (returnFocus) document.getElementById('finish-exam')?.focus();
             };
@@ -1714,6 +1736,26 @@ class MultiExamSimulator {
                 if (event.key === 'Escape') {
                     event.preventDefault();
                     close();
+                    return;
+                }
+
+                if (event.key === 'Tab') {
+                    const focusableElements = getFocusableElements();
+                    if (focusableElements.length === 0) {
+                        event.preventDefault();
+                        return;
+                    }
+
+                    const firstElement = focusableElements[0];
+                    const lastElement = focusableElements[focusableElements.length - 1];
+
+                    if (event.shiftKey && (document.activeElement === firstElement || !dialog.contains(document.activeElement))) {
+                        event.preventDefault();
+                        lastElement.focus();
+                    } else if (!event.shiftKey && document.activeElement === lastElement) {
+                        event.preventDefault();
+                        firstElement.focus();
+                    }
                 }
             };
 
@@ -1889,7 +1931,7 @@ class MultiExamSimulator {
             const isYesNoMatrix = (questionType === 'YES_NO_MATRIX');
 
             const isCorrect = this.isAnswerCorrect(question, userAnswer);
-            const wasAnswered = userAnswer !== undefined && userAnswer !== null && (Array.isArray(userAnswer) ? userAnswer.length > 0 : true);
+            const wasAnswered = this.isAnswerProvided(userAnswer);
             const statusClass = !wasAnswered ? 'skipped' : (isCorrect ? 'correct' : 'incorrect');
             const statusIcon = !wasAnswered ? 'fa-minus-circle' : (isCorrect ? 'fa-check-circle' : 'fa-times-circle');
             const statusText = !wasAnswered ? 'Skipped' : (isCorrect ? 'Correct' : 'Incorrect');

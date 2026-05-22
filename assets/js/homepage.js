@@ -412,6 +412,23 @@ modulesList.innerHTML = '';
 modulesList.className = 'modules-list selectable-list';
 modulesList.dataset.exam = examId;
 
+const moduleQuestionCounts = new Map();
+examData.questions.forEach(question => {
+	const moduleKey = this.normalizeModuleName(question.module).toLowerCase();
+	if (!moduleKey) return;
+	moduleQuestionCounts.set(moduleKey, (moduleQuestionCounts.get(moduleKey) || 0) + 1);
+});
+
+const setModuleChecked = (item, checked) => {
+	item.classList.toggle('checked', checked);
+	item.setAttribute('aria-checked', String(checked));
+};
+
+const toggleModuleItem = item => {
+	setModuleChecked(item, !item.classList.contains('checked'));
+	this.updateSelectedQuestionsCount(examId);
+};
+
 // Clear any existing controls first to avoid duplicates
 const existingControls = modulesSection.querySelector('.modules-select-controls');
 if (existingControls) {
@@ -446,11 +463,14 @@ metadata.modules.forEach(module => {
 	const name = this.normalizeModuleName(module);
 	if (!name) return;
 	const iconClass = typeof module === 'string' ? 'fas fa-graduation-cap' : module.icon || 'fas fa-graduation-cap';
-	const qCount = examData.questions.filter(q => q.module && q.module.trim().toLowerCase() === name.trim().toLowerCase()).length;
+	const qCount = moduleQuestionCounts.get(name.toLowerCase()) || 0;
 
 	const li = document.createElement('li');
 	li.className = 'checked';
 	li.dataset.module = name;
+	li.tabIndex = 0;
+	li.setAttribute('role', 'checkbox');
+	li.setAttribute('aria-checked', 'true');
 
 	const contentWrapper = document.createElement('div');
 	contentWrapper.className = 'module-item-content';
@@ -480,9 +500,12 @@ metadata.modules.forEach(module => {
 	li.appendChild(contentWrapper);
 	li.appendChild(badgeSpan);
 
-	li.addEventListener('click', () => {
-		li.classList.toggle('checked');
-		this.updateSelectedQuestionsCount(examId);
+	li.addEventListener('click', () => toggleModuleItem(li));
+	li.addEventListener('keydown', event => {
+		if (event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			toggleModuleItem(li);
+		}
 	});
 
 	modulesList.appendChild(li);
@@ -490,12 +513,12 @@ metadata.modules.forEach(module => {
 
 // Click handlers for Select All / Deselect All
 selectAllBtn.addEventListener('click', () => {
-	modulesList.querySelectorAll('li').forEach(li => li.classList.add('checked'));
+	modulesList.querySelectorAll('li').forEach(li => setModuleChecked(li, true));
 	this.updateSelectedQuestionsCount(examId);
 });
 
 selectNoneBtn.addEventListener('click', () => {
-	modulesList.querySelectorAll('li').forEach(li => li.classList.remove('checked'));
+	modulesList.querySelectorAll('li').forEach(li => setModuleChecked(li, false));
 	this.updateSelectedQuestionsCount(examId);
 });
 
@@ -603,7 +626,9 @@ updateSelectedQuestionsCount(examId) {
 		return;
 	}
 
-	const selectedModuleNames = Array.from(checkedItems).map(li => li.dataset.module.toLowerCase());
+	const selectedModuleNames = Array.from(checkedItems)
+		.map(li => this.normalizeModuleName(li.dataset.module).toLowerCase())
+		.filter(Boolean);
 
 	const selectedPoolCount = examData.questions.filter(q => {
 		return q.module && selectedModuleNames.includes(q.module.trim().toLowerCase());
