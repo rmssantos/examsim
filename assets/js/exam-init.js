@@ -1,4 +1,4 @@
-// Close exam tab or navigate to homepage
+﻿// Close exam tab or navigate to homepage
 window.ExamApp = window.ExamApp || {};
 window.ExamApp.externalExamBootstrap = true;
 document.body.dataset.examInitManaged = 'true';
@@ -6,7 +6,7 @@ document.body.dataset.examInitManaged = 'true';
 function closeExamTab() {
   // Try to close the tab (works if opened via window.open)
   window.close();
-  
+
   // If close() didn't work (tab still open), redirect after small delay
   setTimeout(() => {
     if (!window.closed) {
@@ -90,18 +90,74 @@ document.addEventListener('DOMContentLoaded', async function() {
         };
       }
 
+      // Check for modules URL parameter
+      const modulesParam = params.get('modules');
+      let questions = examData.questions;
+      let isCustomModulePractice = false;
+      let selectedModules = [];
+      let fullName = metadata.fullName || `Custom Exam: ${examId}`;
+
+      const originalQuestionCount = Math.max(1, metadata.questionCount || Math.min(examData.questions.length, 45));
+      const originalDuration = metadata.duration || 60;
+      const normalizeRequestedModule = value => String(value ?? '').trim().slice(0, 120);
+
+      let questionCount = originalQuestionCount;
+      let duration = originalDuration;
+
+      if (modulesParam) {
+        let parsed = null;
+        if (modulesParam.trim().startsWith('[')) {
+          try {
+            parsed = JSON.parse(modulesParam);
+          } catch (e) {
+            window.ExamApp.warn('Failed to parse modules parameter as JSON:', e);
+          }
+        }
+        if (Array.isArray(parsed)) {
+          selectedModules = parsed.map(normalizeRequestedModule).filter(Boolean);
+        } else {
+          selectedModules = modulesParam.split(',').map(normalizeRequestedModule).filter(Boolean);
+        }
+        selectedModules = Array.from(new Set(selectedModules)).slice(0, 50);
+        if (selectedModules.length > 0) {
+          const selectedModulesLower = selectedModules.map(m => m.toLowerCase());
+          questions = examData.questions.filter(q => {
+            return q.module && selectedModulesLower.includes(q.module.trim().toLowerCase());
+          });
+
+          if (questions.length > 0) {
+            isCustomModulePractice = true;
+            // Append Module Practice suffix
+            fullName = `${metadata.fullName || 'Practice Exam'} - Module Practice`;
+
+            // Scale target question count
+            questionCount = Math.min(questions.length, originalQuestionCount);
+
+            // Scale timer duration proportionally (minimum 5 minutes)
+            duration = Math.max(5, Math.round(questionCount * (originalDuration / originalQuestionCount)));
+          } else {
+            // Fallback to all questions if selection somehow mapped to 0
+            questions = examData.questions;
+          }
+        }
+      }
+
       // Load exam into simulator
       window.examSimulator.examData[examId] = {
-        name: metadata.name,
-        fullName: metadata.fullName,
-        duration: metadata.duration,
-        questionCount: metadata.questionCount,
-        passScore: metadata.passScore,
-        questions: examData.questions,
-        modules: metadata.modules || []
+        name: metadata.name || examId.toUpperCase(),
+        fullName: fullName,
+        duration: duration,
+        questionCount: questionCount,
+        passScore: metadata.passScore || 70,
+        questions: questions,
+        modules: metadata.modules || [],
+        selectedModules: isCustomModulePractice ? selectedModules : null
       };
 
-      window.ExamApp.log(`✅ Loaded ${examData.questions.length} questions for ${examId}`);
+      window.ExamApp.log(`✅ Loaded ${questions.length} questions for ${examId} (Session Target: ${questionCount}, Duration: ${duration} mins)`);
+      if (isCustomModulePractice) {
+        window.ExamApp.log(`🎯 Module Practice Mode. Selected modules: ${selectedModules.join(', ')}`);
+      }
       window.examSimulator.startExam();
     }
   } else {
