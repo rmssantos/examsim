@@ -98,8 +98,6 @@ http://localhost:8000/editor.html
 
 ## 📦 Importing Exams
 
-![Importing Exams](assets/media/importing_and_editing.gif)
-
 ### Automatic (Server Mode)
 
 Place exam folders in `user-content/exams/`:
@@ -193,8 +191,6 @@ Click "Export Progress" to download:
 ---
 
 ## 📝 Creating Questions
-
-![Creating Questions](assets/media/creating_exam.gif)
 
 ### Using the Editor
 
@@ -360,10 +356,11 @@ localStorage['theme']
 ## 📚 More Resources
 
 - **README.md** - Full documentation with all features
+- **docs/Data-and-Dumps.md** - Question schema and data format reference
 - **docs/HOW-TO-DISTRIBUTE.md** - Distribution guide
+- **docs/Troubleshooting.md** - Troubleshooting reference
 - **CONTRIBUTING.md** - How to contribute
 - **user-content/README-IMPORT.md** - Detailed import instructions
-- **docs/** - Technical documentation
 
 ---
 

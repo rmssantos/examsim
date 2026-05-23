@@ -42,19 +42,17 @@ The **Exam Simulator** is a self-contained, browser-based exam practice platform
 
 ### ⚠️ Content Safety & Licensing
 
-- **No official dumps are stored in this repo.** The public SC-900 pack is educational sample content for learning and UI validation, not an official exam dump.
+- **No official dumps are stored in this repo.** The public sample packs (for example `sc900`, `ab730`, and `ab731`) are educational sample content for learning and UI validation, not official exam dumps.
 - **Licensed exam content must live in a private location** (private Git repo, encrypted drive, SharePoint, etc.). Drag/drop or copy them locally when you study.
 - **Recommended workflow:**
   1. Keep this sanitized repo public for the simulator.
   2. Maintain a private repo or storage bucket that contains your proprietary exam packs (e.g., `my-exam-pack.zip`).
   3. When teammates need the full kit, give them (a) the public simulator zip and (b) secure links to the private exam packs.
-- `.gitignore` keeps the public `sc900` educational sample and `user-content/exams/index.json`, while blocking other local exam packs and loose `images/` assets by default.
+- `.gitignore` keeps the bundled educational sample packs and `user-content/exams/index.json`, while blocking other local exam packs and loose `images/` assets by default.
 
 ---
 
 ## 🚀 Quick Start
-
-![Creating an Exam](assets/media/creating_exam.gif)
 
 ### Option 0: Portable Zip (Zero Install)
 
@@ -119,20 +117,14 @@ portable/
 ├── assets/
 │   ├── css/                # App stylesheets
 │   ├── js/                 # Browser runtime scripts
-│   ├── media/              # Documentation/demo media
 │   └── vendor/             # Vendored offline dependencies
 ├── tools/
 │   ├── image-inspector.html
 │   └── generate-exam-data-js.py
-├── docs/                   # Documentation folder
-│   ├── css-architecture.md
-│   ├── HOW-TO-DISTRIBUTE.md
-│   ├── IMAGE-STORAGE-MIGRATION.md
-│   ├── compliance-summary.md
+├── docs/                   # Public documentation
 │   ├── Data-and-Dumps.md
-│   ├── public-repo-plan.md
-│   ├── Troubleshooting.md
-│   └── UI-UX.md
+│   ├── HOW-TO-DISTRIBUTE.md
+│   └── Troubleshooting.md
 ├── exam-dumps/             # Custom exam files folder
 │   └── README.md
 └── user-content/
@@ -140,7 +132,9 @@ portable/
     ├── imports/            # Temporary import staging area
     └── exams/              # Public sample + local/imported exam packs
       ├── index.json      # Static exam index for GitHub Pages
-      └── sc900/          # Educational sample exam
+      ├── sc900/          # Educational sample exam
+      ├── ab730/          # Educational sample exam
+      └── ab731/          # Educational sample exam
 ```
 
 ---
@@ -166,8 +160,6 @@ portable/
 ---
 
 ## 📦 Importing Exams
-
-![Importing and Editing Exams](assets/media/importing_and_editing.gif)
 
 ### Method 1: Automatic Detection (Server Mode Only)
 
@@ -595,9 +587,10 @@ python server.py
 
 - **README.md** (this file) - Main documentation
 - **QUICKSTART.md** - Quick start guide
+- **docs/Data-and-Dumps.md** - Question schema and data format reference
 - **docs/HOW-TO-DISTRIBUTE.md** - Distribution guide
+- **docs/Troubleshooting.md** - Troubleshooting reference
 - **user-content/README-IMPORT.md** - Import instructions
-- **docs/** - Additional technical documentation
 
 ---
 
@@ -663,7 +656,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For issues, questions, or feature requests:
 - Open an issue on [GitHub](https://github.com/rmssantos/examsim/issues)
 - Check the [Troubleshooting](#-troubleshooting) section
-- Review documentation in `docs/` folder
+- Review the public documentation in `docs/`
 
 ---
 

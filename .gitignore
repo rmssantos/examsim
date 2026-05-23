@@ -64,7 +64,7 @@ build/
 coverage/
 .nyc_output/
 
-# Local configuration
+# Local configuration, private development notes, and heavy demo media
 config.local.js
 settings.local.json
 infra/
