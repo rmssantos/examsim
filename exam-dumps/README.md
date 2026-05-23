@@ -12,7 +12,7 @@ This folder is for storing custom exam question files that can be loaded into th
    - Enter your exam code (e.g., `myexam`)
    - Click **Load** to import the questions from `exam-dumps/myexam.json`
 
-3. The simulator stores questions in browser localStorage under the key:
+3. The simulator stores questions locally in browser storage. Current versions use IndexedDB for imported content and may keep this legacy localStorage key for compatibility:
    ```
    custom_<exam-code>_questions
    ```
@@ -40,6 +40,6 @@ See [docs/Data-and-Dumps.md](../docs/Data-and-Dumps.md) for complete schema docu
 ## Notes
 
 - **Custom exams are NOT automatically loaded** - you must explicitly load them via the editor
-- After loading and editing in the editor, click **Save** to persist to localStorage
+- After loading and editing in the editor, click **Save** to persist to browser storage
 - Questions persist in your browser even after closing the tab
 - To share your custom exam, export it as JSON from the editor

@@ -187,7 +187,7 @@ user-content/exams/<exam-id>/
 
 1. Open the simulator in your browser
 2. Drag a `dump.json` file anywhere on the homepage
-3. The exam is imported and stored in `localStorage`
+3. The exam is imported and stored locally in browser storage
 4. A card appears immediately (may show generic metadata)
 
 You can also drop `.zip` exam packs. The simulator will read `dump.json`/`metadata.json` automatically and remind you to copy any bundled images into `user-content/exams/<examId>/images/`.
@@ -206,7 +206,7 @@ You can also drop `.zip` exam packs. The simulator will read `dump.json`/`metada
    - Sequence ordering
    - Y/N matrices
 4. Add images, explanations, and metadata
-5. Save local changes (auto-syncs to this browser's `localStorage` and `window.userExams`)
+5. Save local changes (auto-syncs to this browser's storage and `window.userExams`)
 6. Export as JSON to share or prepare a repository contribution
 
 Editor saves are local to the current browser. They do not change the public GitHub Pages site or affect other users. To make a correction available to everyone, export the updated JSON and open a pull request. If you only want to request a correction, open a GitHub issue with the exam ID, question ID, and suggested change.
@@ -296,31 +296,42 @@ Control which exams appear on the homepage:
 
 ## 📊 Data Storage
 
-### Dual Storage Strategy
+### Local Browser Storage Strategy
 
-Questions are stored in two locations for reliability:
+User-owned data stays in the browser. Larger records use IndexedDB; small settings and legacy compatibility data use `localStorage`.
 
-1. **localStorage** - `custom_${examId}_questions`
+1. **IndexedDB** - `ExamContentDB`
+  - Stores imported questions, metadata, and detailed progress
    - Persistent across browser sessions
    - Survives page refreshes
-   - Limited to ~5-10MB per origin
+  - Better suited to larger local exam packs than `localStorage`
 
-2. **window.userExams** - In-memory object
+2. **localStorage**
+  - Stores small settings such as theme, activation config, and analytics opt-out
+  - Keeps legacy `custom_${examId}_questions`, `exam_metadata_${examId}`, and `${examId}_progress` mirrors when practical for backwards compatibility
+
+3. **window.userExams** - In-memory object
    - Available immediately without reload
    - Used for live exam sessions
-   - Cleared on page refresh (reloaded from localStorage)
+  - Cleared on page refresh (reloaded from browser storage)
 
 ### Storage Keys
 
 ```javascript
 const examId = 'your-exam-id';
 
-// Questions & metadata
+// Questions, metadata, and detailed progress
+IndexedDB['ExamContentDB'].exams;
+IndexedDB['ExamContentDB'].progress;
+
+// Legacy compatibility mirrors
 localStorage[`custom_${examId}_questions`];
 localStorage[`exam_metadata_${examId}`];
-
-// Progress tracking (per exam)
 localStorage[`${examId}_progress`];
+
+// Images
+IndexedDB['ExamImagesDB'].images;
+IndexedDB['ExamImagesDB'].image_metadata;
 
 // Global settings
 localStorage['exam_activation_config'];
@@ -406,11 +417,11 @@ localStorage['theme'];
 ### Save Not Persisting in Editor
 
 **Causes:**
-- Browser localStorage disabled
+- Browser storage disabled
 - Storage quota exceeded
 
 **Solutions:**
-1. Check browser settings (allow localStorage)
+1. Check browser settings (allow site data / browser storage)
 2. Clear old exam data to free space
 3. Export questions as JSON backup
 4. Reload page and try again

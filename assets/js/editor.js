@@ -24,15 +24,7 @@
 
   // Load master data from window.userExams or examManager
   function loadMaster(exam){
-    // Try loading from examManager first (supports all exams including localStorage)
-    if (window.examManager) {
-      const examData = window.examManager.loadFromLocalStorage(exam);
-      if (examData && examData.questions && Array.isArray(examData.questions)) {
-        return deepClone(examData.questions);
-      }
-    }
-
-    // Try loading from window.userExams (new system)
+    // Try loading from window.userExams first (populated by exam-loader from server and browser storage)
     if (window.userExams && window.userExams[exam]) {
       const examData = window.userExams[exam];
       if (examData.questions && Array.isArray(examData.questions)) {
@@ -487,7 +479,7 @@
     }
   }
 
-  function saveAll(){
+  async function saveAll(){
     syncFromForm();
     const examId = state.exam === 'custom' && state.customCode ? state.customCode : state.exam;
     if (!examId) { notify('Select or load an exam first'); return; }
@@ -497,30 +489,53 @@
       notify(`Cannot save: ${validation.errors[0]}`);
       return;
     }
-    const key = `custom_${examId}_questions`;
-
-    window.ExamApp.log('Saving to localStorage:', key);
+    window.ExamApp.log('Saving exam to browser storage:', examId);
     window.ExamApp.log('Exam ID:', examId);
     window.ExamApp.log('Number of questions:', state.items.length);
     window.ExamApp.log('Current question:', state.filtered[state.currentIndex]);
 
-    // Save to localStorage
-    localStorage.setItem(key, JSON.stringify(state.items));
+    const existingMetadata = window.userExams?.[examId]?.metadata;
+    const finalMetadata = existingMetadata || (window.examManager
+      ? window.examManager.generateMetadata(examId, state.items)
+      : null);
+
+    let savedToIndexedDB = false;
+    if (window.ExamApp.examStorage) {
+      try {
+        savedToIndexedDB = await window.ExamApp.examStorage.putExam(examId, state.items, finalMetadata, { source: 'editor' });
+      } catch (error) {
+        window.ExamApp.warn(`IndexedDB save failed for ${examId}, trying legacy storage:`, error);
+      }
+    }
+
+    try {
+      if (window.ExamApp.examStorage) {
+        window.ExamApp.examStorage.putLegacyExam(examId, state.items, finalMetadata);
+      } else {
+        localStorage.setItem(`custom_${examId}_questions`, JSON.stringify(state.items));
+        if (finalMetadata) localStorage.setItem(`exam_metadata_${examId}`, JSON.stringify(finalMetadata));
+      }
+    } catch (error) {
+      if (!savedToIndexedDB) {
+        notify(error?.name === 'QuotaExceededError' ? 'Browser storage is full. Export your edits before adding more content.' : 'Could not save this exam in browser storage.');
+        return;
+      }
+      window.ExamApp.warn(`Legacy localStorage mirror skipped for ${examId}:`, error);
+    }
     window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.exams, examId);
 
     // Also update window.userExams so changes are immediately available
     if (!window.userExams) window.userExams = {};
     if (!window.userExams[examId]) window.userExams[examId] = {};
     window.userExams[examId].questions = state.items;
+    window.userExams[examId].storage = savedToIndexedDB ? 'indexedDB' : 'localStorage';
 
     // Preserve or generate metadata
-    if (!window.userExams[examId].metadata && window.examManager) {
-      window.userExams[examId].metadata = window.examManager.generateMetadata(examId, state.items);
-      // Save metadata to localStorage as well
-      localStorage.setItem(`exam_metadata_${examId}`, JSON.stringify(window.userExams[examId].metadata));
+    if (finalMetadata) {
+      window.userExams[examId].metadata = finalMetadata;
     }
 
-    window.ExamApp.log('✅ Saved successfully to localStorage and window.userExams');
+    window.ExamApp.log('✅ Saved successfully to browser storage and window.userExams');
 
     // Mark as saved and update hash
     state.hasUnsavedChanges = false;
@@ -558,15 +573,16 @@
         <li>For a direct contribution, open a pull request replacing <code>user-content/exams/${safeExamId}/dump.json</code>.</li>
         <li>If you only want to suggest a correction, open a GitHub issue with exam ID <code>${safeExamId}</code>, question ID, current text, and proposed correction.</li>
       </ol>
-      <small style="opacity:0.8;">Until then, edits live in this browser's localStorage.</small>
+      <small style="opacity:0.8;">Until then, edits live in this browser's local storage.</small>
     `;
 
     // Only show hint if there are actual changes saved
-    const hasLocalStorageChanges = localStorage.getItem(`custom_${examId}_questions`) !== null;
+    const hasLocalStorageChanges = localStorage.getItem(`custom_${examId}_questions`) !== null
+      || window.userExams?.[examId]?.storage === 'indexedDB';
     hint.style.display = hasLocalStorageChanges ? 'block' : 'none';
   }
 
-  function clearOverride(){
+  async function clearOverride(){
     const examId = state.exam === 'custom' && state.customCode ? state.customCode : state.exam;
     const key = `custom_${examId}_questions`;
     const metaKey = `exam_metadata_${examId}`;
@@ -577,6 +593,9 @@
 
     localStorage.removeItem(key);
     localStorage.removeItem(metaKey);
+    if (window.ExamApp.examStorage) {
+      await window.ExamApp.examStorage.deleteExamContent(examId);
+    }
 
     // Reload from master (original data)
     state.items = loadMaster(examId);

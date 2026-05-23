@@ -182,18 +182,20 @@ In `dump.json`:
 
 ## Storage Locations
 
-### localStorage Keys
+### Browser Storage
 
-The simulator uses browser localStorage for persistence:
+The simulator uses browser storage for local persistence. Imported exam content and detailed progress are stored in IndexedDB, with legacy localStorage mirrors read for backwards compatibility:
 
 ```javascript
 const examId = 'your-exam-id';
 
-// Questions & metadata
+// Questions, metadata, and detailed progress
+IndexedDB['ExamContentDB'].exams;
+IndexedDB['ExamContentDB'].progress;
+
+// Legacy compatibility mirrors
 localStorage[`custom_${examId}_questions`];
 localStorage[`exam_metadata_${examId}`];
-
-// Progress
 localStorage[`${examId}_progress`];
 
 // Settings
@@ -280,7 +282,7 @@ From the editor:
 
 **Method 1: Drag & Drop**
 1. Drag JSON file onto homepage
-2. Questions saved to localStorage
+2. Questions saved to browser storage
 3. Exam card appears
 
 **Method 2: Manual Placement**

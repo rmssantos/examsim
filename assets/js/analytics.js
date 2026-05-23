@@ -349,6 +349,13 @@
         });
     }
 
+    function trackStorageMigration(dataType = 'unknown', status = 'unknown') {
+        return trackEvent('storage_migration', {
+            data_type: normalizeString(dataType, 40) || 'unknown',
+            status: normalizeString(status, 40) || 'unknown'
+        });
+    }
+
     function setOptOut(disabled) {
         const persisted = disabled
             ? safeLocalStorageSet(CONFIG.optOutKey, 'true')
@@ -506,6 +513,7 @@
         trackImportStarted,
         trackImportCompleted,
         trackImportFailed,
+        trackStorageMigration,
         setOptOut,
         isEnabled,
         isOptedOut,
