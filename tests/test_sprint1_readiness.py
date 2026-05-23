@@ -22,6 +22,14 @@ class Sprint1ReadinessTests(unittest.TestCase):
         ):
             self.assertIn(path, text)
 
+    def test_service_worker_network_first_falls_back_to_all_caches(self):
+        text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
+        start = text.index("async function networkFirst")
+        end = text.index("self.addEventListener('install'", start)
+        network_first = text[start:end]
+
+        self.assertIn("await caches.match(request)", network_first)
+
     def test_pwa_registration_exposes_update_available_prompt(self):
         text = (ROOT / "assets/js/pwa.js").read_text(encoding="utf-8")
 
@@ -94,6 +102,54 @@ class Sprint1ReadinessTests(unittest.TestCase):
 
         self.assertNotEqual(result.returncode, 0, result.stdout)
         self.assertIn("YES_NO_MATRIX answers must be 0 or 1", result.stdout)
+
+    def test_exam_pack_validator_rejects_backslash_image_filenames(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "exams"
+            exam_dir = root / "badimage"
+            exam_dir.mkdir(parents=True)
+            (root / "index.json").write_text(json.dumps(["badimage"]), encoding="utf-8")
+            (exam_dir / "metadata.json").write_text(
+                json.dumps(
+                    {
+                        "id": "badimage",
+                        "name": "Bad Image",
+                        "questionCount": 1,
+                        "totalQuestions": 1,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (exam_dir / "dump.json").write_text(
+                json.dumps(
+                    [
+                        {
+                            "id": 1,
+                            "question": "Reject unsafe image filenames.",
+                            "options": ["A", "B"],
+                            "correct": 0,
+                            "question_images": [{"filename": "foo\\bar.png"}],
+                        }
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "tools/validate-exam-packs.py",
+                    "--root",
+                    str(root),
+                ],
+                cwd=ROOT,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+            )
+
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        self.assertIn("invalid image filename 'foo\\\\bar.png'", result.stdout)
 
     def test_docs_describe_current_yes_no_matrix_schema_and_study_mode_status(self):
         data_docs = (ROOT / "docs/Data-and-Dumps.md").read_text(encoding="utf-8")

@@ -110,7 +110,7 @@ async function networkFirst(request) {
     if (response.ok) await putRuntimeCache(cache, request, response);
     return response;
   } catch (error) {
-    const cached = await cache.match(request);
+    const cached = await caches.match(request);
     if (cached) return cached;
     throw error;
   }
