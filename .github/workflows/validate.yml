@@ -1,0 +1,41 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sprint-1-readiness:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Compile Python tools
+        run: python -m py_compile server.py tools/generate-exam-data-js.py tools/inject-analytics-secret.py tools/validate-exam-packs.py
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check service-worker.js
+          find assets/js -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Validate exam packs
+        run: python tools/validate-exam-packs.py --root user-content/exams
+
+      - name: Run Sprint 1 readiness tests
+        run: python -m unittest tests.test_sprint1_readiness -v

@@ -99,10 +99,10 @@ Drag & drop ordering question where options must be arranged in correct sequence
 Drag & drop question where you select N items from a source list.
 
 ### YES_NO_MATRIX
-Matrix of statements with Yes/No answers for each.
+Matrix of statements with Yes/No answers for each. Use numeric `correct` values (`0 = Yes`, `1 = No`).
 
 ### HOTSPOT
-Click on specific areas of an image (visual questions).
+Planned visual question type. It is not accepted by the current runtime validator or pack validator yet.
 
 ## Image Handling
 

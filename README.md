@@ -251,6 +251,11 @@ Editor saves are local to the current browser. They do not change the public Git
 - **Detailed Statistics** - Per-exam breakdowns with trends
 - **Export Progress** - Download all progress data as JSON
 
+### Study Mode
+- **Study Mode with spaced repetition** - Prioritizes weak, due, new, and later questions using local per-question statistics
+- **Study missed questions** - Restart a study session from questions missed or skipped in a previous attempt
+- **Local study queue** - Stores due dates, ease factors, and accuracy in browser IndexedDB
+
 ### Editor Features
 - **Visual Editing** - WYSIWYG question editor
 - **Live Preview** - See questions as they'll appear
@@ -696,7 +701,6 @@ For issues, questions, or feature requests:
 - Multi-language support
 - Collaborative exam creation
 - Question difficulty ratings
-- Study mode with spaced repetition
 - API for external integrations
 
 ---

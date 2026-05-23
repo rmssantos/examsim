@@ -1,0 +1,122 @@
+import json
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+class Sprint1ReadinessTests(unittest.TestCase):
+    def test_service_worker_uses_v25_and_network_first_for_mutable_exam_assets(self):
+        text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
+
+        self.assertIn("examsim-pwa-v2.5", text)
+        for path in (
+            "/manifest.webmanifest",
+            "/user-content/exams/index.json",
+            "/metadata.json",
+            "/dump.json",
+        ):
+            self.assertIn(path, text)
+
+    def test_pwa_registration_exposes_update_available_prompt(self):
+        text = (ROOT / "assets/js/pwa.js").read_text(encoding="utf-8")
+
+        self.assertIn("showUpdateAvailable", text)
+        self.assertIn("examsim-update-toast", text)
+        self.assertIn("SKIP_WAITING", text)
+        self.assertIn("registration.addEventListener('updatefound'", text)
+
+    def test_exam_pack_validator_accepts_public_packs(self):
+        result = subprocess.run(
+            [
+                sys.executable,
+                "tools/validate-exam-packs.py",
+                "--root",
+                "user-content/exams",
+            ],
+            cwd=ROOT,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("Validated 3 exam pack", result.stdout)
+
+    def test_exam_pack_validator_rejects_boolean_yes_no_matrix_answers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "exams"
+            exam_dir = root / "badmatrix"
+            exam_dir.mkdir(parents=True)
+            (root / "index.json").write_text(json.dumps(["badmatrix"]), encoding="utf-8")
+            (exam_dir / "metadata.json").write_text(
+                json.dumps(
+                    {
+                        "id": "badmatrix",
+                        "name": "Bad Matrix",
+                        "questionCount": 1,
+                        "totalQuestions": 1,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (exam_dir / "dump.json").write_text(
+                json.dumps(
+                    [
+                        {
+                            "id": 1,
+                            "question_type": "YES_NO_MATRIX",
+                            "question": "Validate the statements.",
+                            "statements": ["One", "Two"],
+                            "correct": [True, False],
+                        }
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "tools/validate-exam-packs.py",
+                    "--root",
+                    str(root),
+                ],
+                cwd=ROOT,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+            )
+
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        self.assertIn("YES_NO_MATRIX answers must be 0 or 1", result.stdout)
+
+    def test_docs_describe_current_yes_no_matrix_schema_and_study_mode_status(self):
+        data_docs = (ROOT / "docs/Data-and-Dumps.md").read_text(encoding="utf-8")
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        privacy = (ROOT / "PRIVACY-AND-STORAGE.md").read_text(encoding="utf-8")
+
+        self.assertNotIn('"correct": [true, false, true]', data_docs)
+        self.assertIn('"correct": [0, 1, 0]', data_docs)
+        self.assertIn("0 = Yes, 1 = No", data_docs)
+        self.assertNotIn("- Study mode with spaced repetition", readme)
+        self.assertIn("Study Mode with spaced repetition", readme)
+        self.assertIn("local image upload endpoint", privacy)
+
+    def test_validation_workflow_runs_sprint1_checks(self):
+        workflow = ROOT / ".github/workflows/validate.yml"
+        self.assertTrue(workflow.exists(), "Missing .github/workflows/validate.yml")
+        text = workflow.read_text(encoding="utf-8")
+
+        self.assertIn("python -m unittest tests.test_sprint1_readiness -v", text)
+        self.assertIn("python tools/validate-exam-packs.py --root user-content/exams", text)
+        self.assertIn("node --check service-worker.js", text)
+        self.assertIn("python -m py_compile server.py", text)
+
+
+if __name__ == "__main__":
+    unittest.main()

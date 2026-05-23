@@ -87,7 +87,7 @@ This is an array of question objects:
 **Important Notes:**
 - `id`: Unique question identifier (number)
 - `correct`: Can be a single index (0-3) or array of indices [0,2] for multi-select
-- `question_type`: STANDARD, MULTI, SEQUENCE, DRAG_DROP_SELECT, YES_NO_MATRIX, HOTSPOT
+- `question_type`: STANDARD, MULTI, SEQUENCE, DRAG_DROP_SELECT, YES_NO_MATRIX
 - Image filenames are relative to the `images/` folder
 
 ### Optional File: metadata.json

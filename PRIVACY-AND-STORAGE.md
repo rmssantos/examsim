@@ -51,7 +51,7 @@ Analytics can be turned off from the small **Privacy settings** control on the o
 The analytics workspace is configured with 30-day retention.
 
 ### Server Role
-The server ONLY serves static files:
+The public/static deployment only serves static files:
 - HTML pages (index.html, exam.html, editor.html)
 - CSS stylesheets
 - JavaScript files
@@ -63,6 +63,8 @@ The server ONLY serves static files:
 - ❌ Track users in local/self-hosted mode
 - ❌ Share data between users
 - ❌ Send any data anywhere
+
+When you run `python server.py` locally, it also exposes a same-origin local image upload endpoint (`PUT /__upload_images`) used by the editor to copy image files into `user-content/exams/<examId>/images/`. This endpoint accepts image files only, validates the filename/content, enforces the 10 MB image limit, and does not receive or persist exam dumps.
 
 ---
 
