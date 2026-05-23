@@ -114,8 +114,8 @@
 	align-items: center;
 	gap: 0.85rem;
 	background: rgba(255, 255, 255, 0.75);
-	backdrop-filter: blur(10px);
 	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
 	padding: 0.9rem 1.1rem;
 	border-radius: 14px;
 	border: 1px solid rgba(15, 23, 42, 0.08);
@@ -1600,17 +1600,42 @@ body.dragging-file #compact-import-btn .exam-badge {
 	transform: translateY(-4px);
 }
 
-.exam-card-start {
+.exam-study-info {
+	font-size: 0.78rem;
+	color: rgba(255, 255, 255, 0.9);
+	font-weight: 650;
+	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.35);
+	transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.exam-card:hover .exam-study-info,
+.exam-card.selected .exam-study-info {
+	opacity: 0.12;
+	transform: translateY(-4px);
+}
+
+.exam-card-actions {
 	position: absolute;
 	bottom: 0;
 	left: 0;
 	right: 0;
 	width: 100%;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	transform: translateY(100%);
+	transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+	box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+	z-index: 5;
+	overflow: hidden;
+	border-radius: 0 0 14px 14px;
+}
+
+.exam-card-start,
+.exam-card-study {
 	height: 38px;
 	margin: 0;
 	padding: 0;
 	border: 0;
-	border-radius: 0 0 14px 14px;
 	background: rgba(255, 255, 255, 0.96);
 	color: #0f172a;
 	font-size: 0.85rem;
@@ -1619,19 +1644,22 @@ body.dragging-file #compact-import-btn .exam-badge {
 	align-items: center;
 	justify-content: center;
 	gap: 0.35rem;
-	transform: translateY(100%);
-	transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-	box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
-	z-index: 5;
+	transition: background 0.18s ease, color 0.18s ease;
 	cursor: pointer;
 }
 
-.exam-card:hover .exam-card-start,
-.exam-card.selected .exam-card-start {
+.exam-card-study {
+	border-left: 1px solid rgba(15, 23, 42, 0.08);
+	background: rgba(248, 250, 252, 0.98);
+}
+
+.exam-card:hover .exam-card-actions,
+.exam-card.selected .exam-card-actions {
 	transform: translateY(0);
 }
 
-.exam-card-start:hover {
+.exam-card-start:hover,
+.exam-card-study:hover {
 	background: #ffffff !important;
 	color: var(--primary) !important;
 	box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
@@ -2928,9 +2956,14 @@ body.dragging-file .drop-zone-simple.drag-over,
 	margin-top: auto;
 }
 
-.exam-card .exam-card-start {
-	height: 34px;
+.exam-card .exam-card-actions {
 	border-radius: 0 0 10px 10px;
+}
+
+.exam-card .exam-card-start,
+.exam-card .exam-card-study {
+	height: 34px;
+	border-radius: 0;
 	font-size: 0.8rem;
 	padding: 0;
 }
@@ -3000,6 +3033,7 @@ body.dragging-file .drop-zone-simple.drag-over,
 }
 
 #details-start-exam.btn-start-exam,
+#details-start-study.btn-start-exam,
 .btn-start-exam-inline {
 	width: auto !important;
 	min-width: 0 !important;
@@ -3015,8 +3049,24 @@ body.dragging-file .drop-zone-simple.drag-over,
 }
 
 #details-start-exam.btn-start-exam i,
+#details-start-study.btn-start-exam i,
 .btn-start-exam-inline i {
 	font-size: 0.9rem !important;
+}
+
+.btn-study-inline {
+	background: linear-gradient(135deg, #0f766e, #0ea5e9) !important;
+}
+
+.btn-review-inline {
+	background: linear-gradient(135deg, #334155, #64748b) !important;
+}
+
+.btn-start-exam-inline.is-disabled,
+.btn-start-exam-inline:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+	transform: none !important;
 }
 
 .btn-close-details {
@@ -3078,6 +3128,205 @@ body.dragging-file .drop-zone-simple.drag-over,
 	box-shadow: none;
 }
 
+.progress-item .progress-value {
+	font-size: 0.82rem;
+	line-height: 1.25;
+	word-break: normal;
+	overflow-wrap: anywhere;
+}
+
+.attempt-history-content,
+.attempt-review-content {
+	max-width: 920px;
+}
+
+.attempt-history-subtitle {
+	margin: -0.6rem 0 1rem;
+	color: var(--text-light);
+	font-size: 0.9rem;
+}
+
+.attempt-history-list,
+.attempt-review-list {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.attempt-history-card,
+.attempt-review-item {
+	background: rgba(255, 255, 255, 0.96);
+	border: 1px solid rgba(15, 23, 42, 0.1);
+	border-left: 4px solid var(--primary);
+	border-radius: 8px;
+	padding: 0.85rem;
+}
+
+.attempt-history-card.passed,
+.attempt-review-item.correct {
+	border-left-color: #16a34a;
+}
+
+.attempt-history-card.failed,
+.attempt-review-item.incorrect {
+	border-left-color: #dc2626;
+}
+
+.attempt-review-item.skipped {
+	border-left-color: #f59e0b;
+}
+
+.attempt-history-summary,
+.attempt-review-item-header {
+	display: flex;
+	justify-content: space-between;
+	gap: 0.75rem;
+	align-items: flex-start;
+}
+
+.attempt-history-title,
+.attempt-review-number {
+	font-weight: 800;
+	color: var(--text);
+}
+
+.attempt-history-date {
+	color: var(--text-light);
+	font-size: 0.82rem;
+}
+
+.attempt-history-metrics,
+.attempt-review-summary {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+	gap: 0.5rem;
+	margin: 0.75rem 0;
+}
+
+.attempt-small-metric {
+	background: rgba(15, 23, 42, 0.04);
+	border-radius: 7px;
+	padding: 0.55rem;
+	text-align: center;
+}
+
+.attempt-small-label,
+.attempt-review-label {
+	display: block;
+	font-size: 0.68rem;
+	font-weight: 750;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+	color: var(--text-light);
+	margin-bottom: 0.18rem;
+}
+
+.attempt-small-value {
+	font-size: 0.95rem;
+	color: var(--text);
+}
+
+.attempt-history-actions,
+.attempt-review-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.attempt-action-btn {
+	border: 0;
+	border-radius: 7px;
+	padding: 0.55rem 0.8rem;
+	font-weight: 750;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+}
+
+.attempt-action-btn.primary {
+	background: linear-gradient(135deg, var(--primary), var(--accent));
+	color: #fff;
+}
+
+.attempt-action-btn.secondary {
+	background: rgba(15, 118, 110, 0.1);
+	color: #0f766e;
+}
+
+.attempt-action-btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.attempt-review-status {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	font-weight: 800;
+	font-size: 0.8rem;
+}
+
+.attempt-review-status.correct { color: #15803d; }
+.attempt-review-status.incorrect { color: #b91c1c; }
+.attempt-review-status.skipped { color: #b45309; }
+
+.attempt-review-question {
+	margin: 0.75rem 0;
+	font-weight: 650;
+	line-height: 1.45;
+}
+
+.attempt-review-answers {
+	display: grid;
+	gap: 0.45rem;
+}
+
+.attempt-answer-row {
+	display: grid;
+	grid-template-columns: 130px minmax(0, 1fr);
+	gap: 0.6rem;
+	align-items: baseline;
+}
+
+.attempt-answer-value.correct {
+	color: #15803d;
+}
+
+.attempt-review-explanation {
+	margin-top: 0.7rem;
+	padding: 0.7rem;
+	border-radius: 7px;
+	background: rgba(15, 23, 42, 0.04);
+}
+
+.attempt-review-explanation p {
+	margin: 0;
+	line-height: 1.45;
+	color: var(--text);
+}
+
+[data-theme="dark"] .attempt-history-card,
+[data-theme="dark"] .attempt-review-item,
+.dark-mode .attempt-history-card,
+.dark-mode .attempt-review-item {
+	background: rgba(15, 23, 42, 0.92);
+	border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .attempt-small-metric,
+[data-theme="dark"] .attempt-review-explanation,
+.dark-mode .attempt-small-metric,
+.dark-mode .attempt-review-explanation {
+	background: rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 640px) {
+	.attempt-answer-row {
+		grid-template-columns: 1fr;
+		gap: 0.2rem;
+	}
+}
+
 .modules-resources-grid {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
@@ -3127,7 +3376,9 @@ body.dragging-file .drop-zone-simple.drag-over,
 }
 
 [data-theme="dark"] .exam-card .exam-card-start,
-.dark-mode .exam-card .exam-card-start {
+[data-theme="dark"] .exam-card .exam-card-study,
+.dark-mode .exam-card .exam-card-start,
+.dark-mode .exam-card .exam-card-study {
 	background: rgba(30, 41, 59, 0.96) !important;
 	color: #f3f4f6 !important;
 	border: none !important;
@@ -3135,7 +3386,9 @@ body.dragging-file .drop-zone-simple.drag-over,
 }
 
 [data-theme="dark"] .exam-card .exam-card-start:hover,
-.dark-mode .exam-card .exam-card-start:hover {
+[data-theme="dark"] .exam-card .exam-card-study:hover,
+.dark-mode .exam-card .exam-card-start:hover,
+.dark-mode .exam-card .exam-card-study:hover {
 	background: rgba(30, 41, 59, 1) !important;
 	color: var(--accent) !important;
 }
@@ -3151,6 +3404,7 @@ body.dragging-file .drop-zone-simple.drag-over,
 	}
 
 	#details-start-exam.btn-start-exam,
+	#details-start-study.btn-start-exam,
 	.btn-start-exam-inline {
 		flex: 1;
 		justify-content: center;
@@ -3181,6 +3435,7 @@ body.dragging-file .drop-zone-simple.drag-over,
 	}
 
 	#details-start-exam.btn-start-exam,
+	#details-start-study.btn-start-exam,
 	.btn-start-exam-inline,
 	.btn-close-details {
 		width: 100% !important;

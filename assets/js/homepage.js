@@ -118,6 +118,7 @@ this.placeDetailsPanel();
 
 // Show compact import button when exams exist
 this.showCompactImportButton();
+this.refreshStudySummaries();
 }
 
 updateHeroStats(exams) {
@@ -233,6 +234,15 @@ const totalLabel = totalQuestions > questionCount
 this.appendTextElement(card, 'div', 'exam-total-info', totalLabel);
 }
 
+const studyInfo = document.createElement('div');
+studyInfo.className = 'exam-study-info';
+studyInfo.dataset.studySummaryFor = examId;
+studyInfo.textContent = 'Study: —';
+card.appendChild(studyInfo);
+
+const actions = document.createElement('div');
+actions.className = 'exam-card-actions';
+
 const startButton = document.createElement('button');
 startButton.type = 'button';
 startButton.className = 'exam-card-start';
@@ -243,7 +253,20 @@ startButton.addEventListener('click', (e) => {
 	this.selectExam(examId);
 	this.startSelectedExam();
 });
-card.appendChild(startButton);
+actions.appendChild(startButton);
+
+const studyButton = document.createElement('button');
+studyButton.type = 'button';
+studyButton.className = 'exam-card-study';
+studyButton.appendChild(this.createIcon('fas fa-brain'));
+studyButton.appendChild(document.createTextNode(' Study'));
+studyButton.addEventListener('click', (e) => {
+	e.stopPropagation();
+	this.selectExam(examId);
+	this.startSelectedExam('study');
+});
+actions.appendChild(studyButton);
+card.appendChild(actions);
 
 if (examData.hasImages) {
 const feature = document.createElement('div');
@@ -396,9 +419,8 @@ document.getElementById('details-exam-pass-score').textContent = `${metadata.pas
 document.getElementById('details-exam-images').textContent = examData.hasImages ? 'Yes' : 'No';
 
 // Populate progress
-document.getElementById('details-total-attempts').textContent = stats?.attempts || 0;
-document.getElementById('details-best-score').textContent = stats?.bestScore ? `${stats.bestScore}%` : '—';
-document.getElementById('details-pass-rate').textContent = stats?.passRate != null ? `${stats.passRate}%` : '—';
+this.renderDetailsProgress(examId, stats);
+this.updateDetailsStudySummary(examId);
 
 // Populate modules and resources
 const modulesSection = document.getElementById('details-modules-section');
@@ -556,6 +578,20 @@ startBtn.onclick = () => {
 this.startSelectedExam();
 };
 
+const studyBtn = document.getElementById('details-start-study');
+if (studyBtn) {
+studyBtn.onclick = () => {
+this.startSelectedExam('study');
+};
+}
+
+const reviewBtn = document.getElementById('details-review-attempts');
+if (reviewBtn) {
+reviewBtn.onclick = () => {
+this.openAttemptHistory(examId);
+};
+}
+
 // Setup close button
 const closeBtn = document.getElementById('btn-close-details');
 closeBtn.onclick = () => {
@@ -577,7 +613,7 @@ this.scrollToExamLibrary();
 }
 }
 
-startSelectedExam() {
+startSelectedExam(mode = 'exam') {
 	if (!this.selectedExamId) {
 		window.showCustomAlert('Select an Exam', 'Please select an exam card from the library before proceeding.', 'warning');
 		return;
@@ -587,6 +623,9 @@ startSelectedExam() {
 	const metadata = examData?.metadata || {};
 	const moduleNames = this.getModuleNames(metadata.modules);
 	let urlParams = `exam=${encodeURIComponent(this.selectedExamId)}`;
+	if (mode === 'study') {
+		urlParams += '&mode=study';
+	}
 
 	if (moduleNames.length > 0) {
 		const modulesList = document.getElementById('details-modules-list');
@@ -713,6 +752,7 @@ if (event.storageArea === localStorage && this.isProgressStorageKey(event.key)) 
 });
 
 window.addEventListener('progress-updated', () => this.scheduleProgressRefresh());
+window.addEventListener('study-progress-updated', () => this.scheduleProgressRefresh());
 window.addEventListener('focus', () => this.scheduleProgressRefresh());
 window.addEventListener('pageshow', () => this.scheduleProgressRefresh());
 document.addEventListener('visibilitychange', () => {
@@ -738,7 +778,92 @@ if (typeof window.examSimulator?.updateProgressDisplay === 'function') {
 }
 
 this.refreshSelectedExamProgress();
+this.refreshStudySummaries();
 this.refreshHeroPreview();
+}
+
+async getStudySummary(examId) {
+const examData = this.availableExams.get(examId) || window.userExams[examId];
+const questions = Array.isArray(examData?.questions) ? examData.questions : [];
+if (!questions.length || !window.ExamApp.studyStorage) return null;
+try {
+	return await window.ExamApp.studyStorage.getExamSummary(examId, questions);
+} catch (error) {
+	window.ExamApp.warn('Failed to load study summary for', examId, error);
+	return null;
+}
+}
+
+formatStudyDue(summary) {
+if (!summary) return 'Study: —';
+const due = Number(summary.dueReviewCount || 0);
+const weak = Number(summary.weakCount || 0);
+const fresh = Number(summary.newCount || 0);
+return `Study: ${weak} weak · ${due} due · ${fresh} new`;
+}
+
+async refreshStudySummaries() {
+const summaryNodes = Array.from(document.querySelectorAll('[data-study-summary-for]'));
+await Promise.all(summaryNodes.map(async (node) => {
+	const examId = node.dataset.studySummaryFor;
+	const summary = await this.getStudySummary(examId);
+	node.textContent = this.formatStudyDue(summary);
+}));
+
+if (this.selectedExamId) {
+	this.updateDetailsStudySummary(this.selectedExamId);
+}
+}
+
+async updateDetailsStudySummary(examId) {
+const queueEl = document.getElementById('details-study-queue');
+const masteredEl = document.getElementById('details-mastered');
+const summary = await this.getStudySummary(examId);
+if (!summary) {
+	if (queueEl) queueEl.textContent = '—';
+	if (masteredEl) masteredEl.textContent = '—';
+	return;
+}
+const due = Number(summary.dueReviewCount || 0);
+const weak = Number(summary.weakCount || 0);
+const fresh = Number(summary.newCount || 0);
+if (queueEl) queueEl.textContent = `${weak} weak · ${due} due · ${fresh} new`;
+if (masteredEl) masteredEl.textContent = `${summary.learnedCount || 0}/${summary.totalQuestions || 0}`;
+
+const stats = this.getProgressStats(examId);
+this.renderDetailsProgress(examId, stats, summary);
+}
+
+renderDetailsProgress(examId, stats, studySummary = null) {
+const readiness = document.getElementById('details-readiness');
+const lastAttempt = document.getElementById('details-last-attempt');
+const bestScore = document.getElementById('details-best-score');
+const trend = document.getElementById('details-progress-trend');
+const reviewBtn = document.getElementById('details-review-attempts');
+
+if (readiness) readiness.textContent = this.getReadinessLabel(stats, studySummary);
+if (lastAttempt) {
+	lastAttempt.textContent = stats?.lastScore != null
+		? `${stats.lastScore}% · ${this.formatRelativeDate(stats.lastDate) || 'recent'}`
+		: 'No attempts';
+}
+if (bestScore) bestScore.textContent = stats?.bestScore != null ? `${stats.bestScore}%` : '—';
+if (trend) trend.textContent = stats?.trendLabel || '—';
+if (reviewBtn) {
+	const hasAttempts = Boolean(stats?.attempts);
+	reviewBtn.disabled = !hasAttempts;
+	reviewBtn.classList.toggle('is-disabled', !hasAttempts);
+	reviewBtn.title = hasAttempts ? 'Review previous attempts' : 'Complete an exam to unlock attempt review';
+}
+}
+
+getReadinessLabel(stats, studySummary = null) {
+if (!stats?.attempts && !studySummary?.seenCount) return 'Not enough data';
+const weak = Number(studySummary?.weakCount || 0);
+if (stats?.lastScore != null && stats.lastScore < 70) return 'Needs work';
+if (weak > 0) return 'Review weak spots';
+if (stats?.passRate >= 70 || stats?.lastScore >= 70) return 'On track';
+return 'Building';
 }
 
 refreshSelectedExamProgress() {
@@ -748,13 +873,7 @@ const placeholder = document.getElementById('exam-details-placeholder');
 if (!placeholder?.classList.contains('visible')) return;
 
 const stats = this.getProgressStats(this.selectedExamId);
-const attempts = document.getElementById('details-total-attempts');
-const bestScore = document.getElementById('details-best-score');
-const passRate = document.getElementById('details-pass-rate');
-
-if (attempts) attempts.textContent = stats?.attempts || 0;
-if (bestScore) bestScore.textContent = stats?.bestScore != null ? `${stats.bestScore}%` : '—';
-if (passRate) passRate.textContent = stats?.passRate != null ? `${stats.passRate}%` : '—';
+this.renderDetailsProgress(this.selectedExamId, stats);
 }
 
 updatePreviewHighlights(metadata, examData) {
@@ -793,20 +912,320 @@ const progress = JSON.parse(raw);
 if (!progress?.attempts?.length) return null;
 const attempts = progress.attempts;
 const lastAttempt = attempts[attempts.length - 1];
+const previousAttempt = attempts.length > 1 ? attempts[attempts.length - 2] : null;
 const avgTime = attempts.reduce((sum, attempt) => sum + (attempt.timeSpent || 0), 0) / attempts.length;
 const passRate = attempts.length ? Math.round(((progress.totalPassed || 0) / attempts.length) * 100) : null;
+const trendDelta = previousAttempt ? Number(lastAttempt.score || 0) - Number(previousAttempt.score || 0) : null;
+const detailedAttempts = attempts.filter(attempt => Array.isArray(attempt.questionResults) && attempt.questionResults.length > 0).length;
 return {
 	attempts: attempts.length,
 	lastScore: lastAttempt.score,
 	lastDate: lastAttempt.date,
 	bestScore: progress.bestScore ?? lastAttempt.score,
 	avgTime,
-	passRate
+	passRate,
+	trendDelta,
+	trendLabel: trendDelta == null ? '—' : `${trendDelta >= 0 ? '+' : ''}${trendDelta} pts`,
+	detailedAttempts,
+	lastAttempt
 };
 } catch (error) {
 window.ExamApp.warn('Failed to parse progress stats for', examId, error);
 return null;
 }
+}
+
+getProgressForExam(examId) {
+try {
+	const raw = localStorage.getItem(`${examId}_progress`);
+	const progress = raw ? JSON.parse(raw) : null;
+	return progress && Array.isArray(progress.attempts) ? progress : { attempts: [] };
+} catch (error) {
+	window.ExamApp.warn('Failed to parse progress for', examId, error);
+	return { attempts: [] };
+}
+}
+
+openAttemptHistory(examId) {
+const progress = this.getProgressForExam(examId);
+const attempts = progress.attempts || [];
+if (attempts.length === 0) {
+	window.showCustomAlert('No Attempts', 'Complete an exam attempt first to unlock review history.', 'info');
+	return;
+}
+
+document.getElementById('attempt-history-modal')?.remove();
+const overlay = document.createElement('div');
+overlay.id = 'attempt-history-modal';
+overlay.className = 'progress-modal-overlay attempt-review-overlay';
+
+const content = document.createElement('div');
+content.className = 'progress-modal-content attempt-history-content';
+const closeBtn = this.createModalCloseButton('Close attempt history', () => overlay.remove());
+content.appendChild(closeBtn);
+
+const title = document.createElement('h2');
+title.className = 'progress-modal-title';
+title.appendChild(this.createIcon('fas fa-history'));
+title.appendChild(document.createTextNode(` ${this.getExamName(examId)} Attempts`));
+content.appendChild(title);
+
+const subtitle = document.createElement('p');
+subtitle.className = 'attempt-history-subtitle';
+subtitle.textContent = `${attempts.length} attempt${attempts.length === 1 ? '' : 's'} saved locally in this browser.`;
+content.appendChild(subtitle);
+
+const list = document.createElement('div');
+list.className = 'attempt-history-list';
+attempts.slice().reverse().forEach((attempt, reverseIndex) => {
+	const originalIndex = attempts.length - reverseIndex - 1;
+	list.appendChild(this.createAttemptHistoryCard(examId, attempt, originalIndex));
+});
+content.appendChild(list);
+
+overlay.appendChild(content);
+overlay.addEventListener('click', event => {
+	if (event.target === overlay) overlay.remove();
+});
+document.body.appendChild(overlay);
+window.ExamApp?.analytics?.trackEvent('attempt_history_opened');
+}
+
+createModalCloseButton(label, onClick) {
+const button = document.createElement('button');
+button.className = 'progress-modal-close';
+button.type = 'button';
+button.setAttribute('aria-label', label);
+button.textContent = '×';
+button.addEventListener('click', onClick);
+return button;
+}
+
+getExamName(examId) {
+const examData = this.availableExams.get(examId) || window.userExams[examId];
+return examData?.metadata?.name || examId.toUpperCase();
+}
+
+createAttemptHistoryCard(examId, attempt, originalIndex) {
+const card = document.createElement('article');
+card.className = `attempt-history-card ${attempt.passed ? 'passed' : 'failed'}`;
+
+const summary = document.createElement('div');
+summary.className = 'attempt-history-summary';
+
+const title = document.createElement('div');
+title.className = 'attempt-history-title';
+title.appendChild(this.createIcon(attempt.passed ? 'fas fa-check-circle' : 'fas fa-times-circle'));
+title.appendChild(document.createTextNode(` Attempt #${originalIndex + 1}`));
+summary.appendChild(title);
+
+const date = document.createElement('div');
+date.className = 'attempt-history-date';
+date.textContent = this.formatAttemptDate(attempt.date);
+summary.appendChild(date);
+card.appendChild(summary);
+
+const metrics = document.createElement('div');
+metrics.className = 'attempt-history-metrics';
+metrics.appendChild(this.createSmallMetric('Score', `${attempt.score ?? 0}%`));
+metrics.appendChild(this.createSmallMetric('Time', `${attempt.timeSpent ?? 0} min`));
+metrics.appendChild(this.createSmallMetric('Questions', String(attempt.questionCount || attempt.questionResults?.length || '—')));
+card.appendChild(metrics);
+
+const actions = document.createElement('div');
+actions.className = 'attempt-history-actions';
+const hasDetails = Array.isArray(attempt.questionResults) && attempt.questionResults.length > 0;
+
+const reviewButton = document.createElement('button');
+reviewButton.type = 'button';
+reviewButton.className = 'attempt-action-btn primary';
+reviewButton.disabled = !hasDetails;
+reviewButton.appendChild(this.createIcon('fas fa-list-check'));
+reviewButton.appendChild(document.createTextNode(hasDetails ? 'Review' : 'Review unavailable'));
+reviewButton.addEventListener('click', () => this.openAttemptReview(examId, attempt, originalIndex));
+actions.appendChild(reviewButton);
+
+const missedCount = this.getAttemptMissedQuestionIds(attempt).length;
+const studyButton = document.createElement('button');
+studyButton.type = 'button';
+studyButton.className = 'attempt-action-btn secondary';
+studyButton.disabled = missedCount === 0;
+studyButton.appendChild(this.createIcon('fas fa-brain'));
+studyButton.appendChild(document.createTextNode(missedCount > 0 ? `Study missed (${missedCount})` : 'No misses'));
+studyButton.addEventListener('click', () => this.startMissedStudy(examId, attempt));
+actions.appendChild(studyButton);
+card.appendChild(actions);
+
+return card;
+}
+
+createSmallMetric(label, value) {
+const metric = document.createElement('div');
+metric.className = 'attempt-small-metric';
+this.appendTextElement(metric, 'span', 'attempt-small-label', label);
+this.appendTextElement(metric, 'strong', 'attempt-small-value', value);
+return metric;
+}
+
+formatAttemptDate(dateString) {
+const date = new Date(dateString);
+if (Number.isNaN(date.getTime())) return 'Unknown date';
+return date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+openAttemptReview(examId, attempt, originalIndex) {
+if (!Array.isArray(attempt.questionResults) || attempt.questionResults.length === 0) {
+	window.showCustomAlert('Review Unavailable', 'Detailed review is available for attempts completed after this feature was added.', 'info');
+	return;
+}
+
+document.getElementById('attempt-review-modal')?.remove();
+const overlay = document.createElement('div');
+overlay.id = 'attempt-review-modal';
+overlay.className = 'progress-modal-overlay attempt-review-overlay';
+
+const content = document.createElement('div');
+content.className = 'progress-modal-content attempt-review-content';
+content.appendChild(this.createModalCloseButton('Close attempt review', () => overlay.remove()));
+
+const title = document.createElement('h2');
+title.className = 'progress-modal-title';
+title.appendChild(this.createIcon('fas fa-clipboard-check'));
+title.appendChild(document.createTextNode(` ${this.getExamName(examId)} · Attempt #${originalIndex + 1}`));
+content.appendChild(title);
+
+const summary = document.createElement('div');
+summary.className = 'attempt-review-summary';
+summary.appendChild(this.createSmallMetric('Score', `${attempt.score ?? 0}%`));
+summary.appendChild(this.createSmallMetric('Correct', String(attempt.correctCount ?? attempt.questionResults.filter(result => result.correct).length)));
+summary.appendChild(this.createSmallMetric('Missed', String(this.getAttemptMissedQuestionIds(attempt).length)));
+summary.appendChild(this.createSmallMetric('Time', `${attempt.timeSpent ?? 0} min`));
+content.appendChild(summary);
+
+const missedIds = this.getAttemptMissedQuestionIds(attempt);
+const actions = document.createElement('div');
+actions.className = 'attempt-review-actions';
+const studyMissed = document.createElement('button');
+studyMissed.type = 'button';
+studyMissed.className = 'attempt-action-btn secondary';
+studyMissed.disabled = missedIds.length === 0;
+studyMissed.appendChild(this.createIcon('fas fa-brain'));
+studyMissed.appendChild(document.createTextNode(missedIds.length > 0 ? `Study missed (${missedIds.length})` : 'No missed questions'));
+studyMissed.addEventListener('click', () => this.startMissedStudy(examId, attempt));
+actions.appendChild(studyMissed);
+content.appendChild(actions);
+
+const list = document.createElement('div');
+list.className = 'attempt-review-list';
+attempt.questionResults.forEach(result => {
+	list.appendChild(this.createAttemptReviewItem(examId, result));
+});
+content.appendChild(list);
+
+overlay.appendChild(content);
+overlay.addEventListener('click', event => {
+	if (event.target === overlay) overlay.remove();
+});
+document.body.appendChild(overlay);
+window.ExamApp?.analytics?.trackAttemptReviewOpened?.(examId, {
+	hasQuestionDetails: true,
+	questionCount: attempt.questionResults.length
+});
+}
+
+createAttemptReviewItem(examId, result) {
+const question = this.findQuestionById(examId, result.questionId);
+const item = document.createElement('article');
+const status = result.skipped ? 'skipped' : (result.correct ? 'correct' : 'incorrect');
+item.className = `attempt-review-item ${status}`;
+
+const header = document.createElement('div');
+header.className = 'attempt-review-item-header';
+this.appendTextElement(header, 'span', 'attempt-review-number', `Q${result.order || ''}`.trim());
+const statusEl = this.appendTextElement(header, 'span', `attempt-review-status ${status}`, result.skipped ? 'Skipped' : (result.correct ? 'Correct' : 'Incorrect'));
+statusEl.prepend(this.createIcon(result.skipped ? 'fas fa-minus-circle' : (result.correct ? 'fas fa-check-circle' : 'fas fa-times-circle')));
+item.appendChild(header);
+
+this.appendTextElement(item, 'div', 'attempt-review-question', question?.question || 'Question no longer exists in the current dump.');
+
+const answers = document.createElement('div');
+answers.className = 'attempt-review-answers';
+this.appendAnswerRow(answers, 'Your Answer', this.formatStoredAnswer(question, result.userAnswer));
+if (!result.correct) {
+	this.appendAnswerRow(answers, 'Correct Answer', this.formatStoredAnswer(question, question?.correct), 'correct');
+}
+item.appendChild(answers);
+
+if (question?.explanation) {
+	const explanation = document.createElement('div');
+	explanation.className = 'attempt-review-explanation';
+	this.appendTextElement(explanation, 'span', 'attempt-review-label', 'Justification');
+	this.appendTextElement(explanation, 'p', '', question.explanation);
+	item.appendChild(explanation);
+}
+
+return item;
+}
+
+appendAnswerRow(parent, label, value, extraClass = '') {
+const row = document.createElement('div');
+row.className = 'attempt-answer-row';
+this.appendTextElement(row, 'span', 'attempt-review-label', label);
+this.appendTextElement(row, 'strong', ['attempt-answer-value', extraClass].filter(Boolean).join(' '), value);
+parent.appendChild(row);
+}
+
+findQuestionById(examId, questionId) {
+const questions = window.userExams[examId]?.questions || [];
+const wanted = String(questionId || '');
+return questions.find((question, index) => String(question?.id ?? `question-${index + 1}`) === wanted) || null;
+}
+
+formatStoredAnswer(question, answer) {
+if (!question || answer === null || answer === undefined || answer === '') return 'Not answered';
+const type = window.ExamApp.normalizeQuestionType(question);
+if (type === 'YES_NO_MATRIX') {
+	return (Array.isArray(answer) ? answer : []).map(value => value === 0 ? 'Yes' : 'No').join(', ') || 'Not answered';
+}
+if (Array.isArray(answer)) {
+	return answer.map(index => Number.isInteger(index) ? String.fromCharCode(65 + index) : String(index)).join(', ') || 'Not answered';
+}
+if (Number.isInteger(answer)) return String.fromCharCode(65 + answer);
+return String(answer);
+}
+
+getAttemptMissedQuestionIds(attempt) {
+return (Array.isArray(attempt?.questionResults) ? attempt.questionResults : [])
+	.filter(result => result.skipped || !result.correct)
+	.map(result => String(result.questionId || '').trim())
+	.filter(Boolean);
+}
+
+startMissedStudy(examId, attempt) {
+const questionIds = this.getAttemptMissedQuestionIds(attempt);
+if (questionIds.length === 0) {
+	window.showCustomAlert('No Missed Questions', 'This attempt has no missed or skipped questions to study.', 'success');
+	return;
+}
+
+try {
+	sessionStorage.setItem(`study_focus_${examId}`, JSON.stringify({
+		attemptId: attempt.attemptId || null,
+		questionIds,
+		createdAt: new Date().toISOString()
+	}));
+} catch (error) {
+	window.ExamApp.warn('Failed to prepare missed-question study session', error);
+	window.showCustomAlert('Could Not Start Study', 'The browser could not prepare the missed-question queue.', 'error');
+	return;
+}
+
+let urlParams = `exam=${encodeURIComponent(examId)}&mode=study&focus=missed`;
+if (Array.isArray(attempt.modules) && attempt.modules.length > 0) {
+	urlParams += `&modules=${encodeURIComponent(JSON.stringify(attempt.modules))}`;
+}
+window.ExamApp?.analytics?.trackStudyMissedStarted?.(examId, { questionCount: questionIds.length });
+window.open(`exam.html?${urlParams}`, '_blank');
 }
 
 getMostRecentExamWithProgress() {

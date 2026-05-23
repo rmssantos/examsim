@@ -276,6 +276,53 @@
         });
     }
 
+    function trackStudyStarted(examId, details = {}) {
+        return trackEvent('study_started', getExamProperties(examId), {
+            question_count: details.questionCount,
+            due_count: details.dueCount,
+            new_count: details.newCount,
+            weak_count: details.weakCount
+        });
+    }
+
+    function trackStudyQuestionAnswered(examId, details = {}) {
+        return trackEvent('study_question_answered', {
+            ...getExamProperties(examId),
+            result: details.isCorrect ? 'correct' : 'incorrect',
+            answer_state: details.wasAnswered ? 'answered' : 'blank'
+        });
+    }
+
+    function trackStudyCompleted(examId, details = {}) {
+        const answeredCount = Number(details.answeredCount || 0);
+        const correctCount = Number(details.correctCount || 0);
+        const accuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+        return trackEvent('study_completed', {
+            ...getExamProperties(examId),
+            accuracy_bucket: scoreBucket(accuracy),
+            duration_bucket: durationBucket(details.timeSpent)
+        }, {
+            question_count: details.questionCount,
+            answered_count: answeredCount,
+            correct_count: correctCount
+        });
+    }
+
+    function trackAttemptReviewOpened(examId, details = {}) {
+        return trackEvent('attempt_review_opened', {
+            ...getExamProperties(examId),
+            has_question_details: Boolean(details.hasQuestionDetails)
+        }, {
+            question_count: details.questionCount
+        });
+    }
+
+    function trackStudyMissedStarted(examId, details = {}) {
+        return trackEvent('study_missed_started', getExamProperties(examId), {
+            question_count: details.questionCount
+        });
+    }
+
     function trackImportStarted(file) {
         return trackEvent('import_started', {
             file_type: fileTypeFromName(file?.name),
@@ -447,6 +494,11 @@
         trackPageView,
         trackExamStarted,
         trackExamCompleted,
+        trackStudyStarted,
+        trackStudyQuestionAnswered,
+        trackStudyCompleted,
+        trackAttemptReviewOpened,
+        trackStudyMissedStarted,
         trackImportStarted,
         trackImportCompleted,
         trackImportFailed,

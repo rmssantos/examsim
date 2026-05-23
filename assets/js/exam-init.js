@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   const params = new URLSearchParams(window.location.search);
   const examId = params.get('exam') || '';
+  const pageMode = params.get('mode') === 'study' ? 'study' : 'exam';
 
   if (!window.ExamApp.isSafeExamId(examId)) {
     console.error(`❌ Invalid exam id: ${examId}`);
@@ -158,7 +159,11 @@ document.addEventListener('DOMContentLoaded', async function() {
       if (isCustomModulePractice) {
         window.ExamApp.log(`🎯 Module Practice Mode. Selected modules: ${selectedModules.join(', ')}`);
       }
-      window.examSimulator.startExam();
+      if (pageMode === 'study') {
+        await window.examSimulator.startStudyMode();
+      } else {
+        window.examSimulator.startExam();
+      }
     }
   } else {
     console.error(`❌ Failed to load exam: ${examId}`);

@@ -134,6 +134,14 @@
 										<i aria-hidden="true" class="fas fa-play"></i>
 										<span>Start Exam</span>
 									</button>
+									<button id="details-start-study" class="btn-start-exam btn-start-exam-inline btn-study-inline" type="button">
+										<i aria-hidden="true" class="fas fa-brain"></i>
+										<span>Study</span>
+									</button>
+									<button id="details-review-attempts" class="btn-start-exam btn-start-exam-inline btn-review-inline" type="button">
+										<i aria-hidden="true" class="fas fa-history"></i>
+										<span>Review</span>
+									</button>
 									<button id="btn-close-details" class="btn-close-details" type="button">
 										<i aria-hidden="true" class="fas fa-times"></i>
 										<span>Close</span>
@@ -174,16 +182,28 @@
 									<h3><i aria-hidden="true" class="fas fa-chart-line"></i> Your Progress</h3>
 									<div class="progress-summary">
 										<div class="progress-item">
-											<span class="progress-label">Attempts</span>
-											<span id="details-total-attempts" class="progress-value">0</span>
+											<span class="progress-label">Readiness</span>
+											<span id="details-readiness" class="progress-value">—</span>
+										</div>
+										<div class="progress-item">
+											<span class="progress-label">Last Attempt</span>
+											<span id="details-last-attempt" class="progress-value">—</span>
 										</div>
 										<div class="progress-item">
 											<span class="progress-label">Best Score</span>
 											<span id="details-best-score" class="progress-value">—</span>
 										</div>
 										<div class="progress-item">
-											<span class="progress-label">Pass Rate</span>
-											<span id="details-pass-rate" class="progress-value">—</span>
+											<span class="progress-label">Trend</span>
+											<span id="details-progress-trend" class="progress-value">—</span>
+										</div>
+										<div class="progress-item study-progress-item">
+											<span class="progress-label">Study Queue</span>
+											<span id="details-study-queue" class="progress-value">—</span>
+										</div>
+										<div class="progress-item study-progress-item">
+											<span class="progress-label">Mastered</span>
+											<span id="details-mastered" class="progress-value">—</span>
 										</div>
 									</div>
 								</div>
@@ -608,6 +628,8 @@
 	<script src="assets/js/utils.js"></script>
 	<script src="assets/js/analytics.js"></script>
 	<script src="assets/js/image-storage.js"></script>
+	<script src="assets/js/study-scheduler.js"></script>
+	<script src="assets/js/study-storage.js"></script>
 	<script src="assets/js/image-loader.js"></script>
 	<script src="assets/js/exam-manager.js"></script>
 	<script src="assets/js/exam-loader.js"></script>

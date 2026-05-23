@@ -89,6 +89,10 @@ class MultiExamSimulator {
         this.timerManager = new TimerManager();
         this.navigator = new QuestionNavigator();
         this.reviewPage = 0;
+        this.mode = 'exam';
+        this.studyQueueSummary = null;
+        this.studySessionResults = new Map();
+        this.studySessionId = null;
 
         this.init();
     }
@@ -106,18 +110,19 @@ class MultiExamSimulator {
         // Exam-only mode: if exam param is provided, auto-start in this page
         const params = new URLSearchParams(window.location.search);
         const examParam = params.get('exam');
+        this.mode = params.get('mode') === 'study' ? 'study' : 'exam';
         if (examParam && examParam !== 'custom' && window.ExamApp.isSafeExamId(examParam)) {
             // Load exam dynamically from window.userExams or localStorage
             if (!this.examData[examParam]) {
                 const loaded = this.loadExamFromRuntime(examParam);
                 if (loaded) {
                     this.currentExam = examParam;
-                    this.startExam();
+                    this.startCurrentMode();
                 }
             } else {
                 this.currentExam = examParam;
                 if (this.examData[this.currentExam].questions.length > 0) {
-                    this.startExam();
+                    this.startCurrentMode();
                 }
             }
         }
@@ -125,7 +130,7 @@ class MultiExamSimulator {
         // If custom exam requested via URL, load it and start
         this.loadCustomExamIfRequested().then((loaded)=>{
             if (loaded) {
-                this.startExam();
+                this.startCurrentMode();
             }
         });
 
@@ -266,6 +271,7 @@ class MultiExamSimulator {
         } else if (typeof q.correct === 'number') {
             q.correct = optionMap.findIndex(o => o.originalIndex === q.correct);
         }
+        q._optionIndexMap = optionMap.map(o => o.originalIndex);
         return q;
     }
 
@@ -755,8 +761,83 @@ class MultiExamSimulator {
     }
 
     toggleMarkForReviewShortcut() {
+        if (this.isStudyMode()) return;
         const btn = document.getElementById('mark-review-btn');
         if (btn) btn.click();
+    }
+
+    isStudyMode() {
+        return this.mode === 'study';
+    }
+
+    startCurrentMode() {
+        if (this.isStudyMode()) {
+            this.startStudyMode();
+            return;
+        }
+        this.startExam();
+    }
+
+    setButtonContent(buttonId, iconClass, labelText) {
+        const button = document.getElementById(buttonId);
+        if (!button) return;
+        button.replaceChildren();
+        const icon = document.createElement('i');
+        icon.setAttribute('aria-hidden', 'true');
+        icon.className = iconClass;
+        button.appendChild(icon);
+        button.appendChild(document.createTextNode(` ${labelText}`));
+    }
+
+    getSessionQuestionLimit(totalQuestions) {
+        const desired = Number(this.examData?.[this.currentExam]?.questionCount);
+        if (Number.isFinite(desired) && desired > 0) {
+            return Math.min(totalQuestions, Math.round(desired));
+        }
+        return Math.min(totalQuestions, 45);
+    }
+
+    consumeStudyFocusQuestions(allQuestions) {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('focus') !== 'missed' || !this.currentExam) return null;
+
+        let payload = null;
+        try {
+            const raw = sessionStorage.getItem(`study_focus_${this.currentExam}`);
+            payload = raw ? JSON.parse(raw) : null;
+            sessionStorage.removeItem(`study_focus_${this.currentExam}`);
+        } catch (_) {
+            payload = null;
+        }
+
+        if (!payload || !Array.isArray(payload.questionIds)) return null;
+        const questionIds = new Set(payload.questionIds.map(value => String(value || '').trim()).filter(Boolean));
+        if (questionIds.size === 0) return null;
+
+        const scheduler = window.ExamApp.studyScheduler;
+        const focused = allQuestions.filter((question, index) => questionIds.has(scheduler?.getQuestionId(question, index) || this.getQuestionStableId(question, index)));
+        return focused.length > 0 ? focused : null;
+    }
+
+    applyExamModeChrome() {
+        document.body?.classList.remove('study-mode');
+        window.ExamApp.setElementHidden(document.querySelector('.exam-timer'), false);
+        window.ExamApp.setElementHidden(document.getElementById('mark-review-btn'), false);
+        window.ExamApp.setElementHidden(document.getElementById('review-marked-btn'), false);
+        this.setButtonContent('show-answer-btn', 'fas fa-lightbulb', 'Show Answer');
+        this.setButtonContent('finish-exam', 'fas fa-check', 'Finish Exam');
+    }
+
+    applyStudyModeChrome() {
+        document.body?.classList.add('study-mode');
+        this.timerManager.stop();
+        const timer = document.getElementById('timer');
+        if (timer) timer.textContent = 'Study';
+        window.ExamApp.setElementHidden(document.querySelector('.exam-timer'), true);
+        window.ExamApp.setElementHidden(document.getElementById('mark-review-btn'), true);
+        window.ExamApp.setElementHidden(document.getElementById('review-marked-btn'), true);
+        this.setButtonContent('show-answer-btn', 'fas fa-check-circle', 'Check Answer');
+        this.setButtonContent('finish-exam', 'fas fa-flag-checkered', 'Finish Study');
     }
 
     startExam() {
@@ -764,6 +845,9 @@ class MultiExamSimulator {
             alert('Please select an exam first.');
             return;
         }
+
+        this.mode = 'exam';
+        this.applyExamModeChrome();
 
         if (this._keyHandler) {
             document.removeEventListener('keydown', this._keyHandler);
@@ -781,6 +865,9 @@ class MultiExamSimulator {
         this.selectedAnswers = {};
         this.markedForReview = new Set();
         this.startTime = new Date();
+        this.studyQueueSummary = null;
+        this.studySessionResults = new Map();
+        this.studySessionId = null;
 
         // Update exam badge in header
         document.getElementById('current-exam-badge').textContent = this.examData[this.currentExam].name;
@@ -809,6 +896,67 @@ class MultiExamSimulator {
         this.showScreen('exam-screen');
     }
 
+    async startStudyMode() {
+        if (!this.currentExam) {
+            alert('Please select an exam first.');
+            return;
+        }
+
+        if (this._keyHandler) {
+            document.removeEventListener('keydown', this._keyHandler);
+            this._keyHandler = null;
+        }
+
+        const full = this.examData[this.currentExam]?.questions || [];
+        if (full.length === 0) {
+            alert(`No questions available for this exam.`);
+            return;
+        }
+
+        this.mode = 'study';
+        this.applyStudyModeChrome();
+        this.currentQuestionIndex = 0;
+        this.selectedAnswers = {};
+        this.markedForReview = new Set();
+        this.startTime = new Date();
+        this.studySessionId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+        this.studySessionResults = new Map();
+
+        const examName = this.examData[this.currentExam].name;
+        const badge = document.getElementById('current-exam-badge');
+        if (badge) {
+            badge.textContent = `${examName} · Study`;
+            badge.className = 'exam-badge study-badge';
+        }
+
+        let records = [];
+        if (window.ExamApp.studyStorage) {
+            records = await window.ExamApp.studyStorage.getRecordsForExam(this.currentExam);
+        }
+
+        const scheduler = window.ExamApp.studyScheduler;
+        const limit = this.getSessionQuestionLimit(full.length);
+        this.studyQueueSummary = scheduler?.summarize(full, records) || null;
+        const focusedQuestions = this.consumeStudyFocusQuestions(full);
+        const queue = focusedQuestions || scheduler?.buildStudyQueue(full, records, { limit }) || this.sampleBalancedQuestions(full, limit);
+        this.activeQuestions = queue.map(q => this.randomizeQuestionOptions(q));
+
+        if (focusedQuestions?.length && badge) {
+            badge.textContent = `${examName} · Missed Study`;
+        }
+
+        this.setupKeyboardShortcuts();
+        this.showQuestion(0);
+        this.showScreen('exam-screen');
+
+        window.ExamApp?.analytics?.trackStudyStarted(this.currentExam, {
+            questionCount: this.activeQuestions.length,
+            dueCount: this.studyQueueSummary?.dueReviewCount,
+            newCount: this.studyQueueSummary?.newCount,
+            weakCount: this.studyQueueSummary?.weakCount
+        });
+    }
+
     showQuestion(index) {
         const questions = this.getCurrentQuestions();
         if (index < 0 || index >= questions.length) return;
@@ -819,7 +967,7 @@ class MultiExamSimulator {
     const question = questions[index];
 
         // Update question display
-        document.getElementById('question-number').textContent = `Question ${index + 1}`;
+        document.getElementById('question-number').textContent = this.isStudyMode() ? `Study Question ${index + 1}` : `Question ${index + 1}`;
         document.getElementById('question-text').innerHTML = this.formatQuestionText(question.question);
 
         // Update question counter
@@ -847,7 +995,12 @@ class MultiExamSimulator {
 
         // Update mark for review button
         const isMarked = this.markedForReview.has(index);
-        document.getElementById('mark-review-btn').classList.toggle('marked', isMarked);
+        const markReviewButton = document.getElementById('mark-review-btn');
+        if (markReviewButton) {
+            markReviewButton.classList.toggle('marked', isMarked);
+            window.ExamApp.setElementHidden(markReviewButton, this.isStudyMode());
+        }
+        window.ExamApp.setElementHidden(document.getElementById('review-marked-btn'), this.isStudyMode());
 
         // Hide answer feedback
         this.closeFeedback();
@@ -1175,6 +1328,7 @@ class MultiExamSimulator {
                             [arr[pos - 1], arr[pos]] = [arr[pos], arr[pos - 1]];
                             this.selectedAnswers[this.currentQuestionIndex] = arr;
                             render();
+                            this.handleAnswerChanged();
                         }
                     });
 
@@ -1184,6 +1338,7 @@ class MultiExamSimulator {
                             [arr[pos], arr[pos + 1]] = [arr[pos + 1], arr[pos]];
                             this.selectedAnswers[this.currentQuestionIndex] = arr;
                             render();
+                            this.handleAnswerChanged();
                         }
                     });
 
@@ -1223,6 +1378,7 @@ class MultiExamSimulator {
                         });
                         this.selectedAnswers[this.currentQuestionIndex] = newOrder;
                         render();
+                        this.handleAnswerChanged();
                     });
 
                     sequenceList.appendChild(item);
@@ -1291,12 +1447,14 @@ class MultiExamSimulator {
                     sel[idx] = 0; // Yes maps to option index 0
                     this.selectedAnswers[this.currentQuestionIndex] = sel;
                     sync();
+                    this.handleAnswerChanged();
                 });
                 no.addEventListener('click', () => {
                     const sel = this.selectedAnswers[this.currentQuestionIndex] || [];
                     sel[idx] = 1; // No maps to option index 1
                     this.selectedAnswers[this.currentQuestionIndex] = sel;
                     sync();
+                    this.handleAnswerChanged();
                 });
                 controls.appendChild(yes);
                 controls.appendChild(no);
@@ -1355,6 +1513,7 @@ class MultiExamSimulator {
                                 sel.push(idx);
                                 this.selectedAnswers[this.currentQuestionIndex] = sel;
                                 render();
+                                this.handleAnswerChanged();
                             }
                         });
                         source.appendChild(btn);
@@ -1374,6 +1533,7 @@ class MultiExamSimulator {
                         if (i >= 0) sel.splice(i, 1);
                         this.selectedAnswers[this.currentQuestionIndex] = sel;
                         render();
+                        this.handleAnswerChanged();
                     });
                     chip.appendChild(rm);
                     target.appendChild(chip);
@@ -1424,6 +1584,7 @@ class MultiExamSimulator {
                     if (e.target.checked) this.selectedAnswers[this.currentQuestionIndex] = index;
                 }
                 this.updateOptionStyles();
+                this.handleAnswerChanged();
             });
 
             const label = document.createElement('label');
@@ -1526,6 +1687,16 @@ class MultiExamSimulator {
                 }
             });
         }
+
+        this.recordStudyAnswer(question, isCorrect, userAnswer);
+    }
+
+    handleAnswerChanged() {
+        this.updateNavigator();
+        const feedback = document.getElementById('answer-feedback');
+        if (this.isStudyMode() && feedback && !feedback.hidden) {
+            this.closeFeedback();
+        }
     }
 
     closeFeedback() {
@@ -1552,6 +1723,7 @@ class MultiExamSimulator {
     }
 
     toggleMarkForReview() {
+        if (this.isStudyMode()) return;
         const index = this.currentQuestionIndex;
         if (this.markedForReview.has(index)) {
             this.markedForReview.delete(index);
@@ -1559,7 +1731,79 @@ class MultiExamSimulator {
             this.markedForReview.add(index);
         }
 
-        document.getElementById('mark-review-btn').classList.toggle('marked', this.markedForReview.has(index));
+        const markReviewButton = document.getElementById('mark-review-btn');
+        if (markReviewButton) {
+            markReviewButton.classList.toggle('marked', this.markedForReview.has(index));
+        }
+    }
+
+
+    getStudyAnswerKey(question, index = this.currentQuestionIndex) {
+        const scheduler = window.ExamApp.studyScheduler;
+        const questionId = scheduler?.getQuestionId(question, index) || String(question?.id || index + 1);
+        return { questionId, answerKey: `${index}:${questionId}` };
+    }
+
+    async saveStudyResult(question, index, isCorrect, userAnswer, options = {}) {
+        if (!this.isStudyMode()) return;
+        const { questionId, answerKey } = this.getStudyAnswerKey(question, index);
+
+        const wasAnswered = this.isAnswerProvided(userAnswer);
+        this.studySessionResults.set(answerKey, { questionId, isCorrect, wasAnswered });
+
+        try {
+            await window.ExamApp.studyStorage?.recordQuestionResult(this.currentExam, questionId, isCorrect, {
+                sessionId: this.studySessionId
+            });
+        } catch (error) {
+            window.ExamApp.warn('Failed to record study answer', error);
+        }
+
+        if (options.trackEvent !== false) {
+            window.ExamApp?.analytics?.trackStudyQuestionAnswered(this.currentExam, {
+                isCorrect,
+                wasAnswered
+            });
+        }
+    }
+
+    async recordStudyAnswer(question, isCorrect, userAnswer) {
+        await this.saveStudyResult(question, this.currentQuestionIndex, isCorrect, userAnswer);
+    }
+
+    getStudyFinalSummary(questions) {
+        const summary = { reviewedCount: 0, correctCount: 0, incorrectCount: 0, skippedCount: 0 };
+        questions.forEach((question, index) => {
+            const userAnswer = this.selectedAnswers[index];
+            if (!this.isAnswerProvided(userAnswer)) {
+                summary.skippedCount++;
+                return;
+            }
+
+            summary.reviewedCount++;
+            if (this.isAnswerCorrect(question, userAnswer)) {
+                summary.correctCount++;
+            } else {
+                summary.incorrectCount++;
+            }
+        });
+        return summary;
+    }
+
+    async persistFinalStudyAnswers(questions) {
+        const saves = [];
+        questions.forEach((question, index) => {
+            const userAnswer = this.selectedAnswers[index];
+            if (!this.isAnswerProvided(userAnswer)) return;
+
+            const isCorrect = this.isAnswerCorrect(question, userAnswer);
+            const { answerKey } = this.getStudyAnswerKey(question, index);
+            const previous = this.studySessionResults.get(answerKey);
+            if (previous && previous.isCorrect === isCorrect && previous.wasAnswered === true) return;
+
+            saves.push(this.saveStudyResult(question, index, isCorrect, userAnswer, { trackEvent: false }));
+        });
+        await Promise.all(saves);
     }
 
     reviewMarkedQuestions() {
@@ -1793,6 +2037,11 @@ class MultiExamSimulator {
         }
 
     finishExam(forceFinish = false) {
+        if (this.isStudyMode()) {
+            this.finishStudySession();
+            return;
+        }
+
         if (!forceFinish) {
             const questions = this.getCurrentQuestions();
             this.showFinishExamConfirmation(this.getUnansweredQuestionIndexes(questions), questions.length);
@@ -1833,7 +2082,134 @@ class MultiExamSimulator {
         this.showScreen('results-screen');
     }
 
+    setResultsCopy(mode) {
+        const scoreLabel = document.querySelector('.score-label');
+        const metaLabels = document.querySelectorAll('.summary-meta .meta-label');
+        const insightTitle = document.querySelector('.insights-header h3');
+        const insightDescription = document.querySelector('.insights-header p');
+        const hint = document.querySelector('.insight-hint span');
+
+        if (mode === 'study') {
+            if (scoreLabel) scoreLabel.textContent = 'Study Accuracy';
+            if (metaLabels[0]) metaLabels[0].textContent = 'Questions reviewed';
+            if (metaLabels[1]) metaLabels[1].textContent = 'Due at start';
+            if (insightTitle) {
+                insightTitle.replaceChildren();
+                const icon = document.createElement('i');
+                icon.setAttribute('aria-hidden', 'true');
+                icon.className = 'fas fa-brain';
+                insightTitle.append(icon, document.createTextNode(' Study Insights'));
+            }
+            if (insightDescription) insightDescription.textContent = 'Review how this study session went before returning to the queue.';
+            if (hint) hint.textContent = 'Weak and due questions move earlier in future study sessions.';
+            return;
+        }
+
+        if (scoreLabel) scoreLabel.textContent = 'Final Score';
+        if (metaLabels[0]) metaLabels[0].textContent = 'Questions answered';
+        if (metaLabels[1]) metaLabels[1].textContent = 'Passing threshold';
+        if (insightTitle) {
+            insightTitle.replaceChildren();
+            const icon = document.createElement('i');
+            icon.setAttribute('aria-hidden', 'true');
+            icon.className = 'fas fa-chart-line';
+            insightTitle.append(icon, document.createTextNode(' Performance Insights'));
+        }
+        if (insightDescription) insightDescription.textContent = 'See how this session compares to the target score.';
+        if (hint) hint.textContent = 'Use Retake Exam to immediately replay with updated question order.';
+    }
+
+    async finishStudySession() {
+        if (this._keyHandler) {
+            document.removeEventListener('keydown', this._keyHandler);
+            this._keyHandler = null;
+        }
+
+        this.timerManager.stop();
+        const questions = this.getCurrentQuestions();
+        const stats = this.getStudyFinalSummary(questions);
+        await this.persistFinalStudyAnswers(questions);
+
+        const reviewedCount = Number(stats.reviewedCount || 0);
+        const correctCount = Number(stats.correctCount || 0);
+        const incorrectCount = Number(stats.incorrectCount || 0);
+        const accuracy = reviewedCount > 0 ? Math.round((correctCount / reviewedCount) * 100) : 0;
+        const timeSpent = Math.round((new Date() - this.startTime) / 1000 / 60);
+
+        this.showStudyResults(accuracy, correctCount, incorrectCount, reviewedCount, questions.length, timeSpent);
+        this.showScreen('results-screen');
+
+        window.ExamApp?.analytics?.trackStudyCompleted(this.currentExam, {
+            questionCount: questions.length,
+            answeredCount: reviewedCount,
+            correctCount,
+            timeSpent
+        });
+    }
+
+    showStudyResults(accuracy, correct, incorrect, reviewed, total, timeSpent) {
+        this.setResultsCopy('study');
+
+        const statusIcon = document.getElementById('result-status-icon');
+        const statusText = document.getElementById('result-status');
+        if (statusIcon) {
+            statusIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            statusIcon.className = 'status-icon studied';
+        }
+        if (statusText) {
+            statusText.textContent = 'STUDY DONE';
+            statusText.className = 'result-status result-status-chip studied';
+        }
+
+        const summaryCard = document.getElementById('resultsSummaryCard');
+        if (summaryCard) {
+            summaryCard.classList.remove('passed', 'failed');
+            summaryCard.classList.add('studied');
+        }
+
+        document.getElementById('percentage-score').textContent = `${accuracy}%`;
+        document.getElementById('correct-count').textContent = correct;
+        document.getElementById('incorrect-count').textContent = incorrect;
+        document.getElementById('time-spent').textContent = `${timeSpent}min`;
+        const timeSecondary = document.getElementById('time-spent-secondary');
+        if (timeSecondary) timeSecondary.textContent = `${timeSpent}min`;
+
+        const examNameEl = document.getElementById('exam-name-result');
+        if (examNameEl) {
+            examNameEl.textContent = this.examData[this.currentExam].name;
+            examNameEl.className = `exam-name-pill exam-name-badge ${this.currentExam}`;
+        }
+
+        const reviewedBase = Math.max(1, reviewed);
+        const correctPercentage = (correct / reviewedBase) * 100;
+        const incorrectPercentage = (incorrect / reviewedBase) * 100;
+        document.getElementById('correct-progress').style.width = `${correctPercentage}%`;
+        document.getElementById('incorrect-progress').style.width = `${incorrectPercentage}%`;
+
+        const accuracyText = document.getElementById('accuracy-percentage');
+        if (accuracyText) accuracyText.textContent = `${accuracy}%`;
+        const missedText = document.getElementById('missed-percentage');
+        if (missedText) missedText.textContent = reviewed > 0 ? `${Math.round(incorrectPercentage)}%` : '0%';
+
+        const totalQuestionsEl = document.getElementById('total-questions-result');
+        if (totalQuestionsEl) totalQuestionsEl.textContent = `${reviewed}/${total}`;
+        const passTargetEl = document.getElementById('pass-score-target');
+        if (passTargetEl) passTargetEl.textContent = `${this.studyQueueSummary?.dueCount ?? 0}`;
+        const scoreVsPass = document.getElementById('score-vs-pass');
+        if (scoreVsPass) scoreVsPass.textContent = `${accuracy}% accuracy`;
+
+        const scoreRing = document.getElementById('scoreRing');
+        if (scoreRing) {
+            const clampedScore = Math.max(0, Math.min(100, accuracy));
+            scoreRing.style.setProperty('--score-deg', `${clampedScore * 3.6}deg`);
+        }
+
+        this.generateDetailedReview();
+    }
+
     showResults(score, passed, correct, incorrect, total, timeSpent) {
+        this.setResultsCopy('exam');
+
         // Update result status
         const statusIcon = document.getElementById('result-status-icon');
         const statusText = document.getElementById('result-status');
@@ -1851,6 +2227,7 @@ class MultiExamSimulator {
         }
         const summaryCard = document.getElementById('resultsSummaryCard');
         if (summaryCard) {
+            summaryCard.classList.remove('studied');
             summaryCard.classList.toggle('passed', passed);
             summaryCard.classList.toggle('failed', !passed);
         }
@@ -2032,15 +2409,69 @@ class MultiExamSimulator {
         });
     }
 
+    getQuestionStableId(question, fallbackIndex) {
+        return String(question?.id ?? '').trim() || `question-${fallbackIndex + 1}`;
+    }
+
+    cloneAnswerForStorage(answer) {
+        if (Array.isArray(answer)) return answer.map(value => Number.isInteger(value) ? value : String(value));
+        if (Number.isInteger(answer)) return answer;
+        if (answer === undefined || answer === null || answer === '') return null;
+        return String(answer);
+    }
+
+    normalizeStoredAnswer(question, answer) {
+        const type = window.ExamApp.normalizeQuestionType(question);
+        const optionIndexMap = Array.isArray(question?._optionIndexMap) ? question._optionIndexMap : null;
+
+        if (!optionIndexMap || ['SEQUENCE', 'YES_NO_MATRIX', 'DRAG_DROP_SELECT'].includes(type)) {
+            return this.cloneAnswerForStorage(answer);
+        }
+
+        if (Array.isArray(answer)) {
+            return answer.map(index => Number.isInteger(index) && optionIndexMap[index] !== undefined ? optionIndexMap[index] : index);
+        }
+
+        if (Number.isInteger(answer)) {
+            return optionIndexMap[answer] !== undefined ? optionIndexMap[answer] : answer;
+        }
+
+        return this.cloneAnswerForStorage(answer);
+    }
+
+    buildAttemptQuestionResults(questions) {
+        return questions.map((question, index) => {
+            const userAnswer = this.selectedAnswers[index];
+            const skipped = !this.isAnswerProvided(userAnswer);
+            return {
+                questionId: this.getQuestionStableId(question, index),
+                order: index + 1,
+                userAnswer: skipped ? null : this.normalizeStoredAnswer(question, userAnswer),
+                correct: skipped ? false : this.isAnswerCorrect(question, userAnswer),
+                skipped
+            };
+        });
+    }
+
     saveProgress(score, passed, timeSpent) {
         const examKey = `${this.currentExam}_progress`;
         let progress = JSON.parse(localStorage.getItem(examKey) || '{"attempts": [], "bestScore": 0, "totalPassed": 0}');
+        const questions = this.getCurrentQuestions();
+        const questionResults = this.buildAttemptQuestionResults(questions);
+        const incorrectCount = questionResults.filter(result => !result.correct && !result.skipped).length;
+        const skippedCount = questionResults.filter(result => result.skipped).length;
 
         const attempt = {
+            attemptId: `attempt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
             date: new Date().toISOString(),
             score: score,
             passed: passed,
             timeSpent: timeSpent,
+            questionCount: questions.length,
+            correctCount: questionResults.filter(result => result.correct).length,
+            incorrectCount,
+            skippedCount,
+            questionResults,
             modules: this.examData[this.currentExam]?.selectedModules || null
         };
 
@@ -2128,7 +2559,11 @@ class MultiExamSimulator {
     restartExam() {
         // Reset and restart current exam
         if (this.currentExam) {
-            this.startExam();
+            if (this.isStudyMode()) {
+                this.startStudyMode();
+            } else {
+                this.startExam();
+            }
         } else {
             this.showScreen('welcome-screen');
         }
@@ -2549,6 +2984,34 @@ window.showExamAttempts = function(examId) {
 
         row.appendChild(right);
         card.appendChild(row);
+
+        if (window.homepage && Array.isArray(attempt.questionResults) && attempt.questionResults.length > 0) {
+            const actions = document.createElement('div');
+            actions.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;';
+
+            const reviewButton = document.createElement('button');
+            reviewButton.type = 'button';
+            reviewButton.style.cssText = 'padding:8px 12px;background:#1e3c72;color:white;border:none;border-radius:7px;font-weight:600;cursor:pointer;';
+            reviewButton.appendChild(createProgressIcon('fas fa-list-check'));
+            reviewButton.appendChild(document.createTextNode(' Review'));
+            reviewButton.addEventListener('click', () => {
+                modal.remove();
+                window.homepage.openAttemptReview(examId, attempt, attempts.length - index - 1);
+            });
+            actions.appendChild(reviewButton);
+
+            const missedIds = window.homepage.getAttemptMissedQuestionIds(attempt);
+            const studyButton = document.createElement('button');
+            studyButton.type = 'button';
+            studyButton.disabled = missedIds.length === 0;
+            studyButton.style.cssText = `padding:8px 12px;background:${missedIds.length > 0 ? '#0f766e' : '#94a3b8'};color:white;border:none;border-radius:7px;font-weight:600;cursor:${missedIds.length > 0 ? 'pointer' : 'not-allowed'};`;
+            studyButton.appendChild(createProgressIcon('fas fa-brain'));
+            studyButton.appendChild(document.createTextNode(missedIds.length > 0 ? ` Study missed (${missedIds.length})` : ' No misses'));
+            studyButton.addEventListener('click', () => window.homepage.startMissedStudy(examId, attempt));
+            actions.appendChild(studyButton);
+
+            card.appendChild(actions);
+        }
         list.appendChild(card);
     });
 
