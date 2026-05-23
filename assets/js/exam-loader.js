@@ -139,9 +139,10 @@ window.ExamApp.loadAllExams = async function() {
                     window.userExams[examId] = {
                         questions: storedExam.questions,
                         metadata: storedExam.metadata,
-                        storage: storedExam.source || 'browser'
+                        source: storedExam.source || 'unknown',
+                        storage: storedExam.storage || 'browser'
                     };
-                    window.ExamApp.log(`✓ Loaded ${examId} from ${storedExam.source || 'browser storage'}: ${storedExam.questions.length} questions`);
+                    window.ExamApp.log(`✓ Loaded ${examId} from ${storedExam.storage || 'browser storage'}: ${storedExam.questions.length} questions`);
                 } catch (error) {
                     console.error(`✗ Failed to load ${examId} from browser storage:`, error);
                 }

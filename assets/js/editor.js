@@ -479,15 +479,16 @@
     }
   }
 
-  async function saveAll(){
+  async function saveAll(options = {}){
+    const notifySuccess = options.notifySuccess !== false;
     syncFromForm();
     const examId = state.exam === 'custom' && state.customCode ? state.customCode : state.exam;
-    if (!examId) { notify('Select or load an exam first'); return; }
-    if (!window.ExamApp.isSafeExamId(examId)) { notify('Invalid exam id'); return; }
+    if (!examId) { notify('Select or load an exam first'); return false; }
+    if (!window.ExamApp.isSafeExamId(examId)) { notify('Invalid exam id'); return false; }
     const validation = window.ExamApp.validateExamData(state.items);
     if (!validation.valid) {
       notify(`Cannot save: ${validation.errors[0]}`);
-      return;
+      return false;
     }
     window.ExamApp.log('Saving exam to browser storage:', examId);
     window.ExamApp.log('Exam ID:', examId);
@@ -518,7 +519,7 @@
     } catch (error) {
       if (!savedToIndexedDB) {
         notify(error?.name === 'QuotaExceededError' ? 'Browser storage is full. Export your edits before adding more content.' : 'Could not save this exam in browser storage.');
-        return;
+        return false;
       }
       window.ExamApp.warn(`Legacy localStorage mirror skipped for ${examId}:`, error);
     }
@@ -544,7 +545,10 @@
     updatePersistenceHint();
 
     // Gentle toast-ish feedback without blocking
-    notify('Saved locally in this browser. Open a PR to publish changes, or an issue to request a correction.');
+    if (notifySuccess) {
+      notify('Saved locally in this browser. Open a PR to publish changes, or an issue to request a correction.');
+    }
+    return true;
   }
 
   // Show hint about persisting changes to dump.json
@@ -749,13 +753,22 @@
     }
   }
 
-  function performDelete(q){
+  async function performDelete(q){
     const idx = state.items.indexOf(q);
     if (idx >= 0) {
       state.items.splice(idx, 1);
 
-      // Auto-save after delete (persist to localStorage and window.userExams)
-      saveAll();
+      // Auto-save after delete (persist to browser storage and window.userExams)
+      const saved = await saveAll({ notifySuccess: false });
+      if (!saved) {
+        state.items.splice(idx, 0, q);
+        applyFilter();
+        state.currentIndex = Math.max(0, Math.min(idx, state.filtered.length - 1));
+        renderList();
+        renderForm();
+        notify('Question was not deleted because saving failed.');
+        return;
+      }
 
       applyFilter();
       state.currentIndex = Math.max(0, Math.min(state.currentIndex, state.filtered.length - 1));
@@ -1219,7 +1232,7 @@
     $('#addNew').addEventListener('click', addNew);
     $('#addOption').addEventListener('click', addOption);
   // Single Save button
-  $('#save').addEventListener('click', saveAll);
+  $('#save').addEventListener('click', () => saveAll());
     $('#clearOverride').addEventListener('click', clearOverride);
     $('#exportJson').addEventListener('click', exportJson);
     $('#importJson').addEventListener('click', importJson);

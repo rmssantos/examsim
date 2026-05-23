@@ -93,7 +93,7 @@
                 const metadataRaw = localStorage.getItem(this.legacyMetadataKey(examId));
                 const metadata = metadataRaw ? JSON.parse(metadataRaw) : null;
                 if (!Array.isArray(questions)) return null;
-                return { examId, questions, metadata, source: 'localStorage' };
+                return { examId, questions, metadata, source: 'legacy-localStorage', storage: 'localStorage' };
             } catch (error) {
                 window.ExamApp.warn(`Failed to read legacy exam ${examId}:`, error);
                 return null;
@@ -243,7 +243,7 @@
             if (!window.ExamApp.isSafeExamId(examId)) return null;
             const record = await this.getRecord(this.examStore, examId);
             if (record && Array.isArray(record.questions)) {
-                return { ...record, source: 'indexedDB' };
+                return { ...record, storage: 'indexedDB' };
             }
 
             const legacy = this.getLegacyExam(examId);
@@ -251,6 +251,7 @@
                 try {
                     await this.putExam(examId, legacy.questions, legacy.metadata, { source: 'migrated-localStorage' });
                     window.ExamApp.analytics?.trackStorageMigration?.('exam', 'success');
+                    return { ...legacy, source: 'migrated-localStorage', storage: 'indexedDB' };
                 } catch (error) {
                     window.ExamApp.warn(`Failed to migrate ${examId} to IndexedDB:`, error);
                     window.ExamApp.analytics?.trackStorageMigration?.('exam', this.isQuotaError(error) ? 'quota_error' : 'failed');
