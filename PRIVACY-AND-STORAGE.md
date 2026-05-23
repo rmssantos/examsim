@@ -3,7 +3,7 @@
 ## 🔒 Critical Information: Your Data Stays Local
 
 ### TL;DR
-**Exam content, answers, progress, imports, and images stay in the user's browser storage (`localStorage` and IndexedDB for image data). Each user's study data is isolated and private.**
+**Exam content, answers, progress, imports, and images stay in the user's browser storage (`localStorage` for small settings and IndexedDB for larger local data). Each user's study data is isolated and private.**
 
 The public GitHub Pages version uses aggregate analytics to understand visits and exam usage. It does not collect question text, answers, imported files, filenames, personal study data, names, emails, or a persistent visitor ID. Local/offline use does not send analytics.
 
@@ -84,12 +84,12 @@ Server (completely empty, no dumps)
 1. Opens `http://your-server:8000`
 2. Sees "No exams found" message
 3. Drags `ai900-dump.json` onto the page
-4. **Dump is saved to User A's browser `localStorage`**
+4. **Dump is saved to User A's browser storage**
 5. User A sees the AI-900 exam card
 6. Can take exams, track progress, etc.
 
 **Where is the data?**
-- ✅ User A's browser → `localStorage['custom_ai900_questions']`
+- ✅ User A's browser → IndexedDB exam content, with legacy `localStorage` fallback when needed
 - ❌ NOT on the server
 - ❌ NOT in any database
 - ❌ NOT accessible to anyone else
@@ -111,32 +111,38 @@ Server (completely empty, no dumps)
 
 ## Data Storage Locations
 
-### Client-Side (Browser localStorage)
+### Client-Side (Browser Storage)
 
 All data is stored in the user's browser:
 
 ```javascript
-// Questions
-localStorage['custom_ai900_questions']  // User's imported questions
-localStorage['custom_ai102_questions']
+// Imported questions and larger local exam content
+IndexedDB['ExamContentDB'].exams
 
-// Metadata
-localStorage['exam_metadata_ai900']     // Exam configuration
-localStorage['exam_metadata_ai102']
+// Imported images
+IndexedDB['ExamImagesDB'].images
+IndexedDB['ExamImagesDB'].image_metadata
 
-// Progress
-localStorage['ai900_progress']          // User's exam history and recent local attempt review summaries
-localStorage['ai102_progress']
+// Detailed progress and recent attempt review summaries
+IndexedDB['ExamContentDB'].progress
+
+// Legacy compatibility fallback for older browser data
+localStorage['custom_ai900_questions']
+localStorage['exam_metadata_ai900']
+localStorage['ai900_progress']
 
 // Settings
 localStorage['exam_activation_config']  // Which exams are visible
 localStorage['theme']                   // Dark/light mode preference
+localStorage['exam_analytics_opt_out']  // Online analytics preference
 ```
 
+Existing `localStorage` exams and progress are read for backwards compatibility and migrated opportunistically into IndexedDB after a successful load. The legacy keys may remain as a compatibility mirror; they are not uploaded anywhere.
+
 **Location on disk:**
-- **Chrome/Edge**: `%LocalAppData%\Google\Chrome\User Data\Default\Local Storage\`
-- **Firefox**: `%AppData%\Mozilla\Firefox\Profiles\*.default\storage\default\`
-- **Safari**: `~/Library/Safari/LocalStorage/`
+- Browser storage is scoped by site/origin and browser profile.
+- Chrome/Edge, Firefox, and Safari store `localStorage`, IndexedDB, and Cache Storage under their profile storage folders.
+- Clearing site data, browser data, or the browser profile can remove both `localStorage` and IndexedDB data.
 
 ### Server-Side (Optional Pre-Installed Exams)
 
@@ -166,7 +172,7 @@ user-content/exams/
 
 1. **User-imported exams** - Only visible to the user who imported them
 2. **Progress data** - Stored locally, never sent to server; recent attempts include lightweight review data with question IDs, selected answers, and correct/skipped status
-3. **Editor-created questions** - Saved in user's localStorage
+3. **Editor-created questions** - Saved in the user's browser storage
 4. **Theme preferences** - Local to each browser
 5. **Exam activation settings** - Local to each user
 
@@ -245,7 +251,7 @@ user-content/exams/
 - ✅ Access server logs (HTTP requests)
 
 **Admin CANNOT see:**
-- ❌ User-imported dumps (stored in browser localStorage)
+- ❌ User-imported dumps (stored in browser storage)
 - ❌ User progress or scores
 - ❌ User answers or attempt history
 - ❌ Which users imported what
@@ -259,14 +265,14 @@ user-content/exams/
 **Users CANNOT see:**
 - ❌ Other users' imported dumps
 - ❌ Other users' progress
-- ❌ Other users' localStorage data
+- ❌ Other users' browser storage data
 - ❌ Anything from other users' browsers
 
 ---
 
 ## Technical Details
 
-### How localStorage Works
+### How Browser Storage Works
 
 ```javascript
 // When user imports a dump via drag & drop
@@ -275,12 +281,12 @@ async importJsonFile(file) {
     const data = JSON.parse(text);
     let examId = file.name.replace(/\.(json|zip)$/i, '');
 
-    // Store in localStorage (client-side ONLY)
+    // Store in browser storage (client-side ONLY)
     await window.examManager.importExam(examId, data);
 
     // This creates:
-    // localStorage['custom_' + examId + '_questions'] = JSON.stringify(data.questions)
-    // localStorage['exam_metadata_' + examId] = JSON.stringify(data.metadata)
+    // IndexedDB['ExamContentDB'].exams[examId]
+    // Optional legacy localStorage mirror for backwards compatibility
 }
 ```
 
@@ -288,7 +294,7 @@ async importJsonFile(file) {
 1. Data never leaves the browser
 2. No HTTP POST to server
 3. No network requests for user data
-4. Everything stays in browser memory/localStorage
+4. Everything stays in browser memory/storage
 
 ### Network Traffic Analysis
 
@@ -297,12 +303,18 @@ async importJsonFile(file) {
 Browser → [LOCAL OPERATION] → localStorage
 ```
 
+or, for newer imports:
+
+```
+Browser → [LOCAL OPERATION] → IndexedDB
+```
+
 **NO network traffic to server!**
 
 **When user takes an exam:**
 ```
-Browser → Reads from localStorage → Displays questions
-Browser → Saves progress → localStorage
+Browser → Reads from browser storage → Displays questions
+Browser → Saves progress → browser storage
 ```
 
 **NO network traffic to server!**
@@ -334,7 +346,7 @@ User → Server → Database
 ### This Simulator
 
 ```
-User → Browser localStorage
+User → Browser storage
      ↓
   Server knows nothing:
   - No user tracking
@@ -348,7 +360,7 @@ User → Browser localStorage
 ## FAQ
 
 ### Q: Can the server admin see my progress?
-**A:** No. Progress is stored in your browser's localStorage only.
+**A:** No. Progress is stored in your browser storage only (`IndexedDB`, with legacy `localStorage` fallback/mirror for older data).
 
 ### Q: If I import a dump, can other users see it?
 **A:** No. Your imported dumps are private to your browser.
@@ -385,9 +397,9 @@ User → Browser localStorage
 
 1. **Open browser DevTools (F12)**
 2. **Go to Application tab**
-3. **Select Local Storage**
+3. **Select IndexedDB**
 4. **Import a dump**
-5. **Watch localStorage populate in real-time**
+5. **Open `ExamContentDB` and watch the `exams` store populate**
 6. **Check Network tab** - No POST requests for user data!
 
 ### Network Monitoring

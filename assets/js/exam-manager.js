@@ -109,8 +109,8 @@ class ExamManager {
             foundExams.push(...activeExams);
         }
 
-        // Also check localStorage for custom exams (if active)
-        const customExams = this.getCustomExamsFromStorage();
+        // Also check browser storage for custom exams (if active)
+        const customExams = await this.getCustomExamsFromStorage();
         const activeCustomExams = customExams.filter(id => this.isExamActive(id));
         foundExams.push(...activeCustomExams);
 
@@ -124,9 +124,9 @@ class ExamManager {
             // Try to load from user-content first
             let examData = await this.loadFromUserContent(examId);
 
-            // If not found, try localStorage
+            // If not found, try browser storage
             if (!examData) {
-                examData = this.loadFromLocalStorage(examId);
+                examData = await this.loadFromLocalStorage(examId);
             }
 
             if (examData && examData.questions && examData.questions.length > 0) {
@@ -168,37 +168,42 @@ class ExamManager {
         return null;
     }
 
-    // Load exam from localStorage
-    loadFromLocalStorage(examId) {
+    // Load exam from browser storage
+    async loadFromLocalStorage(examId) {
         try {
-            const storageKey = `custom_${examId}_questions`;
-            const stored = localStorage.getItem(storageKey);
-            if (stored) {
-                const questions = JSON.parse(stored);
-                return { questions };
+            if (window.userExams && window.userExams[examId]?.questions) {
+                return window.userExams[examId];
+            }
+
+            if (window.ExamApp.examStorage) {
+                const stored = await window.ExamApp.examStorage.getExam(examId);
+                if (stored?.questions) {
+                    return { questions: stored.questions, metadata: stored.metadata };
+                }
+            }
+
+            const legacy = window.ExamApp.examStorage?.getLegacyExam(examId);
+            if (legacy?.questions) {
+                return { questions: legacy.questions, metadata: legacy.metadata };
             }
         } catch (error) {
-            window.ExamApp.warn(`Failed to load ${examId} from localStorage:`, error);
+            window.ExamApp.warn(`Failed to load ${examId} from browser storage:`, error);
         }
         return null;
     }
 
-    // Get custom exams from localStorage
-    getCustomExamsFromStorage() {
+    // Get custom exams from browser storage
+    async getCustomExamsFromStorage() {
         const customExams = window.ExamApp.getRegistry(window.ExamApp.STORAGE_KEYS.exams);
         try {
-            const len = localStorage.length;
-            for (let i = 0; i < len; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith('custom_') && key.endsWith('_questions')) {
-                    const examId = key.replace('custom_', '').replace('_questions', '');
-                    if (examId) {
-                        if (window.ExamApp.isSafeExamId(examId) && !customExams.includes(examId)) customExams.push(examId);
-                    }
-                }
+            const storedIds = window.ExamApp.examStorage
+                ? await window.ExamApp.examStorage.listExamIds()
+                : [];
+            for (const examId of storedIds) {
+                if (window.ExamApp.isSafeExamId(examId) && !customExams.includes(examId)) customExams.push(examId);
             }
         } catch (error) {
-            window.ExamApp.warn('Error reading custom exams from localStorage:', error);
+            window.ExamApp.warn('Error reading custom exams from browser storage:', error);
         }
         window.ExamApp.setRegistry(window.ExamApp.STORAGE_KEYS.exams, customExams);
         return customExams;
@@ -274,15 +279,31 @@ class ExamManager {
                 throw new Error(`Invalid question format: ${validation.errors.slice(0, 3).join('; ')}`);
             }
 
-            // Store in localStorage with special marker
-            const storageKey = `custom_${examId}_questions`;
-            localStorage.setItem(storageKey, JSON.stringify(questions));
-            window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.exams, examId);
-
             // Generate and store metadata
-            const metadataKey = `exam_metadata_${examId}`;
             const finalMetadata = metadata || this.generateMetadata(examId, questions);
-            localStorage.setItem(metadataKey, JSON.stringify(finalMetadata));
+
+            let savedToIndexedDB = false;
+            if (window.ExamApp.examStorage) {
+                try {
+                    savedToIndexedDB = await window.ExamApp.examStorage.putExam(examId, questions, finalMetadata, { source: 'imported' });
+                } catch (error) {
+                    window.ExamApp.warn(`IndexedDB save failed for ${examId}, trying legacy storage:`, error);
+                }
+            }
+
+            try {
+                if (window.ExamApp.examStorage) {
+                    window.ExamApp.examStorage.putLegacyExam(examId, questions, finalMetadata);
+                } else {
+                    localStorage.setItem(`custom_${examId}_questions`, JSON.stringify(questions));
+                    localStorage.setItem(`exam_metadata_${examId}`, JSON.stringify(finalMetadata));
+                }
+            } catch (error) {
+                if (!savedToIndexedDB) throw error;
+                window.ExamApp.warn(`Legacy localStorage mirror skipped for ${examId}:`, error);
+            }
+
+            window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.exams, examId);
 
             // Also add to window.userExams immediately (so it appears without refresh)
             if (!window.userExams) window.userExams = {};
@@ -324,11 +345,16 @@ class ExamManager {
     }
 
     // Delete exam
-    deleteExam(examId) {
+    async deleteExam(examId) {
         try {
             if (!window.ExamApp.isSafeExamId(examId)) return false;
-            localStorage.removeItem(`custom_${examId}_questions`);
-            localStorage.removeItem(`exam_metadata_${examId}`);
+            if (window.ExamApp.examStorage) {
+                await window.ExamApp.examStorage.deleteExam(examId);
+            } else {
+                localStorage.removeItem(`custom_${examId}_questions`);
+                localStorage.removeItem(`exam_metadata_${examId}`);
+                localStorage.removeItem(`${examId}_progress`);
+            }
             window.ExamApp.removeFromRegistry(window.ExamApp.STORAGE_KEYS.exams, examId);
             window.ExamApp.removeFromRegistry(window.ExamApp.STORAGE_KEYS.progress, examId);
             this.availableExams.delete(examId);

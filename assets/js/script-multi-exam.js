@@ -302,6 +302,7 @@ class MultiExamSimulator {
         for (const examId of Object.keys(this.examData)) {
             try {
                 if (!window.ExamApp.isSafeExamId(examId)) continue;
+                if (window.userExams?.[examId]?.storage === 'indexedDB') continue;
                 const overrideRaw = localStorage.getItem(`custom_${examId}_questions`);
                 if (overrideRaw) {
                     const parsed = JSON.parse(overrideRaw);
@@ -437,6 +438,9 @@ class MultiExamSimulator {
             }
             const getMeta = (questions) => {
                 // 1) Prefer existing metadata
+                if (window.userExams?.[code]?.metadata) {
+                    return window.userExams[code].metadata;
+                }
                 try {
                     const rawMeta = localStorage.getItem(`exam_metadata_${code}`);
                     if (rawMeta) {
@@ -463,7 +467,27 @@ class MultiExamSimulator {
                 };
             };
 
-            // Try localStorage override first
+            // Try browser-loaded custom exam first
+            if (window.userExams?.[code]?.questions) {
+                const data = window.userExams[code].questions;
+                if (Array.isArray(data) && data.length && window.ExamApp.validateExamData(data).valid) {
+                    const meta = getMeta(data);
+                    this.examData['custom'] = {
+                        name: meta.name || code.toUpperCase(),
+                        fullName: meta.fullName || meta.name || code,
+                        duration: Number.isFinite(Number(meta.duration)) ? Number(meta.duration) : 45,
+                        questionCount: Number.isFinite(Number(meta.questionCount)) ? Number(meta.questionCount) : 45,
+                        passScore: Number.isFinite(Number(meta.passScore)) ? Number(meta.passScore) : 70,
+                        questions: data,
+                        modules: Array.isArray(meta.modules) ? meta.modules : [],
+                        resources: []
+                    };
+                    this.currentExam = 'custom';
+                    return true;
+                }
+            }
+
+            // Try legacy localStorage override next
             try {
                 const raw = localStorage.getItem(`custom_${code}_questions`);
                 if (raw) {
@@ -2485,8 +2509,17 @@ class MultiExamSimulator {
 
     saveProgressToStorage(examKey, progress) {
         this.trimAttemptReviewDetails(progress);
+        const examId = String(examKey || '').replace(/_progress$/, '');
+        const mirrorToIndexedDB = () => {
+            if (window.ExamApp.examStorage && window.ExamApp.isSafeExamId(examId)) {
+                window.ExamApp.examStorage.putProgress(examId, progress).catch(error => {
+                    window.ExamApp.warn(`Failed to mirror ${examId} progress to IndexedDB:`, error);
+                });
+            }
+        };
         try {
             localStorage.setItem(examKey, JSON.stringify(progress));
+            mirrorToIndexedDB();
             return true;
         } catch (error) {
             if (!(error.name === 'QuotaExceededError' || error.code === 22)) throw error;
@@ -2494,6 +2527,7 @@ class MultiExamSimulator {
 
         this.trimAttemptReviewDetails(progress, 1);
         localStorage.setItem(examKey, JSON.stringify(progress));
+        mirrorToIndexedDB();
         return true;
     }
 

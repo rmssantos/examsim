@@ -5,7 +5,7 @@
  * This module automatically:
  * - Discovers exam directories in user-content/exams/
  * - Loads dump.json and metadata.json from each directory
- * - Checks localStorage for imported exams
+ * - Checks browser storage for imported exams
  * - Populates window.userExams with all available exams
  */
 
@@ -115,37 +115,47 @@ window.ExamApp.loadAllExams = async function() {
     // Wait for all exams to load
     await Promise.all(loadPromises);
 
-    // Also check localStorage for imported exams
-    window.ExamApp.log('🔍 Checking localStorage for imported exams...');
-    const len = localStorage.length;
-    for (let i = 0; i < len; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('custom_') && key.endsWith('_questions')) {
-            const examId = key.replace('custom_', '').replace('_questions', '');
-            if (!window.ExamApp.isSafeExamId(examId)) {
-                window.ExamApp.warn(`Skipping invalid localStorage exam id: ${examId}`);
-            } else if (!window.userExams[examId]) {
-                try {
-                    const questions = JSON.parse(localStorage.getItem(key));
-                    const metadataKey = `exam_metadata_${examId}`;
-                    const metadataRaw = localStorage.getItem(metadataKey);
-                    const metadata = metadataRaw ? JSON.parse(metadataRaw) : null;
+    // Also check browser storage for imported exams and local edits.
+    window.ExamApp.log('🔍 Checking browser storage for imported exams...');
+    if (window.ExamApp.examStorage) {
+        try {
+            const storedExamIds = await window.ExamApp.examStorage.listExamIds();
+            for (const examId of storedExamIds) {
+                if (!window.ExamApp.isSafeExamId(examId)) {
+                    window.ExamApp.warn(`Skipping invalid stored exam id: ${examId}`);
+                    continue;
+                }
 
-                    const validation = window.ExamApp.validateExamData(questions, metadata);
+                try {
+                    const storedExam = await window.ExamApp.examStorage.getExam(examId);
+                    if (!storedExam || !Array.isArray(storedExam.questions)) continue;
+
+                    const validation = window.ExamApp.validateExamData(storedExam.questions, storedExam.metadata);
                     if (!validation.valid) {
-                        console.error(`✗ Failed to load ${examId} from localStorage: invalid data`, validation.errors.slice(0, 10));
+                        console.error(`✗ Failed to load ${examId} from browser storage: invalid data`, validation.errors.slice(0, 10));
                         continue;
                     }
 
                     window.userExams[examId] = {
-                        questions: questions,
-                        metadata: metadata
+                        questions: storedExam.questions,
+                        metadata: storedExam.metadata,
+                        source: storedExam.source || 'unknown',
+                        storage: storedExam.storage || 'browser'
                     };
-                    window.ExamApp.log(`✓ Loaded ${examId} from localStorage: ${questions.length} questions`);
-                } catch (e) {
-                    console.error(`✗ Failed to load ${examId} from localStorage:`, e);
+                    window.ExamApp.log(`✓ Loaded ${examId} from ${storedExam.storage || 'browser storage'}: ${storedExam.questions.length} questions`);
+                } catch (error) {
+                    console.error(`✗ Failed to load ${examId} from browser storage:`, error);
                 }
             }
+        } catch (error) {
+            window.ExamApp.warn('Failed to inspect browser exam storage:', error);
+        }
+
+        try {
+            const progressExamIds = await window.ExamApp.examStorage.listProgressExamIds();
+            await Promise.all(progressExamIds.map(examId => window.ExamApp.examStorage.getProgress(examId)));
+        } catch (error) {
+            window.ExamApp.warn('Failed to migrate browser progress storage:', error);
         }
     }
 

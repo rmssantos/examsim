@@ -120,7 +120,7 @@ Refresh the page → Exams appear automatically!
 
 1. Open simulator in browser
 2. Drag `dump.json` file onto the homepage
-3. Exam imported to localStorage
+3. Exam imported to browser storage
 4. Card appears immediately
 
 Dropping a `.zip` exam pack works too—the simulator reads `dump.json`/`metadata.json` automatically and lets you know if you need to copy bundled images into `user-content/exams/<examId>/images/`.
@@ -199,7 +199,7 @@ Click "Export Progress" to download:
 3. **Add questions** - Click "Add Question"
 4. **Fill details** - Question text, options, correct answer, explanation
 5. **Add images (server mode)** - Upload/place images under `user-content/exams/<examId>/images/` and reference them in questions/explanations
-6. **Save** - Questions saved to localStorage automatically
+6. **Save** - Questions saved to browser storage automatically
 7. **Export** - Download as JSON to share
 
 ### Supported Question Types
@@ -287,14 +287,14 @@ If no metadata file, simulator auto-generates basic settings.
 
 ### Progress cards show no data
 - **Fix:** Complete at least one exam to generate progress
-- **Note:** Data is stored per-exam in localStorage
+- **Note:** Data is stored per-exam in local browser storage
 
 ### Exam shows "DUMP" name
 - **Fix:** Add `metadata.json` to exam folder
 - **Or:** Accept generic name for testing
 
 ### Save not working in editor
-- **Fix:** Check browser localStorage is enabled
+- **Fix:** Check browser site data/storage is enabled
 - **Backup:** Export questions as JSON regularly
 
 ### Giant empty space in exam view
@@ -304,17 +304,21 @@ If no metadata file, simulator auto-generates basic settings.
 
 ## 📊 Data Storage
 
-Everything stored in browser localStorage:
+Everything is stored locally in browser storage:
 
 ```javascript
-// Questions (per exam)
-localStorage['custom_<examId>_questions']  // e.g., custom_myexam_questions
+// Questions, metadata, and detailed progress
+IndexedDB['ExamContentDB'].exams
+IndexedDB['ExamContentDB'].progress
 
-// Metadata (per exam)
-localStorage['exam_metadata_<examId>']     // e.g., exam_metadata_myexam
+// Images
+IndexedDB['ExamImagesDB'].images
+IndexedDB['ExamImagesDB'].image_metadata
 
-// Progress (per exam)
-localStorage['<examId>_progress']          // e.g., myexam_progress
+// Legacy compatibility mirrors may exist
+localStorage['custom_<examId>_questions']
+localStorage['exam_metadata_<examId>']
+localStorage['<examId>_progress']
 
 // Settings
 localStorage['exam_activation_config']

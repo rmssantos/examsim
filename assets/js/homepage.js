@@ -1699,12 +1699,17 @@ if (!confirm(`⚠️ Are you sure you want to completely remove exam "${examId}"
 return;
 }
 
-// Remove from localStorage (correct keys)
+// Remove questions, metadata, and progress from browser storage
+if (window.ExamApp.examStorage) {
+await window.ExamApp.examStorage.deleteExam(examId);
+} else {
 localStorage.removeItem(`custom_${examId}_questions`);
 localStorage.removeItem(`exam_metadata_${examId}`);
-localStorage.removeItem(`exam_images_list_${examId}`);
+localStorage.removeItem(`${examId}_progress`);
 window.ExamApp.removeFromRegistry(window.ExamApp.STORAGE_KEYS.exams, examId);
 window.ExamApp.removeFromRegistry(window.ExamApp.STORAGE_KEYS.progress, examId);
+}
+localStorage.removeItem(`exam_images_list_${examId}`);
 
 // Remove from memory
 if (window.userExams) {
