@@ -1,4 +1,4 @@
-// Dynamic Home Page Management
+﻿// Dynamic Home Page Management
 class HomePage {
 constructor() {
 this.examSelection = document.getElementById('exam-selection');
@@ -150,6 +150,16 @@ const value = String(icon || '').trim();
 return /^[a-zA-Z0-9 _-]+$/.test(value) ? value : fallback;
 }
 
+normalizeModuleName(module) {
+return String(typeof module === 'string' ? module : module?.name || module || '').trim();
+}
+
+getModuleNames(modules) {
+return (Array.isArray(modules) ? modules : [])
+	.map(module => this.normalizeModuleName(module))
+	.filter(Boolean);
+}
+
 safeExternalUrl(url) {
 const value = String(url || '').trim();
 if (!value) return '#';
@@ -230,7 +240,7 @@ startButton.appendChild(this.createIcon('fas fa-play'));
 startButton.appendChild(document.createTextNode(' Start'));
 startButton.addEventListener('click', (e) => {
 	e.stopPropagation();
-	this.selectedExamId = examId;
+	this.selectExam(examId);
 	this.startSelectedExam();
 });
 card.appendChild(startButton);
@@ -394,14 +404,126 @@ document.getElementById('details-pass-rate').textContent = stats?.passRate != nu
 const modulesSection = document.getElementById('details-modules-section');
 const modulesList = document.getElementById('details-modules-list');
 const resourcesList = document.getElementById('details-resources-list');
+const moduleNames = this.getModuleNames(metadata.modules);
 
-if (metadata.modules && metadata.modules.length > 0) {
+if (moduleNames.length > 0) {
 modulesSection.style.display = 'block';
 modulesList.innerHTML = '';
-metadata.modules.forEach(module => {
-const name = typeof module === 'string' ? module : module.name || String(module || '');
-this.appendTextElement(modulesList, 'li', '', name);
+modulesList.className = 'modules-list selectable-list';
+modulesList.dataset.exam = examId;
+
+const moduleQuestionCounts = new Map();
+examData.questions.forEach(question => {
+	const moduleKey = this.normalizeModuleName(question.module).toLowerCase();
+	if (!moduleKey) return;
+	moduleQuestionCounts.set(moduleKey, (moduleQuestionCounts.get(moduleKey) || 0) + 1);
 });
+
+const setModuleChecked = (item, checked) => {
+	item.classList.toggle('checked', checked);
+	item.setAttribute('aria-checked', String(checked));
+};
+
+const toggleModuleItem = item => {
+	setModuleChecked(item, !item.classList.contains('checked'));
+	this.updateSelectedQuestionsCount(examId);
+};
+
+// Clear any existing controls first to avoid duplicates
+const existingControls = modulesSection.querySelector('.modules-select-controls');
+if (existingControls) {
+	existingControls.remove();
+}
+
+// Create Select All / Deselect All controls
+const selectControls = document.createElement('div');
+selectControls.className = 'modules-select-controls';
+
+const selectAllBtn = document.createElement('button');
+selectAllBtn.className = 'modules-select-btn';
+selectAllBtn.type = 'button';
+selectAllBtn.textContent = 'Select All';
+
+const separator = document.createElement('span');
+separator.className = 'modules-select-separator';
+separator.textContent = '|';
+
+const selectNoneBtn = document.createElement('button');
+selectNoneBtn.className = 'modules-select-btn';
+selectNoneBtn.type = 'button';
+selectNoneBtn.textContent = 'Deselect All';
+
+selectControls.appendChild(selectAllBtn);
+selectControls.appendChild(separator);
+selectControls.appendChild(selectNoneBtn);
+
+modulesList.parentNode.insertBefore(selectControls, modulesList);
+
+metadata.modules.forEach(module => {
+	const name = this.normalizeModuleName(module);
+	if (!name) return;
+	const iconClass = typeof module === 'string' ? 'fas fa-graduation-cap' : module.icon || 'fas fa-graduation-cap';
+	const qCount = moduleQuestionCounts.get(name.toLowerCase()) || 0;
+
+	const li = document.createElement('li');
+	li.className = 'checked';
+	li.dataset.module = name;
+	li.tabIndex = 0;
+	li.setAttribute('role', 'checkbox');
+	li.setAttribute('aria-checked', 'true');
+
+	const contentWrapper = document.createElement('div');
+	contentWrapper.className = 'module-item-content';
+
+	const checkboxWrapper = document.createElement('div');
+	checkboxWrapper.className = 'module-checkbox-wrapper';
+
+	const checkboxCustom = document.createElement('div');
+	checkboxCustom.className = 'module-checkbox-custom';
+
+	checkboxWrapper.appendChild(checkboxCustom);
+	contentWrapper.appendChild(checkboxWrapper);
+
+	if (iconClass) {
+		contentWrapper.appendChild(this.createIcon(iconClass, 'module-icon'));
+	}
+
+	const titleSpan = document.createElement('span');
+	titleSpan.className = 'module-item-title';
+	titleSpan.textContent = name;
+	contentWrapper.appendChild(titleSpan);
+
+	const badgeSpan = document.createElement('span');
+	badgeSpan.className = 'module-qcount-badge';
+	badgeSpan.textContent = `${qCount} Qs`;
+
+	li.appendChild(contentWrapper);
+	li.appendChild(badgeSpan);
+
+	li.addEventListener('click', () => toggleModuleItem(li));
+	li.addEventListener('keydown', event => {
+		if (event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			toggleModuleItem(li);
+		}
+	});
+
+	modulesList.appendChild(li);
+});
+
+// Click handlers for Select All / Deselect All
+selectAllBtn.addEventListener('click', () => {
+	modulesList.querySelectorAll('li').forEach(li => setModuleChecked(li, true));
+	this.updateSelectedQuestionsCount(examId);
+});
+
+selectNoneBtn.addEventListener('click', () => {
+	modulesList.querySelectorAll('li').forEach(li => setModuleChecked(li, false));
+	this.updateSelectedQuestionsCount(examId);
+});
+
+// Initialize selected questions count
+this.updateSelectedQuestionsCount(examId);
 
 if (metadata.resources && metadata.resources.length > 0) {
 	resourcesList.innerHTML = '';
@@ -420,6 +542,12 @@ if (metadata.resources && metadata.resources.length > 0) {
 }
 } else {
 modulesSection.style.display = 'none';
+delete modulesList.dataset.exam;
+// Clear controls if hidden
+const existingControls = modulesSection.querySelector('.modules-select-controls');
+if (existingControls) {
+	existingControls.remove();
+}
 }
 
 // Setup start button
@@ -450,17 +578,65 @@ this.scrollToExamLibrary();
 }
 
 startSelectedExam() {
-if (!this.selectedExamId) {
-	window.showCustomAlert('Select an Exam', 'Please select an exam card from the library before proceeding.', 'warning');
-	return;
+	if (!this.selectedExamId) {
+		window.showCustomAlert('Select an Exam', 'Please select an exam card from the library before proceeding.', 'warning');
+		return;
+	}
+
+	const examData = window.userExams[this.selectedExamId];
+	const metadata = examData?.metadata || {};
+	const moduleNames = this.getModuleNames(metadata.modules);
+	let urlParams = `exam=${encodeURIComponent(this.selectedExamId)}`;
+
+	if (moduleNames.length > 0) {
+		const modulesList = document.getElementById('details-modules-list');
+		const panelMatchesExam = modulesList?.dataset.exam === this.selectedExamId;
+		const selectedModules = panelMatchesExam
+			? Array.from(modulesList.querySelectorAll('li.checked')).map(li => li.dataset.module).filter(Boolean)
+			: moduleNames;
+
+		if (selectedModules.length === 0) {
+			window.showCustomAlert('No Modules Selected', 'Please select at least one module to start practicing.', 'warning');
+			return;
+		}
+
+		urlParams += `&modules=${encodeURIComponent(JSON.stringify(selectedModules))}`;
+	}
+
+	const simulator = window.ExamApp?.examSimulator || window.examSimulator;
+	if (simulator?.currentExam !== this.selectedExamId) {
+		this.selectExam(this.selectedExamId);
+	}
+
+	window.open(`exam.html?${urlParams}`, '_blank');
 }
 
-const simulator = window.ExamApp?.examSimulator || window.examSimulator;
-if (simulator?.currentExam !== this.selectedExamId) {
-	this.selectExam(this.selectedExamId);
-}
+updateSelectedQuestionsCount(examId) {
+	const examData = window.userExams[examId];
+	if (!examData) return;
 
-window.open(`exam.html?exam=${encodeURIComponent(this.selectedExamId)}`, '_blank');
+	const metadata = examData.metadata || {};
+	const modulesList = document.getElementById('details-modules-list');
+		if (!modulesList) return;
+	const checkedItems = modulesList.querySelectorAll('li.checked');
+
+	if (!metadata.modules || metadata.modules.length === 0) {
+		const total = examData.questions.length;
+		document.getElementById('details-exam-questions').textContent = `${metadata.questionCount || total}`;
+		return;
+	}
+
+	const selectedModuleNames = Array.from(checkedItems)
+		.map(li => this.normalizeModuleName(li.dataset.module).toLowerCase())
+		.filter(Boolean);
+
+	const selectedPoolCount = examData.questions.filter(q => {
+		return q.module && selectedModuleNames.includes(q.module.trim().toLowerCase());
+	}).length;
+
+	const totalPoolCount = examData.questions.length;
+
+	document.getElementById('details-exam-questions').textContent = `${selectedPoolCount} / ${totalPoolCount}`;
 }
 
 scrollToExamLibrary() {
@@ -1017,7 +1193,7 @@ try {
 	const mimeType = window.ExamApp.getImageMimeType(fileName);
 	if (!mimeType) throw new Error(`Unsupported image type: ${extension}`);
 	const blob = await entry.async('blob');
-	
+
 	await window.imageStorage.storeImageBlob(examId, fileName, blob, mimeType);
 	storedCount++;
 	const percentage = (storedCount / imageFiles.length) * 100;

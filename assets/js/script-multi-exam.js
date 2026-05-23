@@ -1,4 +1,4 @@
-// Multi-Exam Simulator - Generic Exam Support
+﻿// Multi-Exam Simulator - Generic Exam Support
 // Supports categorized images (question images vs explanation images)
 
 class TimerManager {
@@ -32,6 +32,13 @@ class TimerManager {
     }
 }
 
+function isExamAnswerProvided(answer) {
+    if (Array.isArray(answer)) {
+        return answer.length > 0 && answer.every(value => value !== undefined && value !== null && value !== '');
+    }
+    return answer !== undefined && answer !== null && answer !== '';
+}
+
 class QuestionNavigator {
     constructor() {
         this.container = null;
@@ -49,7 +56,7 @@ class QuestionNavigator {
             btn.title = 'Question ' + (i + 1);
 
             if (i === currentIndex) btn.classList.add('nav-current');
-            if (selectedAnswers[i] !== undefined && selectedAnswers[i] !== null) {
+            if (isExamAnswerProvided(selectedAnswers[i])) {
                 btn.classList.add('nav-answered');
             }
             if (markedForReview && markedForReview.has(i)) {
@@ -542,7 +549,7 @@ class MultiExamSimulator {
 
         // Update UI to show selected exam
         this.updateExamInfo(exam);
-        
+
         // Show exam info and start button
         document.getElementById('current-exam-info').style.display = 'block';
         document.querySelector('.start-exam-cta').style.display = 'block';
@@ -622,6 +629,8 @@ class MultiExamSimulator {
             this._keyHandler = null;
         }
         this._keyHandler = (e) => {
+            if (document.getElementById('finish-exam-confirm-modal')) return;
+
             // Don't trigger if user is typing in an input
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
@@ -812,10 +821,10 @@ class MultiExamSimulator {
         // Update question display
         document.getElementById('question-number').textContent = `Question ${index + 1}`;
         document.getElementById('question-text').innerHTML = this.formatQuestionText(question.question);
-        
+
         // Update question counter
         document.getElementById('question-counter').textContent = `${index + 1} / ${questions.length}`;
-        
+
         // Update progress bar
         const progress = ((index + 1) / questions.length) * 100;
         document.getElementById('progress-fill').style.width = `${progress}%`;
@@ -897,7 +906,7 @@ class MultiExamSimulator {
             question.question_images.forEach((imageInfo, index) => {
                 const imageWrapper = document.createElement('div');
                 imageWrapper.className = 'question-image-wrapper';
-                
+
                 // Add loading placeholder
                 const placeholder = document.createElement('div');
                 placeholder.className = 'image-placeholder';
@@ -907,10 +916,10 @@ class MultiExamSimulator {
                         <small>Loading image...</small>
                     </div>
                 `;
-                
+
                 imageWrapper.appendChild(placeholder);
                 container.appendChild(imageWrapper);
-                
+
                 // Load image from IndexedDB or filesystem (non-blocking)
                 (async () => {
                     try {
@@ -925,25 +934,25 @@ class MultiExamSimulator {
                         if (!window.ExamApp.isSafeImageFileName(filename)) {
                             throw new Error('Invalid image filename');
                         }
-                        
+
                         // Use imageLoader to get image from IndexedDB first, then filesystem
                         const imagePath = await window.imageLoader.loadImage(filename);
-                        
+
                         if (!imagePath) {
                             throw new Error('Image not found');
                         }
-                        
+
                         const img = document.createElement('img');
                         img.className = 'question-image';
                         img.src = imagePath;
                         img.alt = `Question ${this.currentQuestionIndex + 1} - Image ${index + 1}`;
                         img.loading = 'lazy';
-                        
+
                         // Remove placeholder when image loads
                         img.onload = () => {
                             placeholder.remove();
                         };
-                        
+
                         // Add error handling
                         img.onerror = () => {
                                         imageWrapper.innerHTML = `
@@ -953,7 +962,7 @@ class MultiExamSimulator {
                                             </div>
                                         `;
                         };
-                        
+
                         imageWrapper.appendChild(img);
                     } catch (error) {
                         window.ExamApp.warn(`Failed to load image: ${imageInfo.filename}`, error);
@@ -971,6 +980,13 @@ class MultiExamSimulator {
 
     displayExplanationImages(question) {
         const container = document.getElementById('explanation-images');
+        if (container) {
+            this.renderExplanationImagesForContainer(question, container);
+        }
+    }
+
+    renderExplanationImagesForContainer(question, container) {
+        if (!container) return;
         container.innerHTML = '';
 
         // Show explanation images if available
@@ -983,7 +999,7 @@ class MultiExamSimulator {
             question.explanation_images.forEach((imageInfo, index) => {
                 const imageWrapper = document.createElement('div');
                 imageWrapper.className = 'explanation-image-wrapper';
-                
+
                 // Add loading placeholder
                 const placeholder = document.createElement('div');
                 placeholder.className = 'image-placeholder';
@@ -993,10 +1009,10 @@ class MultiExamSimulator {
                         <small>Loading image...</small>
                     </div>
                 `;
-                
+
                 imageWrapper.appendChild(placeholder);
                 container.appendChild(imageWrapper);
-                
+
                 // Load image from IndexedDB or filesystem (non-blocking)
                 (async () => {
                     try {
@@ -1011,25 +1027,25 @@ class MultiExamSimulator {
                         if (!window.ExamApp.isSafeImageFileName(filename)) {
                             throw new Error('Invalid image filename');
                         }
-                        
+
                         // Use imageLoader to get image from IndexedDB first, then filesystem
                         const imagePath = await window.imageLoader.loadImage(filename);
-                        
+
                         if (!imagePath) {
                             throw new Error('Image not found');
                         }
-                        
+
                         const img = document.createElement('img');
                         img.className = 'explanation-image';
                         img.src = imagePath;
                         img.alt = `Explanation Image ${index + 1}`;
                         img.loading = 'lazy';
-                        
+
                         // Remove placeholder when image loads
                         img.onload = () => {
                             placeholder.remove();
                         };
-                        
+
                         img.onerror = () => {
                             imageWrapper.innerHTML = `
                                 <div class="image-error">
@@ -1038,7 +1054,7 @@ class MultiExamSimulator {
                                 </div>
                             `;
                         };
-                        
+
                         imageWrapper.appendChild(img);
                     } catch (error) {
                         window.ExamApp.warn(`Failed to load image: ${imageInfo.filename}`, error);
@@ -1429,27 +1445,27 @@ class MultiExamSimulator {
     }
 
     showAnswer() {
-    const question = this.getCurrentQuestions()[this.currentQuestionIndex];
-    const userAnswer = this.selectedAnswers[this.currentQuestionIndex];
-    const correctAnswer = question.correct;
-    const questionType = window.ExamApp.normalizeQuestionType(question);
-    const isSequence = (questionType === 'SEQUENCE');
-    const isYesNoMatrix = (questionType === 'YES_NO_MATRIX');
-    const isDragSelect = (questionType === 'DRAG_DROP_SELECT');
-    const isMulti = Array.isArray(correctAnswer) && !isSequence && !isYesNoMatrix && !isDragSelect;
+        const question = this.getCurrentQuestions()[this.currentQuestionIndex];
+        const userAnswer = this.selectedAnswers[this.currentQuestionIndex];
+        const correctAnswer = question.correct;
+        const questionType = window.ExamApp.normalizeQuestionType(question);
+        const isSequence = (questionType === 'SEQUENCE');
+        const isYesNoMatrix = (questionType === 'YES_NO_MATRIX');
+        const isDragSelect = (questionType === 'DRAG_DROP_SELECT');
+        const isMulti = Array.isArray(correctAnswer) && !isSequence && !isYesNoMatrix && !isDragSelect;
 
         const isCorrect = this.isAnswerCorrect(question, userAnswer);
-        
+
         // Show feedback
         const feedback = document.getElementById('answer-feedback');
         const status = feedback.querySelector('.feedback-status');
         const correctAnswerDiv = feedback.querySelector('.correct-answer');
         const explanationDiv = feedback.querySelector('.explanation');
-        
-        status.innerHTML = isCorrect 
+
+        status.innerHTML = isCorrect
             ? '<i class="fas fa-check-circle" style="color: #28a745;"></i> Correct!'
             : '<i class="fas fa-times-circle" style="color: #dc3545;"></i> Incorrect';
-        
+
         if (isSequence) {
             const letters = (correctAnswer || []).map(i => `${String.fromCharCode(65 + i)}. ${this.escapeHtml(question.options[i])}`);
             correctAnswerDiv.innerHTML = `<strong>Correct Order:</strong> ${letters.join(' → ')}`;
@@ -1464,7 +1480,7 @@ class MultiExamSimulator {
         } else {
             correctAnswerDiv.innerHTML = `<strong>Correct Answer:</strong> ${String.fromCharCode(65 + correctAnswer)}. ${this.escapeHtml(question.options[correctAnswer])}`;
         }
-        
+
         if (question.explanation) {
             explanationDiv.innerHTML = `<strong>Explanation:</strong><br>${this.formatQuestionText(question.explanation)}`;
         } else {
@@ -1473,17 +1489,25 @@ class MultiExamSimulator {
 
         // Display explanation images
         this.displayExplanationImages(question);
-        
+
         feedback.setAttribute('role', 'status');
         feedback.setAttribute('aria-live', 'polite');
         window.ExamApp.setElementHidden(feedback, false);
-        
+
         // Update option styles to show correct/incorrect (skip for sequence type)
-    if (!isSequence && !isYesNoMatrix && !isDragSelect) {
+        if (!isSequence && !isYesNoMatrix && !isDragSelect) {
             document.querySelectorAll('.option').forEach((option, index) => {
                 const input = option.querySelector('input');
                 option.classList.remove('correct', 'incorrect', 'user-selected', 'correct-answer', 'incorrect-answer');
-        if (isMulti) {
+                const isUserSelected = isMulti
+                    ? Array.isArray(userAnswer) && userAnswer.includes(index)
+                    : index === userAnswer;
+
+                if (input) input.checked = isUserSelected;
+                option.classList.toggle('selected', isUserSelected);
+                option.classList.toggle('user-selected', isUserSelected);
+
+                if (isMulti) {
                     if (correctAnswer.includes(index)) option.classList.add('correct');
                     if (Array.isArray(userAnswer) && userAnswer.includes(index) && !correctAnswer.includes(index)) {
                         option.classList.add('incorrect', 'user-selected', 'incorrect-answer');
@@ -1534,7 +1558,7 @@ class MultiExamSimulator {
         } else {
             this.markedForReview.add(index);
         }
-        
+
         document.getElementById('mark-review-btn').classList.toggle('marked', this.markedForReview.has(index));
     }
 
@@ -1588,18 +1612,191 @@ class MultiExamSimulator {
         );
     }
 
+        isAnswerProvided(answer) {
+            return isExamAnswerProvided(answer);
+        }
+
+        getUnansweredQuestionIndexes(questions) {
+            const unanswered = [];
+            questions.forEach((_, index) => {
+                if (!this.isAnswerProvided(this.selectedAnswers[index])) {
+                    unanswered.push(index);
+                }
+            });
+            return unanswered;
+        }
+
+        showFinishExamConfirmation(unansweredIndexes, totalQuestions) {
+            const existing = document.getElementById('finish-exam-confirm-modal');
+            if (existing) existing.remove();
+
+            const unansweredCount = unansweredIndexes.length;
+            const answeredCount = Math.max(0, totalQuestions - unansweredCount);
+            const hasUnanswered = unansweredCount > 0;
+
+            const overlay = document.createElement('div');
+            overlay.id = 'finish-exam-confirm-modal';
+            overlay.className = 'exam-confirm-overlay';
+
+            const dialog = document.createElement('div');
+            dialog.className = 'exam-confirm-dialog';
+            dialog.setAttribute('role', 'dialog');
+            dialog.setAttribute('aria-modal', 'true');
+            dialog.setAttribute('aria-labelledby', 'finish-confirm-title');
+            dialog.setAttribute('aria-describedby', 'finish-confirm-message');
+
+            const iconWrap = document.createElement('div');
+            iconWrap.className = `exam-confirm-icon ${hasUnanswered ? 'warning' : 'ready'}`;
+            const icon = document.createElement('i');
+            icon.className = hasUnanswered ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle';
+            icon.setAttribute('aria-hidden', 'true');
+            iconWrap.appendChild(icon);
+
+            const title = document.createElement('h2');
+            title.id = 'finish-confirm-title';
+            title.textContent = hasUnanswered ? 'Finish with unanswered questions?' : 'Finish exam?';
+
+            const message = document.createElement('p');
+            message.id = 'finish-confirm-message';
+            message.textContent = hasUnanswered
+                ? `You still have ${unansweredCount} unanswered question${unansweredCount === 1 ? '' : 's'}. Review them before submitting, or finish now to see your report.`
+                : 'Submit your answers and open the final report.';
+
+            const summary = document.createElement('div');
+            summary.className = 'exam-confirm-summary';
+
+            const addMetric = (labelText, valueText, extraClass = '') => {
+                const metric = document.createElement('div');
+                metric.className = `exam-confirm-metric ${extraClass}`.trim();
+                const label = document.createElement('span');
+                label.textContent = labelText;
+                const value = document.createElement('strong');
+                value.textContent = valueText;
+                metric.appendChild(label);
+                metric.appendChild(value);
+                summary.appendChild(metric);
+            };
+
+            addMetric('Answered', `${answeredCount}/${totalQuestions}`);
+            addMetric('Unanswered', String(unansweredCount), hasUnanswered ? 'is-warning' : '');
+
+            const actions = document.createElement('div');
+            actions.className = 'exam-confirm-actions';
+
+            const createButton = (className, iconClass, labelText) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = className;
+                const buttonIcon = document.createElement('i');
+                buttonIcon.className = iconClass;
+                buttonIcon.setAttribute('aria-hidden', 'true');
+                const label = document.createElement('span');
+                label.textContent = labelText;
+                button.appendChild(buttonIcon);
+                button.appendChild(label);
+                return button;
+            };
+
+            const reviewButton = createButton(
+                'exam-confirm-btn secondary',
+                hasUnanswered ? 'fas fa-list' : 'fas fa-arrow-left',
+                hasUnanswered ? 'Review unanswered' : 'Keep working'
+            );
+            const finishButton = createButton('exam-confirm-btn primary', 'fas fa-check', 'Finish Exam');
+
+            const appShell = document.querySelector('.container');
+            const hadAriaHidden = appShell?.hasAttribute('aria-hidden') || false;
+            const previousAriaHidden = appShell?.getAttribute('aria-hidden');
+            const supportsInert = Boolean(appShell && 'inert' in appShell);
+            const previousInert = supportsInert ? appShell.inert : false;
+
+            if (appShell) {
+                appShell.setAttribute('aria-hidden', 'true');
+                if (supportsInert) appShell.inert = true;
+            }
+
+            const getFocusableElements = () => Array.from(dialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+                .filter(element => !element.disabled && element.getAttribute('aria-hidden') !== 'true');
+
+            const close = (returnFocus = true) => {
+                document.removeEventListener('keydown', handleKeydown);
+                if (appShell) {
+                    if (hadAriaHidden) {
+                        appShell.setAttribute('aria-hidden', previousAriaHidden);
+                    } else {
+                        appShell.removeAttribute('aria-hidden');
+                    }
+                    if (supportsInert) appShell.inert = previousInert;
+                }
+                overlay.remove();
+                if (returnFocus) document.getElementById('finish-exam')?.focus();
+            };
+
+            const handleKeydown = (event) => {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    close();
+                    return;
+                }
+
+                if (event.key === 'Tab') {
+                    const focusableElements = getFocusableElements();
+                    if (focusableElements.length === 0) {
+                        event.preventDefault();
+                        return;
+                    }
+
+                    const firstElement = focusableElements[0];
+                    const lastElement = focusableElements[focusableElements.length - 1];
+
+                    if (event.shiftKey && (document.activeElement === firstElement || !dialog.contains(document.activeElement))) {
+                        event.preventDefault();
+                        lastElement.focus();
+                    } else if (!event.shiftKey && document.activeElement === lastElement) {
+                        event.preventDefault();
+                        firstElement.focus();
+                    }
+                }
+            };
+
+            reviewButton.addEventListener('click', () => {
+                const firstUnanswered = unansweredIndexes[0];
+                close(false);
+                if (Number.isInteger(firstUnanswered)) {
+                    this.showQuestion(firstUnanswered);
+                } else {
+                    document.getElementById('finish-exam')?.focus();
+                }
+            });
+
+            finishButton.addEventListener('click', () => {
+                close(false);
+                this.finishExam(true);
+            });
+
+            overlay.addEventListener('click', (event) => {
+                if (event.target === overlay) close();
+            });
+
+            actions.appendChild(reviewButton);
+            actions.appendChild(finishButton);
+            dialog.appendChild(iconWrap);
+            dialog.appendChild(title);
+            dialog.appendChild(message);
+            dialog.appendChild(summary);
+            dialog.appendChild(actions);
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+            document.addEventListener('keydown', handleKeydown);
+
+            (hasUnanswered ? reviewButton : finishButton).focus();
+        }
+
     finishExam(forceFinish = false) {
         if (!forceFinish) {
             const questions = this.getCurrentQuestions();
-            let unanswered = 0;
-            for (let i = 0; i < questions.length; i++) {
-                const ans = this.selectedAnswers[i];
-                if (ans === undefined || ans === null || ans === '') unanswered++;
-            }
-            const msg = unanswered > 0
-                ? `You have ${unanswered} unanswered questions. Are you sure you want to finish?`
-                : 'Are you sure you want to finish the exam?';
-            if (!confirm(msg)) return;
+            this.showFinishExamConfirmation(this.getUnansweredQuestionIndexes(questions), questions.length);
+            return;
         }
 
         // Remove keyboard shortcuts listener
@@ -1614,23 +1811,23 @@ class MultiExamSimulator {
         const questions = this.getCurrentQuestions();
         let correct = 0;
         let incorrect = 0;
-        
+
         questions.forEach((question, index) => {
             const ua = this.selectedAnswers[index];
-            const wasAnswered = ua !== undefined && ua !== null && (Array.isArray(ua) ? ua.length > 0 : true);
+            const wasAnswered = this.isAnswerProvided(ua);
             if (this.isAnswerCorrect(question, ua)) {
                 correct++;
             } else if (wasAnswered) {
                 incorrect++;
             }
         });
-        
+
         const score = Math.round((correct / questions.length) * 100);
         const passed = score >= this.examData[this.currentExam].passScore;
-        
+
         // Calculate time spent
         const timeSpent = Math.round((new Date() - this.startTime) / 1000 / 60);
-        
+
         // Update results screen
         this.showResults(score, passed, correct, incorrect, questions.length, timeSpent);
         this.showScreen('results-screen');
@@ -1640,7 +1837,7 @@ class MultiExamSimulator {
         // Update result status
         const statusIcon = document.getElementById('result-status-icon');
         const statusText = document.getElementById('result-status');
-        
+
         if (passed) {
             statusIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
             statusIcon.className = 'status-icon passed';
@@ -1654,9 +1851,10 @@ class MultiExamSimulator {
         }
         const summaryCard = document.getElementById('resultsSummaryCard');
         if (summaryCard) {
+            summaryCard.classList.toggle('passed', passed);
             summaryCard.classList.toggle('failed', !passed);
         }
-        
+
         // Update scores
         document.getElementById('percentage-score').textContent = `${score}%`;
         document.getElementById('correct-count').textContent = correct;
@@ -1664,14 +1862,14 @@ class MultiExamSimulator {
         document.getElementById('time-spent').textContent = `${timeSpent}min`;
         const timeSecondary = document.getElementById('time-spent-secondary');
         if (timeSecondary) timeSecondary.textContent = `${timeSpent}min`;
-        
+
         // Update exam name in results
         const examNameEl = document.getElementById('exam-name-result');
         if (examNameEl) {
             examNameEl.textContent = this.examData[this.currentExam].name;
             examNameEl.className = `exam-name-pill exam-name-badge ${this.currentExam}`;
         }
-        
+
         // Update progress bars
         const correctPercentage = (correct / total) * 100;
         const incorrectPercentage = (incorrect / total) * 100;
@@ -1733,7 +1931,7 @@ class MultiExamSimulator {
             const isYesNoMatrix = (questionType === 'YES_NO_MATRIX');
 
             const isCorrect = this.isAnswerCorrect(question, userAnswer);
-            const wasAnswered = userAnswer !== undefined && userAnswer !== null && (Array.isArray(userAnswer) ? userAnswer.length > 0 : true);
+            const wasAnswered = this.isAnswerProvided(userAnswer);
             const statusClass = !wasAnswered ? 'skipped' : (isCorrect ? 'correct' : 'incorrect');
             const statusIcon = !wasAnswered ? 'fa-minus-circle' : (isCorrect ? 'fa-check-circle' : 'fa-times-circle');
             const statusText = !wasAnswered ? 'Skipped' : (isCorrect ? 'Correct' : 'Incorrect');
@@ -1774,7 +1972,7 @@ class MultiExamSimulator {
                             <i class="fas ${statusIcon}"></i> ${statusText}
                         </span>
                     </div>
-                    <div class="review-question">${this.escapeHtml(question.question.substring(0, 120))}${question.question.length > 120 ? '...' : ''}</div>
+                    <div class="review-question">${this.formatQuestionText(question.question)}</div>
                     <div class="review-answers">
                         <div class="review-answer-row">
                             <span class="review-label">Your Answer:</span>
@@ -1784,6 +1982,15 @@ class MultiExamSimulator {
                             <span class="review-label">Correct Answer:</span>
                             <span class="review-value correct">${correctAnswerText}</span>
                         </div>` : ''}
+                        ${(question.explanation || (question.explanation_images && question.explanation_images.length > 0)) ? `
+                        <div class="review-explanation-box" data-q-index="${index}">
+                            ${question.explanation ? `
+                            <span class="review-label">Justification:</span>
+                            <span class="explanation-text">${this.formatQuestionText(question.explanation)}</span>
+                            ` : ''}
+                            <div class="review-explanation-images explanation-images-container"></div>
+                        </div>
+                        ` : ''}
                     </div>
                 </div>
             `;
@@ -1806,6 +2013,15 @@ class MultiExamSimulator {
 
         container.innerHTML = html;
 
+        // Render explanation images inside detailed review cards
+        container.querySelectorAll('.review-explanation-box[data-q-index]').forEach(box => {
+            const qIndex = parseInt(box.dataset.qIndex, 10);
+            const imgContainer = box.querySelector('.review-explanation-images');
+            if (imgContainer && questions[qIndex]) {
+                this.renderExplanationImagesForContainer(questions[qIndex], imgContainer);
+            }
+        });
+
         // Bind pagination button events
         container.querySelectorAll('.review-page-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1819,18 +2035,19 @@ class MultiExamSimulator {
     saveProgress(score, passed, timeSpent) {
         const examKey = `${this.currentExam}_progress`;
         let progress = JSON.parse(localStorage.getItem(examKey) || '{"attempts": [], "bestScore": 0, "totalPassed": 0}');
-        
+
         const attempt = {
             date: new Date().toISOString(),
             score: score,
             passed: passed,
-            timeSpent: timeSpent
+            timeSpent: timeSpent,
+            modules: this.examData[this.currentExam]?.selectedModules || null
         };
-        
+
         progress.attempts.push(attempt);
         progress.bestScore = Math.max(progress.bestScore, score);
         if (passed) progress.totalPassed++;
-        
+
         try {
             localStorage.setItem(examKey, JSON.stringify(progress));
             window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.progress, this.currentExam);
@@ -1929,7 +2146,7 @@ class MultiExamSimulator {
 
     toggleTheme() {
         document.body.classList.toggle('dark-mode');
-        
+
         // Update theme icon
         document.querySelectorAll('.theme-icon').forEach(icon => {
             if (document.body.classList.contains('dark-mode')) {
@@ -1938,7 +2155,7 @@ class MultiExamSimulator {
                 icon.className = 'fas fa-moon theme-icon';
             }
         });
-        
+
         // Save theme preference
         localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
     }
@@ -1959,7 +2176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             icon.className = 'fas fa-sun theme-icon';
         });
     }
-    
+
     // Ensure dynamic exams are loaded (server mode) before simulator instantiation.
     if (window.examsLoadedPromise) {
         try {
@@ -2294,6 +2511,29 @@ window.showExamAttempts = function(examId) {
         dateLine.appendChild(createProgressIcon('fas fa-calendar-alt'));
         dateLine.appendChild(document.createTextNode(` ${dateStr}`));
         left.appendChild(dateLine);
+
+        if (attempt.modules && Array.isArray(attempt.modules) && attempt.modules.length > 0) {
+            const modulesLine = document.createElement('div');
+            modulesLine.style.cssText = 'font-size:12px;color:#495057;margin-top:6px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;line-height:1.4;';
+
+            const tagIcon = createProgressIcon('fas fa-tags');
+            tagIcon.style.color = '#6c757d';
+            modulesLine.appendChild(tagIcon);
+
+            const modulesLabel = document.createElement('span');
+            modulesLabel.style.fontWeight = '600';
+            modulesLabel.textContent = 'Modules: ';
+            modulesLine.appendChild(modulesLabel);
+
+            const modulesText = document.createElement('span');
+            modulesText.textContent = attempt.modules.join(', ');
+            modulesText.style.cssText = 'background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:4px;font-style:italic;display:inline-block;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+            modulesText.title = attempt.modules.join(', '); // Show full list on hover
+
+            modulesLine.appendChild(modulesText);
+            left.appendChild(modulesLine);
+        }
+
         row.appendChild(left);
 
         const right = document.createElement('div');
