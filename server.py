@@ -9,7 +9,7 @@ import os
 import sys
 import webbrowser
 from pathlib import Path
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs, parse_qsl, urlencode
 import json
 import re
 
@@ -22,6 +22,11 @@ CLEAN_ROUTES = {
     '/editor': '/editor.html',
     '/exam': '/exam.html',
     '/study': '/exam.html',
+}
+CLEAN_ROUTE_REDIRECTS = {
+    '/editor/': '/editor',
+    '/exam/': '/exam',
+    '/study/': '/study',
 }
 
 def looks_like_supported_image(extension, data):
@@ -84,10 +89,22 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urlparse(self.path)
-        normalized_path = parsed.path.rstrip('/') or '/'
-        if parsed.path != normalized_path and normalized_path in CLEAN_ROUTES:
-            safe_query = parsed.query.replace('\r', '').replace('\n', '')
-            location = normalized_path + (f'?{safe_query}' if safe_query else '')
+        redirect_path = CLEAN_ROUTE_REDIRECTS.get(parsed.path)
+        if redirect_path:
+            try:
+                query_pairs = parse_qsl(parsed.query, keep_blank_values=True, max_num_fields=100)
+            except ValueError:
+                self.send_response(400)
+                self.end_headers()
+                return
+
+            safe_query = urlencode(query_pairs, doseq=True)
+            location = redirect_path + (f'?{safe_query}' if safe_query else '')
+            if not re.fullmatch(r'/[A-Za-z0-9._~/?=&%+-]*', location):
+                self.send_response(400)
+                self.end_headers()
+                return
+
             self.send_response(302)
             self.send_header('Location', location)
             self.end_headers()

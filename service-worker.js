@@ -67,13 +67,34 @@ function cleanRouteRedirect(url) {
   return new URL(`${normalized}${url.search}`, url.origin).href;
 }
 
+async function putRuntimeCache(cache, request, response) {
+  try {
+    await cache.put(request, response.clone());
+  } catch (_) {
+    // Cache quota or unsupported response failures should not break the request.
+  }
+}
+
+async function navigationFallback(pathname) {
+  const routeShell = await caches.match(cleanRouteShell(pathname));
+  if (routeShell) return routeShell;
+
+  const homeShell = await caches.match('./index.html');
+  if (homeShell) return homeShell;
+
+  return new Response('<!doctype html><title>Exam Simulator</title><p>Exam Simulator is unavailable offline.</p>', {
+    status: 503,
+    headers: { 'Content-Type': 'text/html; charset=utf-8' }
+  });
+}
+
 async function cacheFirst(request) {
   const cached = await caches.match(request);
   if (cached) return cached;
   const response = await fetch(request);
   if (response.ok) {
     const cache = await caches.open(RUNTIME_CACHE);
-    cache.put(request, response.clone());
+    await putRuntimeCache(cache, request, response);
   }
   return response;
 }
@@ -82,7 +103,7 @@ async function networkFirst(request) {
   const cache = await caches.open(RUNTIME_CACHE);
   try {
     const response = await fetch(request);
-    if (response.ok) cache.put(request, response.clone());
+    if (response.ok) await putRuntimeCache(cache, request, response);
     return response;
   } catch (error) {
     const cached = await cache.match(request);
@@ -128,7 +149,7 @@ self.addEventListener('fetch', event => {
         // Fall through to the route shell cache.
       }
 
-      return caches.match(cleanRouteShell(url.pathname));
+      return navigationFallback(url.pathname);
     })());
     return;
   }
