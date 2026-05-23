@@ -1002,8 +1002,15 @@ return button;
 }
 
 getExamName(examId) {
-const examData = this.availableExams.get(examId) || window.userExams[examId];
+const examData = this.getExamDataForReview(examId);
 return examData?.metadata?.name || examId.toUpperCase();
+}
+
+getExamDataForReview(examId) {
+return this.availableExams.get(examId)
+	|| window.examManager?.availableExams?.get?.(examId)
+	|| window.userExams?.[examId]
+	|| null;
 }
 
 createAttemptHistoryCard(examId, attempt, originalIndex) {
@@ -1146,13 +1153,18 @@ const statusEl = this.appendTextElement(header, 'span', `attempt-review-status $
 statusEl.prepend(this.createIcon(result.skipped ? 'fas fa-minus-circle' : (result.correct ? 'fas fa-check-circle' : 'fas fa-times-circle')));
 item.appendChild(header);
 
-this.appendTextElement(item, 'div', 'attempt-review-question', question?.question || 'Question no longer exists in the current dump.');
+if (!question) {
+	this.appendTextElement(item, 'div', 'attempt-review-question missing', 'Question no longer exists in the current dump.');
+	return item;
+}
+
+this.appendTextElement(item, 'div', 'attempt-review-question', question.question || 'Question text is unavailable.');
 
 const answers = document.createElement('div');
 answers.className = 'attempt-review-answers';
 this.appendAnswerRow(answers, 'Your Answer', this.formatStoredAnswer(question, result.userAnswer));
-if (!result.correct) {
-	this.appendAnswerRow(answers, 'Correct Answer', this.formatStoredAnswer(question, question?.correct), 'correct');
+if (!result.correct && question.correct !== undefined && question.correct !== null) {
+	this.appendAnswerRow(answers, 'Correct Answer', this.formatStoredAnswer(question, question.correct), 'correct');
 }
 item.appendChild(answers);
 
@@ -1176,9 +1188,10 @@ parent.appendChild(row);
 }
 
 findQuestionById(examId, questionId) {
-const questions = window.userExams[examId]?.questions || [];
-const wanted = String(questionId || '');
-return questions.find((question, index) => String(question?.id ?? `question-${index + 1}`) === wanted) || null;
+const questions = this.getExamDataForReview(examId)?.questions || [];
+const normalize = window.ExamApp.studyScheduler?.normalizeQuestionId || (value => String(value || '').trim());
+const wanted = normalize(questionId);
+return questions.find((question, index) => normalize(question?.id || `question-${index + 1}`) === wanted) || null;
 }
 
 formatStoredAnswer(question, answer) {

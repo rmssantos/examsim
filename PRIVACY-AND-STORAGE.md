@@ -125,7 +125,7 @@ localStorage['exam_metadata_ai900']     // Exam configuration
 localStorage['exam_metadata_ai102']
 
 // Progress
-localStorage['ai900_progress']          // User's exam history and local attempt review summaries
+localStorage['ai900_progress']          // User's exam history and recent local attempt review summaries
 localStorage['ai102_progress']
 
 // Settings
@@ -165,7 +165,7 @@ user-content/exams/
 ### ✅ What IS Private
 
 1. **User-imported exams** - Only visible to the user who imported them
-2. **Progress data** - Stored locally, never sent to server; newer attempts include lightweight review data with question IDs, selected answers, and correct/skipped status
+2. **Progress data** - Stored locally, never sent to server; recent attempts include lightweight review data with question IDs, selected answers, and correct/skipped status
 3. **Editor-created questions** - Saved in user's localStorage
 4. **Theme preferences** - Local to each browser
 5. **Exam activation settings** - Local to each user

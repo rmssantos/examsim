@@ -1183,6 +1183,14 @@ body {
 .attempt-score { font-weight:600; }
 .attempt-status { display:flex; align-items:center; gap: var(--space-xs); font-weight:500; }
 .attempt-status i { font-size:.7rem; }
+.progress-attempt-actions { display:flex; gap: var(--space-sm); flex-wrap:wrap; margin-top: var(--space-sm); }
+.progress-attempt-btn {
+  display:inline-flex; align-items:center; gap: var(--space-xs); padding: 8px 12px;
+  border:0; border-radius: var(--radius); font-weight:600; cursor:pointer; color:#fff;
+}
+.progress-attempt-btn.primary { background: linear-gradient(135deg, var(--primary), var(--accent)); }
+.progress-attempt-btn.secondary { background: var(--success); }
+.progress-attempt-btn:disabled { background: var(--text-light); cursor:not-allowed; opacity:.7; }
 
 /* ===== CERTIFICATE ===== */
 #certificate-screen { background: var(--bg); padding: var(--space-xl); text-align:center; }

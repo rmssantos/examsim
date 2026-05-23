@@ -93,8 +93,21 @@ class MultiExamSimulator {
         this.studyQueueSummary = null;
         this.studySessionResults = new Map();
         this.studySessionId = null;
+        this.localIdCounter = 0;
+        this.attemptReviewDetailLimit = 10;
 
         this.init();
+    }
+
+    generateLocalId(prefix = 'id') {
+        this.localIdCounter += 1;
+        const timePart = Date.now().toString(36);
+        if (window.crypto?.getRandomValues) {
+            const bytes = new Uint32Array(2);
+            window.crypto.getRandomValues(bytes);
+            return `${prefix}_${timePart}_${Array.from(bytes, value => value.toString(36)).join('')}`;
+        }
+        return `${prefix}_${timePart}_${this.localIdCounter.toString(36)}`;
     }
 
     init() {
@@ -919,7 +932,7 @@ class MultiExamSimulator {
         this.selectedAnswers = {};
         this.markedForReview = new Set();
         this.startTime = new Date();
-        this.studySessionId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+        this.studySessionId = this.generateLocalId('study_session');
         this.studySessionResults = new Map();
 
         const examName = this.examData[this.currentExam].name;
@@ -2410,7 +2423,8 @@ class MultiExamSimulator {
     }
 
     getQuestionStableId(question, fallbackIndex) {
-        return String(question?.id ?? '').trim() || `question-${fallbackIndex + 1}`;
+        const rawId = String(question?.id ?? '').trim() || `question-${fallbackIndex + 1}`;
+        return window.ExamApp.studyScheduler?.normalizeQuestionId?.(rawId) || rawId;
     }
 
     cloneAnswerForStorage(answer) {
@@ -2453,6 +2467,34 @@ class MultiExamSimulator {
         });
     }
 
+    trimAttemptReviewDetails(progress, keepDetailedCount = this.attemptReviewDetailLimit) {
+        const attempts = Array.isArray(progress?.attempts) ? progress.attempts : [];
+        const detailed = attempts.filter(attempt => Array.isArray(attempt.questionResults) && attempt.questionResults.length > 0);
+        const keepIds = new Set(detailed.slice(-Math.max(0, keepDetailedCount)).map(attempt => attempt.attemptId || attempt.date));
+
+        attempts.forEach(attempt => {
+            const attemptKey = attempt.attemptId || attempt.date;
+            if (Array.isArray(attempt.questionResults) && !keepIds.has(attemptKey)) {
+                delete attempt.questionResults;
+                attempt.hasReviewDetails = false;
+            }
+        });
+    }
+
+    saveProgressToStorage(examKey, progress) {
+        this.trimAttemptReviewDetails(progress);
+        try {
+            localStorage.setItem(examKey, JSON.stringify(progress));
+            return true;
+        } catch (error) {
+            if (!(error.name === 'QuotaExceededError' || error.code === 22)) throw error;
+        }
+
+        this.trimAttemptReviewDetails(progress, 1);
+        localStorage.setItem(examKey, JSON.stringify(progress));
+        return true;
+    }
+
     saveProgress(score, passed, timeSpent) {
         const examKey = `${this.currentExam}_progress`;
         let progress = JSON.parse(localStorage.getItem(examKey) || '{"attempts": [], "bestScore": 0, "totalPassed": 0}');
@@ -2462,7 +2504,7 @@ class MultiExamSimulator {
         const skippedCount = questionResults.filter(result => result.skipped).length;
 
         const attempt = {
-            attemptId: `attempt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            attemptId: this.generateLocalId('attempt'),
             date: new Date().toISOString(),
             score: score,
             passed: passed,
@@ -2471,6 +2513,7 @@ class MultiExamSimulator {
             correctCount: questionResults.filter(result => result.correct).length,
             incorrectCount,
             skippedCount,
+            hasReviewDetails: true,
             questionResults,
             modules: this.examData[this.currentExam]?.selectedModules || null
         };
@@ -2480,7 +2523,7 @@ class MultiExamSimulator {
         if (passed) progress.totalPassed++;
 
         try {
-            localStorage.setItem(examKey, JSON.stringify(progress));
+            this.saveProgressToStorage(examKey, progress);
             window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.progress, this.currentExam);
         } catch (e) {
             if (e.name === 'QuotaExceededError' || e.code === 22) {
@@ -2987,11 +3030,11 @@ window.showExamAttempts = function(examId) {
 
         if (window.homepage && Array.isArray(attempt.questionResults) && attempt.questionResults.length > 0) {
             const actions = document.createElement('div');
-            actions.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;';
+            actions.className = 'progress-attempt-actions';
 
             const reviewButton = document.createElement('button');
             reviewButton.type = 'button';
-            reviewButton.style.cssText = 'padding:8px 12px;background:#1e3c72;color:white;border:none;border-radius:7px;font-weight:600;cursor:pointer;';
+            reviewButton.className = 'progress-attempt-btn primary';
             reviewButton.appendChild(createProgressIcon('fas fa-list-check'));
             reviewButton.appendChild(document.createTextNode(' Review'));
             reviewButton.addEventListener('click', () => {
@@ -3004,7 +3047,7 @@ window.showExamAttempts = function(examId) {
             const studyButton = document.createElement('button');
             studyButton.type = 'button';
             studyButton.disabled = missedIds.length === 0;
-            studyButton.style.cssText = `padding:8px 12px;background:${missedIds.length > 0 ? '#0f766e' : '#94a3b8'};color:white;border:none;border-radius:7px;font-weight:600;cursor:${missedIds.length > 0 ? 'pointer' : 'not-allowed'};`;
+            studyButton.className = 'progress-attempt-btn secondary';
             studyButton.appendChild(createProgressIcon('fas fa-brain'));
             studyButton.appendChild(document.createTextNode(missedIds.length > 0 ? ` Study missed (${missedIds.length})` : ' No misses'));
             studyButton.addEventListener('click', () => window.homepage.startMissedStudy(examId, attempt));

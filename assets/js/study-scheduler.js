@@ -12,9 +12,26 @@
         return Number.isFinite(time) ? time : 0;
     }
 
+    function hashString(value) {
+        let hash = 2166136261;
+        const text = String(value ?? '');
+        for (let i = 0; i < text.length; i++) {
+            hash ^= text.charCodeAt(i);
+            hash = Math.imul(hash, 16777619);
+        }
+        return (hash >>> 0).toString(16).padStart(8, '0');
+    }
+
+    function normalizeQuestionId(questionId) {
+        const value = String(questionId ?? '').trim().replace(/\s+/g, ' ');
+        if (!value) return '';
+        if (value.length <= 120) return value;
+        return `q_${hashString(value)}_${encodeURIComponent(value).slice(0, 80)}`;
+    }
+
     function getQuestionId(question, fallbackIndex = 0) {
         const value = String(question?.id ?? '').trim();
-        return value || `question-${fallbackIndex + 1}`;
+        return normalizeQuestionId(value || `question-${fallbackIndex + 1}`);
     }
 
     function getAccuracy(record) {
@@ -211,6 +228,7 @@
         getQuestionId,
         getAccuracy,
         isWeak,
-        summarize
+        summarize,
+        normalizeQuestionId
     });
 })();

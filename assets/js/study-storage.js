@@ -63,9 +63,17 @@
             return encodeURIComponent(String(questionId ?? '').trim()).slice(0, 80);
         }
 
+        normalizeQuestionId(questionId) {
+            const value = String(questionId ?? '').trim().replace(/\s+/g, ' ');
+            if (!value) return '';
+            return window.ExamApp.studyScheduler?.normalizeQuestionId?.(value) || (value.length <= 120
+                ? value
+                : `q_${this.hashString(value)}_${this.encodeQuestionId(value)}`);
+        }
+
         buildKey(examId, questionId) {
             const normalizedExamId = String(examId || '').trim();
-            const normalizedQuestionId = String(questionId || '').trim();
+            const normalizedQuestionId = this.normalizeQuestionId(questionId);
             return `studyStats_${normalizedExamId}_${this.hashString(normalizedQuestionId)}_${this.encodeQuestionId(normalizedQuestionId)}`;
         }
 
@@ -108,6 +116,7 @@
 
             const nextRecord = {
                 ...record,
+                questionId: this.normalizeQuestionId(record.questionId),
                 key: this.buildKey(record.examId, record.questionId)
             };
 
