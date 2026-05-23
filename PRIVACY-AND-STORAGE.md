@@ -22,6 +22,8 @@ The public GitHub Pages deployment (`rmssantos.github.io/examsim`) sends limited
 **Collected events:**
 - Page views for the home, exam, and editor pages
 - Exam started and exam completed counts
+- Study Mode started/completed counts and aggregate answer-check counts
+- Attempt history/review opened counts and Study missed started counts
 - Import started/completed/failed counts
 - Progress export and editor import/export actions
 
@@ -31,6 +33,8 @@ In Application Insights, page visits are recorded as native page views (`pageVie
 - Public bundled exam ID (`ab730`, `ab731`, or `sc900`) or generic `imported`
 - Pass/fail result
 - Score bucket (`0-49`, `50-69`, `70-89`, `90-100`)
+- Study accuracy bucket, due/new/weak queue counts, and correct/reviewed counts
+- Attempt review availability flag and missed-study question count
 - Duration bucket (`<5m`, `5-15m`, `15-30m`, `30m+`)
 - Question count and coarse file size/type buckets for imports
 
@@ -38,6 +42,7 @@ In Application Insights, page visits are recorded as native page views (`pageVie
 - Names, emails, or account identifiers
 - Persistent visitor IDs or custom session IDs
 - Question text, options, answers, explanations, or selected responses
+- Question IDs, attempt review records, Study Mode per-question records, ease factors, due dates, or personal study history
 - Imported exam IDs, imported exam content, ZIP contents, filenames, or browser storage exports
 - Local progress history beyond aggregate completion events
 
@@ -120,7 +125,7 @@ localStorage['exam_metadata_ai900']     // Exam configuration
 localStorage['exam_metadata_ai102']
 
 // Progress
-localStorage['ai900_progress']          // User's exam history
+localStorage['ai900_progress']          // User's exam history and recent local attempt review summaries
 localStorage['ai102_progress']
 
 // Settings
@@ -160,7 +165,7 @@ user-content/exams/
 ### ✅ What IS Private
 
 1. **User-imported exams** - Only visible to the user who imported them
-2. **Progress data** - Stored locally, never sent to server
+2. **Progress data** - Stored locally, never sent to server; recent attempts include lightweight review data with question IDs, selected answers, and correct/skipped status
 3. **Editor-created questions** - Saved in user's localStorage
 4. **Theme preferences** - Local to each browser
 5. **Exam activation settings** - Local to each user

@@ -73,6 +73,11 @@
     letter-spacing: 0.5px;
 }
 
+.exam-header .study-badge {
+    background: rgba(20, 184, 166, 0.28);
+    border-color: rgba(153, 246, 228, 0.45);
+}
+
 
 /* Progress Section - Compact */
 .exam-progress {
@@ -193,6 +198,22 @@
 
 .exam-timer.danger #timer {
     color: white !important;
+}
+
+.result-status-chip.studied,
+.status-icon.studied {
+    color: #0f766e;
+}
+
+.results-summary-card.studied {
+    border-color: rgba(20, 184, 166, 0.35);
+}
+
+[data-theme="dark"] .result-status-chip.studied,
+[data-theme="dark"] .status-icon.studied,
+.dark-mode .result-status-chip.studied,
+.dark-mode .status-icon.studied {
+    color: #5eead4;
 }
 
 @keyframes timerPulse {
