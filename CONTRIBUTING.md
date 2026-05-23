@@ -181,7 +181,8 @@ portable/
 │   └── exams/              # User exam data
 │       └── <exam-id>/        # e.g., myexam/
 │
-└── docs/                   # Documentation
+├── docs/                   # Public documentation
+└── .local/                 # Ignored local planning/development notes
 ```
 
 ### Key Files
