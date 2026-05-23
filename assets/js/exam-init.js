@@ -10,7 +10,7 @@ function closeExamTab() {
   // If close() didn't work (tab still open), redirect after small delay
   setTimeout(() => {
     if (!window.closed) {
-      window.location.href = 'index.html';
+      window.location.href = window.ExamApp.router?.buildUrl('home') || 'index.html';
     }
   }, 100);
 }
@@ -27,8 +27,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   const params = new URLSearchParams(window.location.search);
+  const route = window.ExamApp.router?.getRoute?.() || { page: 'exam' };
   const examId = params.get('exam') || '';
-  const pageMode = params.get('mode') === 'study' ? 'study' : 'exam';
+  const pageMode = route.page === 'study' || params.get('mode') === 'study' ? 'study' : 'exam';
 
   if (!window.ExamApp.isSafeExamId(examId)) {
     console.error(`❌ Invalid exam id: ${examId}`);

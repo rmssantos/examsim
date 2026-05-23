@@ -74,7 +74,11 @@
     }
 
     function pageNameFromPath(pathname = window.location.pathname) {
-        const page = String(pathname || '').split('/').pop() || 'index.html';
+        const path = String(pathname || '');
+        const page = path.split('/').pop() || 'index.html';
+        if (page === 'editor') return 'editor';
+        if (page === 'exam') return 'exam';
+        if (page === 'study') return 'study';
         if (page === 'index.html' || page === '') return 'home';
         if (page === 'exam.html') return 'exam';
         if (page === 'editor.html') return 'editor';

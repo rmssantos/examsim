@@ -1,0 +1,18 @@
+{
+  "name": "Exam Simulator",
+  "short_name": "ExamSim",
+  "description": "Offline-first exam practice with study mode, progress tracking, and local imports.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#1e3c72",
+  "icons": [
+    {
+      "src": "assets/media/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

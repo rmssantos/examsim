@@ -9,7 +9,7 @@ import os
 import sys
 import webbrowser
 from pathlib import Path
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs, parse_qsl, urlencode
 import json
 import re
 
@@ -18,6 +18,16 @@ HOST = "127.0.0.1"
 DIRECTORY = Path(__file__).parent
 ALLOWED_IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
 MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10 MB
+CLEAN_ROUTES = {
+    '/editor': '/editor.html',
+    '/exam': '/exam.html',
+    '/study': '/exam.html',
+}
+CLEAN_ROUTE_REDIRECTS = {
+    '/editor/': '/editor',
+    '/exam/': '/exam',
+    '/study/': '/study',
+}
 
 def looks_like_supported_image(extension, data):
     if extension in {'.jpg', '.jpeg'}:
@@ -39,6 +49,17 @@ def safe_join_under(root, *parts):
 class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(DIRECTORY), **kwargs)
+
+    def route_static_path(self, path):
+        parsed = urlparse(path)
+        normalized_path = parsed.path.rstrip('/') or '/'
+        target = CLEAN_ROUTES.get(normalized_path)
+        if not target:
+            return path
+        return target + (f'?{parsed.query}' if parsed.query else '')
+
+    def translate_path(self, path):
+        return super().translate_path(self.route_static_path(path))
 
     def end_headers(self):
         # Only allow requests from the same origin (localhost)
@@ -68,6 +89,27 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urlparse(self.path)
+        redirect_path = CLEAN_ROUTE_REDIRECTS.get(parsed.path)
+        if redirect_path:
+            try:
+                query_pairs = parse_qsl(parsed.query, keep_blank_values=True, max_num_fields=100)
+            except ValueError:
+                self.send_response(400)
+                self.end_headers()
+                return
+
+            safe_query = urlencode(query_pairs, doseq=True)
+            location = redirect_path + (f'?{safe_query}' if safe_query else '')
+            if not re.fullmatch(r'/[A-Za-z0-9._~/?=&%+-]*', location):
+                self.send_response(400)
+                self.end_headers()
+                return
+
+            self.send_response(302)
+            self.send_header('Location', location)
+            self.end_headers()
+            return
+
         if parsed.path == '/user-content/exams/index.json':
             exams_root = DIRECTORY / 'user-content' / 'exams'
             exam_dirs = []
@@ -77,6 +119,8 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         exam_dirs.append(child.name)
             self.send_json(200, exam_dirs)
             return
+
+        self.path = self.route_static_path(self.path)
 
         super().do_GET()
 

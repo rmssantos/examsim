@@ -622,9 +622,9 @@ startSelectedExam(mode = 'exam') {
 	const examData = window.userExams[this.selectedExamId];
 	const metadata = examData?.metadata || {};
 	const moduleNames = this.getModuleNames(metadata.modules);
-	let urlParams = `exam=${encodeURIComponent(this.selectedExamId)}`;
+	const routeParams = { exam: this.selectedExamId };
 	if (mode === 'study') {
-		urlParams += '&mode=study';
+		routeParams.mode = 'study';
 	}
 
 	if (moduleNames.length > 0) {
@@ -639,7 +639,7 @@ startSelectedExam(mode = 'exam') {
 			return;
 		}
 
-		urlParams += `&modules=${encodeURIComponent(JSON.stringify(selectedModules))}`;
+		routeParams.modules = JSON.stringify(selectedModules);
 	}
 
 	const simulator = window.ExamApp?.examSimulator || window.examSimulator;
@@ -647,7 +647,10 @@ startSelectedExam(mode = 'exam') {
 		this.selectExam(this.selectedExamId);
 	}
 
-	window.open(`exam.html?${urlParams}`, '_blank');
+	const routeName = mode === 'study' ? 'study' : 'exam';
+	const url = window.ExamApp.router?.buildUrl(routeName, routeParams)
+		|| `exam.html?${new URLSearchParams(routeParams).toString()}`;
+	window.open(url, '_blank');
 }
 
 updateSelectedQuestionsCount(examId) {
@@ -1233,12 +1236,14 @@ try {
 	return;
 }
 
-let urlParams = `exam=${encodeURIComponent(examId)}&mode=study&focus=missed`;
+const routeParams = { exam: examId, mode: 'study', focus: 'missed' };
 if (Array.isArray(attempt.modules) && attempt.modules.length > 0) {
-	urlParams += `&modules=${encodeURIComponent(JSON.stringify(attempt.modules))}`;
+	routeParams.modules = JSON.stringify(attempt.modules);
 }
 window.ExamApp?.analytics?.trackStudyMissedStarted?.(examId, { questionCount: questionIds.length });
-window.open(`exam.html?${urlParams}`, '_blank');
+const url = window.ExamApp.router?.buildUrl('study', routeParams)
+	|| `exam.html?${new URLSearchParams(routeParams).toString()}`;
+window.open(url, '_blank');
 }
 
 getMostRecentExamWithProgress() {

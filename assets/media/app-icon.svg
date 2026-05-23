@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Exam Simulator">
+  <rect width="512" height="512" rx="96" fill="#1e3c72"/>
+  <path d="M146 112h220c18 0 32 14 32 32v224c0 18-14 32-32 32H146c-18 0-32-14-32-32V144c0-18 14-32 32-32Z" fill="#ffffff"/>
+  <path d="M172 184h168M172 248h168M172 312h112" stroke="#1e3c72" stroke-width="28" stroke-linecap="round"/>
+  <circle cx="346" cy="320" r="54" fill="#0f766e"/>
+  <path d="m320 319 18 18 34-40" fill="none" stroke="#ffffff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
