@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'">
+  <title>Exam Simulator</title>
+</head>
+<body>
+  <p>Opening Exam Simulator...</p>
+  <script>
+    (function () {
+      var segments = window.location.pathname.split('/').filter(Boolean);
+      var routeIndex = segments.findIndex(function (segment) {
+        return segment === 'editor' || segment === 'exam' || segment === 'study';
+      });
+      var base = '/' + (routeIndex > 0 ? segments.slice(0, routeIndex).join('/') + '/' : '');
+      var route = routeIndex >= 0 ? segments[routeIndex] : '';
+      var params = new URLSearchParams(window.location.search);
+      var target = 'index.html';
+
+      if (route === 'editor') {
+        target = 'editor.html';
+      } else if (route === 'exam' || route === 'study') {
+        target = 'exam.html';
+        if (route === 'study' && !params.has('mode')) params.set('mode', 'study');
+      }
+
+      var query = params.toString();
+      window.location.replace(base + target + (query ? '?' + query : ''));
+    })();
+  </script>
+</body>
+</html>

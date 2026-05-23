@@ -338,7 +338,8 @@ class MultiExamSimulator {
                 return;
             }
             // Open in a new page like the single-exam flow
-            const url = `exam.html?exam=${encodeURIComponent(this.currentExam)}`;
+            const url = window.ExamApp.router?.buildUrl('exam', { exam: this.currentExam })
+                || `exam.html?exam=${encodeURIComponent(this.currentExam)}`;
             window.open(url, '_blank');
         });
 
@@ -346,7 +347,8 @@ class MultiExamSimulator {
         document.getElementById('start-custom-exam')?.addEventListener('click', () => {
             const code = (document.getElementById('custom-exam-code')?.value || '').trim();
             if (!code) { alert('Enter a custom exam code'); return; }
-            const url = `exam.html?exam=custom&code=${encodeURIComponent(code)}`;
+            const url = window.ExamApp.router?.buildUrl('exam', { exam: 'custom', code })
+                || `exam.html?exam=custom&code=${encodeURIComponent(code)}`;
             window.open(url, '_blank');
         });
 
