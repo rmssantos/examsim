@@ -42,7 +42,7 @@ The **Exam Simulator** is a self-contained, browser-based exam practice platform
 
 ### ⚠️ Content Safety & Licensing
 
-- **No official dumps are stored in this repo.** The public SC-900 pack is educational sample content for learning and UI validation, not an official exam dump.
+- **No official dumps are stored in this repo.** The public sample packs (for example `sc900`, `ab730`, and `ab731`) are educational sample content for learning and UI validation, not official exam dumps.
 - **Licensed exam content must live in a private location** (private Git repo, encrypted drive, SharePoint, etc.). Drag/drop or copy them locally when you study.
 - **Recommended workflow:**
   1. Keep this sanitized repo public for the simulator.
@@ -132,7 +132,9 @@ portable/
     ├── imports/            # Temporary import staging area
     └── exams/              # Public sample + local/imported exam packs
       ├── index.json      # Static exam index for GitHub Pages
-      └── sc900/          # Educational sample exam
+      ├── sc900/          # Educational sample exam
+      ├── ab730/          # Educational sample exam
+      └── ab731/          # Educational sample exam
 ```
 
 ---
