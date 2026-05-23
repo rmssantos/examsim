@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'examsim-pwa-v2';
+const CACHE_VERSION = 'examsim-pwa-v2.5';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -41,7 +41,10 @@ const CORE_ASSETS = [
 ];
 
 const NETWORK_FIRST_PATHS = [
-  '/user-content/exams/index.json'
+  '/manifest.webmanifest',
+  '/user-content/exams/index.json',
+  '/metadata.json',
+  '/dump.json'
 ];
 
 function sameOrigin(url) {
@@ -107,7 +110,7 @@ async function networkFirst(request) {
     if (response.ok) await putRuntimeCache(cache, request, response);
     return response;
   } catch (error) {
-    const cached = await cache.match(request);
+    const cached = await caches.match(request);
     if (cached) return cached;
     throw error;
   }
@@ -117,8 +120,13 @@ self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(STATIC_CACHE);
     await cache.addAll(CORE_ASSETS);
-    await self.skipWaiting();
   })());
+});
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('activate', event => {

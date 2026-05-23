@@ -117,16 +117,16 @@ Answer Yes/No for each statement.
     "Statement 2 is false",
     "Statement 3 is true"
   ],
-  "correct": [true, false, true]
+  "correct": [0, 1, 0]
 }
 ```
 
 **Required field**: `statements` - array of statements
-**Note**: `correct` contains boolean values (true = Yes, false = No)
+**Note**: `correct` contains numeric Yes/No values (`0 = Yes, 1 = No`). Boolean values are rejected by the app validator and by `tools/validate-exam-packs.py`.
 
 ---
 
-### HOTSPOT
+### HOTSPOT (Planned)
 Click on specific areas of an image.
 
 ```json
@@ -137,7 +137,7 @@ Click on specific areas of an image.
 }
 ```
 
-**Note**: Currently in development. May require additional fields.
+**Note**: Planned only. The current runtime validator and `tools/validate-exam-packs.py` accept `STANDARD`, `MULTI`, `SEQUENCE`, `DRAG_DROP_SELECT`, and `YES_NO_MATRIX`.
 
 ---
 
@@ -300,6 +300,12 @@ From the editor:
 ---
 
 ## Data Validation
+
+Run the repository validator before sharing or publishing packs:
+
+```bash
+python tools/validate-exam-packs.py --root user-content/exams
+```
 
 ### Required Validation
 
