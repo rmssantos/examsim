@@ -30,7 +30,12 @@ class UtilityFooterTests(unittest.TestCase):
 
         css = (ROOT / "assets/css/app-footer.css").read_text(encoding="utf-8")
         self.assertIn(".app-footer", css)
+        self.assertIn('body:not(.dark-mode):not([data-theme="dark"]) .app-footer', css)
+        self.assertIn("background: rgba(255, 255, 255, 0.78)", css)
+        self.assertIn("box-shadow: 0 14px 28px rgba(15, 23, 42, 0.06)", css)
         self.assertIn("@media (max-width: 720px)", css)
+        self.assertIn("width: min(1180px, calc(100% - 24px))", css)
+        self.assertNotIn("width: min(100% - 24px, 1180px)", css)
 
         service_worker = (ROOT / "service-worker.js").read_text(encoding="utf-8")
         self.assertIn("./assets/css/app-footer.css", service_worker)

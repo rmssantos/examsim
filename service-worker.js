@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'examsim-pwa-v2.7';
+const CACHE_VERSION = 'examsim-pwa-v2.8';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -8,6 +8,8 @@ const CORE_ASSETS = [
   './exam.html',
   './editor.html',
   './404.html',
+  './PRIVACY-AND-STORAGE.md',
+  './LICENSE',
   './manifest.webmanifest',
   './assets/js/router.js',
   './assets/js/pwa.js',
@@ -54,6 +56,8 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './exam.html',
   './editor.html',
   './404.html',
+  './PRIVACY-AND-STORAGE.md',
+  './LICENSE',
   './manifest.webmanifest',
   './assets/js/router.js',
   './assets/js/pwa.js',
@@ -197,6 +201,9 @@ self.addEventListener('fetch', event => {
       } catch (_) {
         // Fall through to the route shell cache.
       }
+
+      const cached = await caches.match(request);
+      if (cached) return cached;
 
       return navigationFallback(url.pathname);
     })());

@@ -10,10 +10,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class Sprint1ReadinessTests(unittest.TestCase):
-    def test_service_worker_uses_v27_and_network_first_for_mutable_exam_assets(self):
+    def test_service_worker_uses_v28_and_network_first_for_mutable_exam_assets(self):
         text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
 
-        self.assertIn("examsim-pwa-v2.7", text)
+        self.assertIn("examsim-pwa-v2.8", text)
         for path in (
             "/manifest.webmanifest",
             "/user-content/exams/index.json",
@@ -29,6 +29,24 @@ class Sprint1ReadinessTests(unittest.TestCase):
         network_first = text[start:end]
 
         self.assertIn("await caches.match(request)", network_first)
+
+    def test_service_worker_serves_cached_docs_before_app_shell_fallback(self):
+        text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
+        core_start = text.index("const CORE_ASSETS")
+        core_end = text.index("\n];", core_start)
+        core_assets = text[core_start:core_end]
+        start = text.index("if (request.mode === 'navigate')")
+        end = text.index("if (isAppShellNetworkFirstAsset", start)
+        navigate_block = text[start:end]
+
+        self.assertIn("./PRIVACY-AND-STORAGE.md", core_assets)
+        self.assertIn("./LICENSE", core_assets)
+        self.assertIn("const cached = await caches.match(request)", navigate_block)
+        self.assertIn("if (cached) return cached", navigate_block)
+        self.assertLess(
+            navigate_block.index("const cached = await caches.match(request)"),
+            navigate_block.index("return navigationFallback(url.pathname)"),
+        )
 
     def test_service_worker_revalidates_app_shell_assets_before_cache_fallback(self):
         text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
