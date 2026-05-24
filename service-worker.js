@@ -47,12 +47,37 @@ const NETWORK_FIRST_PATHS = [
   '/dump.json'
 ];
 
-const APP_SHELL_NETWORK_FIRST_ASSETS = CORE_ASSETS.filter(asset =>
-  asset.endsWith('.html') ||
-  asset.endsWith('.js') ||
-  asset.endsWith('.css') ||
-  asset.endsWith('.webmanifest')
-);
+const APP_SHELL_NETWORK_FIRST_ASSETS = [
+  './',
+  './index.html',
+  './exam.html',
+  './editor.html',
+  './404.html',
+  './manifest.webmanifest',
+  './assets/js/router.js',
+  './assets/js/pwa.js',
+  './assets/js/utils.js',
+  './assets/js/analytics.js',
+  './assets/js/exam-storage.js',
+  './assets/js/exam-loader.js',
+  './assets/js/exam-manager.js',
+  './assets/js/homepage.js',
+  './assets/js/script-multi-exam.js',
+  './assets/js/exam-init.js',
+  './assets/js/editor.js',
+  './assets/js/image-loader.js',
+  './assets/js/image-storage.js',
+  './assets/js/study-scheduler.js',
+  './assets/js/study-storage.js',
+  './assets/css/style-new.css',
+  './assets/css/multi-exam-styles.css',
+  './assets/css/modern-enhancements.css',
+  './assets/css/homepage-styles.css',
+  './assets/css/exam-enhancements.css',
+  './assets/css/analytics-privacy.css',
+  './assets/css/index-inline.css',
+  './assets/css/editor-styles.css'
+];
 
 function sameOrigin(url) {
   return url.origin === self.location.origin;
