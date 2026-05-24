@@ -9,7 +9,7 @@
 }
 
 .legal-page {
-  width: min(1180px, calc(100% - 32px));
+  width: min(1120px, calc(100% - 24px));
   margin: 0 auto;
   padding: 20px 0 0;
 }
@@ -285,7 +285,7 @@
 
 @media (max-width: 720px) {
   .legal-page {
-    width: min(1180px, calc(100% - 24px));
+    width: min(1120px, calc(100% - 8px));
     padding-top: 18px;
   }
 
@@ -315,5 +315,12 @@
 
   .legal-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .legal-hero,
+  .legal-content {
+    padding: 0.85rem;
   }
 }
