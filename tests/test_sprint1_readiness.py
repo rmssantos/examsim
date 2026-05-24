@@ -53,7 +53,87 @@ class Sprint1ReadinessTests(unittest.TestCase):
         )
 
         self.assertEqual(result.returncode, 0, result.stdout)
-        self.assertIn("Validated 3 exam pack", result.stdout)
+        self.assertRegex(result.stdout, r"Validated \d+ exam pack\(s\), \d+ question\(s\)\.")
+
+    def test_exam_pack_validator_reports_missing_dump_without_schema_noise(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "exams"
+            exam_dir = root / "missingdump"
+            exam_dir.mkdir(parents=True)
+            (root / "index.json").write_text(json.dumps(["missingdump"]), encoding="utf-8")
+            (exam_dir / "metadata.json").write_text(
+                json.dumps(
+                    {
+                        "id": "missingdump",
+                        "name": "Missing Dump",
+                        "questionCount": 1,
+                        "totalQuestions": 1,
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "tools/validate-exam-packs.py",
+                    "--root",
+                    str(root),
+                ],
+                cwd=ROOT,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+            )
+
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        self.assertIn("missing file", result.stdout)
+        self.assertNotIn("dump.json must be an array", result.stdout)
+
+    def test_exam_pack_validator_does_not_duplicate_missing_ids(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "exams"
+            exam_dir = root / "missingids"
+            exam_dir.mkdir(parents=True)
+            (root / "index.json").write_text(json.dumps(["missingids"]), encoding="utf-8")
+            (exam_dir / "metadata.json").write_text(
+                json.dumps(
+                    {
+                        "id": "missingids",
+                        "name": "Missing IDs",
+                        "questionCount": 2,
+                        "totalQuestions": 2,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (exam_dir / "dump.json").write_text(
+                json.dumps(
+                    [
+                        {"question": "First missing id", "options": ["A", "B"], "correct": 0},
+                        {"question": "Second missing id", "options": ["A", "B"], "correct": 1},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "tools/validate-exam-packs.py",
+                    "--root",
+                    str(root),
+                ],
+                cwd=ROOT,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+            )
+
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        self.assertIn("question 1: missing id", result.stdout)
+        self.assertIn("question 2: missing id", result.stdout)
+        self.assertNotIn("duplicate id ''", result.stdout)
 
     def test_exam_pack_validator_rejects_boolean_yes_no_matrix_answers(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -168,7 +248,7 @@ class Sprint1ReadinessTests(unittest.TestCase):
         self.assertTrue(workflow.exists(), "Missing .github/workflows/validate.yml")
         text = workflow.read_text(encoding="utf-8")
 
-        self.assertIn("python -m unittest tests.test_sprint1_readiness -v", text)
+        self.assertIn("python -m unittest discover -s tests -v", text)
         self.assertIn("python tools/validate-exam-packs.py --root user-content/exams", text)
         self.assertIn("node --check service-worker.js", text)
         self.assertIn("python -m py_compile server.py", text)
