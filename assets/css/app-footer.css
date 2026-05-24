@@ -1,3 +1,36 @@
+.app-nav-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 38px;
+  padding: 0.625rem 1rem;
+  color: #0066cc;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid rgba(30, 60, 114, 0.2);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+}
+
+.app-nav-action:hover,
+.app-nav-action:focus-visible {
+  color: #0066cc;
+  background: rgba(248, 249, 250, 1);
+  border-color: rgba(30, 60, 114, 0.35);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  outline: none;
+  transform: translateY(-2px);
+}
+
+.app-nav-action i {
+  font-size: 1rem;
+}
+
 .app-footer {
   width: min(1180px, calc(100% - 32px));
   margin: 28px auto 0;
@@ -57,6 +90,12 @@
   outline: none;
 }
 
+.app-footer-links a[aria-current="page"] {
+  color: #0066cc;
+  background: rgba(219, 234, 254, 0.74);
+  border-color: rgba(37, 99, 235, 0.24);
+}
+
 body:not(.dark-mode):not([data-theme="dark"]) .app-footer {
   padding: 14px 16px;
   color: #475569;
@@ -89,6 +128,22 @@ body:not(.dark-mode):not([data-theme="dark"]) .app-footer-links a:focus-visible 
   border-top-color: rgba(148, 163, 184, 0.18);
 }
 
+.dark-mode .app-nav-action,
+[data-theme="dark"] .app-nav-action {
+  color: #cbd5e1;
+  background: rgba(45, 55, 72, 0.95);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark-mode .app-nav-action:hover,
+.dark-mode .app-nav-action:focus-visible,
+[data-theme="dark"] .app-nav-action:hover,
+[data-theme="dark"] .app-nav-action:focus-visible {
+  color: #ffffff;
+  background: #0066cc;
+  border-color: #0066cc;
+}
+
 .dark-mode .app-footer-note strong,
 [data-theme="dark"] .app-footer-note strong {
   color: #e2e8f0;
@@ -106,6 +161,13 @@ body:not(.dark-mode):not([data-theme="dark"]) .app-footer-links a:focus-visible 
   color: #f8fafc;
   background: rgba(94, 234, 212, 0.1);
   border-color: rgba(94, 234, 212, 0.2);
+}
+
+.dark-mode .app-footer-links a[aria-current="page"],
+[data-theme="dark"] .app-footer-links a[aria-current="page"] {
+  color: #ffffff;
+  background: rgba(0, 102, 204, 0.28);
+  border-color: rgba(0, 188, 242, 0.35);
 }
 
 @media (max-width: 720px) {

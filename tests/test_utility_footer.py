@@ -15,7 +15,9 @@ class UtilityFooterTests(unittest.TestCase):
             self.assertIn("https://github.com/rmssantos/examsim", html, page)
             self.assertIn("https://github.com/rmssantos/examsim/issues", html, page)
             self.assertIn('href="privacy-and-storage.html"', html, page)
+            self.assertIn('data-route="privacy-and-storage"', html, page)
             self.assertIn('href="license.html"', html, page)
+            self.assertIn('data-route="license"', html, page)
             self.assertNotIn('href="PRIVACY-AND-STORAGE.md"', html, page)
             self.assertNotIn('href="LICENSE"', html, page)
             self.assertIn("Offline-ready", html, page)
@@ -33,6 +35,8 @@ class UtilityFooterTests(unittest.TestCase):
             self.assertIn("assets/css/legal-page.css", html, page)
             self.assertIn("assets/css/app-footer.css", html, page)
             self.assertIn('href="index.html"', html, page)
+            self.assertIn('data-route="home"', html, page)
+            self.assertIn('class="app-nav-action"', html, page)
             for text in expected_text:
                 self.assertIn(text, html, page)
 
@@ -48,6 +52,7 @@ class UtilityFooterTests(unittest.TestCase):
 
         css = (ROOT / "assets/css/app-footer.css").read_text(encoding="utf-8")
         self.assertIn(".app-footer", css)
+        self.assertIn(".app-nav-action", css)
         self.assertIn('body:not(.dark-mode):not([data-theme="dark"]) .app-footer', css)
         self.assertIn("background: rgba(255, 255, 255, 0.78)", css)
         self.assertIn("box-shadow: 0 14px 28px rgba(15, 23, 42, 0.06)", css)
@@ -58,6 +63,22 @@ class UtilityFooterTests(unittest.TestCase):
         service_worker = (ROOT / "service-worker.js").read_text(encoding="utf-8")
         self.assertIn("./assets/css/app-footer.css", service_worker)
         self.assertIn("./assets/css/legal-page.css", service_worker)
+
+    def test_legal_pages_use_clean_route_fallbacks_without_theme_side_effects(self):
+        router = (ROOT / "assets/js/router.js").read_text(encoding="utf-8")
+        server = (ROOT / "server.py").read_text(encoding="utf-8")
+        css = (ROOT / "assets/css/legal-page.css").read_text(encoding="utf-8")
+        script = (ROOT / "assets/js/legal-page.js").read_text(encoding="utf-8")
+
+        self.assertIn("'privacy-and-storage': 'privacy-and-storage.html'", router)
+        self.assertIn("license: 'license.html'", router)
+        self.assertIn("'/privacy-and-storage': '/privacy-and-storage.html'", server)
+        self.assertIn("'/license': '/license.html'", server)
+        self.assertIn("width: min(1180px, calc(100% - 24px))", css)
+        self.assertNotIn("width: min(100% - 24px, 980px)", css)
+        self.assertIn("if (persist) localStorage.setItem('theme', theme);", script)
+        self.assertIn("applyTheme(preferredTheme());", script)
+        self.assertIn("'dark', true", script)
 
 
 if __name__ == "__main__":

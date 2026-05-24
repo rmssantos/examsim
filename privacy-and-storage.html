@@ -14,12 +14,12 @@
 <body class="legal-shell">
   <main class="legal-page">
     <header class="legal-topbar">
-      <a class="legal-brand" href="index.html">
+      <a class="legal-brand" href="index.html" data-route="home">
         <i aria-hidden="true" class="fas fa-graduation-cap"></i>
         <span>Exam Simulator</span>
       </a>
       <div class="legal-actions">
-        <a class="legal-action" href="index.html">
+        <a class="app-nav-action" href="index.html" data-route="home">
           <i aria-hidden="true" class="fas fa-arrow-left"></i>
           <span>Back</span>
         </a>
@@ -99,11 +99,11 @@
             <i aria-hidden="true" class="fas fa-circle-exclamation"></i>
             <span>Report issue</span>
           </a>
-          <a href="privacy-and-storage.html" aria-current="page">
+          <a href="privacy-and-storage.html" data-route="privacy-and-storage" aria-current="page">
             <i aria-hidden="true" class="fas fa-shield-alt"></i>
             <span>Privacy &amp; storage</span>
           </a>
-          <a href="license.html">
+          <a href="license.html" data-route="license">
             <i aria-hidden="true" class="fas fa-scale-balanced"></i>
             <span>MIT license</span>
           </a>
@@ -111,5 +111,6 @@
       </div>
     </footer>
   </main>
+  <script src="assets/js/router.js"></script>
 </body>
 </html>

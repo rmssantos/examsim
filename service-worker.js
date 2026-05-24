@@ -112,6 +112,8 @@ function cleanRouteShell(pathname) {
   const lastSegment = normalized.split('/').filter(Boolean).pop() || '';
   if (lastSegment === 'editor') return './editor.html';
   if (lastSegment === 'exam' || lastSegment === 'study') return './exam.html';
+  if (lastSegment === 'privacy-and-storage') return './privacy-and-storage.html';
+  if (lastSegment === 'license') return './license.html';
   return './index.html';
 }
 
@@ -119,7 +121,7 @@ function cleanRouteRedirect(url) {
   if (!url.pathname.endsWith('/')) return null;
   const normalized = url.pathname.replace(/\/+/g, '/').replace(/\/$/, '');
   const lastSegment = normalized.split('/').filter(Boolean).pop() || '';
-  if (!['editor', 'exam', 'study'].includes(lastSegment)) return null;
+  if (!['editor', 'exam', 'study', 'privacy-and-storage', 'license'].includes(lastSegment)) return null;
   return new URL(`${normalized}${url.search}`, url.origin).href;
 }
 
