@@ -10,10 +10,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class Sprint1ReadinessTests(unittest.TestCase):
-    def test_service_worker_uses_v28_and_network_first_for_mutable_exam_assets(self):
+    def test_service_worker_uses_v29_and_network_first_for_mutable_exam_assets(self):
         text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
 
-        self.assertIn("examsim-pwa-v2.8", text)
+        self.assertIn("examsim-pwa-v2.9", text)
         for path in (
             "/manifest.webmanifest",
             "/user-content/exams/index.json",
@@ -39,6 +39,8 @@ class Sprint1ReadinessTests(unittest.TestCase):
         end = text.index("if (isAppShellNetworkFirstAsset", start)
         navigate_block = text[start:end]
 
+        self.assertIn("./privacy-and-storage.html", core_assets)
+        self.assertIn("./license.html", core_assets)
         self.assertIn("./PRIVACY-AND-STORAGE.md", core_assets)
         self.assertIn("./LICENSE", core_assets)
         self.assertIn("const cached = await caches.match(request)", navigate_block)

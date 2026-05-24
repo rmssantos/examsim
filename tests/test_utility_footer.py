@@ -14,9 +14,27 @@ class UtilityFooterTests(unittest.TestCase):
             self.assertIn('aria-label="Project and privacy links"', html, page)
             self.assertIn("https://github.com/rmssantos/examsim", html, page)
             self.assertIn("https://github.com/rmssantos/examsim/issues", html, page)
-            self.assertIn("PRIVACY-AND-STORAGE.md", html, page)
-            self.assertIn("LICENSE", html, page)
+            self.assertIn('href="privacy-and-storage.html"', html, page)
+            self.assertIn('href="license.html"', html, page)
+            self.assertNotIn('href="PRIVACY-AND-STORAGE.md"', html, page)
+            self.assertNotIn('href="LICENSE"', html, page)
             self.assertIn("Offline-ready", html, page)
+
+    def test_footer_document_links_render_as_app_pages(self):
+        pages = {
+            "privacy-and-storage.html": ("Privacy &amp; Data Storage", "Your data stays local"),
+            "license.html": ("MIT License", "Copyright (c) 2025 Exam Simulator Contributors"),
+        }
+
+        for page, expected_text in pages.items():
+            html = (ROOT / page).read_text(encoding="utf-8")
+
+            self.assertIn('<main class="legal-page"', html, page)
+            self.assertIn("assets/css/legal-page.css", html, page)
+            self.assertIn("assets/css/app-footer.css", html, page)
+            self.assertIn('href="index.html"', html, page)
+            for text in expected_text:
+                self.assertIn(text, html, page)
 
     def test_exam_page_keeps_footer_out_of_active_exam_flow(self):
         html = (ROOT / "exam.html").read_text(encoding="utf-8")
@@ -39,6 +57,7 @@ class UtilityFooterTests(unittest.TestCase):
 
         service_worker = (ROOT / "service-worker.js").read_text(encoding="utf-8")
         self.assertIn("./assets/css/app-footer.css", service_worker)
+        self.assertIn("./assets/css/legal-page.css", service_worker)
 
 
 if __name__ == "__main__":
