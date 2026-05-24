@@ -34,6 +34,18 @@ class EditorUiReadinessTests(unittest.TestCase):
 
         self.assertIn("syncFromForm();\n      markUnsaved();", debounced_block)
 
+    def test_editor_save_state_updates_existing_dom_nodes(self):
+        js = (ROOT / "assets/js/editor.js").read_text(encoding="utf-8")
+        start = js.index("function updateUnsavedIndicator()")
+        end = js.index("  // Warn before leaving", start)
+        update_block = js[start:end]
+
+        self.assertNotIn("innerHTML", update_block)
+        self.assertNotIn("unsaved-indicator", update_block)
+        self.assertIn("querySelector('i')", update_block)
+        self.assertIn("querySelector('span')", update_block)
+        self.assertIn("textContent = label", update_block)
+
     def test_validation_workflow_runs_all_unittest_files(self):
         workflow = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8")
 

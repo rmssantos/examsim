@@ -1144,18 +1144,20 @@
 
     [headerStatus, footerStatus].forEach(status => {
       if (!status) return;
+      const statusIcon = status.querySelector('i');
+      const statusLabel = status.querySelector('span');
+
       status.classList.toggle('is-dirty', state.hasUnsavedChanges);
-      status.innerHTML = `<i aria-hidden="true" class="${icon}"></i><span>${label}</span>`;
+      if (statusIcon) {
+        statusIcon.className = icon;
+        statusIcon.setAttribute('aria-hidden', 'true');
+      }
+      if (statusLabel) {
+        statusLabel.textContent = label;
+      }
       status.title = title;
       status.setAttribute('aria-label', label);
     });
-
-    const indicator = document.getElementById('unsaved-indicator');
-    if (state.hasUnsavedChanges) {
-      if (indicator) indicator.style.display = 'inline-block';
-    } else {
-      if (indicator) indicator.style.display = 'none';
-    }
   }
 
   // Warn before leaving with unsaved changes
