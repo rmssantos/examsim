@@ -68,7 +68,7 @@
       <p>Dragging an exam file into the app or saving changes in the editor updates only that browser profile. To publish corrections for everyone, export the corrected JSON and open a pull request or GitHub issue.</p>
 
       <h2>Offline behavior</h2>
-      <p>After the app shell is cached, the simulator works offline for the pages and assets already installed by the service worker. The privacy and license pages are also cached so these footer links open as readable app pages instead of downloading raw files.</p>
+      <p>After the app shell is cached, the simulator works offline for the pages and assets already installed by the service worker. This privacy page is cached so the footer link opens as a readable app page instead of downloading a raw file.</p>
 
       <h2>Self-hosting and shared exams</h2>
       <p>A server can pre-install exams in <strong>user-content/exams/</strong>. Those static exam files are visible to every user of that deployment, but each user's progress and imported private exams still stay in their own browser storage.</p>
@@ -102,10 +102,6 @@
           <a href="privacy-and-storage.html" data-route="privacy-and-storage" aria-current="page">
             <i aria-hidden="true" class="fas fa-shield-alt"></i>
             <span>Privacy &amp; storage</span>
-          </a>
-          <a href="license.html" data-route="license">
-            <i aria-hidden="true" class="fas fa-scale-balanced"></i>
-            <span>MIT license</span>
           </a>
         </nav>
       </div>

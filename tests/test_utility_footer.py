@@ -16,16 +16,15 @@ class UtilityFooterTests(unittest.TestCase):
             self.assertIn("https://github.com/rmssantos/examsim/issues", html, page)
             self.assertIn('href="privacy-and-storage.html"', html, page)
             self.assertIn('data-route="privacy-and-storage"', html, page)
-            self.assertIn('href="license.html"', html, page)
-            self.assertIn('data-route="license"', html, page)
+            self.assertNotIn('href="license.html"', html, page)
+            self.assertNotIn('data-route="license"', html, page)
             self.assertNotIn('href="PRIVACY-AND-STORAGE.md"', html, page)
             self.assertNotIn('href="LICENSE"', html, page)
             self.assertIn("Offline-ready", html, page)
 
-    def test_footer_document_links_render_as_app_pages(self):
+    def test_footer_privacy_link_renders_as_app_page(self):
         pages = {
             "privacy-and-storage.html": ("Privacy &amp; Data Storage", "Your data stays local"),
-            "license.html": ("MIT License", "Copyright (c) 2025 Exam Simulator Contributors"),
         }
 
         for page, expected_text in pages.items():
@@ -71,9 +70,9 @@ class UtilityFooterTests(unittest.TestCase):
         script = (ROOT / "assets/js/legal-page.js").read_text(encoding="utf-8")
 
         self.assertIn("'privacy-and-storage': 'privacy-and-storage.html'", router)
-        self.assertIn("license: 'license.html'", router)
+        self.assertNotIn("license: 'license.html'", router)
         self.assertIn("'/privacy-and-storage': '/privacy-and-storage.html'", server)
-        self.assertIn("'/license': '/license.html'", server)
+        self.assertNotIn("'/license': '/license.html'", server)
         self.assertIn("width: min(1120px, calc(100% - 24px))", css)
         self.assertIn("width: min(1120px, calc(100% - 8px))", css)
         self.assertNotIn("width: min(100% - 24px, 980px)", css)

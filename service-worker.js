@@ -9,9 +9,7 @@ const CORE_ASSETS = [
   './editor.html',
   './404.html',
   './privacy-and-storage.html',
-  './license.html',
   './PRIVACY-AND-STORAGE.md',
-  './LICENSE',
   './manifest.webmanifest',
   './assets/js/router.js',
   './assets/js/pwa.js',
@@ -61,9 +59,7 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './editor.html',
   './404.html',
   './privacy-and-storage.html',
-  './license.html',
   './PRIVACY-AND-STORAGE.md',
-  './LICENSE',
   './manifest.webmanifest',
   './assets/js/router.js',
   './assets/js/pwa.js',
@@ -113,7 +109,6 @@ function cleanRouteShell(pathname) {
   if (lastSegment === 'editor') return './editor.html';
   if (lastSegment === 'exam' || lastSegment === 'study') return './exam.html';
   if (lastSegment === 'privacy-and-storage') return './privacy-and-storage.html';
-  if (lastSegment === 'license') return './license.html';
   return './index.html';
 }
 
@@ -121,7 +116,7 @@ function cleanRouteRedirect(url) {
   if (!url.pathname.endsWith('/')) return null;
   const normalized = url.pathname.replace(/\/+/g, '/').replace(/\/$/, '');
   const lastSegment = normalized.split('/').filter(Boolean).pop() || '';
-  if (!['editor', 'exam', 'study', 'privacy-and-storage', 'license'].includes(lastSegment)) return null;
+  if (!['editor', 'exam', 'study', 'privacy-and-storage'].includes(lastSegment)) return null;
   return new URL(`${normalized}${url.search}`, url.origin).href;
 }
 

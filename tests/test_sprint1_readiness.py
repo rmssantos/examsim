@@ -40,9 +40,9 @@ class Sprint1ReadinessTests(unittest.TestCase):
         navigate_block = text[start:end]
 
         self.assertIn("./privacy-and-storage.html", core_assets)
-        self.assertIn("./license.html", core_assets)
         self.assertIn("./PRIVACY-AND-STORAGE.md", core_assets)
-        self.assertIn("./LICENSE", core_assets)
+        self.assertNotIn("./license.html", core_assets)
+        self.assertNotIn("./LICENSE", core_assets)
         self.assertIn("const cached = await caches.match(request)", navigate_block)
         self.assertIn("if (cached) return cached", navigate_block)
         self.assertLess(
