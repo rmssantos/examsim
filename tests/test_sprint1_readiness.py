@@ -10,10 +10,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class Sprint1ReadinessTests(unittest.TestCase):
-    def test_service_worker_uses_v26_and_network_first_for_mutable_exam_assets(self):
+    def test_service_worker_uses_v27_and_network_first_for_mutable_exam_assets(self):
         text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
 
-        self.assertIn("examsim-pwa-v2.6", text)
+        self.assertIn("examsim-pwa-v2.7", text)
         for path in (
             "/manifest.webmanifest",
             "/user-content/exams/index.json",

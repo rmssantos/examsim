@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'examsim-pwa-v2.6';
+const CACHE_VERSION = 'examsim-pwa-v2.7';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -35,6 +35,7 @@ const CORE_ASSETS = [
   './assets/css/homepage-styles.css',
   './assets/css/exam-enhancements.css',
   './assets/css/analytics-privacy.css',
+  './assets/css/app-footer.css',
   './assets/css/index-inline.css',
   './assets/css/editor-styles.css',
   './assets/media/app-icon.svg'
@@ -75,6 +76,7 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/css/homepage-styles.css',
   './assets/css/exam-enhancements.css',
   './assets/css/analytics-privacy.css',
+  './assets/css/app-footer.css',
   './assets/css/index-inline.css',
   './assets/css/editor-styles.css'
 ];
