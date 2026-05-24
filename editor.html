@@ -11,6 +11,7 @@
   <title>Question Editor - Create & Edit Exams</title>
   <link href="assets/vendor/fontawesome/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/analytics-privacy.css">
+  <link rel="stylesheet" href="assets/css/app-footer.css">
   <link rel="stylesheet" href="assets/css/editor-styles.css">
 </head>
 <body>
@@ -18,7 +19,7 @@
     <div class="editor-header">
       <h1><i aria-hidden="true" class="fas fa-pen-ruler"></i> Question Editor</h1>
       <div class="editor-header-actions">
-        <a href="index.html" data-route="home" class="btn btn-outline"><i aria-hidden="true" class="fas fa-arrow-left"></i> Back</a>
+        <a href="index.html" data-route="home" class="app-nav-action"><i aria-hidden="true" class="fas fa-arrow-left"></i> Back</a>
         <button class="editor-theme-toggle" id="editorThemeToggle" title="Toggle theme" aria-label="Toggle theme">
           <i aria-hidden="true" class="fas fa-moon" id="editorThemeIcon"></i>
         </button>
@@ -186,6 +187,28 @@
   </div>
 
   <input id="fileInput" class="is-hidden" type="file" accept="application/json" aria-label="Import exam JSON file" />
+  <footer class="app-footer" aria-label="Project and privacy links">
+    <div class="app-footer-inner">
+      <p class="app-footer-note">
+        <strong>Exam Simulator</strong>
+        <span>Offline-ready. Browser edits stay local unless exported.</span>
+      </p>
+      <nav class="app-footer-links" aria-label="Project links">
+        <a href="https://github.com/rmssantos/examsim" target="_blank" rel="noopener noreferrer">
+          <i aria-hidden="true" class="fab fa-github"></i>
+          <span>Source</span>
+        </a>
+        <a href="https://github.com/rmssantos/examsim/issues" target="_blank" rel="noopener noreferrer">
+          <i aria-hidden="true" class="fas fa-circle-exclamation"></i>
+          <span>Report issue</span>
+        </a>
+        <a href="privacy-and-storage.html" data-route="privacy-and-storage">
+          <i aria-hidden="true" class="fas fa-shield-alt"></i>
+          <span>Privacy &amp; storage</span>
+        </a>
+      </nav>
+    </div>
+  </footer>
 
   <script src="assets/js/router.js"></script>
   <script src="assets/js/pwa.js"></script>

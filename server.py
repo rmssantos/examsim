@@ -22,11 +22,13 @@ CLEAN_ROUTES = {
     '/editor': '/editor.html',
     '/exam': '/exam.html',
     '/study': '/exam.html',
+    '/privacy-and-storage': '/privacy-and-storage.html',
 }
 CLEAN_ROUTE_REDIRECTS = {
     '/editor/': '/editor',
     '/exam/': '/exam',
     '/study/': '/study',
+    '/privacy-and-storage/': '/privacy-and-storage',
 }
 
 def looks_like_supported_image(extension, data):

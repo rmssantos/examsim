@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Exam Simulator privacy and local storage information">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <title>Privacy &amp; Data Storage - Exam Simulator</title>
+  <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/app-footer.css">
+  <link rel="stylesheet" href="assets/css/legal-page.css">
+  <script src="assets/js/legal-page.js" defer></script>
+</head>
+<body class="legal-shell">
+  <main class="legal-page">
+    <header class="legal-topbar">
+      <a class="legal-brand" href="index.html" data-route="home">
+        <i aria-hidden="true" class="fas fa-graduation-cap"></i>
+        <span>Exam Simulator</span>
+      </a>
+      <div class="legal-actions">
+        <a class="app-nav-action" href="index.html" data-route="home">
+          <i aria-hidden="true" class="fas fa-arrow-left"></i>
+          <span>Back</span>
+        </a>
+        <button class="legal-action legal-theme-toggle" id="legalThemeToggle" type="button" title="Toggle theme" aria-label="Toggle theme">
+          <i aria-hidden="true" class="fas fa-moon" id="legalThemeIcon"></i>
+        </button>
+      </div>
+    </header>
+
+    <section class="legal-hero">
+      <div class="legal-kicker">
+        <i aria-hidden="true" class="fas fa-shield-alt"></i>
+        <span>Privacy &amp; storage</span>
+      </div>
+      <h1>Privacy &amp; Data Storage</h1>
+      <p>Your data stays local. Exam content, answers, progress, imports, images, editor changes, and preferences are stored in your browser unless you explicitly export and share them.</p>
+    </section>
+
+    <article class="legal-content">
+      <div class="legal-callout">
+        <p><strong>Your data stays local.</strong> The app stores study data in browser storage: IndexedDB for larger exam data and images, with localStorage for small settings and legacy compatibility.</p>
+      </div>
+
+      <div class="legal-grid">
+        <section class="legal-mini-card">
+          <i aria-hidden="true" class="fas fa-database"></i>
+          <h2>Stored in your browser</h2>
+          <p>Imported exams, images, recent attempts, progress, editor changes, theme preference, and local exam visibility settings.</p>
+        </section>
+        <section class="legal-mini-card">
+          <i aria-hidden="true" class="fas fa-user-shield"></i>
+          <h2>Not sent to the server</h2>
+          <p>Question text, selected answers, imported files, filenames, personal progress, study history, names, emails, and account identifiers.</p>
+        </section>
+      </div>
+
+      <h2>Online analytics</h2>
+      <p>The public GitHub Pages deployment can send limited aggregate analytics to Azure Application Insights. Analytics is not initialized on localhost, private self-hosted URLs, or file URLs.</p>
+      <ul>
+        <li>Collected: page views, exam started/completed counts, study mode counts, import counts, progress export actions, and coarse score/duration buckets.</li>
+        <li>Not collected: question text, options, answers, explanations, selected responses, imported content, filenames, personal study records, persistent visitor IDs, names, or emails.</li>
+        <li>You can turn analytics off from the Privacy settings control on the online site.</li>
+      </ul>
+
+      <h2>Imports and editor changes</h2>
+      <p>Dragging an exam file into the app or saving changes in the editor updates only that browser profile. To publish corrections for everyone, export the corrected JSON and open a pull request or GitHub issue.</p>
+
+      <h2>Offline behavior</h2>
+      <p>After the app shell is cached, the simulator works offline for the pages and assets already installed by the service worker. This privacy page is cached so the footer link opens as a readable app page instead of downloading a raw file.</p>
+
+      <h2>Self-hosting and shared exams</h2>
+      <p>A server can pre-install exams in <strong>user-content/exams/</strong>. Those static exam files are visible to every user of that deployment, but each user's progress and imported private exams still stay in their own browser storage.</p>
+
+      <h2>Storage locations</h2>
+      <ul>
+        <li><strong>IndexedDB:</strong> imported exam content, images, image metadata, progress, and recent attempt review summaries.</li>
+        <li><strong>localStorage:</strong> theme, analytics opt-out, exam activation settings, and legacy compatibility mirrors.</li>
+        <li><strong>Cache Storage:</strong> app shell files needed for offline use.</li>
+      </ul>
+
+      <h2>Backups</h2>
+      <p>Browser storage is scoped to the site origin and browser profile. Clearing site data can remove imports and progress. Use the export actions when you need a backup or want to move data to another browser.</p>
+    </article>
+
+    <footer class="app-footer" aria-label="Project and privacy links">
+      <div class="app-footer-inner">
+        <p class="app-footer-note">
+          <strong>Exam Simulator</strong>
+          <span>Offline-ready. Browser edits stay local unless exported.</span>
+        </p>
+        <nav class="app-footer-links" aria-label="Project links">
+          <a href="https://github.com/rmssantos/examsim" target="_blank" rel="noopener noreferrer">
+            <i aria-hidden="true" class="fab fa-github"></i>
+            <span>Source</span>
+          </a>
+          <a href="https://github.com/rmssantos/examsim/issues" target="_blank" rel="noopener noreferrer">
+            <i aria-hidden="true" class="fas fa-circle-exclamation"></i>
+            <span>Report issue</span>
+          </a>
+          <a href="privacy-and-storage.html" data-route="privacy-and-storage" aria-current="page">
+            <i aria-hidden="true" class="fas fa-shield-alt"></i>
+            <span>Privacy &amp; storage</span>
+          </a>
+        </nav>
+      </div>
+    </footer>
+  </main>
+  <script src="assets/js/router.js"></script>
+</body>
+</html>

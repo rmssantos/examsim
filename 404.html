@@ -12,7 +12,7 @@
     (function () {
       var segments = window.location.pathname.split('/').filter(Boolean);
       var routeIndex = segments.findIndex(function (segment) {
-        return segment === 'editor' || segment === 'exam' || segment === 'study';
+        return segment === 'editor' || segment === 'exam' || segment === 'study' || segment === 'privacy-and-storage';
       });
       var base = '/' + (routeIndex > 0 ? segments.slice(0, routeIndex).join('/') + '/' : '');
       var route = routeIndex >= 0 ? segments[routeIndex] : '';
@@ -24,6 +24,8 @@
       } else if (route === 'exam' || route === 'study') {
         target = 'exam.html';
         if (route === 'study' && !params.has('mode')) params.set('mode', 'study');
+      } else if (route === 'privacy-and-storage') {
+        target = 'privacy-and-storage.html';
       }
 
       var query = params.toString();

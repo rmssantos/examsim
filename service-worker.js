@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'examsim-pwa-v2.6';
+const CACHE_VERSION = 'examsim-pwa-v2.9';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -8,6 +8,8 @@ const CORE_ASSETS = [
   './exam.html',
   './editor.html',
   './404.html',
+  './privacy-and-storage.html',
+  './PRIVACY-AND-STORAGE.md',
   './manifest.webmanifest',
   './assets/js/router.js',
   './assets/js/pwa.js',
@@ -20,6 +22,7 @@ const CORE_ASSETS = [
   './assets/js/script-multi-exam.js',
   './assets/js/exam-init.js',
   './assets/js/editor.js',
+  './assets/js/legal-page.js',
   './assets/js/image-loader.js',
   './assets/js/image-storage.js',
   './assets/js/study-scheduler.js',
@@ -35,6 +38,8 @@ const CORE_ASSETS = [
   './assets/css/homepage-styles.css',
   './assets/css/exam-enhancements.css',
   './assets/css/analytics-privacy.css',
+  './assets/css/app-footer.css',
+  './assets/css/legal-page.css',
   './assets/css/index-inline.css',
   './assets/css/editor-styles.css',
   './assets/media/app-icon.svg'
@@ -53,6 +58,8 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './exam.html',
   './editor.html',
   './404.html',
+  './privacy-and-storage.html',
+  './PRIVACY-AND-STORAGE.md',
   './manifest.webmanifest',
   './assets/js/router.js',
   './assets/js/pwa.js',
@@ -65,6 +72,7 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/js/script-multi-exam.js',
   './assets/js/exam-init.js',
   './assets/js/editor.js',
+  './assets/js/legal-page.js',
   './assets/js/image-loader.js',
   './assets/js/image-storage.js',
   './assets/js/study-scheduler.js',
@@ -75,6 +83,8 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/css/homepage-styles.css',
   './assets/css/exam-enhancements.css',
   './assets/css/analytics-privacy.css',
+  './assets/css/app-footer.css',
+  './assets/css/legal-page.css',
   './assets/css/index-inline.css',
   './assets/css/editor-styles.css'
 ];
@@ -98,6 +108,7 @@ function cleanRouteShell(pathname) {
   const lastSegment = normalized.split('/').filter(Boolean).pop() || '';
   if (lastSegment === 'editor') return './editor.html';
   if (lastSegment === 'exam' || lastSegment === 'study') return './exam.html';
+  if (lastSegment === 'privacy-and-storage') return './privacy-and-storage.html';
   return './index.html';
 }
 
@@ -105,7 +116,7 @@ function cleanRouteRedirect(url) {
   if (!url.pathname.endsWith('/')) return null;
   const normalized = url.pathname.replace(/\/+/g, '/').replace(/\/$/, '');
   const lastSegment = normalized.split('/').filter(Boolean).pop() || '';
-  if (!['editor', 'exam', 'study'].includes(lastSegment)) return null;
+  if (!['editor', 'exam', 'study', 'privacy-and-storage'].includes(lastSegment)) return null;
   return new URL(`${normalized}${url.search}`, url.origin).href;
 }
 
@@ -195,6 +206,9 @@ self.addEventListener('fetch', event => {
       } catch (_) {
         // Fall through to the route shell cache.
       }
+
+      const cached = await caches.match(request);
+      if (cached) return cached;
 
       return navigationFallback(url.pathname);
     })());
