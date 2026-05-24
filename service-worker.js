@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'examsim-pwa-v2.5';
+const CACHE_VERSION = 'examsim-pwa-v2.6';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -47,12 +47,25 @@ const NETWORK_FIRST_PATHS = [
   '/dump.json'
 ];
 
+const APP_SHELL_NETWORK_FIRST_ASSETS = CORE_ASSETS.filter(asset =>
+  asset.endsWith('.html') ||
+  asset.endsWith('.js') ||
+  asset.endsWith('.css') ||
+  asset.endsWith('.webmanifest')
+);
+
 function sameOrigin(url) {
   return url.origin === self.location.origin;
 }
 
 function isAnalyticsRequest(url) {
   return /applicationinsights\.azure\.com$/i.test(url.hostname);
+}
+
+function isAppShellNetworkFirstAsset(url) {
+  return APP_SHELL_NETWORK_FIRST_ASSETS.some(asset =>
+    url.pathname === new URL(asset, self.location.href).pathname
+  );
 }
 
 function cleanRouteShell(pathname) {
@@ -106,7 +119,7 @@ async function cacheFirst(request) {
 async function networkFirst(request) {
   const cache = await caches.open(RUNTIME_CACHE);
   try {
-    const response = await fetch(request);
+    const response = await fetch(request, { cache: 'no-cache' });
     if (response.ok) await putRuntimeCache(cache, request, response);
     return response;
   } catch (error) {
@@ -163,7 +176,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (NETWORK_FIRST_PATHS.some(path => url.pathname.endsWith(path))) {
+  if (isAppShellNetworkFirstAsset(url) || NETWORK_FIRST_PATHS.some(path => url.pathname.endsWith(path))) {
     event.respondWith(networkFirst(request));
     return;
   }

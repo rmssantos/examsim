@@ -10,10 +10,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class Sprint1ReadinessTests(unittest.TestCase):
-    def test_service_worker_uses_v25_and_network_first_for_mutable_exam_assets(self):
+    def test_service_worker_uses_v26_and_network_first_for_mutable_exam_assets(self):
         text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
 
-        self.assertIn("examsim-pwa-v2.5", text)
+        self.assertIn("examsim-pwa-v2.6", text)
         for path in (
             "/manifest.webmanifest",
             "/user-content/exams/index.json",
@@ -29,6 +29,19 @@ class Sprint1ReadinessTests(unittest.TestCase):
         network_first = text[start:end]
 
         self.assertIn("await caches.match(request)", network_first)
+
+    def test_service_worker_revalidates_app_shell_assets_before_cache_fallback(self):
+        text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
+
+        self.assertIn("APP_SHELL_NETWORK_FIRST_ASSETS", text)
+        for asset in (
+            "./assets/js/editor.js",
+            "./assets/css/editor-styles.css",
+            "./assets/js/pwa.js",
+        ):
+            self.assertIn(asset, text)
+        self.assertIn("isAppShellNetworkFirstAsset(url)", text)
+        self.assertIn("cache: 'no-cache'", text)
 
     def test_pwa_registration_exposes_update_available_prompt(self):
         text = (ROOT / "assets/js/pwa.js").read_text(encoding="utf-8")
