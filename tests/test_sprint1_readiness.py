@@ -10,10 +10,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class Sprint1ReadinessTests(unittest.TestCase):
-    def test_service_worker_uses_v25_and_network_first_for_mutable_exam_assets(self):
+    def test_service_worker_uses_v26_and_network_first_for_mutable_exam_assets(self):
         text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
 
-        self.assertIn("examsim-pwa-v2.5", text)
+        self.assertIn("examsim-pwa-v2.6", text)
         for path in (
             "/manifest.webmanifest",
             "/user-content/exams/index.json",
@@ -29,6 +29,29 @@ class Sprint1ReadinessTests(unittest.TestCase):
         network_first = text[start:end]
 
         self.assertIn("await caches.match(request)", network_first)
+
+    def test_service_worker_revalidates_app_shell_assets_before_cache_fallback(self):
+        text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
+        start = text.index("const APP_SHELL_NETWORK_FIRST_ASSETS")
+        end = text.index("\n\nfunction sameOrigin", start)
+        app_shell_assets = text[start:end]
+
+        self.assertIn("APP_SHELL_NETWORK_FIRST_ASSETS", text)
+        self.assertIn("const APP_SHELL_NETWORK_FIRST_ASSETS = [", app_shell_assets)
+        self.assertNotIn("CORE_ASSETS.filter", app_shell_assets)
+        for asset in (
+            "./assets/js/editor.js",
+            "./assets/css/editor-styles.css",
+            "./assets/js/pwa.js",
+        ):
+            self.assertIn(asset, app_shell_assets)
+        for vendor_asset in (
+            "./assets/vendor/jszip/jszip.min.js",
+            "./assets/vendor/fontawesome/css/all.min.css",
+        ):
+            self.assertNotIn(vendor_asset, app_shell_assets)
+        self.assertIn("isAppShellNetworkFirstAsset(url)", text)
+        self.assertIn("cache: 'no-cache'", text)
 
     def test_pwa_registration_exposes_update_available_prompt(self):
         text = (ROOT / "assets/js/pwa.js").read_text(encoding="utf-8")

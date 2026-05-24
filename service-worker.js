@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'examsim-pwa-v2.5';
+const CACHE_VERSION = 'examsim-pwa-v2.6';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -47,12 +47,50 @@ const NETWORK_FIRST_PATHS = [
   '/dump.json'
 ];
 
+const APP_SHELL_NETWORK_FIRST_ASSETS = [
+  './',
+  './index.html',
+  './exam.html',
+  './editor.html',
+  './404.html',
+  './manifest.webmanifest',
+  './assets/js/router.js',
+  './assets/js/pwa.js',
+  './assets/js/utils.js',
+  './assets/js/analytics.js',
+  './assets/js/exam-storage.js',
+  './assets/js/exam-loader.js',
+  './assets/js/exam-manager.js',
+  './assets/js/homepage.js',
+  './assets/js/script-multi-exam.js',
+  './assets/js/exam-init.js',
+  './assets/js/editor.js',
+  './assets/js/image-loader.js',
+  './assets/js/image-storage.js',
+  './assets/js/study-scheduler.js',
+  './assets/js/study-storage.js',
+  './assets/css/style-new.css',
+  './assets/css/multi-exam-styles.css',
+  './assets/css/modern-enhancements.css',
+  './assets/css/homepage-styles.css',
+  './assets/css/exam-enhancements.css',
+  './assets/css/analytics-privacy.css',
+  './assets/css/index-inline.css',
+  './assets/css/editor-styles.css'
+];
+
 function sameOrigin(url) {
   return url.origin === self.location.origin;
 }
 
 function isAnalyticsRequest(url) {
   return /applicationinsights\.azure\.com$/i.test(url.hostname);
+}
+
+function isAppShellNetworkFirstAsset(url) {
+  return APP_SHELL_NETWORK_FIRST_ASSETS.some(asset =>
+    url.pathname === new URL(asset, self.location.href).pathname
+  );
 }
 
 function cleanRouteShell(pathname) {
@@ -106,7 +144,7 @@ async function cacheFirst(request) {
 async function networkFirst(request) {
   const cache = await caches.open(RUNTIME_CACHE);
   try {
-    const response = await fetch(request);
+    const response = await fetch(request, { cache: 'no-cache' });
     if (response.ok) await putRuntimeCache(cache, request, response);
     return response;
   } catch (error) {
@@ -163,7 +201,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (NETWORK_FIRST_PATHS.some(path => url.pathname.endsWith(path))) {
+  if (isAppShellNetworkFirstAsset(url) || NETWORK_FIRST_PATHS.some(path => url.pathname.endsWith(path))) {
     event.respondWith(networkFirst(request));
     return;
   }
