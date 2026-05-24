@@ -1134,33 +1134,27 @@
 
   // Update unsaved changes indicator
   function updateUnsavedIndicator(){
-    let indicator = document.getElementById('unsaved-indicator');
-    if (!indicator) {
-      // Create indicator next to Save button
-      const saveButton = document.getElementById('save');
-      if (!saveButton) return;
+    const headerStatus = document.getElementById('editorSaveState');
+    const footerStatus = document.getElementById('saveStatus');
+    const icon = state.hasUnsavedChanges ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+    const label = state.hasUnsavedChanges ? 'Unsaved edits' : 'No unsaved edits';
+    const title = state.hasUnsavedChanges
+      ? 'This question has edits that are not saved in browser storage'
+      : 'Current question has no unsaved edits';
 
-      indicator = document.createElement('span');
-      indicator.id = 'unsaved-indicator';
-      indicator.style.cssText = 'color:#dc3545;font-size:14px;font-weight:600;margin-left:10px;animation:pulse 2s infinite;';
-      saveButton.parentElement.insertBefore(indicator, saveButton.nextSibling);
+    [headerStatus, footerStatus].forEach(status => {
+      if (!status) return;
+      status.classList.toggle('is-dirty', state.hasUnsavedChanges);
+      status.innerHTML = `<i aria-hidden="true" class="${icon}"></i><span>${label}</span>`;
+      status.title = title;
+      status.setAttribute('aria-label', label);
+    });
 
-      // Add pulse animation
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-      `;
-      document.head.appendChild(style);
-    }
-
+    const indicator = document.getElementById('unsaved-indicator');
     if (state.hasUnsavedChanges) {
-      indicator.innerHTML = '<i class="fas fa-exclamation-circle"></i> Unsaved changes';
-      indicator.style.display = 'inline-block';
+      if (indicator) indicator.style.display = 'inline-block';
     } else {
-      indicator.style.display = 'none';
+      if (indicator) indicator.style.display = 'none';
     }
   }
 
@@ -1280,17 +1274,17 @@
       renderForm();
     });
 
-    // Live preview updates for inputs (mark as unsaved on any change)
-    // Debounce the expensive sync+render, but keep markUnsaved immediate
+    // Live preview updates for inputs. Mark dirty after form values are synced into state.
     const debouncedSyncAndPreview = debounce(() => {
       syncFromForm();
+      markUnsaved();
       renderPreview(state.filtered[state.currentIndex]);
       updateValidationPanel(state.filtered[state.currentIndex]);
     }, 150);
 
     ['#qText', '#qExplanation', '#qImages', '#eImages', '#qCorrect', '#qDragSelectN', '#qStatements'].forEach(sel => {
       const el = $(sel);
-      if (el) el.addEventListener('input', () => { markUnsaved(); debouncedSyncAndPreview(); });
+      if (el) el.addEventListener('input', () => { debouncedSyncAndPreview(); });
     });
 
     // Image upload handlers (dev local server)

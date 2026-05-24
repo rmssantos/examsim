@@ -97,7 +97,9 @@ class PackValidator:
             self.add_issue(exam_dir, "listed exam folder does not exist")
             return
 
+        issue_count_before_dump = len(self.issues)
         questions_raw = self.load_json(dump_path)
+        dump_load_failed = len(self.issues) > issue_count_before_dump
         if isinstance(questions_raw, dict) and isinstance(questions_raw.get("questions"), list):
             questions = questions_raw["questions"]
         else:
@@ -107,6 +109,8 @@ class PackValidator:
         if metadata is not None:
             self.validate_metadata(exam_id, metadata, metadata_path, questions)
 
+        if dump_load_failed:
+            return
         if not isinstance(questions, list):
             self.add_issue(dump_path, "dump.json must be an array or an object with a questions array")
             return
@@ -158,7 +162,8 @@ class PackValidator:
                 self.add_issue(path, f"{label}: missing id")
             elif question_id in ids:
                 self.add_issue(path, f"{label}: duplicate id {question_id!r}")
-            ids.add(question_id)
+            else:
+                ids.add(question_id)
 
             if not has_text(question.get("question")):
                 self.add_issue(path, f"{label}: question text is required")

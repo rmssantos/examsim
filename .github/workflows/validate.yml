@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  sprint-1-readiness:
+  repository-validation:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,5 +37,5 @@ jobs:
       - name: Validate exam packs
         run: python tools/validate-exam-packs.py --root user-content/exams
 
-      - name: Run Sprint 1 readiness tests
-        run: python -m unittest tests.test_sprint1_readiness -v
+      - name: Run repository tests
+        run: python -m unittest discover -s tests -v

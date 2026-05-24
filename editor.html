@@ -90,7 +90,10 @@
       <div class="form">
         <div class="form-header">
           <span class="form-header-title" id="formTitle">Edit Question</span>
-          <span class="form-header-status"><i aria-hidden="true" class="fas fa-check-circle"></i> Saved</span>
+          <span class="form-header-status" id="editorSaveState" role="status" aria-live="polite" title="Current question has no unsaved edits">
+            <i aria-hidden="true" class="fas fa-check-circle"></i>
+            <span>No unsaved edits</span>
+          </span>
         </div>
         <div id="editorValidation" class="editor-validation editor-validation-ok" role="status" aria-live="polite">
           <i aria-hidden="true" class="fas fa-shield-alt"></i>
@@ -163,7 +166,10 @@
         <div class="form-footer">
           <button id="save" class="btn primary"><i aria-hidden="true" class="fas fa-save"></i> Save Local Changes</button>
           <button id="deleteCurrent" class="btn danger"><i aria-hidden="true" class="fas fa-trash"></i> Delete</button>
-          <span class="small editor-save-status" id="saveStatus">✓ Saved</span>
+          <span class="small editor-save-status" id="saveStatus" role="status" aria-live="polite">
+            <i aria-hidden="true" class="fas fa-check-circle"></i>
+            <span>No unsaved edits</span>
+          </span>
         </div>
       </div>
       <div class="preview" id="preview">
