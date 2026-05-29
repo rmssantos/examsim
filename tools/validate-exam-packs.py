@@ -4,10 +4,12 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -15,7 +17,11 @@ from typing import Any
 EXAM_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 IMAGE_NAME_RE = re.compile(r"^[A-Za-z0-9_. -]{1,128}$")
 SUPPORTED_TYPES = {"STANDARD", "MULTI", "YES_NO_MATRIX", "SEQUENCE", "DRAG_DROP_SELECT"}
+CONTENT_ORIGINS = {"original", "derived-from-public", "imported"}
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+MANIFEST_NAME = "manifest.json"
+MANIFEST_FORMAT = "examsim-manifest"
+MANIFEST_VERSION = 1
 
 
 @dataclass
@@ -148,6 +154,10 @@ class PackValidator:
         pass_score = metadata.get("passScore")
         if pass_score is not None and (not is_plain_number(pass_score) or pass_score < 1 or pass_score > 100):
             self.add_issue(path, "passScore must be between 1 and 100")
+
+        content_origin = metadata.get("contentOrigin")
+        if content_origin is not None and content_origin not in CONTENT_ORIGINS:
+            self.add_issue(path, f"contentOrigin must be one of {sorted(CONTENT_ORIGINS)}")
 
     def validate_questions(self, exam_id: str, questions: list[Any], path: Path) -> None:
         ids = set()
@@ -290,9 +300,124 @@ def is_safe_image_name(value: str) -> bool:
     )
 
 
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(65536), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def pack_file_paths(exam_dir: Path) -> list[str]:
+    """Relative file paths (forward-slash) inside an exam pack, excluding manifest.json."""
+    paths: list[str] = []
+    for name in ("dump.json", "metadata.json"):
+        if (exam_dir / name).is_file():
+            paths.append(name)
+    images_dir = exam_dir / "images"
+    if images_dir.is_dir():
+        for image in sorted(images_dir.iterdir()):
+            if image.is_file():
+                paths.append(f"images/{image.name}")
+    return paths
+
+
+def safe_manifest_file_path(exam_dir: Path, rel: Any) -> Path | None:
+    if not isinstance(rel, str) or not rel or "\\" in rel:
+        return None
+    rel_path = Path(rel)
+    if rel_path.is_absolute() or any(part in {"", ".", ".."} for part in rel_path.parts):
+        return None
+    file_path = (exam_dir / rel_path).resolve()
+    try:
+        file_path.relative_to(exam_dir.resolve())
+    except ValueError:
+        return None
+    return file_path
+
+
+def build_manifest(exam_dir: Path) -> dict[str, Any]:
+    files = {rel: sha256_file(exam_dir / rel) for rel in pack_file_paths(exam_dir)}
+    return {
+        "format": MANIFEST_FORMAT,
+        "version": MANIFEST_VERSION,
+        "algorithm": "SHA-256",
+        "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "files": files,
+    }
+
+
+def write_manifests(root: Path, exam_ids: list[str]) -> int:
+    written = 0
+    for exam_id in exam_ids:
+        exam_dir = root / exam_id
+        if not exam_dir.is_dir():
+            print(f"- {exam_id}: skipped (folder not found)")
+            continue
+        manifest = build_manifest(exam_dir)
+        manifest_path = exam_dir / MANIFEST_NAME
+        manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        written += 1
+        print(f"- {exam_id}: wrote manifest with {len(manifest['files'])} file(s)")
+    print(f"Wrote {written} manifest(s).")
+    return 0
+
+
+def check_manifests(root: Path, exam_ids: list[str]) -> int:
+    problems = 0
+    checked = 0
+    for exam_id in exam_ids:
+        exam_dir = root / exam_id
+        manifest_path = exam_dir / MANIFEST_NAME
+        if not manifest_path.is_file():
+            print(f"- {exam_id}: missing {MANIFEST_NAME}")
+            problems += 1
+            continue
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            print(f"- {exam_id}: could not read manifest: {error}")
+            problems += 1
+            continue
+        expected = manifest.get("files") if isinstance(manifest, dict) else None
+        if not isinstance(expected, dict):
+            print(f"- {exam_id}: manifest has no files map")
+            problems += 1
+            continue
+        checked += 1
+        actual_paths = set(pack_file_paths(exam_dir))
+        safe_expected_paths: set[str] = set()
+        for rel, expected_hash in expected.items():
+            file_path = safe_manifest_file_path(exam_dir, rel)
+            if file_path is None:
+                print(f"- {exam_id}: unsafe manifest path {rel!r}")
+                problems += 1
+                continue
+            safe_expected_paths.add(rel)
+            if not file_path.is_file():
+                print(f"- {exam_id}: missing file {rel}")
+                problems += 1
+                continue
+            actual_hash = sha256_file(file_path)
+            if actual_hash != str(expected_hash).lower():
+                print(f"- {exam_id}: hash mismatch for {rel}")
+                problems += 1
+        for rel in sorted(actual_paths - safe_expected_paths):
+            print(f"- {exam_id}: untracked file not in manifest: {rel}")
+            problems += 1
+    if problems:
+        print(f"Manifest check failed with {problems} issue(s) across {checked} pack(s).")
+        return 1
+    print(f"Manifest check passed for {checked} pack(s).")
+    return 0
+
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate ExamSim exam packs.")
     parser.add_argument("--root", default="user-content/exams", help="Directory containing exam pack folders.")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--write-manifest", action="store_true", help="Generate manifest.json with SHA-256 hashes for each pack.")
+    group.add_argument("--check-manifest", action="store_true", help="Verify pack files against their manifest.json.")
     return parser.parse_args(argv)
 
 
@@ -302,14 +427,20 @@ def main(argv: list[str] | None = None) -> int:
     validator = PackValidator(root)
     ok = validator.validate()
 
-    if ok:
-        print(f"Validated {validator.pack_count} exam pack(s), {validator.question_count} question(s).")
-        return 0
+    if not ok:
+        print(f"Found {len(validator.issues)} validation issue(s):")
+        for issue in validator.issues:
+            print(f"- {issue.format(root)}")
+        return 1
 
-    print(f"Found {len(validator.issues)} validation issue(s):")
-    for issue in validator.issues:
-        print(f"- {issue.format(root)}")
-    return 1
+    exam_ids = validator.discover_exam_ids()
+    if args.write_manifest:
+        return write_manifests(root, exam_ids)
+    if args.check_manifest:
+        return check_manifests(root, exam_ids)
+
+    print(f"Validated {validator.pack_count} exam pack(s), {validator.question_count} question(s).")
+    return 0
 
 
 if __name__ == "__main__":

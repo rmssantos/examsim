@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'examsim-pwa-v2.9';
+const CACHE_VERSION = 'examsim-pwa-v3.0';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -16,6 +16,7 @@ const CORE_ASSETS = [
   './assets/js/utils.js',
   './assets/js/analytics.js',
   './assets/js/exam-storage.js',
+  './assets/js/secure-transfer.js',
   './assets/js/exam-loader.js',
   './assets/js/exam-manager.js',
   './assets/js/homepage.js',
@@ -66,6 +67,7 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/js/utils.js',
   './assets/js/analytics.js',
   './assets/js/exam-storage.js',
+  './assets/js/secure-transfer.js',
   './assets/js/exam-loader.js',
   './assets/js/exam-manager.js',
   './assets/js/homepage.js',

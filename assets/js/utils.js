@@ -365,3 +365,97 @@ window.showCustomAlert = function(titleText, messageText, type = 'info') {
         if (e.target === modal) modal.remove();
     });
 };
+
+// Promise-based confirm modal replacement for native confirm(). Resolves true/false.
+window.showCustomConfirm = function(titleText, messageText, options = {}) {
+    const confirmLabel = options.confirmLabel || 'Confirm';
+    const cancelLabel = options.cancelLabel || 'Cancel';
+
+    return new Promise((resolve) => {
+        const existing = document.getElementById('custom-confirm-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'custom-confirm-modal';
+        modal.className = 'progress-modal-overlay';
+        modal.style.zIndex = '11000';
+
+        const content = document.createElement('div');
+        content.className = 'progress-modal-content custom-alert-animate';
+        content.setAttribute('role', 'dialog');
+        content.setAttribute('aria-modal', 'true');
+        content.setAttribute('aria-labelledby', 'custom-confirm-title');
+        content.setAttribute('aria-describedby', 'custom-confirm-description');
+        content.style.maxWidth = '420px';
+        content.style.textAlign = 'center';
+        content.style.padding = '30px';
+        content.style.borderRadius = '16px';
+        content.style.boxShadow = '0 20px 50px rgba(0, 0, 0, 0.3)';
+
+        const title = document.createElement('h3');
+    title.id = 'custom-confirm-title';
+        title.style.margin = '0 0 10px 0';
+        title.style.fontSize = '1.3rem';
+        title.style.fontWeight = '700';
+        title.textContent = titleText;
+        content.appendChild(title);
+
+        const desc = document.createElement('p');
+    desc.id = 'custom-confirm-description';
+        desc.style.margin = '0 0 24px 0';
+        desc.style.fontSize = '0.95rem';
+        desc.style.lineHeight = '1.5';
+        desc.style.color = 'var(--text-light, #64748b)';
+        desc.textContent = messageText;
+        content.appendChild(desc);
+
+        const actions = document.createElement('div');
+        actions.style.display = 'flex';
+        actions.style.gap = '12px';
+        actions.style.justifyContent = 'center';
+
+        let settled = false;
+        const finish = (value) => {
+            if (settled) return;
+            settled = true;
+            modal.remove();
+            resolve(value);
+        };
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.style.padding = '10px 24px';
+        cancelBtn.style.background = '#f1f5f9';
+        cancelBtn.style.color = '#334155';
+        cancelBtn.style.border = '1px solid #cbd5e1';
+        cancelBtn.style.borderRadius = '8px';
+        cancelBtn.style.fontSize = '0.9rem';
+        cancelBtn.style.fontWeight = '600';
+        cancelBtn.style.cursor = 'pointer';
+        cancelBtn.textContent = cancelLabel;
+        cancelBtn.addEventListener('click', () => finish(false));
+
+        const confirmBtn = document.createElement('button');
+        confirmBtn.type = 'button';
+        confirmBtn.style.padding = '10px 24px';
+        confirmBtn.style.background = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
+        confirmBtn.style.color = 'white';
+        confirmBtn.style.border = 'none';
+        confirmBtn.style.borderRadius = '8px';
+        confirmBtn.style.fontSize = '0.9rem';
+        confirmBtn.style.fontWeight = '600';
+        confirmBtn.style.cursor = 'pointer';
+        confirmBtn.textContent = confirmLabel;
+        confirmBtn.addEventListener('click', () => finish(true));
+
+        actions.appendChild(cancelBtn);
+        actions.appendChild(confirmBtn);
+        content.appendChild(actions);
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) finish(false);
+        });
+    });
+};

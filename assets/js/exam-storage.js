@@ -334,6 +334,37 @@
             }
             return [...ids].filter(window.ExamApp.isSafeExamId).sort();
         }
+
+        // Mirror durable IndexedDB progress back into the localStorage cache used by
+        // synchronous UI reads. Keeps IndexedDB as the source of truth while preserving
+        // the existing fast, synchronous read paths. Best-effort: never throws.
+        async hydrateProgressMirror() {
+            const result = { restored: 0, scanned: 0 };
+            try {
+                const indexedIds = await this.listKeys(this.progressStore);
+                for (const examId of indexedIds) {
+                    if (!window.ExamApp.isSafeExamId(examId)) continue;
+                    result.scanned++;
+                    const record = await this.getRecord(this.progressStore, examId).catch(() => null);
+                    const progress = record && record.progress;
+                    if (!progress || !Array.isArray(progress.attempts)) continue;
+
+                    const local = this.getLegacyProgress(examId);
+                    const localCount = local && Array.isArray(local.attempts) ? local.attempts.length : -1;
+                    if (progress.attempts.length > localCount) {
+                        try {
+                            this.putLegacyProgress(examId, progress);
+                            result.restored++;
+                        } catch (error) {
+                            window.ExamApp.warn(`Failed to mirror ${examId} progress to localStorage:`, error);
+                        }
+                    }
+                }
+            } catch (error) {
+                window.ExamApp.warn('Progress hydration skipped:', error);
+            }
+            return result;
+        }
     }
 
     window.ExamApp.ExamStorage = ExamStorage;

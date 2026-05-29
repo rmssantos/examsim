@@ -1,0 +1,78 @@
+{
+  "id": "az900",
+  "name": "AZ-900",
+  "fullName": "Microsoft Azure Fundamentals",
+  "description": "Original AZ-900 study bank with questions written from scratch using public Microsoft Learn documentation. It does not contain real exam questions.",
+  "duration": 45,
+  "questionCount": 40,
+  "totalQuestions": 120,
+  "passScore": 70,
+  "language": "en",
+  "schemaVersion": "1.1",
+  "badge": "Fundamentals",
+  "icon": "fas fa-cloud",
+  "contentOrigin": "original",
+  "modules": [
+    {
+      "icon": "fas fa-cloud",
+      "name": "Cloud Computing Concepts"
+    },
+    {
+      "icon": "fas fa-gauge-high",
+      "name": "Benefits of Cloud Services"
+    },
+    {
+      "icon": "fas fa-layer-group",
+      "name": "Cloud Service Types"
+    },
+    {
+      "icon": "fas fa-sitemap",
+      "name": "Core Azure Architecture"
+    },
+    {
+      "icon": "fas fa-server",
+      "name": "Compute & Networking"
+    },
+    {
+      "icon": "fas fa-database",
+      "name": "Storage Services"
+    },
+    {
+      "icon": "fas fa-user-shield",
+      "name": "Identity, Access & Security"
+    },
+    {
+      "icon": "fas fa-coins",
+      "name": "Cost Management"
+    },
+    {
+      "icon": "fas fa-scale-balanced",
+      "name": "Governance & Compliance"
+    },
+    {
+      "icon": "fas fa-toolbox",
+      "name": "Management & Deployment Tools"
+    },
+    {
+      "icon": "fas fa-chart-line",
+      "name": "Monitoring Tools"
+    }
+  ],
+  "resources": [
+    {
+      "icon": "fas fa-book",
+      "name": "Microsoft Learn AZ-900 Study Guide",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-900"
+    },
+    {
+      "icon": "fas fa-graduation-cap",
+      "name": "Microsoft Certified: Azure Fundamentals",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/azure-fundamentals/"
+    },
+    {
+      "icon": "fas fa-file-lines",
+      "name": "Azure documentation",
+      "url": "https://learn.microsoft.com/en-us/azure/"
+    }
+  ]
+}

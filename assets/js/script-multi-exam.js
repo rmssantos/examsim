@@ -2754,7 +2754,7 @@ window.showProgressStatistics = function() {
     showProgressModal(allProgress);
 };
 
-window.exportProgress = function() {
+window.exportProgress = async function() {
     // Gather all progress data
     const allProgress = {};
 
@@ -2800,12 +2800,48 @@ window.exportProgress = function() {
         exams: allProgress
     };
 
+    // Optionally protect the backup with a passphrase (AES-GCM).
+    const secureTransfer = window.ExamApp?.secureTransfer;
+    let payload = exportData;
+    let encrypted = false;
+    if (secureTransfer && typeof window.showCustomConfirm === 'function') {
+        const wantsEncryption = await window.showCustomConfirm(
+            'Protect this backup?',
+            'Encrypt the exported progress with a passphrase? You will need the same passphrase to import it again.',
+            { confirmLabel: 'Encrypt', cancelLabel: 'Export plain' }
+        );
+        if (wantsEncryption) {
+            const passphrase = await secureTransfer.promptPassphrase({
+                title: 'Set export passphrase',
+                message: 'Choose a passphrase to encrypt this backup. Keep it safe — it cannot be recovered.',
+                confirmLabel: 'Encrypt & export',
+                requireConfirmation: true
+            });
+            if (passphrase === null) {
+                return; // user cancelled
+            }
+            try {
+                payload = await secureTransfer.encrypt(exportData, passphrase);
+                encrypted = true;
+            } catch (error) {
+                window.ExamApp.warn('Encryption failed:', error);
+                if (typeof window.showCustomAlert === 'function') {
+                    window.showCustomAlert('Encryption Failed', error.message || 'Could not encrypt the backup.', 'error');
+                }
+                return;
+            }
+        }
+    }
+
     // Download as JSON
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `exam-progress-${new Date().toISOString().split('T')[0]}.json`;
+    const dateStamp = new Date().toISOString().split('T')[0];
+    a.download = encrypted
+        ? `exam-progress-${dateStamp}.encrypted.json`
+        : `exam-progress-${dateStamp}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
