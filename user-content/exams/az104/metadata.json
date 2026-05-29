@@ -1,0 +1,94 @@
+{
+  "id": "az104",
+  "name": "AZ-104",
+  "fullName": "Microsoft Azure Administrator",
+  "description": "Banco de estudo original para o AZ-104, com perguntas escritas de raiz a partir de documentação pública da Microsoft Learn. Não contém perguntas reais de exame.",
+  "duration": 60,
+  "questionCount": 40,
+  "totalQuestions": 120,
+  "passScore": 70,
+  "language": "en",
+  "schemaVersion": "1.1",
+  "badge": "Associate",
+  "icon": "fas fa-user-gear",
+  "contentOrigin": "original",
+  "modules": [
+    {
+      "icon": "fas fa-users",
+      "name": "Microsoft Entra Users & Groups"
+    },
+    {
+      "icon": "fas fa-key",
+      "name": "Access to Azure Resources (RBAC)"
+    },
+    {
+      "icon": "fas fa-scale-balanced",
+      "name": "Subscriptions & Governance"
+    },
+    {
+      "icon": "fas fa-lock",
+      "name": "Storage Access & Security"
+    },
+    {
+      "icon": "fas fa-database",
+      "name": "Storage Accounts"
+    },
+    {
+      "icon": "fas fa-folder-open",
+      "name": "Azure Files & Blob Storage"
+    },
+    {
+      "icon": "fas fa-file-code",
+      "name": "ARM Templates & Bicep"
+    },
+    {
+      "icon": "fas fa-server",
+      "name": "Virtual Machines"
+    },
+    {
+      "icon": "fas fa-cubes",
+      "name": "Containers"
+    },
+    {
+      "icon": "fas fa-globe",
+      "name": "Azure App Service"
+    },
+    {
+      "icon": "fas fa-network-wired",
+      "name": "Virtual Networking"
+    },
+    {
+      "icon": "fas fa-shield-halved",
+      "name": "Network Security"
+    },
+    {
+      "icon": "fas fa-arrows-split-up-and-left",
+      "name": "Name Resolution & Load Balancing"
+    },
+    {
+      "icon": "fas fa-chart-line",
+      "name": "Monitoring"
+    },
+    {
+      "icon": "fas fa-rotate",
+      "name": "Backup & Recovery"
+    }
+  ],
+  "resources": [
+    {
+      "icon": "fas fa-book",
+      "name": "Microsoft Learn AZ-104 Study Guide",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-104"
+    },
+    {
+      "icon": "fas fa-graduation-cap",
+      "name": "Microsoft Certified: Azure Administrator Associate",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/azure-administrator/"
+    },
+    {
+      "icon": "fas fa-file-lines",
+      "name": "Azure documentation",
+      "url": "https://learn.microsoft.com/en-us/azure/"
+    }
+  ]
+}

@@ -39,12 +39,27 @@ this.init();
 
 async init() {
 this.updateLocalOnlyLinks();
+await this.hydrateProgressFromIndexedDB();
 await this.loadAvailableExams();
 this.placeDetailsPanel();
 this.setupEventListeners();
 this.setupConfigModal();
 this.setupProgressRefreshListeners();
 this.refreshProgressUI();
+}
+
+async hydrateProgressFromIndexedDB() {
+try {
+const storage = window.ExamApp && window.ExamApp.examStorage;
+if (storage && typeof storage.hydrateProgressMirror === 'function') {
+	const result = await storage.hydrateProgressMirror();
+	if (result && result.restored) {
+		window.ExamApp.log(`Hydrated ${result.restored} progress record(s) from IndexedDB`);
+	}
+}
+} catch (error) {
+window.ExamApp.warn('Progress hydration failed:', error);
+}
 }
 
 updateLocalOnlyLinks() {
@@ -1532,7 +1547,27 @@ throw new Error('Unsupported file type. Please use .json or .zip files.');
 
 async importJsonFile(file) {
 const text = await file.text();
-const data = JSON.parse(text);
+let data = JSON.parse(text);
+
+// Transparently handle passphrase-protected (AES-GCM) exports.
+const secureTransfer = window.ExamApp && window.ExamApp.secureTransfer;
+if (secureTransfer && secureTransfer.isEncryptedEnvelope(data)) {
+const passphrase = await secureTransfer.promptPassphrase({
+	title: 'Enter import passphrase',
+	message: 'This file is encrypted. Enter the passphrase used when it was exported.',
+	confirmLabel: 'Decrypt & import'
+});
+if (passphrase === null) {
+	return; // user cancelled
+}
+data = await secureTransfer.decrypt(data, passphrase);
+}
+
+// A progress backup carries an `exams` map alongside export metadata.
+if (data && typeof data === 'object' && data.exams && typeof data.exams === 'object' && !Array.isArray(data.exams)) {
+await this.restoreProgressBackup(data);
+return;
+}
 
 // Determine exam ID from filename or data
 let examId = file.name.replace(/\.(json|zip)$/i, '');
@@ -1549,6 +1584,41 @@ await window.examManager.importExam(examId, data);
 
 window.ExamApp.log(`Successfully imported exam: ${examId}`);
 this.showNotification(`✅ Exam "${examId}" imported successfully!`);
+}
+
+async restoreProgressBackup(backup) {
+const storage = window.ExamApp && window.ExamApp.examStorage;
+let restored = 0;
+let skipped = 0;
+for (const [rawId, progress] of Object.entries(backup.exams)) {
+const examId = window.ExamApp.normalizeExamId(rawId);
+if (!examId || !window.ExamApp.isSafeExamId(examId)) {
+	skipped++;
+	continue;
+}
+if (!progress || typeof progress !== 'object' || !Array.isArray(progress.attempts)) {
+	skipped++;
+	continue;
+}
+try {
+	if (storage && typeof storage.putLegacyProgress === 'function') {
+		storage.putLegacyProgress(examId, progress);
+	} else {
+		localStorage.setItem(`${examId}_progress`, JSON.stringify(progress));
+	}
+	window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.progress, examId);
+	if (storage && typeof storage.putProgress === 'function') {
+		await storage.putProgress(examId, progress).catch(() => {});
+	}
+	restored++;
+} catch (error) {
+	window.ExamApp.warn(`Failed to restore progress for ${examId}:`, error);
+	skipped++;
+}
+}
+this.refreshProgressUI();
+const suffix = skipped ? ` (${skipped} skipped)` : '';
+this.showNotification(`✅ Restored progress for ${restored} exam(s)${suffix}.`);
 }
 
 async importZipFile(file) {
@@ -1942,6 +2012,10 @@ document.getElementById('view-progress')?.addEventListener('click', () => {
 if (typeof showProgressStatistics === 'function') showProgressStatistics();
 });
 document.getElementById('export-progress')?.addEventListener('click', () => {
-if (typeof exportProgress === 'function') exportProgress();
+if (typeof exportProgress === 'function') {
+	Promise.resolve(exportProgress()).catch((error) => {
+		window.ExamApp.warn('Export progress failed:', error);
+	});
+}
 });
 });

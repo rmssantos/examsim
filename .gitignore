@@ -35,6 +35,12 @@ user-content/exams/*
 !user-content/exams/ab730/**
 !user-content/exams/ab731/
 !user-content/exams/ab731/**
+!user-content/exams/ai901/
+!user-content/exams/ai901/**
+!user-content/exams/az900/
+!user-content/exams/az900/**
+!user-content/exams/az104/
+!user-content/exams/az104/**
 
 # Private exam backups/zips (keep local only)
 user-content/*.zip
