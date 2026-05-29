@@ -49,6 +49,8 @@ class SecureTransferModuleTests(unittest.TestCase):
         self.assertNotIn("innerHTML", text)
         self.assertIn("createElement", text)
         self.assertIn("textContent", text)
+        self.assertIn("aria-labelledby", text)
+        self.assertIn("aria-describedby", text)
 
     def test_module_is_wired_into_pages_and_service_worker(self):
         for page in ("index.html", "exam.html", "editor.html"):
@@ -60,6 +62,8 @@ class SecureTransferModuleTests(unittest.TestCase):
     def test_utils_exposes_confirm_helper(self):
         text = (ROOT / "assets/js/utils.js").read_text(encoding="utf-8")
         self.assertIn("window.showCustomConfirm", text)
+        self.assertIn("aria-labelledby", text)
+        self.assertIn("aria-describedby", text)
 
 
 class StorageHydrationTests(unittest.TestCase):
@@ -114,6 +118,30 @@ class ManifestTests(unittest.TestCase):
             tampered = run_validator(root, "--check-manifest")
             self.assertEqual(tampered.returncode, 1, tampered.stdout)
             self.assertIn("hash mismatch", tampered.stdout)
+
+    def test_manifest_check_rejects_unsafe_paths(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "exams"
+            exam_dir = make_pack(
+                root,
+                "demo",
+                [{"id": "q1", "question": "2+2?", "question_type": "STANDARD", "options": ["3", "4"], "correct": 1}],
+            )
+            (exam_dir / "manifest.json").write_text(
+                json.dumps(
+                    {
+                        "format": "examsim-manifest",
+                        "version": 1,
+                        "algorithm": "SHA-256",
+                        "files": {"../outside.json": "0" * 64},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            result = run_validator(root, "--check-manifest")
+            self.assertEqual(result.returncode, 1, result.stdout)
+            self.assertIn("unsafe manifest path", result.stdout)
 
 
 class AdvancedQuestionTypeTests(unittest.TestCase):

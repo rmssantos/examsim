@@ -382,6 +382,10 @@ window.showCustomConfirm = function(titleText, messageText, options = {}) {
 
         const content = document.createElement('div');
         content.className = 'progress-modal-content custom-alert-animate';
+        content.setAttribute('role', 'dialog');
+        content.setAttribute('aria-modal', 'true');
+        content.setAttribute('aria-labelledby', 'custom-confirm-title');
+        content.setAttribute('aria-describedby', 'custom-confirm-description');
         content.style.maxWidth = '420px';
         content.style.textAlign = 'center';
         content.style.padding = '30px';
@@ -389,6 +393,7 @@ window.showCustomConfirm = function(titleText, messageText, options = {}) {
         content.style.boxShadow = '0 20px 50px rgba(0, 0, 0, 0.3)';
 
         const title = document.createElement('h3');
+    title.id = 'custom-confirm-title';
         title.style.margin = '0 0 10px 0';
         title.style.fontSize = '1.3rem';
         title.style.fontWeight = '700';
@@ -396,6 +401,7 @@ window.showCustomConfirm = function(titleText, messageText, options = {}) {
         content.appendChild(title);
 
         const desc = document.createElement('p');
+    desc.id = 'custom-confirm-description';
         desc.style.margin = '0 0 24px 0';
         desc.style.fontSize = '0.95rem';
         desc.style.lineHeight = '1.5';

@@ -175,15 +175,20 @@
             dialog.className = 'secure-passphrase-dialog';
             dialog.setAttribute('role', 'dialog');
             dialog.setAttribute('aria-modal', 'true');
+            dialog.setAttribute('aria-labelledby', 'secure-passphrase-title');
             dialog.style.cssText = 'background:#fff;color:#1a1a1a;max-width:420px;width:100%;border-radius:10px;padding:22px;box-shadow:0 18px 48px rgba(0,0,0,0.35);font-family:inherit;';
 
             const heading = document.createElement('h2');
+            heading.id = 'secure-passphrase-title';
             heading.style.cssText = 'margin:0 0 10px;font-size:19px;';
             heading.textContent = config.title;
             dialog.appendChild(heading);
 
+            const descriptionIds = [];
             if (config.message) {
                 const description = document.createElement('p');
+                description.id = 'secure-passphrase-description';
+                descriptionIds.push(description.id);
                 description.style.cssText = 'margin:0 0 14px;color:#555;font-size:14px;line-height:1.5;';
                 description.textContent = config.message;
                 dialog.appendChild(description);
@@ -206,9 +211,12 @@
             const confirmInput = config.requireConfirmation ? makeField('Confirm passphrase') : null;
 
             const error = document.createElement('p');
+            error.id = 'secure-passphrase-error';
+            descriptionIds.push(error.id);
             error.style.cssText = 'margin:0 0 12px;color:#c0392b;font-size:13px;min-height:18px;';
             error.setAttribute('aria-live', 'polite');
             dialog.appendChild(error);
+            dialog.setAttribute('aria-describedby', descriptionIds.join(' '));
 
             const actions = document.createElement('div');
             actions.style.cssText = 'display:flex;gap:10px;justify-content:flex-end;';

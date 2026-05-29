@@ -322,6 +322,20 @@ def pack_file_paths(exam_dir: Path) -> list[str]:
     return paths
 
 
+def safe_manifest_file_path(exam_dir: Path, rel: Any) -> Path | None:
+    if not isinstance(rel, str) or not rel or "\\" in rel:
+        return None
+    rel_path = Path(rel)
+    if rel_path.is_absolute() or any(part in {"", ".", ".."} for part in rel_path.parts):
+        return None
+    file_path = (exam_dir / rel_path).resolve()
+    try:
+        file_path.relative_to(exam_dir.resolve())
+    except ValueError:
+        return None
+    return file_path
+
+
 def build_manifest(exam_dir: Path) -> dict[str, Any]:
     files = {rel: sha256_file(exam_dir / rel) for rel in pack_file_paths(exam_dir)}
     return {
@@ -372,8 +386,14 @@ def check_manifests(root: Path, exam_ids: list[str]) -> int:
             continue
         checked += 1
         actual_paths = set(pack_file_paths(exam_dir))
+        safe_expected_paths: set[str] = set()
         for rel, expected_hash in expected.items():
-            file_path = exam_dir / rel
+            file_path = safe_manifest_file_path(exam_dir, rel)
+            if file_path is None:
+                print(f"- {exam_id}: unsafe manifest path {rel!r}")
+                problems += 1
+                continue
+            safe_expected_paths.add(rel)
             if not file_path.is_file():
                 print(f"- {exam_id}: missing file {rel}")
                 problems += 1
@@ -382,7 +402,7 @@ def check_manifests(root: Path, exam_ids: list[str]) -> int:
             if actual_hash != str(expected_hash).lower():
                 print(f"- {exam_id}: hash mismatch for {rel}")
                 problems += 1
-        for rel in sorted(actual_paths - set(expected.keys())):
+        for rel in sorted(actual_paths - safe_expected_paths):
             print(f"- {exam_id}: untracked file not in manifest: {rel}")
             problems += 1
     if problems:

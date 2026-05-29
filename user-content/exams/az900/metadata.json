@@ -2,7 +2,7 @@
   "id": "az900",
   "name": "AZ-900",
   "fullName": "Microsoft Azure Fundamentals",
-  "description": "Banco de estudo original para o AZ-900, com perguntas escritas de raiz a partir de documentação pública da Microsoft Learn. Não contém perguntas reais de exame.",
+  "description": "Original AZ-900 study bank with questions written from scratch using public Microsoft Learn documentation. It does not contain real exam questions.",
   "duration": 45,
   "questionCount": 40,
   "totalQuestions": 120,

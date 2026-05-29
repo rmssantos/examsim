@@ -2,7 +2,7 @@
   "id": "az104",
   "name": "AZ-104",
   "fullName": "Microsoft Azure Administrator",
-  "description": "Banco de estudo original para o AZ-104, com perguntas escritas de raiz a partir de documentação pública da Microsoft Learn. Não contém perguntas reais de exame.",
+  "description": "Original AZ-104 study bank with questions written from scratch using public Microsoft Learn documentation. It does not contain real exam questions.",
   "duration": 60,
   "questionCount": 40,
   "totalQuestions": 120,
