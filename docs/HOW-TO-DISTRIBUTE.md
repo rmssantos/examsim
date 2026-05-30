@@ -340,7 +340,7 @@ In the preview pack's `metadata.json`, ship a small free sample and add:
 "pro": {
   "title": "AZ-104 Complete",
   "questions": 300,
-  "price": "29 EUR",
+  "price": "19 EUR",
   "url": "https://your-store.gumroad.com/l/az104-complete",
   "highlights": ["300+ original questions", "Detailed explanations", "Study mode", "Free updates"]
 }
