@@ -2,10 +2,10 @@
   "id": "az104",
   "name": "AZ-104",
   "fullName": "Microsoft Azure Administrator",
-  "description": "Original AZ-104 study bank with questions written from scratch using public Microsoft Learn documentation. It does not contain real exam questions.",
+  "description": "Free 20-question preview of the AZ-104 study bank. Original questions written from public Microsoft Learn docs; not real exam questions. Unlock the full pack for the complete set, detailed explanations, and study mode.",
   "duration": 60,
-  "questionCount": 40,
-  "totalQuestions": 120,
+  "questionCount": 20,
+  "totalQuestions": 20,
   "passScore": 70,
   "language": "en",
   "schemaVersion": "1.1",
@@ -90,5 +90,19 @@
       "name": "Azure documentation",
       "url": "https://learn.microsoft.com/en-us/azure/"
     }
-  ]
+  ],
+  "preview": true,
+  "pro": {
+    "title": "AZ-104 Complete",
+    "questions": 300,
+    "price": "29 EUR",
+    "url": "https://example.gumroad.com/l/az104-complete",
+    "highlights": [
+      "300+ original questions across every exam objective",
+      "Detailed explanation for the correct answer and every distractor",
+      "Study mode with spaced repetition and weak-area focus",
+      "Coverage map so you see nothing is missing",
+      "Free updates when the exam changes"
+    ]
+  }
 }

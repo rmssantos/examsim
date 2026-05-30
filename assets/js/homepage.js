@@ -231,6 +231,14 @@ deleteBtn.appendChild(this.createIcon('fas fa-eye-slash'));
 card.appendChild(deleteBtn);
 
 this.appendTextElement(card, 'div', 'exam-badge', metadata.badge || 'Custom');
+if (metadata.preview) {
+card.classList.add('exam-card--preview');
+const previewFlag = document.createElement('div');
+previewFlag.className = 'exam-preview-flag';
+previewFlag.appendChild(this.createIcon('fas fa-lock'));
+previewFlag.appendChild(document.createTextNode(' Preview'));
+card.appendChild(previewFlag);
+}
 card.appendChild(this.createIcon(metadata.icon || 'fas fa-book', 'exam-icon'));
 this.appendTextElement(card, 'div', 'exam-title', metadata.name || examId.toUpperCase());
 this.appendTextElement(card, 'div', 'exam-subtitle', metadata.fullName || 'Custom Exam');
@@ -283,6 +291,19 @@ studyButton.addEventListener('click', (e) => {
 actions.appendChild(studyButton);
 card.appendChild(actions);
 
+if (metadata.pro) {
+const unlockButton = document.createElement('button');
+unlockButton.type = 'button';
+unlockButton.className = 'exam-card-unlock';
+unlockButton.appendChild(this.createIcon('fas fa-unlock'));
+unlockButton.appendChild(document.createTextNode(' Unlock full pack'));
+unlockButton.addEventListener('click', (e) => {
+e.stopPropagation();
+this.showProModal(examId, metadata);
+});
+card.appendChild(unlockButton);
+}
+
 if (examData.hasImages) {
 const feature = document.createElement('div');
 feature.className = 'exam-feature';
@@ -306,6 +327,99 @@ if (!e.target.closest('.exam-delete')) {
 });
 
 return card;
+}
+
+showProModal(examId, metadata) {
+const pro = (metadata && metadata.pro) || {};
+this.closeProModal();
+
+const overlay = document.createElement('div');
+overlay.className = 'pro-modal-overlay';
+overlay.id = 'pro-modal-overlay';
+
+const dialog = document.createElement('div');
+dialog.className = 'pro-modal';
+dialog.setAttribute('role', 'dialog');
+dialog.setAttribute('aria-modal', 'true');
+dialog.setAttribute('aria-label', 'Unlock the full pack');
+
+const closeBtn = document.createElement('button');
+closeBtn.type = 'button';
+closeBtn.className = 'pro-modal-close';
+closeBtn.setAttribute('aria-label', 'Close');
+closeBtn.appendChild(this.createIcon('fas fa-times'));
+closeBtn.addEventListener('click', () => this.closeProModal());
+dialog.appendChild(closeBtn);
+
+const title = document.createElement('h2');
+title.className = 'pro-modal-title';
+title.textContent = pro.title || `${metadata.name || examId.toUpperCase()} Complete`;
+dialog.appendChild(title);
+
+const sub = document.createElement('p');
+sub.className = 'pro-modal-sub';
+sub.textContent = `You are practicing the free preview. Unlock the complete ${metadata.name || 'exam'} pack.`;
+dialog.appendChild(sub);
+
+if (Array.isArray(pro.highlights) && pro.highlights.length) {
+const list = document.createElement('ul');
+list.className = 'pro-modal-list';
+pro.highlights.forEach((item) => {
+const li = document.createElement('li');
+li.appendChild(this.createIcon('fas fa-check'));
+li.appendChild(document.createTextNode(' ' + String(item)));
+list.appendChild(li);
+});
+dialog.appendChild(list);
+}
+
+const buy = document.createElement('a');
+buy.className = 'pro-modal-buy';
+buy.href = pro.url || '#';
+buy.target = '_blank';
+buy.rel = 'noopener noreferrer';
+buy.appendChild(this.createIcon('fas fa-store'));
+buy.appendChild(document.createTextNode(' Get the full pack' + (pro.price ? ' (' + pro.price + ')' : '')));
+dialog.appendChild(buy);
+
+const divider = document.createElement('div');
+divider.className = 'pro-modal-divider';
+dialog.appendChild(divider);
+
+const activateText = document.createElement('p');
+activateText.className = 'pro-modal-activate-text';
+activateText.textContent = 'Already purchased? Import your pack file and enter your license key to activate it on this device.';
+dialog.appendChild(activateText);
+
+const importBtn = document.createElement('button');
+importBtn.type = 'button';
+importBtn.className = 'pro-modal-import';
+importBtn.appendChild(this.createIcon('fas fa-file-import'));
+importBtn.appendChild(document.createTextNode(' Import & activate'));
+importBtn.addEventListener('click', () => {
+this.closeProModal();
+this.triggerFileImport();
+});
+dialog.appendChild(importBtn);
+
+overlay.appendChild(dialog);
+overlay.addEventListener('click', (e) => {
+if (e.target === overlay) this.closeProModal();
+});
+this._proModalKeyHandler = (e) => {
+if (e.key === 'Escape') this.closeProModal();
+};
+document.addEventListener('keydown', this._proModalKeyHandler);
+document.body.appendChild(overlay);
+}
+
+closeProModal() {
+const overlay = document.getElementById('pro-modal-overlay');
+if (overlay) overlay.remove();
+if (this._proModalKeyHandler) {
+document.removeEventListener('keydown', this._proModalKeyHandler);
+this._proModalKeyHandler = null;
+}
 }
 
 getCardClass(examId) {

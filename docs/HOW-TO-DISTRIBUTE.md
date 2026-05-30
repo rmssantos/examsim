@@ -322,3 +322,46 @@ For issues or questions:
 ---
 
 **Remember**: The simulator is the platform, exam packs are the content. Keep them separate for flexibility and legal clarity.
+
+---
+
+## Selling a pro pack (paid, encrypted)
+
+A "pro" pack is delivered as an **encrypted file** that buyers activate with a **license key** (the decryption passphrase). The app's importer detects the encrypted envelope, asks for the key, and decrypts locally — no backend required.
+
+> **Honest note on protection:** anything the browser can display can ultimately be extracted (this is true for every browser-based course too). Encryption + a license key is *friction*, not an unbreakable vault. Price on curation, explanations, study mode and updates — and simply don't publish the pro content anywhere for free.
+
+### 1. Mark the public pack as a preview
+
+In the preview pack's `metadata.json`, ship a small free sample and add:
+
+```json
+"preview": true,
+"pro": {
+  "title": "AZ-104 Complete",
+  "questions": 300,
+  "price": "29 EUR",
+  "url": "https://your-store.gumroad.com/l/az104-complete",
+  "highlights": ["300+ original questions", "Detailed explanations", "Study mode", "Free updates"]
+}
+```
+
+The homepage shows a **Preview** flag and an **Unlock full pack** button that opens a buy/activate modal.
+
+### 2. Produce the encrypted pro pack
+
+Build the full pack privately (never commit it to the public repo), then encrypt it with the license key you will sell:
+
+```bash
+node tools/encrypt-pack.js encrypt \
+  --in path/to/full/dump.json --id az104 --metadata path/to/full/metadata.json \
+  --key "YOUR-LICENSE-KEY" --out az104-complete.json
+```
+
+Sell `az104-complete.json` (e.g. on Gumroad/Lemon Squeezy) and deliver the **license key** to the buyer (Gumroad can auto-generate per-sale license keys).
+
+### 3. Buyer activates
+
+The buyer clicks **Unlock full pack -> Import & activate**, picks `az104-complete.json`, and enters the license key. The app decrypts it locally and imports the full pack as their own.
+
+Verify an envelope round-trips with `node tools/encrypt-pack.js decrypt --in az104-complete.json --key "YOUR-LICENSE-KEY" --out check.json`.
