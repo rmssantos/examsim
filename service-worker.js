@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'examsim-pwa-v3.0';
+const CACHE_VERSION = 'examsim-pwa-v3.1';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -43,7 +43,10 @@ const CORE_ASSETS = [
   './assets/css/legal-page.css',
   './assets/css/index-inline.css',
   './assets/css/editor-styles.css',
-  './assets/media/app-icon.svg'
+  './assets/media/favicon-64.png',
+  './assets/media/apple-touch-icon.png',
+  './assets/media/icon-192.png',
+  './assets/media/icon-512.png'
 ];
 
 const NETWORK_FIRST_PATHS = [
@@ -137,7 +140,7 @@ async function navigationFallback(pathname) {
   const homeShell = await caches.match('./index.html');
   if (homeShell) return homeShell;
 
-  return new Response('<!doctype html><title>Exam Simulator</title><p>Exam Simulator is unavailable offline.</p>', {
+  return new Response('<!doctype html><title>Examplar</title><p>Examplar is unavailable offline.</p>', {
     status: 503,
     headers: { 'Content-Type': 'text/html; charset=utf-8' }
   });
