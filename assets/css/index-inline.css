@@ -853,9 +853,9 @@ pointer-events: none;
     border-bottom: none;
     border-radius: 18px;
     background:
-        radial-gradient(120% 130% at 88% 6%, rgba(0, 188, 242, 0.30), transparent 42%),
-        radial-gradient(90% 90% at 6% 112%, rgba(20, 184, 166, 0.22), transparent 52%),
-        linear-gradient(135deg, #091a24 0%, #0c3a40 52%, #0a2238 100%);
+        radial-gradient(120% 130% at 88% 6%, rgba(0, 188, 242, 0.28), transparent 42%),
+        radial-gradient(90% 90% at 6% 112%, rgba(0, 102, 204, 0.26), transparent 52%),
+        linear-gradient(135deg, #0a1a33 0%, #143a72 52%, #0a1d3c 100%);
     box-shadow: 0 24px 55px -28px rgba(3, 18, 30, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
@@ -990,7 +990,7 @@ pointer-events: none;
     backdrop-filter: blur(6px);
 }
 .hero-banner .hero-trust .trust-chip i {
-    color: #2dd4bf;
+    color: #38bdf8;
     font-size: 0.78rem;
 }
 
@@ -1079,7 +1079,7 @@ pointer-events: none;
     color: rgba(233, 246, 252, 0.7) !important;
 }
 .hero-proof .stat-label-icon {
-    color: #2dd4bf;
+    color: #38bdf8;
 }
 
 /* entrance animation */
