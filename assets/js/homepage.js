@@ -332,6 +332,7 @@ return card;
 
 showProModal(examId, metadata) {
 const pro = (metadata && metadata.pro) || {};
+const returnFocus = (document.activeElement instanceof HTMLElement) ? document.activeElement : null;
 this.closeProModal();
 
 const overlay = document.createElement('div');
@@ -376,7 +377,7 @@ dialog.appendChild(list);
 
 const buy = document.createElement('a');
 buy.className = 'pro-modal-buy';
-buy.href = pro.url || '#';
+buy.href = this.safeExternalUrl(pro.url);
 buy.target = '_blank';
 buy.rel = 'noopener noreferrer';
 buy.appendChild(this.createIcon('fas fa-store'));
@@ -412,6 +413,8 @@ if (e.key === 'Escape') this.closeProModal();
 };
 document.addEventListener('keydown', this._proModalKeyHandler);
 document.body.appendChild(overlay);
+this._proModalReturnFocus = returnFocus;
+closeBtn.focus();
 }
 
 closeProModal() {
@@ -421,6 +424,9 @@ if (this._proModalKeyHandler) {
 document.removeEventListener('keydown', this._proModalKeyHandler);
 this._proModalKeyHandler = null;
 }
+const returnFocus = this._proModalReturnFocus;
+this._proModalReturnFocus = null;
+if (returnFocus && document.contains(returnFocus)) returnFocus.focus();
 }
 
 getCardClass(examId) {

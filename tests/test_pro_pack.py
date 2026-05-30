@@ -69,6 +69,16 @@ class ProPackTests(unittest.TestCase):
                 capture_output=True, text=True)
             self.assertNotEqual(bad.returncode, 0, "decryption with the wrong key should fail")
 
+            # The key can also come from the environment (keeps it out of argv).
+            import os
+            os_env = dict(os.environ, ENCRYPT_PACK_KEY=key)
+            env_out = tmp / "env-out.json"
+            enc_env = subprocess.run(
+                [node, str(tool), "encrypt", "--in", str(tmp / "dump.json"), "--id", "demo", "--out", str(env_out)],
+                capture_output=True, text=True, env=os_env)
+            self.assertEqual(enc_env.returncode, 0, enc_env.stderr)
+            self.assertEqual(json.loads(env_out.read_text(encoding="utf-8")).get("format"), "examsim-encrypted")
+
 
 if __name__ == "__main__":
     unittest.main()

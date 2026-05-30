@@ -17,6 +17,10 @@
  *
  *   Decrypt (verify) an envelope back to the pack:
  *     node tools/encrypt-pack.js decrypt --in az104-complete.json --key "LICENSE-KEY" --out pack.json
+ *
+ *   The license key / passphrase can also come from the ENCRYPT_PACK_KEY env var or an
+ *   interactive prompt (preferred for paid packs, so it never lands in shell history or
+ *   process listings).
  */
 'use strict';
 
@@ -126,20 +130,53 @@ function buildPack(input, id, metadataPath) {
   return pack;
 }
 
+function promptHidden(query) {
+  return new Promise((resolve) => {
+    const stream = require('stream');
+    const readline = require('readline');
+    const muted = new stream.Writable({
+      write(chunk, enc, cb) { if (!muted.isMuted) process.stdout.write(chunk, enc); cb(); }
+    });
+    muted.isMuted = false;
+    const rl = readline.createInterface({ input: process.stdin, output: muted, terminal: true });
+    process.stdout.write(query);
+    muted.isMuted = true;
+    rl.question('', (answer) => {
+      rl.close();
+      process.stdout.write('\n');
+      resolve(String(answer).trim());
+    });
+  });
+}
+
+async function resolveKey(argKey) {
+  if (argKey && argKey !== true) return String(argKey);
+  if (process.env.ENCRYPT_PACK_KEY) return String(process.env.ENCRYPT_PACK_KEY);
+  if (process.stdin.isTTY) {
+    const key = await promptHidden('License key / passphrase: ');
+    if (key) return key;
+  }
+  throw new Error('No license key. Pass --key, set ENCRYPT_PACK_KEY, or run interactively.');
+}
+
 async function main() {
   const argv = process.argv.slice(2);
   const mode = argv[0];
   const args = parseArgs(argv.slice(1));
 
-  if (!['encrypt', 'decrypt'].includes(mode) || !args.in || !args.key || !args.out) {
+  if (!['encrypt', 'decrypt'].includes(mode) || !args.in || !args.out) {
     process.stderr.write(
       'Usage:\n'
-      + '  node tools/encrypt-pack.js encrypt --in <pack.json|questions.json> [--id <id>] [--metadata <metadata.json>] --key <licenseKey> --out <out.json>\n'
-      + '  node tools/encrypt-pack.js decrypt --in <envelope.json> --key <licenseKey> --out <pack.json>\n'
+      + '  node tools/encrypt-pack.js encrypt --in <pack.json|questions.json> [--id <id>] [--metadata <metadata.json>] --out <out.json>\n'
+      + '  node tools/encrypt-pack.js decrypt --in <envelope.json> --out <pack.json>\n'
+      + '\n'
+      + 'The license key / passphrase is read from --key, the ENCRYPT_PACK_KEY env var,\n'
+      + 'or an interactive prompt (preferred, so it never lands in shell history or process listings).\n'
     );
     process.exit(2);
   }
 
+  const key = await resolveKey(args.key);
   const input = readJson(args.in);
 
   if (mode === 'encrypt') {
@@ -147,11 +184,11 @@ async function main() {
     if (!Array.isArray(pack.questions) || pack.questions.length === 0) {
       throw new Error('Pack has no questions to encrypt.');
     }
-    const envelope = await encrypt(pack, String(args.key));
+    const envelope = await encrypt(pack, key);
     fs.writeFileSync(args.out, JSON.stringify(envelope, null, 2) + '\n');
     process.stdout.write(`Encrypted ${pack.questions.length} question(s) into ${args.out}\n`);
   } else {
-    const pack = await decrypt(input, String(args.key));
+    const pack = await decrypt(input, key);
     fs.writeFileSync(args.out, JSON.stringify(pack, null, 2) + '\n');
     const n = Array.isArray(pack.questions) ? pack.questions.length : 'unknown';
     process.stdout.write(`Decrypted ${n} question(s) into ${args.out}\n`);
