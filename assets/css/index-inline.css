@@ -897,23 +897,9 @@ pointer-events: none;
     padding: 2.1rem 2.25rem;
 }
 
-/* badges / eyebrow */
-.hero-banner .hero-badges {
-    margin-bottom: 1rem;
-}
-.hero-banner .hero-pill--eyebrow {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    color: #dff4ff;
-    box-shadow: none;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-size: 0.72rem;
-    padding: 0.42rem 0.85rem;
-}
-.hero-banner .hero-pill--eyebrow i {
-    color: #00bcf2;
-    -webkit-text-fill-color: #00bcf2;
+/* live-site link — only shown on local self-host, points to the public site */
+.hero-banner .hero-livelink {
+    margin-top: 1.2rem;
 }
 .hero-banner .hero-pill.public-link {
     background: rgba(255, 255, 255, 0.06);
