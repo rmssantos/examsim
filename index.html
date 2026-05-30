@@ -3,12 +3,24 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="Exam Simulator - Practice for certification exams with interactive questions, timed tests, and detailed results">
+	<meta name="description" content="Practice certification exams privately and offline with Examplar. Original, syllabus-aligned questions for SC-900, AZ-900, AB-730 and more. Free, open-source, no account, and your data stays in your browser.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="Examplar">
+	<meta property="og:title" content="Examplar | Private, offline certification exam practice">
+	<meta property="og:description" content="A private, offline, open-source engine for certification practice. Study the built-in packs or build your own. No account, and your data stays in your browser.">
+	<meta property="og:url" content="https://rmssantos.github.io/examsim/">
+	<meta property="og:image" content="https://rmssantos.github.io/examsim/assets/media/og-image.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Examplar | Private, offline certification exam practice">
+	<meta name="twitter:description" content="Private, offline, open-source exam practice. No account. Your data stays in your browser.">
+	<meta name="twitter:image" content="https://rmssantos.github.io/examsim/assets/media/og-image.png">
 	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.applicationinsights.azure.com; object-src 'none'; base-uri 'self'; form-action 'self'">
 	<link rel="manifest" href="manifest.webmanifest">
-	<link rel="apple-touch-icon" href="assets/media/app-icon.svg">
-	<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📝</text></svg>">
-	<title>Exam Simulator Pro - Universal Exam Practice Platform</title>
+	<link rel="apple-touch-icon" href="assets/media/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="64x64" href="assets/media/favicon-64.png">
+	<title>Examplar | Private, offline certification exam practice</title>
 	<link rel="stylesheet" href="assets/css/style-new.css">
 	<link rel="stylesheet" href="assets/css/multi-exam-styles.css">
 	<link rel="stylesheet" href="assets/css/modern-enhancements.css">
@@ -32,46 +44,66 @@
 			</div>
 			<section class="home-board">
 				<!-- Hero Header -->
-				<header class="hero-header">
-					<div class="hero-branding">
-						<div class="hero-badges">
-							<div class="hero-pill">
-								<i aria-hidden="true" class="fas fa-bolt"></i>
-								<span>Multi-exam workspace</span>
-							</div>
-							<a class="hero-pill public-link local-only-public-link" href="https://rmssantos.github.io/examsim/" target="_blank" rel="noopener noreferrer">
-								<i aria-hidden="true" class="fab fa-github"></i>
-								<span>github.io/examsim</span>
-							</a>
-						</div>
-						<div class="logo">
-							<i aria-hidden="true" class="fas fa-graduation-cap"></i>
-							<h1>Exam Simulator Pro</h1>
-						</div>
-						<p class="hero-subtitle">Import exams, create questions, and track your progress with professional tools.</p>
-					</div>
-					<div class="hero-stats">
-						<div class="stat-card active-exams-card">
-							<div class="stat-content">
-								<span class="stat-value" id="active-exams-count">0</span>
-								<span class="stat-label"><i aria-hidden="true" class="fas fa-clipboard-list stat-label-icon"></i>Active Exams</span>
-							</div>
-						</div>
-						<div class="stat-card questions-card">
-							<div class="stat-content">
-								<span class="stat-value" id="total-questions-count">0</span>
-								<span class="stat-label"><i aria-hidden="true" class="fas fa-circle-question stat-label-icon"></i>Questions</span>
-							</div>
-						</div>
-						<div class="stat-card support-card">
-							<div class="stat-content">
-								<div class="status-pulse-chip">
-									<span id="image-support-flag" class="stat-value">Auto-detecting</span>
-									<span class="pulse-dot"></span>
+				<header class="hero-header hero-banner">
+					<div class="hero-banner__inner">
+						<div class="hero-branding">
+							<div class="hero-badges">
+								<div class="hero-pill hero-pill--eyebrow">
+									<i aria-hidden="true" class="fas fa-bolt"></i>
+									<span>Local-first exam practice</span>
 								</div>
-								<span class="stat-label"><i aria-hidden="true" class="fas fa-image stat-label-icon"></i>Image Support</span>
+								<a class="hero-pill public-link local-only-public-link" href="https://rmssantos.github.io/examsim/" target="_blank" rel="noopener noreferrer">
+									<i aria-hidden="true" class="fab fa-github"></i>
+									<span>rmssantos.github.io/examsim</span>
+								</a>
+							</div>
+							<div class="logo">
+								<img class="logo-img" src="assets/media/examplar-mark.png" alt="Examplar logo" width="67" height="60" decoding="async">
+								<h1>Exampl<span class="logo-accent">a</span>r</h1>
+							</div>
+							<p class="hero-subtitle"><strong>Free, private, and fully offline</strong> practice for certification exams. Study the built-in packs or import and build your own. Your data never leaves your browser.</p>
+							<ul class="hero-trust" aria-label="Why Examplar">
+								<li class="trust-chip"><i aria-hidden="true" class="fas fa-wifi"></i> Works 100% offline</li>
+								<li class="trust-chip"><i aria-hidden="true" class="fas fa-user-shield"></i> No account, no tracking</li>
+								<li class="trust-chip"><i aria-hidden="true" class="fas fa-feather"></i> Original questions, not dumps</li>
+								<li class="trust-chip"><i aria-hidden="true" class="fas fa-code-branch"></i> Free &amp; open-source</li>
+							</ul>
+							<div class="hero-cta-row">
+								<a href="#exam-selection" class="hero-cta-primary">
+									<i aria-hidden="true" class="fas fa-play"></i>
+									<span>Start practicing for free</span>
+								</a>
+								<a href="#exam-selection" class="hero-cta-ghost">
+									<span>Browse exams</span>
+									<i aria-hidden="true" class="fas fa-arrow-right"></i>
+								</a>
 							</div>
 						</div>
+						<aside class="hero-proof" aria-label="Library at a glance">
+							<div class="hero-stats">
+								<div class="stat-card active-exams-card">
+									<div class="stat-content">
+										<span class="stat-value" id="active-exams-count">0</span>
+										<span class="stat-label"><i aria-hidden="true" class="fas fa-clipboard-list stat-label-icon"></i>Active Exams</span>
+									</div>
+								</div>
+								<div class="stat-card questions-card">
+									<div class="stat-content">
+										<span class="stat-value" id="total-questions-count">0</span>
+										<span class="stat-label"><i aria-hidden="true" class="fas fa-circle-question stat-label-icon"></i>Questions</span>
+									</div>
+								</div>
+								<div class="stat-card support-card">
+									<div class="stat-content">
+										<div class="status-pulse-chip">
+											<span id="image-support-flag" class="stat-value">Auto-detecting</span>
+											<span class="pulse-dot"></span>
+										</div>
+										<span class="stat-label"><i aria-hidden="true" class="fas fa-image stat-label-icon"></i>Image Support</span>
+									</div>
+								</div>
+							</div>
+						</aside>
 					</div>
 				</header>
 
@@ -374,7 +406,7 @@
 			<footer class="app-footer" aria-label="Project and privacy links">
 				<div class="app-footer-inner">
 					<p class="app-footer-note">
-						<strong>Exam Simulator</strong>
+						<strong>Examplar</strong>
 						<span>Offline-ready. Browser edits stay local unless exported.</span>
 					</p>
 					<nav class="app-footer-links" aria-label="Project links">

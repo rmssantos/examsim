@@ -1,7 +1,7 @@
 {
-  "name": "Exam Simulator",
-  "short_name": "ExamSim",
-  "description": "Offline-first exam practice with study mode, progress tracking, and local imports.",
+  "name": "Examplar",
+  "short_name": "Examplar",
+  "description": "Private, offline certification exam practice. Study the built-in packs or build your own.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -9,9 +9,15 @@
   "theme_color": "#1e3c72",
   "icons": [
     {
-      "src": "assets/media/app-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "assets/media/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/media/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
