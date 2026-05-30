@@ -1141,27 +1141,26 @@ pointer-events: none;
     font-size: 9px;
 }
 
+/* Unlock action lives inside the hover/selected actions overlay (grid cell),
+   so it is never covered by Start/Study. */
 .exam-card-unlock {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    width: 100%;
-    margin-top: 8px;
-    padding: 9px 12px;
-    border: none;
-    border-radius: 8px;
+    gap: 0.35rem;
+    height: 38px;
+    margin: 0;
+    padding: 0;
+    border: 0;
     cursor: pointer;
-    font-weight: 700;
     font-size: 0.85rem;
+    font-weight: 800;
     color: #3a2400;
     background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    box-shadow: 0 8px 18px -8px rgba(217, 119, 6, 0.7);
-    transition: filter 0.2s ease, transform 0.2s ease;
+    transition: filter 0.18s ease;
 }
 .exam-card-unlock:hover {
-    filter: brightness(1.05);
-    transform: translateY(-1px);
+    filter: brightness(1.06);
 }
 
 .pro-modal-overlay {

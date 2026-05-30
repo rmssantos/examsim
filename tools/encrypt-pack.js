@@ -8,14 +8,14 @@
  *   PBKDF2-SHA256 (210000 iters), 16-byte salt, 12-byte IV, AES-GCM-256.
  *
  * Usage:
- *   Encrypt a dump.json (array) into a pack envelope:
- *     node tools/encrypt-pack.js encrypt --in dump.json --id az104 \
+ *   Encrypt a combined pack file ({id, questions, metadata}) into an envelope:
+ *     node tools/encrypt-pack.js encrypt --in pack.json --key "LICENSE-KEY" --out az104-complete.json
+ *
+ *   Or pass a raw questions array file plus its metadata:
+ *     node tools/encrypt-pack.js encrypt --in questions.json --id az104 \
  *          --metadata metadata.json --key "LICENSE-KEY" --out az104-complete.json
  *
- *   Encrypt a combined pack object ({id, questions, metadata}):
- *     node tools/encrypt-pack.js encrypt --in pack.json --key "LICENSE-KEY" --out out.json
- *
- *   Decrypt (verify) an envelope back to the pack object:
+ *   Decrypt (verify) an envelope back to the pack:
  *     node tools/encrypt-pack.js decrypt --in az104-complete.json --key "LICENSE-KEY" --out pack.json
  */
 'use strict';
@@ -134,7 +134,7 @@ async function main() {
   if (!['encrypt', 'decrypt'].includes(mode) || !args.in || !args.key || !args.out) {
     process.stderr.write(
       'Usage:\n'
-      + '  node tools/encrypt-pack.js encrypt --in <dump.json|pack.json> [--id <id>] [--metadata <metadata.json>] --key <licenseKey> --out <out.json>\n'
+      + '  node tools/encrypt-pack.js encrypt --in <pack.json|questions.json> [--id <id>] [--metadata <metadata.json>] --key <licenseKey> --out <out.json>\n'
       + '  node tools/encrypt-pack.js decrypt --in <envelope.json> --key <licenseKey> --out <pack.json>\n'
     );
     process.exit(2);

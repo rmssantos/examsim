@@ -253,7 +253,7 @@ card.appendChild(stats);
 if (hasDeclaredTotalQuestions) {
 const totalLabel = totalQuestions > questionCount
 	? `From ${totalQuestions} total questions`
-	: `${totalQuestions} total questions in dump`;
+	: `${totalQuestions} total questions in this pack`;
 this.appendTextElement(card, 'div', 'exam-total-info', totalLabel);
 }
 
@@ -288,21 +288,22 @@ studyButton.addEventListener('click', (e) => {
 	this.selectExam(examId);
 	this.startSelectedExam('study');
 });
-actions.appendChild(studyButton);
-card.appendChild(actions);
 
 if (metadata.pro) {
 const unlockButton = document.createElement('button');
 unlockButton.type = 'button';
 unlockButton.className = 'exam-card-unlock';
 unlockButton.appendChild(this.createIcon('fas fa-unlock'));
-unlockButton.appendChild(document.createTextNode(' Unlock full pack'));
+unlockButton.appendChild(document.createTextNode(' Unlock'));
 unlockButton.addEventListener('click', (e) => {
 e.stopPropagation();
 this.showProModal(examId, metadata);
 });
-card.appendChild(unlockButton);
+actions.appendChild(unlockButton);
+} else {
+actions.appendChild(studyButton);
 }
+card.appendChild(actions);
 
 if (examData.hasImages) {
 const feature = document.createElement('div');
@@ -1286,7 +1287,7 @@ statusEl.prepend(this.createIcon(result.skipped ? 'fas fa-minus-circle' : (resul
 item.appendChild(header);
 
 if (!question) {
-	this.appendTextElement(item, 'div', 'attempt-review-question missing', 'Question no longer exists in the current dump.');
+	this.appendTextElement(item, 'div', 'attempt-review-question missing', 'Question no longer exists in the current pack.');
 	return item;
 }
 

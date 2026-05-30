@@ -350,11 +350,11 @@ The homepage shows a **Preview** flag and an **Unlock full pack** button that op
 
 ### 2. Produce the encrypted pro pack
 
-Build the full pack privately (never commit it to the public repo), then encrypt it with the license key you will sell:
+Build the full pack privately (never commit it to the public repo) as a single `pack.json` of the form `{ "id": "az104", "questions": [...], "metadata": {...} }`, then encrypt it with the license key you will sell:
 
 ```bash
 node tools/encrypt-pack.js encrypt \
-  --in path/to/full/dump.json --id az104 --metadata path/to/full/metadata.json \
+  --in path/to/full/pack.json \
   --key "YOUR-LICENSE-KEY" --out az104-complete.json
 ```
 
