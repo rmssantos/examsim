@@ -46,6 +46,22 @@ class EditorUiReadinessTests(unittest.TestCase):
         self.assertIn("querySelector('span')", update_block)
         self.assertIn("textContent = label", update_block)
 
+    def test_editor_makes_builtin_packs_readonly_with_duplicate_path(self):
+        js = (ROOT / "assets/js/editor.js").read_text(encoding="utf-8")
+
+        # Built-in packs are detected from the server index.json
+        self.assertIn("user-content/exams/index.json", js)
+        self.assertIn("function isBuiltinExam", js)
+        # A read-only banner with a one-click duplicate action is offered
+        self.assertIn("builtin-readonly-banner", js)
+        self.assertIn("Duplicate to my packs", js)
+        self.assertIn("async function duplicateForEditing", js)
+        # saveAll refuses to overwrite a built-in pack in place and duplicates instead
+        save_start = js.index("async function saveAll(")
+        save_block = js[save_start:save_start + 700]
+        self.assertIn("if (isBuiltinExam(examId))", save_block)
+        self.assertIn("duplicateForEditing()", save_block)
+
     def test_validation_workflow_runs_all_unittest_files(self):
         workflow = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8")
 

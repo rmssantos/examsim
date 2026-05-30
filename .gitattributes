@@ -1,0 +1,6 @@
+# Exam pack JSON files are hashed by SHA-256 manifests
+# (tools/validate-exam-packs.py --check-manifest). Pin their line endings to LF
+# so the hashes are identical on every platform; a Windows CRLF checkout would
+# otherwise change the bytes and break the manifest check in CI.
+user-content/exams/*.json text eol=lf
+user-content/exams/**/*.json text eol=lf

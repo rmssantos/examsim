@@ -85,6 +85,7 @@
     renderForm();
     updateUnsavedIndicator();
     updatePersistenceHint();
+    applyBuiltinReadonly();
 
     return true;
   }
@@ -479,12 +480,137 @@
     }
   }
 
+  // ---- Built-in pack read-only handling ----
+  // Built-in packs are the ones served from the repository (listed in
+  // user-content/exams/index.json). They stay read-only in the editor so pack
+  // updates and SHA-256 integrity checks keep working; users duplicate them to
+  // get a fully editable copy they own.
+  let builtinExamIds = new Set();
+  const currentExamId = () => (state.exam === 'custom' && state.customCode ? state.customCode : state.exam);
+  function isBuiltinExam(id){ return !!id && builtinExamIds.has(id); }
+
+  (function loadBuiltinExamIds(){
+    fetch('user-content/exams/index.json')
+      .then((r) => (r.ok ? r.json() : []))
+      .then((list) => {
+        if (Array.isArray(list)) {
+          builtinExamIds = new Set(list.filter(window.ExamApp.isSafeExamId));
+        }
+      })
+      .catch(() => {})
+      .finally(() => applyBuiltinReadonly());
+  })();
+
+  function injectReadonlyStyles(){
+    if (document.getElementById('builtin-readonly-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'builtin-readonly-styles';
+    style.textContent = [
+      '.builtin-readonly-banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;padding:14px 16px;border-radius:10px;background:rgba(0,102,204,0.08);border:1px solid rgba(0,102,204,0.28);}',
+      '.builtin-readonly-banner strong{display:block;margin-bottom:4px;}',
+      '.builtin-readonly-banner .builtin-readonly-text span{font-size:13px;opacity:.85;line-height:1.5;}',
+      '.builtin-readonly-banner code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:4px;}',
+      '.builtin-readonly-banner button{flex-shrink:0;}',
+      '[data-theme="dark"] .builtin-readonly-banner,.dark-mode .builtin-readonly-banner{background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.3);}',
+      '[data-theme="dark"] .builtin-readonly-banner code,.dark-mode .builtin-readonly-banner code{background:rgba(255,255,255,.1);}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function ensureReadonlyBanner(){
+    let banner = document.getElementById('builtin-readonly-banner');
+    if (banner) return banner;
+    const anchor = document.querySelector('.exam-selection-bar');
+    if (!anchor || !anchor.parentElement) return null;
+    injectReadonlyStyles();
+    banner = document.createElement('div');
+    banner.id = 'builtin-readonly-banner';
+    banner.className = 'builtin-readonly-banner';
+    banner.style.display = 'none';
+    banner.innerHTML =
+      '<div class="builtin-readonly-text">' +
+        '<strong><i class="fas fa-lock" aria-hidden="true"></i> Built-in pack (read-only)</strong>' +
+        '<span>You are viewing <code class="builtin-readonly-name"></code>. Built-in packs stay read-only so updates and integrity checks keep working. Make your own copy to edit, export, and share it freely.</span>' +
+      '</div>' +
+      '<button type="button" id="duplicateForEdit" class="btn primary"><i class="fas fa-copy" aria-hidden="true"></i> Duplicate to my packs</button>';
+    anchor.parentElement.insertBefore(banner, anchor.nextSibling);
+    const dupBtn = banner.querySelector('#duplicateForEdit');
+    if (dupBtn) dupBtn.addEventListener('click', () => { duplicateForEditing(); });
+    return banner;
+  }
+
+  function applyBuiltinReadonly(){
+    const id = currentExamId();
+    const readonly = isBuiltinExam(id);
+    const banner = ensureReadonlyBanner();
+    if (banner) {
+      banner.style.display = readonly ? 'flex' : 'none';
+      if (readonly) {
+        const nameEl = banner.querySelector('.builtin-readonly-name');
+        if (nameEl) nameEl.textContent = id;
+      }
+    }
+    const saveBtn = document.getElementById('save');
+    if (saveBtn) {
+      saveBtn.title = readonly
+        ? 'Built-in pack is read-only. Save will create your own editable copy.'
+        : '';
+    }
+  }
+
+  function uniqueCopyId(base){
+    const taken = (id) => isBuiltinExam(id)
+      || (window.userExams && window.userExams[id])
+      || localStorage.getItem(`custom_${id}_questions`) != null;
+    let id = `${base}-copy`;
+    let n = 2;
+    while (taken(id)) { id = `${base}-copy-${n++}`; }
+    return id;
+  }
+
+  function addExamSelectOption(id){
+    const sel = $('#examSelect');
+    if (!sel) return;
+    if (Array.from(sel.options).some((o) => o.value === id)) return;
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = id;
+    const customOpt = Array.from(sel.options).find((o) => o.value === 'custom');
+    if (customOpt) sel.insertBefore(opt, customOpt); else sel.appendChild(opt);
+  }
+
+  async function duplicateForEditing(){
+    const base = currentExamId();
+    if (!isBuiltinExam(base)) return false;
+    syncFromForm();
+    const newId = uniqueCopyId(base);
+    if (!window.ExamApp.isSafeExamId(newId)) { notify('Could not create a copy id'); return false; }
+    state.exam = newId;
+    state.customCode = null;
+    addExamSelectOption(newId);
+    if ($('#examSelect')) $('#examSelect').value = newId;
+    const ok = await saveAll({ notifySuccess: false });
+    if (ok) {
+      state.savedItemsHash = hashItems(state.items);
+      state.hasUnsavedChanges = false;
+      updateUnsavedIndicator();
+      applyBuiltinReadonly();
+      updatePersistenceHint();
+      notify(`Created your editable copy: ${newId}. You can now edit, export, and share it.`);
+    }
+    return ok;
+  }
+
   async function saveAll(options = {}){
     const notifySuccess = options.notifySuccess !== false;
     syncFromForm();
     const examId = state.exam === 'custom' && state.customCode ? state.customCode : state.exam;
     if (!examId) { notify('Select or load an exam first'); return false; }
     if (!window.ExamApp.isSafeExamId(examId)) { notify('Invalid exam id'); return false; }
+    if (isBuiltinExam(examId)) {
+      notify('Built-in packs are read-only. Creating your own editable copy.');
+      return duplicateForEditing();
+    }
     const validation = window.ExamApp.validateExamData(state.items);
     if (!validation.valid) {
       notify(`Cannot save: ${validation.errors[0]}`);
