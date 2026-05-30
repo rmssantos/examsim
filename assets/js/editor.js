@@ -511,8 +511,8 @@
       '.builtin-readonly-banner .builtin-readonly-text span{font-size:13px;opacity:.85;line-height:1.5;}',
       '.builtin-readonly-banner code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:4px;}',
       '.builtin-readonly-banner button{flex-shrink:0;}',
-      '[data-theme="dark"] .builtin-readonly-banner{background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.3);}',
-      '[data-theme="dark"] .builtin-readonly-banner code{background:rgba(255,255,255,.1);}'
+      '[data-theme="dark"] .builtin-readonly-banner,.dark-mode .builtin-readonly-banner{background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.3);}',
+      '[data-theme="dark"] .builtin-readonly-banner code,.dark-mode .builtin-readonly-banner code{background:rgba(255,255,255,.1);}'
     ].join('');
     document.head.appendChild(style);
   }
