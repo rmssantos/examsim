@@ -5,7 +5,7 @@
 
     const CONFIG = Object.freeze({
         connectionString: '__APPINSIGHTS_CONNECTION_STRING__',
-        publicHost: 'rmssantos.github.io',
+        publicHosts: Object.freeze(['examplar.app', 'www.examplar.app', 'rmssantos.github.io']),
         optOutKey: 'exam_analytics_opt_out',
         analyticsVersion: '1.0.0',
         publicExamIds: Object.freeze(['ab730', 'ab731', 'sc900', 'az900', 'az104'])
@@ -50,8 +50,8 @@
         }
     }
 
-    function isGitHubPagesHost(hostname = window.location.hostname) {
-        return hostname === CONFIG.publicHost;
+    function isPublicSiteHost(hostname = window.location.hostname) {
+        return CONFIG.publicHosts.includes(hostname);
     }
 
     function isOptedOut() {
@@ -63,11 +63,11 @@
     }
 
     function isEnabled() {
-        return Boolean(hasValidConnection() && isGitHubPagesHost() && !isOptedOut());
+        return Boolean(hasValidConnection() && isPublicSiteHost() && !isOptedOut());
     }
 
     function analyticsStatusLabel() {
-        if (!isGitHubPagesHost()) return 'Analytics are off outside the public site.';
+        if (!isPublicSiteHost()) return 'Analytics are off outside the public site.';
         if (isOptedOut()) return 'Analytics are off in this browser.';
         if (!hasValidConnection()) return 'Analytics are unavailable in this build.';
         return 'Analytics are on for aggregate site metrics.';
@@ -483,7 +483,7 @@
     }
 
     function injectPrivacyButton() {
-        if (!isGitHubPagesHost() || document.getElementById('analytics-privacy-button')) return;
+        if (!isPublicSiteHost() || document.getElementById('analytics-privacy-button')) return;
         const button = document.createElement('button');
         button.id = 'analytics-privacy-button';
         button.type = 'button';
@@ -518,7 +518,7 @@
         isEnabled,
         isOptedOut,
         _private: Object.freeze({
-            isGitHubPagesHost,
+            isPublicSiteHost,
             getExamProperties,
             scoreBucket,
             durationBucket,

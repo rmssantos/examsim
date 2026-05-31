@@ -17,7 +17,7 @@ Editing and saving questions in the browser changes only that user's local copy.
 
 ### Online Analytics
 
-The public GitHub Pages deployment (`rmssantos.github.io/examsim`) sends limited aggregate events to Azure Application Insights / Azure Monitor. Analytics is enabled by default for the online site only and is not initialized on `localhost`, `127.0.0.1`, private self-hosted URLs, or `file://`.
+The public deployment (`examplar.app`, also reachable at `rmssantos.github.io/examsim`) sends limited aggregate events to Azure Application Insights / Azure Monitor. Analytics is enabled by default for the online site only and is not initialized on `localhost`, `127.0.0.1`, private self-hosted URLs, or `file://`.
 
 **Collected events:**
 - Page views for the home, exam, and editor pages
@@ -430,12 +430,12 @@ PUT /api/user-data       ← Doesn't exist!
 This exam simulator is designed with **privacy-by-default**:
 
 - ✅ **100% client-side** data storage
-- ✅ **No tracking or telemetry**
+- ✅ **No personal tracking** - the public site sends only anonymous aggregate metrics (opt-out anytime); self-hosted and offline send nothing
 - ✅ **No user database**
-- ✅ **No data collection**
+- ✅ **Your content is never collected** - questions, answers, imported files, and progress stay in your browser
 - ✅ **Complete isolation** between users
 - ✅ **Fully offline** after initial load
-- ✅ **No cookies** or tracking scripts
+- ✅ **No third-party cookies** or trackers
 - ✅ **Open source** - verify the code yourself
 
 **Your data is YOUR data. It stays in YOUR browser.**
