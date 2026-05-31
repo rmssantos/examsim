@@ -5,7 +5,6 @@
 
     const CONFIG = Object.freeze({
         connectionString: '__APPINSIGHTS_CONNECTION_STRING__',
-        publicHosts: Object.freeze(['examplar.app', 'www.examplar.app', 'rmssantos.github.io']),
         optOutKey: 'exam_analytics_opt_out',
         analyticsVersion: '1.0.0',
         publicExamIds: Object.freeze(['ab730', 'ab731', 'sc900', 'az900', 'az104'])
@@ -51,7 +50,7 @@
     }
 
     function isPublicSiteHost(hostname = window.location.hostname) {
-        return CONFIG.publicHosts.includes(hostname);
+        return window.ExamApp.isPublicSiteHost(hostname);
     }
 
     function isOptedOut() {

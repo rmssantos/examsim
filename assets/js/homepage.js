@@ -63,7 +63,7 @@ window.ExamApp.warn('Progress hydration failed:', error);
 }
 
 updateLocalOnlyLinks() {
-const isPublicPages = ['examplar.app', 'www.examplar.app', 'rmssantos.github.io'].includes(window.location.hostname);
+const isPublicPages = window.ExamApp.isPublicSiteHost();
 document.querySelectorAll('.local-only-public-link').forEach((element) => {
 	window.ExamApp.setElementHidden(element, isPublicPages);
 });

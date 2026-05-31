@@ -30,7 +30,7 @@ The public deployment (`examplar.app`, also reachable at `rmssantos.github.io/ex
 In Application Insights, page visits are recorded as native page views (`pageViews`). Product actions such as exam starts/completions and imports are recorded as custom events (`customEvents`).
 
 **Collected event properties:**
-- Public bundled exam ID (`ab730`, `ab731`, or `sc900`) or generic `imported`
+- Public bundled exam ID (`ab730`, `ab731`, `sc900`, `az900`, or `az104`) or generic `imported`
 - Pass/fail result
 - Score bucket (`0-49`, `50-69`, `70-89`, `90-100`)
 - Study accuracy bucket, due/new/weak queue counts, and correct/reviewed counts
