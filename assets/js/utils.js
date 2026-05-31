@@ -24,6 +24,13 @@ window.ExamApp.EXAM_LIMITS = Object.freeze({
     allowedImageMimeTypes: Object.freeze(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
 });
 
+// Hosts that serve the public deployment. Single source of truth shared by
+// analytics gating and local-only link hiding.
+window.ExamApp.PUBLIC_HOSTS = Object.freeze(['examplar.app', 'www.examplar.app', 'rmssantos.github.io']);
+window.ExamApp.isPublicSiteHost = function isPublicSiteHost(hostname = window.location.hostname) {
+    return window.ExamApp.PUBLIC_HOSTS.includes(hostname);
+};
+
 function safeGetLocalStorage(key) {
     try {
         return localStorage.getItem(key);

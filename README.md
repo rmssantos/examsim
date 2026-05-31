@@ -544,7 +544,7 @@ This project can be hosted on GitHub Pages because the runtime is static HTML, C
 Public site:
 
 ```text
-https://rmssantos.github.io/examsim/
+https://examplar.app/
 ```
 
 Keep proprietary or licensed exam packs outside the public repo; users can still import private `.json` or `.zip` packs locally in the browser. Browser edits remain local. Public content changes should go through a pull request, or through a GitHub issue if the contributor is only proposing a change.
@@ -634,10 +634,10 @@ python server.py
 
 ## 🔒 Privacy
 
-- **100% Client-Side** - No data sent to servers
-- **Local Storage Only** - All data stays in your browser
-- **No Analytics** - No tracking or telemetry
-- **Offline Capable** - Works without internet
+- **Your content stays local** - Questions, answers, and progress never leave your browser
+- **Local storage only** - Imported packs and progress live in IndexedDB and localStorage
+- **Aggregate metrics, opt-out** - The public site sends only anonymous usage events (no account, no visitor ID, no cookies); self-hosted and offline use send nothing
+- **Offline capable** - Works without internet after the first load
 
 ---
 

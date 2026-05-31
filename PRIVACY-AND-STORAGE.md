@@ -17,7 +17,7 @@ Editing and saving questions in the browser changes only that user's local copy.
 
 ### Online Analytics
 
-The public GitHub Pages deployment (`rmssantos.github.io/examsim`) sends limited aggregate events to Azure Application Insights / Azure Monitor. Analytics is enabled by default for the online site only and is not initialized on `localhost`, `127.0.0.1`, private self-hosted URLs, or `file://`.
+The public deployment (`examplar.app`, also reachable at `rmssantos.github.io/examsim`) sends limited aggregate events to Azure Application Insights / Azure Monitor. Analytics is enabled by default for the online site only and is not initialized on `localhost`, `127.0.0.1`, private self-hosted URLs, or `file://`.
 
 **Collected events:**
 - Page views for the home, exam, and editor pages
@@ -30,7 +30,7 @@ The public GitHub Pages deployment (`rmssantos.github.io/examsim`) sends limited
 In Application Insights, page visits are recorded as native page views (`pageViews`). Product actions such as exam starts/completions and imports are recorded as custom events (`customEvents`).
 
 **Collected event properties:**
-- Public bundled exam ID (`ab730`, `ab731`, or `sc900`) or generic `imported`
+- Public bundled exam ID (`ab730`, `ab731`, `sc900`, `az900`, or `az104`) or generic `imported`
 - Pass/fail result
 - Score bucket (`0-49`, `50-69`, `70-89`, `90-100`)
 - Study accuracy bucket, due/new/weak queue counts, and correct/reviewed counts
@@ -430,12 +430,12 @@ PUT /api/user-data       ← Doesn't exist!
 This exam simulator is designed with **privacy-by-default**:
 
 - ✅ **100% client-side** data storage
-- ✅ **No tracking or telemetry**
+- ✅ **No personal tracking** - the public site sends only anonymous aggregate metrics (opt-out anytime); self-hosted and offline send nothing
 - ✅ **No user database**
-- ✅ **No data collection**
+- ✅ **Your content is never collected** - questions, answers, imported files, and progress stay in your browser
 - ✅ **Complete isolation** between users
 - ✅ **Fully offline** after initial load
-- ✅ **No cookies** or tracking scripts
+- ✅ **No third-party cookies** or trackers
 - ✅ **Open source** - verify the code yourself
 
 **Your data is YOUR data. It stays in YOUR browser.**
