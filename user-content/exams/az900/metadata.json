@@ -11,6 +11,16 @@
   "schemaVersion": "1.1",
   "badge": "Fundamentals",
   "icon": "fas fa-cloud",
+  "vendor": "Microsoft",
+  "certificationCode": "AZ-900",
+  "domains": [
+    "Cloud",
+    "Azure"
+  ],
+  "level": "Fundamentals",
+  "productFamily": "Azure",
+  "contentType": "practice-exam",
+  "commercialStatus": "free",
   "contentOrigin": "original",
   "modules": [
     {

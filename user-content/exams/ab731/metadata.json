@@ -10,6 +10,17 @@
   "schemaVersion": "1.1",
   "badge": "AI Leader",
   "icon": "fas fa-chess-king",
+  "vendor": "Microsoft",
+  "certificationCode": "AB-731",
+  "domains": [
+    "AI",
+    "Business",
+    "Leadership"
+  ],
+  "level": "Leadership",
+  "productFamily": "Microsoft AI Business",
+  "contentType": "practice-exam",
+  "commercialStatus": "free",
   "modules": [
     {
       "icon": "fas fa-lightbulb",
