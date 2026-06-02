@@ -374,6 +374,16 @@
             .filter(element => !element.hasAttribute('hidden') && element.offsetParent !== null);
     }
 
+    function privacyNotesUrl() {
+        const url = window.ExamApp.router?.buildUrl('privacy-and-storage') || 'privacy-and-storage.html';
+        const isFileMode = window.ExamApp.router?.isFileMode?.() || window.location.protocol === 'file:';
+        if (isFileMode) return url;
+        if (isPublicSiteHost() || window.ExamApp.router?.cleanRoutesSupported?.()) {
+            return url.replace(/privacy-and-storage\.html$/, 'privacy-and-storage');
+        }
+        return url;
+    }
+
     function showPrivacyDialog() {
         const existing = document.getElementById('analytics-privacy-overlay');
         if (existing) existing.remove();
@@ -409,7 +419,7 @@
         actions.className = 'analytics-privacy-actions';
 
         const docs = document.createElement('a');
-        docs.href = 'PRIVACY-AND-STORAGE.md';
+        docs.href = privacyNotesUrl();
         docs.target = '_blank';
         docs.rel = 'noopener noreferrer';
         docs.textContent = 'Privacy notes';
