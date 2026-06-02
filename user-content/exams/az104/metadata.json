@@ -11,6 +11,17 @@
   "schemaVersion": "1.1",
   "badge": "Associate",
   "icon": "fas fa-user-gear",
+  "vendor": "Microsoft",
+  "certificationCode": "AZ-104",
+  "domains": [
+    "Cloud",
+    "Azure",
+    "Administration"
+  ],
+  "level": "Associate",
+  "productFamily": "Azure",
+  "contentType": "preview",
+  "commercialStatus": "pro-preview",
   "contentOrigin": "original",
   "modules": [
     {

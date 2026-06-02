@@ -10,6 +10,16 @@
   "schemaVersion": "1.1",
   "badge": "AI Business",
   "icon": "fas fa-briefcase",
+  "vendor": "Microsoft",
+  "certificationCode": "AB-730",
+  "domains": [
+    "AI",
+    "Business"
+  ],
+  "level": "Professional",
+  "productFamily": "Microsoft AI Business",
+  "contentType": "practice-exam",
+  "commercialStatus": "free",
   "modules": [
     {
       "icon": "fas fa-brain",

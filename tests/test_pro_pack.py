@@ -28,6 +28,46 @@ class ProPackTests(unittest.TestCase):
         # The "import & activate" path reuses the existing import (which decrypts envelopes).
         self.assertIn("triggerFileImport", js)
 
+    def test_homepage_exposes_metadata_driven_library_filters(self):
+        html = (ROOT / "index.html").read_text(encoding="utf-8")
+        js = (ROOT / "assets/js/homepage.js").read_text(encoding="utf-8")
+
+        for element_id in (
+            "library-search",
+            "library-filter-vendor",
+            "library-filter-domain",
+            "library-filter-level",
+            "library-filter-status",
+            "library-filter-toggle",
+            "library-filter-toggle-label",
+            "library-search-control",
+            "library-advanced-filters",
+            "library-filter-count",
+            "library-sort",
+            "library-result-count",
+            "details-exam-taxonomy",
+        ):
+            self.assertIn(element_id, html)
+
+        self.assertIn("renderLibraryFilterOptions", js)
+        self.assertIn("getExamTaxonomy", js)
+        self.assertIn("getFilteredSortedExams", js)
+        self.assertIn("updateLibraryFilterPanel", js)
+        self.assertIn("filtersCollapsed", js)
+        self.assertIn("filtersCollapsed: true", js)
+        self.assertIn("library-controls filters-collapsed", html)
+        self.assertIn('aria-expanded="false"', html)
+        self.assertIn("Show search and filters", js)
+        self.assertIn("Search & filters", js)
+        self.assertIn("metadata.vendor", js)
+        self.assertIn("metadata.domains", js)
+        self.assertIn("createExamTaxonomy", js)
+        self.assertIn("exam-taxonomy-chip", js)
+        self.assertIn("variant: 'details'", js)
+        self.assertIn("exam-card-import", js)
+        self.assertIn("exam-import-hint", js)
+        self.assertIn("formatCommercialStatus", js)
+
     def test_encrypt_pack_tool_round_trips(self):
         node = shutil.which("node")
         if not node:

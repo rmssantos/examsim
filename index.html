@@ -139,7 +139,62 @@
 									<span>Add Exam</span>
 								</button>
 							</div>
+							<div class="library-controls filters-collapsed" id="library-controls" aria-label="Exam library filters">
+								<div class="library-control-topline">
+									<label id="library-search-control" class="library-search" for="library-search" aria-hidden="true" inert>
+										<i aria-hidden="true" class="fas fa-search"></i>
+										<span class="sr-only">Search exams</span>
+										<input id="library-search" type="search" autocomplete="off" placeholder="Search exams, vendors, domains, modules...">
+									</label>
+									<button id="library-filter-toggle" class="library-filter-toggle" type="button" aria-expanded="false" aria-controls="library-search-control library-advanced-filters" aria-label="Show search and filters" title="Show search and filters">
+										<i aria-hidden="true" class="fas fa-bars"></i>
+										<span id="library-filter-toggle-label">Search & filters</span>
+										<strong id="library-filter-count" class="library-filter-count is-hidden">0</strong>
+										<i aria-hidden="true" class="fas fa-chevron-up library-filter-chevron"></i>
+									</button>
+								</div>
+								<div id="library-advanced-filters" class="library-advanced-filters" aria-hidden="true" inert>
+									<div class="library-filter-row">
+									<label>
+										<span>Vendor</span>
+										<select id="library-filter-vendor"></select>
+									</label>
+									<label>
+										<span>Domain</span>
+										<select id="library-filter-domain"></select>
+									</label>
+									<label>
+										<span>Level</span>
+										<select id="library-filter-level"></select>
+									</label>
+									<label>
+										<span>Status</span>
+										<select id="library-filter-status"></select>
+									</label>
+									<label>
+										<span>Sort</span>
+										<select id="library-sort">
+											<option value="recommended">Recommended</option>
+											<option value="az">A-Z</option>
+											<option value="questions-desc">Most questions</option>
+											<option value="duration-asc">Shortest session</option>
+											<option value="duration-desc">Longest session</option>
+										</select>
+									</label>
+									<button id="library-clear-filters" class="library-clear-filters" type="button">
+										<i aria-hidden="true" class="fas fa-rotate-left"></i>
+										<span>Clear</span>
+									</button>
+									</div>
+								</div>
+								<p id="library-result-count" class="library-result-count" aria-live="polite"></p>
+							</div>
 							<div id="exam-selection" class="exam-grid"></div>
+							<div id="library-empty-state" class="library-empty-state is-hidden">
+								<i aria-hidden="true" class="fas fa-filter-circle-xmark"></i>
+								<h3>No exams match your filters</h3>
+								<p>Clear filters or try a broader search.</p>
+							</div>
 						</section>
 
 						<!-- Exam Details Placeholder -->
@@ -151,6 +206,7 @@
 										<span class="current-exam-indicator">Selected</span>
 									</h2>
 									<p id="details-exam-subtitle">Select an exam to view details</p>
+									<div id="details-exam-taxonomy" class="details-exam-taxonomy" aria-label="Selected exam taxonomy"></div>
 								</div>
 								<div class="exam-details-actions">
 									<button id="details-start-exam" class="btn-start-exam btn-start-exam-inline" type="button">

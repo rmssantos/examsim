@@ -72,6 +72,41 @@
 
         <div class="list" id="questionList"></div>
 
+        <section class="editor-metadata-panel" aria-labelledby="editorMetadataTitle">
+          <h4 id="editorMetadataTitle"><i aria-hidden="true" class="fas fa-tags"></i> Library Metadata</h4>
+          <p class="editor-metadata-note">Used by the library filters and cards. Optional for private/imported packs.</p>
+          <div id="editorMetadataStatus" class="editor-metadata-status" role="status" aria-live="polite">
+            <i aria-hidden="true" class="fas fa-circle-info"></i>
+            <span>Complete these fields before preparing a public pack.</span>
+          </div>
+          <div class="editor-metadata-grid">
+            <label for="metaVendor">
+              <span>Vendor</span>
+              <input id="metaVendor" type="text" placeholder="e.g., Microsoft, AWS, Cisco">
+            </label>
+            <label for="metaCertificationCode">
+              <span>Code</span>
+              <input id="metaCertificationCode" type="text" placeholder="e.g., AZ-900">
+            </label>
+            <label for="metaDomains">
+              <span>Domains</span>
+              <input id="metaDomains" type="text" placeholder="Cloud, Security, AI">
+            </label>
+            <label for="metaLevel">
+              <span>Level</span>
+              <input id="metaLevel" type="text" placeholder="Fundamentals, Associate">
+            </label>
+            <label for="metaProductFamily">
+              <span>Product family</span>
+              <input id="metaProductFamily" type="text" placeholder="Azure, Networking, Kubernetes">
+            </label>
+            <label for="metaContentType">
+              <span>Content type</span>
+              <input id="metaContentType" type="text" placeholder="practice-exam">
+            </label>
+          </div>
+        </section>
+
         <div class="sidebar-footer">
           <div class="exam-management">
             <h4><i aria-hidden="true" class="fas fa-cog"></i> Exam Management</h4>

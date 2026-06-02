@@ -10,6 +10,17 @@
   "schemaVersion": "1.1",
   "badge": "Fundamentals",
   "icon": "fas fa-shield-alt",
+  "vendor": "Microsoft",
+  "certificationCode": "SC-900",
+  "domains": [
+    "Security",
+    "Compliance",
+    "Identity"
+  ],
+  "level": "Fundamentals",
+  "productFamily": "Security, Compliance, and Identity",
+  "contentType": "practice-exam",
+  "commercialStatus": "free",
   "modules": [
     {
       "icon": "fas fa-lock",

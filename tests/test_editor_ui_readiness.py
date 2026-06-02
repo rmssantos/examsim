@@ -62,6 +62,34 @@ class EditorUiReadinessTests(unittest.TestCase):
         self.assertIn("if (isBuiltinExam(examId))", save_block)
         self.assertIn("duplicateForEditing()", save_block)
 
+    def test_editor_exposes_library_metadata_panel(self):
+        html = (ROOT / "editor.html").read_text(encoding="utf-8")
+        js = (ROOT / "assets/js/editor.js").read_text(encoding="utf-8")
+        css = (ROOT / "assets/css/editor-styles.css").read_text(encoding="utf-8")
+
+        for element_id in (
+            "metaVendor",
+            "metaCertificationCode",
+            "metaDomains",
+            "metaLevel",
+            "metaProductFamily",
+            "metaContentType",
+        ):
+            self.assertIn(element_id, html)
+
+        self.assertNotIn("metaCommercialStatus", html)
+
+        self.assertIn("Library Metadata", html)
+        self.assertIn("editorMetadataStatus", html)
+        self.assertIn("metadataFieldIds", js)
+        self.assertIn("metadataReadinessIssues", js)
+        self.assertIn("updateMetadataPanelStatus", js)
+        self.assertIn("populateMetadataForm", js)
+        self.assertIn("mergeMetadataForm", js)
+        self.assertIn("savedMetadataHash", js)
+        self.assertIn("editor-metadata-panel", css)
+        self.assertIn("editor-metadata-status", css)
+
     def test_validation_workflow_runs_all_unittest_files(self):
         workflow = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8")
 

@@ -77,6 +77,7 @@
 
     state.items = loadWorkingSet(newExamId);
     state.savedItemsHash = hashItems(state.items);
+    populateMetadataForm(newExamId);
     state.hasUnsavedChanges = false;
     updateCategoryFilter();
     applyFilter();
@@ -97,7 +98,8 @@
     filtered: [],
     currentIndex: -1,
     hasUnsavedChanges: false, // Track unsaved changes
-    savedItemsHash: null // Hash of last saved state
+    savedItemsHash: null, // Hash of last saved state
+    savedMetadataHash: null
   };
 
   function idSort(a,b){
@@ -489,6 +491,117 @@
   const currentExamId = () => (state.exam === 'custom' && state.customCode ? state.customCode : state.exam);
   function isBuiltinExam(id){ return !!id && builtinExamIds.has(id); }
 
+  const metadataFieldIds = [
+    'metaVendor',
+    'metaCertificationCode',
+    'metaDomains',
+    'metaLevel',
+    'metaProductFamily',
+    'metaContentType'
+  ];
+
+  function splitMetadataList(value){
+    return String(value || '')
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  function baseMetadataFor(examId){
+    return window.userExams?.[examId]?.metadata || (window.examManager
+      ? window.examManager.generateMetadata(examId, state.items)
+      : {});
+  }
+
+  function readMetadataFormValues(){
+    return {
+      vendor: ($('#metaVendor')?.value || '').trim(),
+      certificationCode: ($('#metaCertificationCode')?.value || '').trim(),
+      domains: splitMetadataList($('#metaDomains')?.value),
+      level: ($('#metaLevel')?.value || '').trim(),
+      productFamily: ($('#metaProductFamily')?.value || '').trim(),
+      contentType: ($('#metaContentType')?.value || '').trim()
+    };
+  }
+
+  function metadataReadinessIssues(values = readMetadataFormValues()){
+    const required = [
+      ['vendor', 'vendor'],
+      ['certificationCode', 'code'],
+      ['domains', 'domains'],
+      ['level', 'level'],
+      ['productFamily', 'product family'],
+      ['contentType', 'content type']
+    ];
+    return required
+      .filter(([key]) => Array.isArray(values[key]) ? values[key].length === 0 : !values[key])
+      .map(([, label]) => label);
+  }
+
+  function updateMetadataPanelStatus(){
+    const status = document.getElementById('editorMetadataStatus');
+    if (!status) return;
+    const icon = status.querySelector('i');
+    const label = status.querySelector('span');
+    const missing = metadataReadinessIssues();
+    const isReady = missing.length === 0;
+    status.classList.toggle('is-ready', isReady);
+    if (icon) {
+      icon.className = isReady ? 'fas fa-check-circle' : 'fas fa-circle-info';
+      icon.setAttribute('aria-hidden', 'true');
+    }
+    if (label) {
+      label.textContent = isReady
+        ? 'Metadata is ready for public-pack preparation.'
+        : `For public packs, add: ${missing.join(', ')}.`;
+    }
+  }
+
+  function hashMetadataForm(){
+    return JSON.stringify(readMetadataFormValues());
+  }
+
+  function setFieldValue(id, value){
+    const field = document.getElementById(id);
+    if (field) field.value = value || '';
+  }
+
+  function populateMetadataForm(examId = currentExamId()){
+    if (!examId) {
+      metadataFieldIds.forEach((id) => setFieldValue(id, ''));
+      state.savedMetadataHash = hashMetadataForm();
+      updateMetadataPanelStatus();
+      return;
+    }
+    const metadata = baseMetadataFor(examId) || {};
+    setFieldValue('metaVendor', metadata.vendor || '');
+    setFieldValue('metaCertificationCode', metadata.certificationCode || metadata.name || examId || '');
+    setFieldValue('metaDomains', Array.isArray(metadata.domains) ? metadata.domains.join(', ') : '');
+    setFieldValue('metaLevel', metadata.level || metadata.badge || '');
+    setFieldValue('metaProductFamily', metadata.productFamily || '');
+    setFieldValue('metaContentType', metadata.contentType || (metadata.preview ? 'preview' : 'practice-exam'));
+    state.savedMetadataHash = hashMetadataForm();
+    updateMetadataPanelStatus();
+  }
+
+  function mergeMetadataForm(baseMetadata, examId){
+    const metadata = { ...(baseMetadata || {}) };
+    const values = readMetadataFormValues();
+    const assignString = (key, value) => {
+      if (value) metadata[key] = value;
+      else delete metadata[key];
+    };
+
+    assignString('vendor', values.vendor);
+    assignString('certificationCode', values.certificationCode || examId);
+    assignString('level', values.level);
+    assignString('productFamily', values.productFamily);
+    assignString('contentType', values.contentType);
+    if (values.domains.length) metadata.domains = values.domains;
+    else delete metadata.domains;
+    return metadata;
+  }
+
   (function loadBuiltinExamIds(){
     fetch('user-content/exams/index.json')
       .then((r) => (r.ok ? r.json() : []))
@@ -621,10 +734,8 @@
     window.ExamApp.log('Number of questions:', state.items.length);
     window.ExamApp.log('Current question:', state.filtered[state.currentIndex]);
 
-    const existingMetadata = window.userExams?.[examId]?.metadata;
-    const finalMetadata = existingMetadata || (window.examManager
-      ? window.examManager.generateMetadata(examId, state.items)
-      : null);
+    const existingMetadata = baseMetadataFor(examId);
+    const finalMetadata = mergeMetadataForm(existingMetadata, examId);
 
     let savedToIndexedDB = false;
     if (window.ExamApp.examStorage) {
@@ -667,6 +778,7 @@
     // Mark as saved and update hash
     state.hasUnsavedChanges = false;
     state.savedItemsHash = hashItems(state.items);
+    state.savedMetadataHash = hashMetadataForm();
     updateUnsavedIndicator();
     updatePersistenceHint();
 
@@ -731,6 +843,7 @@
     state.items = loadMaster(examId);
     state.savedItemsHash = hashItems(state.items);
     state.hasUnsavedChanges = false;
+    populateMetadataForm(examId);
     applyFilter();
     state.currentIndex = 0;
     renderList();
@@ -1252,7 +1365,8 @@
   // Mark changes as unsaved
   function markUnsaved(){
     const currentHash = hashItems(state.items);
-    if (currentHash !== state.savedItemsHash) {
+    const currentMetadataHash = hashMetadataForm();
+    if (currentHash !== state.savedItemsHash || currentMetadataHash !== state.savedMetadataHash) {
       state.hasUnsavedChanges = true;
       updateUnsavedIndicator();
     }
@@ -1351,6 +1465,15 @@
     if ($('#filterCategory')) {
       $('#filterCategory').addEventListener('change', ()=>{ applyFilter(); renderList(); });
     }
+    metadataFieldIds.forEach((id) => {
+      const field = document.getElementById(id);
+      const handleMetadataEdit = () => {
+        markUnsaved();
+        updateMetadataPanelStatus();
+      };
+      if (field) field.addEventListener('input', handleMetadataEdit);
+      if (field) field.addEventListener('change', handleMetadataEdit);
+    });
     $('#addNew').addEventListener('click', addNew);
     $('#addOption').addEventListener('click', addOption);
   // Single Save button
@@ -1463,6 +1586,7 @@
         state.customCode = code;
         $('#examSelect').value = 'custom';
         state.items = Array.isArray(json) ? json : [];
+        populateMetadataForm(code);
         applyFilter();
         state.currentIndex = 0;
         renderList();
@@ -1481,6 +1605,7 @@
       state.customCode = code;
       $('#examSelect').value = 'custom';
       state.items = [];
+      populateMetadataForm(code);
       applyFilter();
       state.currentIndex = -1;
       renderList();
@@ -1501,6 +1626,7 @@
     // Default exam
     state.items = loadWorkingSet(state.exam);
     state.savedItemsHash = hashItems(state.items); // Initialize saved hash
+    populateMetadataForm(currentExamId());
     updateCategoryFilter();
     applyFilter();
     state.currentIndex = 0;
