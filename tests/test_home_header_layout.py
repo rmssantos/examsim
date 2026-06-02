@@ -15,6 +15,12 @@ class HomeHeaderLayoutTests(unittest.TestCase):
         self.assertRegex(css, r"\.hero-banner\s+\.hero-trust\s*\{[^}]*margin:\s*0\.55rem\s*0\s*0;")
         self.assertRegex(css, r"\.hero-banner\s+\.hero-trust\s+\.trust-chip\s*\{[^}]*padding:\s*0\.28rem\s*0\.58rem;")
 
+    def test_local_only_link_can_be_revealed_by_script(self):
+        css = (ROOT / "assets/css/index-inline.css").read_text(encoding="utf-8")
+
+        self.assertRegex(css, r"\.hero-banner\s+\.hero-livelink\s*\{[^}]*margin-top:\s*0\.5rem;")
+        self.assertNotRegex(css, r"\.hero-banner\s+\.hero-livelink\s*\{[^}]*display:\s*none;")
+
     def test_image_support_status_does_not_consume_hero_space(self):
         css = (ROOT / "assets/css/index-inline.css").read_text(encoding="utf-8")
         html = (ROOT / "index.html").read_text(encoding="utf-8")
@@ -47,3 +53,7 @@ class HomeHeaderLayoutTests(unittest.TestCase):
             css,
             r"@media\s*\(max-width:\s*520px\)\s*\{[\s\S]*?#compact-import-btn\s*\{[^}]*display:\s*none;",
         )
+
+
+if __name__ == "__main__":
+    unittest.main()

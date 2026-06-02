@@ -899,7 +899,7 @@ pointer-events: none;
 
 /* live-site link — only shown on local self-host, points to the public site */
 .hero-banner .hero-livelink {
-    display: none;
+    margin-top: 0.5rem;
 }
 .hero-banner .hero-pill.public-link {
     background: rgba(255, 255, 255, 0.06);
