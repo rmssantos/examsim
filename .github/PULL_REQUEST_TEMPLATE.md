@@ -30,6 +30,12 @@
 
 <!-- List commands, browser checks, screenshots, or explain why validation is not needed. -->
 
+For exam pack or library metadata changes, include the output summary from:
+
+```bash
+python tools/validate-exam-packs.py --root user-content/exams --health-report
+```
+
 ## Notes for Reviewers
 
 <!-- Highlight risky files, follow-up work, or anything reviewers should focus on. -->

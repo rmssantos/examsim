@@ -234,6 +234,13 @@ Optional `metadata.json` provides rich exam information:
   "passScore": 75,
   "badge": "Fundamentals",
   "icon": "fas fa-brain",
+  "vendor": "Microsoft",
+  "certificationCode": "AI-900",
+  "domains": ["AI", "Cloud"],
+  "level": "Fundamentals",
+  "productFamily": "Azure",
+  "contentType": "practice-exam",
+  "commercialStatus": "free",
   "modules": [
     {
       "icon": "fas fa-brain",
@@ -261,8 +268,19 @@ Optional `metadata.json` provides rich exam information:
 | `passScore` | number | Passing score percentage (70-100) |
 | `badge` | string | Badge text (e.g., "Fundamentals") |
 | `icon` | string | Font Awesome icon class |
+| `vendor` | string | Certification vendor or publisher used by library filters |
+| `certificationCode` | string | Public exam/certification code used by search and filters |
+| `domains` | string[] | Vendor-neutral domains such as Cloud, Security, Networking, AI, Data, DevOps |
+| `level` | string | Certification level or audience, e.g., Fundamentals, Associate, Professional, Leadership |
+| `productFamily` | string | Product or certification family, e.g., Azure, Cisco Certifications, CompTIA |
+| `contentType` | string | Pack shape, e.g., practice-exam, preview, study-bank, lab-style, case-study |
+| `commercialStatus` | string | Publication/licensing status, e.g., free, preview, pro-preview, pro. This is controlled during publication, not by the normal browser editor. |
 | `modules` | object[] | List of exam modules |
 | `hasImages` | boolean | Whether exam includes images |
+
+Public packs should include the library taxonomy fields (`vendor`, `certificationCode`, `domains`, `level`, `productFamily`, `contentType`, and publication-controlled `commercialStatus`) so search, sort, filters, cards, and health reports keep working as the catalog grows across vendors. Imported/private packs can omit them; the simulator falls back to generic metadata.
+
+When preparing a public pack in the browser editor, complete the visible library metadata fields first. The editor intentionally does not expose `commercialStatus`; set or review that field only in the publication/licensing workflow.
 
 **If no metadata.json**: Simulator auto-generates basic metadata using exam ID.
 
@@ -306,6 +324,14 @@ Run the repository validator before sharing or publishing packs:
 ```bash
 python tools/validate-exam-packs.py --root user-content/exams
 ```
+
+For a non-blocking catalog quality overview, run:
+
+```bash
+python tools/validate-exam-packs.py --root user-content/exams --health-report
+```
+
+The health report assigns each pack a `score:/100` and a `Ready`, `Review`, or `Needs work` label. The score combines metadata completeness, schema validity, manifest integrity, image-reference health, and suspicious duplicate question text. It also prints question counts and the question-type mix for quick catalog review.
 
 ### Required Validation
 
