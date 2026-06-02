@@ -1370,6 +1370,22 @@ body.dragging-file .exam-library-section::after {
 	pointer-events: none;
 }
 
+[data-theme="dark"] body.dragging-file .exam-library-section,
+body.dark-mode.dragging-file .exam-library-section {
+	background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.95));
+	border-color: rgba(56, 189, 248, 0.72);
+	box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.22),
+	            0 0 34px 12px rgba(56, 189, 248, 0.28),
+	            0 10px 40px rgba(0, 0, 0, 0.42);
+}
+
+[data-theme="dark"] body.dragging-file .exam-library-section::after,
+body.dark-mode.dragging-file .exam-library-section::after {
+	border-color: rgba(125, 211, 252, 0.68);
+	background: rgba(15, 23, 42, 0.92);
+	color: #bae6fd;
+}
+
 .section-header h2 i {
 	font-size: 1.1rem;
 	color: var(--primary);

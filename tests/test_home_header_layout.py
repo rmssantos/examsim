@@ -72,6 +72,23 @@ class HomeHeaderLayoutTests(unittest.TestCase):
         self.assertRegex(css, r"body\.dragging-file\s+\.exam-library-section::after\s*\{[^}]*Drop exam pack to import")
         self.assertIn("e.target.closest('.exam-library-section')", js)
 
+    def test_file_drops_are_suppressed_outside_library_allowlist(self):
+        js = (ROOT / "assets/js/homepage.js").read_text(encoding="utf-8")
+
+        self.assertIn("const hasDroppedFiles = e.dataTransfer?.files?.length > 0;", js)
+        self.assertRegex(
+            js,
+            r"if\s*\(hasDroppedFiles\)\s*\{\s*e\.preventDefault\(\);",
+        )
+
+    def test_library_drag_overlay_has_dark_theme_treatment(self):
+        css = (ROOT / "assets/css/homepage-styles.css").read_text(encoding="utf-8")
+
+        self.assertRegex(css, r"\[data-theme=\"dark\"\]\s+body\.dragging-file\s+\.exam-library-section")
+        self.assertRegex(css, r"body\.dark-mode\.dragging-file\s+\.exam-library-section")
+        self.assertRegex(css, r"\[data-theme=\"dark\"\]\s+body\.dragging-file\s+\.exam-library-section::after")
+        self.assertRegex(css, r"body\.dark-mode\.dragging-file\s+\.exam-library-section::after")
+
     def test_library_removes_duplicate_add_exam_action(self):
         html = (ROOT / "index.html").read_text(encoding="utf-8")
         js = (ROOT / "assets/js/homepage.js").read_text(encoding="utf-8")

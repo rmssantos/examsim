@@ -1850,8 +1850,12 @@ if (e.target === document.body || !e.relatedTarget) {
 
 document.body.addEventListener('drop', (e) => {
 document.body.classList.remove('dragging-file');
+const hasDroppedFiles = e.dataTransfer?.files?.length > 0;
+if (hasDroppedFiles) {
+	e.preventDefault();
+}
 // Only handle if dropping on body, hero, or the library area
-if (e.target === document.body || e.target.closest('#exam-selection') || e.target.closest('.exam-library-section') || e.target.closest('.hero')) {
+if (hasDroppedFiles && (e.target === document.body || e.target.closest('#exam-selection') || e.target.closest('.exam-library-section') || e.target.closest('.hero'))) {
 	e.preventDefault();
 	this.handleFiles(e.dataTransfer.files);
 }
