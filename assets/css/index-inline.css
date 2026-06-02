@@ -897,19 +897,49 @@ pointer-events: none;
     padding: 1.05rem 1.35rem;
 }
 
-/* live-site link — only shown on local self-host, points to the public site */
-.hero-banner .hero-livelink {
-    margin-top: 0.5rem;
+/* local self-host link, kept out of the hero so it does not compete with library content */
+.theme-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
-.hero-banner .hero-pill.public-link {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.16);
-    color: #cdeffb;
-    box-shadow: none;
+.theme-controls .theme-public-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    height: 40px;
+    padding: 0 0.85rem;
+    border-radius: 999px;
+    border: 1px solid rgba(125, 211, 252, 0.34);
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.96), rgba(0, 102, 204, 0.94));
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 10px 24px rgba(0, 102, 204, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
-.hero-banner .hero-pill.public-link:hover {
-    background: rgba(0, 188, 242, 0.16);
-    border-color: rgba(0, 188, 242, 0.4);
+.theme-controls .theme-public-link:hover {
+    transform: translateY(-1px);
+    border-color: rgba(186, 230, 253, 0.72);
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.98), rgba(0, 102, 204, 0.98));
+    box-shadow: 0 14px 30px rgba(0, 102, 204, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+[data-theme="dark"] .theme-controls .theme-public-link,
+.dark-mode .theme-controls .theme-public-link {
+    border-color: rgba(125, 211, 252, 0.28);
+    background: rgba(15, 23, 42, 0.84);
+    color: #7dd3fc;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+[data-theme="dark"] .theme-controls .theme-public-link:hover,
+.dark-mode .theme-controls .theme-public-link:hover {
+    border-color: rgba(125, 211, 252, 0.48);
+    background: rgba(30, 41, 59, 0.94);
+    color: #bae6fd;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 /* wordmark */
@@ -1159,7 +1189,12 @@ pointer-events: none;
     .quick-actions .action-btn i {
         font-size: 0.95rem;
     }
-    #compact-import-btn {
+    .theme-controls .theme-public-link {
+        width: 40px;
+        padding: 0;
+        justify-content: center;
+    }
+    .theme-controls .theme-public-link span {
         display: none;
     }
 }

@@ -12,7 +12,6 @@ this.modulesSection = document.getElementById('modules-section');
 this.modulesList = document.getElementById('modules-list');
 this.resourcesList = document.getElementById('resources-list');
 this.heroImportBtn = document.getElementById('hero-import-btn');
-this.addExamBtn = document.getElementById('add-exam-btn');
 this.heroViewProgressBtn = document.getElementById('hero-view-progress');
 this.heroManageExamsBtn = document.getElementById('hero-manage-exams');
 this.previewActionBtn = document.getElementById('preview-action-btn');
@@ -164,8 +163,6 @@ if (this.selectedExamId && !exams.has(this.selectedExamId)) {
 }
 this.placeDetailsPanel();
 
-// Show compact import button when exams exist
-this.showCompactImportButton();
 this.refreshStudySummaries();
 }
 
@@ -1777,53 +1774,6 @@ this.examSelection.style.display = '';
 this.noExamsSection.style.display = 'none';
 }
 
-showCompactImportButton() {
-// Check if button already exists
-if (document.getElementById('compact-import-btn')) return;
-
-// Create compact import button/card
-const importCard = document.createElement('div');
-importCard.id = 'compact-import-btn';
-importCard.className = 'exam-card custom exam-card-import';
-importCard.style.cssText = 'cursor:pointer;';
-
-this.appendTextElement(importCard, 'div', 'exam-badge', 'Import');
-importCard.appendChild(this.createIcon('fas fa-cloud-upload-alt', 'exam-icon'));
-this.appendTextElement(importCard, 'div', 'exam-title', 'Import Exam');
-this.appendTextElement(importCard, 'div', 'exam-subtitle', 'Add packs');
-const importHint = document.createElement('div');
-importHint.className = 'exam-import-hint';
-importHint.appendChild(this.createIcon('fas fa-file-arrow-up'));
-importHint.appendChild(document.createTextNode('Drop or browse'));
-importCard.appendChild(importHint);
-
-// Add click handler
-importCard.addEventListener('click', () => {
-this.triggerFileImport();
-});
-
-// Add drag & drop to this card too
-importCard.addEventListener('dragover', (e) => {
-e.preventDefault();
-e.stopPropagation();
-importCard.classList.add('drag-over');
-});
-
-importCard.addEventListener('dragleave', (e) => {
-e.stopPropagation();
-importCard.classList.remove('drag-over');
-});
-
-importCard.addEventListener('drop', (e) => {
-e.preventDefault();
-e.stopPropagation();
-importCard.classList.remove('drag-over');
-document.body.classList.remove('dragging-file');
-this.handleFiles(e.dataTransfer.files);
-});					// Insert as first card
-this.examSelection.insertBefore(importCard, this.examSelection.firstChild);
-}
-
 triggerFileImport() {
 if (!this.fileInput) {
 this.fileInput = document.createElement('input');
@@ -1900,8 +1850,12 @@ if (e.target === document.body || !e.relatedTarget) {
 
 document.body.addEventListener('drop', (e) => {
 document.body.classList.remove('dragging-file');
-// Only handle if dropping on body or exam-selection area
-if (e.target === document.body || e.target.closest('#exam-selection') || e.target.closest('.hero')) {
+const hasDroppedFiles = e.dataTransfer?.files?.length > 0;
+if (hasDroppedFiles) {
+	e.preventDefault();
+}
+// Only handle if dropping on body, hero, or the library area
+if (hasDroppedFiles && (e.target === document.body || e.target.closest('#exam-selection') || e.target.closest('.exam-library-section') || e.target.closest('.hero'))) {
 	e.preventDefault();
 	this.handleFiles(e.dataTransfer.files);
 }
@@ -1934,29 +1888,6 @@ if (e.target === this.dropZone || e.target.closest('.drop-zone') && !e.target.cl
 
 // Hero action buttons
 this.heroImportBtn?.addEventListener('click', () => this.triggerFileImport());
-this.addExamBtn?.addEventListener('click', () => this.triggerFileImport());
-
-// Add Exam button drag & drop
-if (this.addExamBtn) {
-this.addExamBtn.addEventListener('dragover', (e) => {
-	e.preventDefault();
-	e.stopPropagation();
-	this.addExamBtn.classList.add('drag-over');
-});
-
-this.addExamBtn.addEventListener('dragleave', (e) => {
-	e.stopPropagation();
-	this.addExamBtn.classList.remove('drag-over');
-});
-
-this.addExamBtn.addEventListener('drop', (e) => {
-	e.preventDefault();
-	e.stopPropagation();
-	this.addExamBtn.classList.remove('drag-over');
-	document.body.classList.remove('dragging-file');
-	this.handleFiles(e.dataTransfer.files);
-});
-}
 
 // Preview action
 this.previewActionBtn?.addEventListener('click', () => this.handlePreviewAction());
