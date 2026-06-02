@@ -1,4 +1,5 @@
 import unittest
+import subprocess
 from pathlib import Path
 
 
@@ -38,6 +39,64 @@ class UtilityFooterTests(unittest.TestCase):
             self.assertIn('class="app-nav-action"', html, page)
             for text in expected_text:
                 self.assertIn(text, html, page)
+
+    def test_analytics_privacy_dialog_links_to_app_privacy_page(self):
+        script = (ROOT / "assets/js/analytics.js").read_text(encoding="utf-8")
+
+        self.assertIn("buildUrl('privacy-and-storage')", script)
+        self.assertIn("isFileMode", script)
+        self.assertNotIn("docs.href = 'PRIVACY-AND-STORAGE.md'", script)
+
+    def test_analytics_privacy_dialog_preserves_file_mode_links(self):
+        node_script = r"""
+const fs = require('fs');
+const source = fs.readFileSync(process.argv[1], 'utf8')
+  .replace('function showPrivacyDialog()', 'window.__privacyNotesUrl = privacyNotesUrl;\n    function showPrivacyDialog()');
+
+function runCase(protocol, hostname, routeResult, isFileMode) {
+  const listeners = {};
+  global.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+  global.navigator = { serviceWorker: null };
+  global.fetch = () => Promise.resolve();
+  global.HTMLElement = function HTMLElement() {};
+  global.document = {
+    readyState: 'loading',
+    addEventListener(name, handler) { listeners[name] = handler; },
+    getElementById() { return null; },
+  };
+  global.window = {
+    location: { protocol, hostname, pathname: '/editor', href: `${protocol}//${hostname}/editor` },
+    ExamApp: {
+      isPublicSiteHost(host = hostname) {
+        return ['examplar.app', 'www.examplar.app', 'rmssantos.github.io'].includes(host);
+      },
+      router: {
+        buildUrl(route) { return route === 'privacy-and-storage' ? routeResult : ''; },
+        isFileMode() { return isFileMode; }
+      }
+    }
+  };
+  eval(source);
+  return window.__privacyNotesUrl();
+}
+
+const results = {
+  file: runCase('file:', '', 'privacy-and-storage.html', true),
+  public: runCase('https:', 'examplar.app', 'privacy-and-storage.html', false)
+};
+console.log(JSON.stringify(results));
+"""
+        result = subprocess.run(
+            ["node", "-e", node_script, str(ROOT / "assets/js/analytics.js")],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(
+            '{"file":"privacy-and-storage.html","public":"privacy-and-storage"}',
+            result.stdout.strip(),
+        )
 
     def test_exam_page_keeps_footer_out_of_active_exam_flow(self):
         html = (ROOT / "exam.html").read_text(encoding="utf-8")
