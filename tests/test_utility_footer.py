@@ -50,8 +50,7 @@ class UtilityFooterTests(unittest.TestCase):
     def test_analytics_privacy_dialog_preserves_file_mode_links(self):
         node_script = r"""
 const fs = require('fs');
-const source = fs.readFileSync(process.argv[1], 'utf8')
-  .replace('function showPrivacyDialog()', 'window.__privacyNotesUrl = privacyNotesUrl;\n    function showPrivacyDialog()');
+const source = fs.readFileSync(process.argv[1], 'utf8');
 
 function runCase(protocol, hostname, routeResult, isFileMode) {
   const listeners = {};
@@ -77,7 +76,7 @@ function runCase(protocol, hostname, routeResult, isFileMode) {
     }
   };
   eval(source);
-  return window.__privacyNotesUrl();
+  return window.ExamApp.analytics._private.privacyNotesUrl();
 }
 
 const results = {
@@ -91,6 +90,7 @@ console.log(JSON.stringify(results));
             check=True,
             capture_output=True,
             text=True,
+            timeout=5,
         )
 
         self.assertEqual(

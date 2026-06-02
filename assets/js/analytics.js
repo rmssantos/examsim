@@ -532,6 +532,7 @@
             scoreBucket,
             durationBucket,
             fileSizeBucket,
+            privacyNotesUrl,
             buildEnvelope,
             buildPageViewEnvelope
         })
