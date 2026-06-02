@@ -39,6 +39,10 @@
 		<!-- Welcome Screen -->
 		<div id="welcome-screen" class="screen active">
 			<div class="theme-controls">
+				<a class="theme-public-link local-only-public-link" href="https://examplar.app/" target="_blank" rel="noopener noreferrer" title="Open public Examplar site" aria-label="Open public Examplar site" hidden aria-hidden="true">
+					<i aria-hidden="true" class="fas fa-globe"></i>
+					<span>examplar.app</span>
+				</a>
 				<button id="theme-toggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
 					<i aria-hidden="true" class="fas fa-moon"></i>
 				</button>
@@ -67,12 +71,6 @@
 								<a href="#exam-selection" class="hero-cta-ghost">
 									<span>Browse exams</span>
 									<i aria-hidden="true" class="fas fa-arrow-right"></i>
-								</a>
-							</div>
-							<div class="hero-livelink local-only-public-link">
-								<a class="hero-pill public-link" href="https://examplar.app/" target="_blank" rel="noopener noreferrer">
-									<i aria-hidden="true" class="fas fa-globe"></i>
-									<span>examplar.app</span>
 								</a>
 							</div>
 						</div>
@@ -112,7 +110,7 @@
 					</button>
 					<a href="editor.html" data-route="editor" class="action-btn secondary">
 						<i aria-hidden="true" class="fas fa-pen-ruler"></i>
-						<span>Question Editor</span>
+						<span>Create / Edit Exams</span>
 					</a>
 					<button id="hero-view-progress" class="action-btn ghost" type="button">
 						<i aria-hidden="true" class="fas fa-chart-line"></i>
@@ -134,10 +132,6 @@
 									<h2><i aria-hidden="true" class="fas fa-layer-group"></i> Exam Library</h2>
 									<p class="section-subtitle">Select an exam to start practicing</p>
 								</div>
-								<button id="add-exam-btn" class="btn-add-exam" type="button">
-									<i aria-hidden="true" class="fas fa-plus-circle"></i>
-									<span>Add Exam</span>
-								</button>
 							</div>
 							<div class="library-controls filters-collapsed" id="library-controls" aria-label="Exam library filters">
 								<div class="library-control-topline">
@@ -450,7 +444,7 @@
 								<i aria-hidden="true" class="fas fa-cog"></i> Manage Exams
 							</button>
 							<a href="editor.html" data-route="editor" class="btn-outline-sm">
-								<i aria-hidden="true" class="fas fa-edit"></i> Question Editor
+								<i aria-hidden="true" class="fas fa-edit"></i> Create / Edit Exams
 							</a>
 						</div>
 					</div>

@@ -64,8 +64,9 @@ class ProPackTests(unittest.TestCase):
         self.assertIn("createExamTaxonomy", js)
         self.assertIn("exam-taxonomy-chip", js)
         self.assertIn("variant: 'details'", js)
-        self.assertIn("exam-card-import", js)
-        self.assertIn("exam-import-hint", js)
+        self.assertNotIn("exam-card-import", js)
+        self.assertIn("e.target.closest('.exam-library-section')", js)
+        self.assertIn("Drop exam pack to import", (ROOT / "assets/css/homepage-styles.css").read_text(encoding="utf-8"))
         self.assertIn("formatCommercialStatus", js)
 
     def test_encrypt_pack_tool_round_trips(self):
