@@ -22,6 +22,8 @@ IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 MANIFEST_NAME = "manifest.json"
 MANIFEST_FORMAT = "examsim-manifest"
 MANIFEST_VERSION = 1
+TAXONOMY_TEXT_FIELDS = ("vendor", "certificationCode", "level", "productFamily", "contentType", "commercialStatus")
+TAXONOMY_LIST_FIELDS = ("domains",)
 
 
 @dataclass
@@ -158,6 +160,17 @@ class PackValidator:
         content_origin = metadata.get("contentOrigin")
         if content_origin is not None and content_origin not in CONTENT_ORIGINS:
             self.add_issue(path, f"contentOrigin must be one of {sorted(CONTENT_ORIGINS)}")
+
+        has_library_taxonomy = any(field in metadata for field in TAXONOMY_TEXT_FIELDS + TAXONOMY_LIST_FIELDS)
+        if has_library_taxonomy:
+            for field in TAXONOMY_TEXT_FIELDS:
+                if not has_text(metadata.get(field)):
+                    self.add_issue(path, f"{field} is required for library filtering")
+
+            for field in TAXONOMY_LIST_FIELDS:
+                values = metadata.get(field)
+                if not isinstance(values, list) or not values or any(not has_text(value) for value in values):
+                    self.add_issue(path, f"{field} must be a non-empty array of strings")
 
     def validate_questions(self, exam_id: str, questions: list[Any], path: Path) -> None:
         ids = set()
@@ -412,12 +425,164 @@ def check_manifests(root: Path, exam_ids: list[str]) -> int:
     return 0
 
 
+def metadata_health_score(metadata: Any) -> tuple[int, int]:
+    required = TAXONOMY_TEXT_FIELDS + TAXONOMY_LIST_FIELDS
+    if not isinstance(metadata, dict):
+        return 0, len(required)
+    present = 0
+    for field in TAXONOMY_TEXT_FIELDS:
+        if has_text(metadata.get(field)):
+            present += 1
+    for field in TAXONOMY_LIST_FIELDS:
+        values = metadata.get(field)
+        if isinstance(values, list) and values and all(has_text(value) for value in values):
+            present += 1
+    return present, len(required)
+
+
+def duplicate_question_text_count(questions: list[Any]) -> int:
+    seen: set[str] = set()
+    duplicates = 0
+    for question in questions:
+        if not isinstance(question, dict):
+            continue
+        text = " ".join(str(question.get("question") or "").lower().split())
+        if not text:
+            continue
+        if text in seen:
+            duplicates += 1
+        else:
+            seen.add(text)
+    return duplicates
+
+
+def question_type_summary(questions: list[Any]) -> str:
+    counts: dict[str, int] = {}
+    for question in questions:
+        if not isinstance(question, dict):
+            continue
+        question_type = normalize_question_type(question)
+        counts[question_type] = counts.get(question_type, 0) + 1
+    return ", ".join(f"{key}:{counts[key]}" for key in sorted(counts)) or "none"
+
+
+def manifest_issue_count(exam_dir: Path) -> int:
+    manifest_path = exam_dir / MANIFEST_NAME
+    if not manifest_path.is_file():
+        return 1
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return 1
+    expected = manifest.get("files") if isinstance(manifest, dict) else None
+    if not isinstance(expected, dict):
+        return 1
+    problems = 0
+    actual_paths = set(pack_file_paths(exam_dir))
+    safe_expected_paths: set[str] = set()
+    for rel, expected_hash in expected.items():
+        file_path = safe_manifest_file_path(exam_dir, rel)
+        if file_path is None:
+            problems += 1
+            continue
+        safe_expected_paths.add(rel)
+        if not file_path.is_file():
+            problems += 1
+            continue
+        if sha256_file(file_path) != str(expected_hash).lower():
+            problems += 1
+    problems += len(actual_paths - safe_expected_paths)
+    return problems
+
+
+def image_reference_issue_count(root: Path, exam_id: str, questions: list[Any]) -> int:
+    problems = 0
+    for question in questions:
+        if not isinstance(question, dict):
+            continue
+        for field in ("question_images", "explanation_images"):
+            refs = question.get(field)
+            if refs is None:
+                continue
+            if not isinstance(refs, list):
+                problems += 1
+                continue
+            for ref in refs:
+                filename = ref.get("filename") if isinstance(ref, dict) else None
+                if not isinstance(filename, str) or not is_safe_image_name(filename.strip()):
+                    problems += 1
+                    continue
+                if not (root / exam_id / "images" / filename.strip()).is_file():
+                    problems += 1
+    return problems
+
+
+def schema_issue_count(root: Path, exam_id: str) -> int:
+    validator = PackValidator(root)
+    validator.validate_pack(exam_id)
+    return len(validator.issues)
+
+
+def bounded_component_score(max_score: int, issue_count: int, penalty: int) -> int:
+    return max(0, max_score - (issue_count * penalty))
+
+
+def health_label(score: int) -> str:
+    if score >= 90:
+        return "Ready"
+    if score >= 75:
+        return "Review"
+    return "Needs work"
+
+
+def print_health_report(root: Path, exam_ids: list[str]) -> int:
+    print("Exam library health report")
+    for exam_id in exam_ids:
+        exam_dir = root / exam_id
+        metadata_path = exam_dir / "metadata.json"
+        dump_path = exam_dir / "dump.json"
+        try:
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8")) if metadata_path.is_file() else None
+            raw_questions = json.loads(dump_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            print(f"- {exam_id}: unreadable pack ({error})")
+            continue
+
+        questions = raw_questions.get("questions") if isinstance(raw_questions, dict) else raw_questions
+        if not isinstance(questions, list):
+            questions = []
+        present, total = metadata_health_score(metadata)
+        percentage = round((present / total) * 100) if total else 0
+        duplicate_texts = duplicate_question_text_count(questions)
+        manifest_issues = manifest_issue_count(exam_dir)
+        image_issues = image_reference_issue_count(root, exam_id, questions)
+        schema_issues = schema_issue_count(root, exam_id)
+        score = (
+            round((present / total) * 30) if total else 0
+        ) + bounded_component_score(25, schema_issues, 5) \
+            + bounded_component_score(20, manifest_issues, 5) \
+            + bounded_component_score(15, image_issues, 5) \
+            + bounded_component_score(10, duplicate_texts, 5)
+        manifest_status = "ok" if manifest_issues == 0 else f"{manifest_issues} issue(s)"
+        image_status = "ok" if image_issues == 0 else f"{image_issues} issue(s)"
+        schema_status = "ok" if schema_issues == 0 else f"{schema_issues} issue(s)"
+        image_count = len([rel for rel in pack_file_paths(exam_dir) if rel.startswith("images/")])
+        print(
+            f"- {exam_id}: score:{score}/100 {health_label(score)}, "
+            f"metadata:{percentage}% ({present}/{total}), schema:{schema_status}, "
+            f"manifest:{manifest_status}, images:{image_status} ({image_count}), "
+            f"duplicates:{duplicate_texts}, questions:{len(questions)}, types:{question_type_summary(questions)}"
+        )
+    return 0
+
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate ExamSim exam packs.")
     parser.add_argument("--root", default="user-content/exams", help="Directory containing exam pack folders.")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--write-manifest", action="store_true", help="Generate manifest.json with SHA-256 hashes for each pack.")
     group.add_argument("--check-manifest", action="store_true", help="Verify pack files against their manifest.json.")
+    group.add_argument("--health-report", action="store_true", help="Print a non-blocking pack health summary.")
     return parser.parse_args(argv)
 
 
@@ -438,6 +603,8 @@ def main(argv: list[str] | None = None) -> int:
         return write_manifests(root, exam_ids)
     if args.check_manifest:
         return check_manifests(root, exam_ids)
+    if args.health_report:
+        return print_health_report(root, exam_ids)
 
     print(f"Validated {validator.pack_count} exam pack(s), {validator.question_count} question(s).")
     return 0
