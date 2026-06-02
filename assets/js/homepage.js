@@ -30,8 +30,23 @@ this.previewHighlights = document.getElementById('preview-highlights');
 this.activeExamsCount = document.getElementById('active-exams-count');
 this.totalQuestionsCount = document.getElementById('total-questions-count');
 this.imageSupportFlag = document.getElementById('image-support-flag');
+this.librarySearchInput = document.getElementById('library-search');
+this.librarySearchControl = document.getElementById('library-search-control');
+this.libraryVendorFilter = document.getElementById('library-filter-vendor');
+this.libraryDomainFilter = document.getElementById('library-filter-domain');
+this.libraryLevelFilter = document.getElementById('library-filter-level');
+this.libraryStatusFilter = document.getElementById('library-filter-status');
+this.librarySort = document.getElementById('library-sort');
+this.libraryClearFilters = document.getElementById('library-clear-filters');
+this.libraryFilterToggle = document.getElementById('library-filter-toggle');
+this.libraryFilterToggleLabel = document.getElementById('library-filter-toggle-label');
+this.libraryAdvancedFilters = document.getElementById('library-advanced-filters');
+this.libraryFilterCount = document.getElementById('library-filter-count');
+this.libraryResultCount = document.getElementById('library-result-count');
+this.libraryEmptyState = document.getElementById('library-empty-state');
 this.selectedExamId = null;
 this.availableExams = new Map();
+this.libraryState = this.loadLibraryState();
 this.progressRefreshTimer = null;
 
 this.init();
@@ -96,7 +111,10 @@ window.ExamApp.log('Detected exams:', exams.size, 'exams');
 window.ExamApp.log('Exam IDs:', Array.from(exams.keys()));
 window.ExamApp.log('All window.userExams:', window.userExams ? Object.keys(window.userExams) : []);
 window.ExamApp.log('Active exams:', window.examManager.getActiveExamIds());
-this.renderExamCards(exams);
+this.renderLibraryFilterOptions(exams);
+this.syncLibraryControls();
+this.readLibraryControls();
+this.renderExamCards(this.getFilteredSortedExams());
 this.updateHeroStats(exams);
 if (this.selectedExamId && !exams.has(this.selectedExamId)) {
 	this.selectedExamId = null;
@@ -111,12 +129,23 @@ this.updateHeroStats(new Map());
 
 renderExamCards(exams) {
 if (exams.size === 0) {
+if (this.availableExams.size > 0) {
+	this.hideNoExamsSection();
+	this.examSelection.innerHTML = '';
+	this.examSelection.style.display = 'none';
+	document.getElementById('exam-details-placeholder')?.classList.remove('visible');
+	this.updateLibraryResultCount(0, this.availableExams.size);
+	window.ExamApp.setElementHidden(this.libraryEmptyState, false);
+	return;
+}
 this.showNoExamsSection();
 return;
 }
 
 // Hide "No Exams" section and show exam cards
 this.hideNoExamsSection();
+this.examSelection.style.display = '';
+window.ExamApp.setElementHidden(this.libraryEmptyState, true);
 const detailsPanel = document.getElementById('exam-details-placeholder');
 if (detailsPanel?.parentElement === this.examSelection) {
 	detailsPanel.remove();
@@ -129,11 +158,241 @@ const card = this.createExamCard(examId, examData);
 fragment.appendChild(card);
 });
 this.examSelection.appendChild(fragment);
+this.updateLibraryResultCount(exams.size, this.availableExams.size);
+if (this.selectedExamId && !exams.has(this.selectedExamId)) {
+	detailsPanel?.classList.remove('visible');
+}
 this.placeDetailsPanel();
 
 // Show compact import button when exams exist
 this.showCompactImportButton();
 this.refreshStudySummaries();
+}
+
+defaultLibraryState() {
+return {
+	query: '',
+	vendor: '',
+	domain: '',
+	level: '',
+	status: '',
+	sort: 'recommended',
+	filtersCollapsed: true
+};
+}
+
+loadLibraryState() {
+try {
+	const parsed = JSON.parse(localStorage.getItem('exam_library_filters') || '{}');
+	return { ...this.defaultLibraryState(), ...parsed };
+} catch (_) {
+	return this.defaultLibraryState();
+}
+}
+
+saveLibraryState() {
+try {
+	localStorage.setItem('exam_library_filters', JSON.stringify(this.libraryState));
+} catch (_) {
+	// Filtering still works when storage is unavailable.
+}
+}
+
+syncLibraryControls() {
+if (this.librarySearchInput) this.librarySearchInput.value = this.libraryState.query || '';
+if (this.libraryVendorFilter) this.libraryVendorFilter.value = this.libraryState.vendor || '';
+if (this.libraryDomainFilter) this.libraryDomainFilter.value = this.libraryState.domain || '';
+if (this.libraryLevelFilter) this.libraryLevelFilter.value = this.libraryState.level || '';
+if (this.libraryStatusFilter) this.libraryStatusFilter.value = this.libraryState.status || '';
+if (this.librarySort) this.librarySort.value = this.libraryState.sort || 'recommended';
+this.updateLibraryFilterPanel();
+}
+
+readLibraryControls() {
+const filtersCollapsed = Boolean(this.libraryState.filtersCollapsed);
+this.libraryState = {
+	query: this.librarySearchInput?.value || '',
+	vendor: this.libraryVendorFilter?.value || '',
+	domain: this.libraryDomainFilter?.value || '',
+	level: this.libraryLevelFilter?.value || '',
+	status: this.libraryStatusFilter?.value || '',
+	sort: this.librarySort?.value || 'recommended',
+	filtersCollapsed
+};
+}
+
+getActiveLibraryFilterCount() {
+return ['query', 'vendor', 'domain', 'level', 'status'].reduce((count, key) => count + (this.libraryState[key] ? 1 : 0), 0);
+}
+
+updateLibraryFilterPanel() {
+const collapsed = Boolean(this.libraryState.filtersCollapsed);
+const controls = document.getElementById('library-controls');
+controls?.classList.toggle('filters-collapsed', collapsed);
+if (this.libraryAdvancedFilters) {
+	this.libraryAdvancedFilters.hidden = false;
+	this.libraryAdvancedFilters.inert = collapsed;
+	this.libraryAdvancedFilters.setAttribute('aria-hidden', collapsed ? 'true' : 'false');
+}
+if (this.librarySearchControl) {
+	this.librarySearchControl.inert = collapsed;
+	this.librarySearchControl.setAttribute('aria-hidden', collapsed ? 'true' : 'false');
+}
+if (this.libraryFilterToggle) {
+	this.libraryFilterToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+	this.libraryFilterToggle.setAttribute('aria-label', collapsed ? 'Show search and filters' : 'Minimize search and filters');
+	this.libraryFilterToggle.title = collapsed ? 'Show search and filters' : 'Minimize search and filters';
+}
+if (this.libraryFilterToggleLabel) {
+	this.libraryFilterToggleLabel.textContent = collapsed ? 'Search & filters' : 'Minimize';
+}
+const activeCount = this.getActiveLibraryFilterCount();
+if (this.libraryFilterCount) {
+	this.libraryFilterCount.textContent = String(activeCount);
+	window.ExamApp.setElementHidden(this.libraryFilterCount, activeCount === 0);
+}
+}
+
+setSelectOptions(select, label, values) {
+if (!select) return;
+const current = select.value;
+select.innerHTML = '';
+const allOption = document.createElement('option');
+allOption.value = '';
+allOption.textContent = `All ${label}`;
+select.appendChild(allOption);
+values.forEach(value => {
+	const option = document.createElement('option');
+	option.value = value;
+	option.textContent = this.formatLibraryFilterLabel(value);
+	select.appendChild(option);
+});
+select.value = values.includes(current) ? current : '';
+}
+
+formatLibraryFilterLabel(value) {
+const labels = {
+	free: 'Free',
+	preview: 'Preview',
+	pro: 'Pro',
+	'pro-preview': 'Pro preview',
+	'practice-exam': 'Practice exam'
+};
+return labels[value] || value;
+}
+
+renderLibraryFilterOptions(exams) {
+const vendors = new Set();
+const domains = new Set();
+const levels = new Set();
+const statuses = new Set();
+exams.forEach((examData, examId) => {
+	const taxonomy = this.getExamTaxonomy(examId, examData);
+	if (taxonomy.vendor) vendors.add(taxonomy.vendor);
+	taxonomy.domains.forEach(domain => domains.add(domain));
+	if (taxonomy.level) levels.add(taxonomy.level);
+	if (taxonomy.status) statuses.add(taxonomy.status);
+});
+const sortValues = values => Array.from(values).sort((left, right) => left.localeCompare(right));
+this.setSelectOptions(this.libraryVendorFilter, 'vendors', sortValues(vendors));
+this.setSelectOptions(this.libraryDomainFilter, 'domains', sortValues(domains));
+this.setSelectOptions(this.libraryLevelFilter, 'levels', sortValues(levels));
+this.setSelectOptions(this.libraryStatusFilter, 'status', sortValues(statuses));
+}
+
+getExamTaxonomy(examId, examData) {
+const metadata = examData?.metadata || {};
+const domains = Array.isArray(metadata.domains) ? metadata.domains : [];
+const status = metadata.commercialStatus || (metadata.preview && metadata.pro ? 'pro-preview' : metadata.preview ? 'preview' : metadata.pro ? 'pro' : 'free');
+return {
+	vendor: String(metadata.vendor || 'Custom').trim(),
+	certificationCode: String(metadata.certificationCode || metadata.name || examId).trim(),
+	domains: domains.map(domain => String(domain || '').trim()).filter(Boolean),
+	level: String(metadata.level || metadata.badge || 'Custom').trim(),
+	productFamily: String(metadata.productFamily || '').trim(),
+	contentType: String(metadata.contentType || (metadata.preview ? 'preview' : 'practice-exam')).trim(),
+	status: String(status || 'free').trim()
+};
+}
+
+getExamSearchText(examId, examData) {
+const metadata = examData?.metadata || {};
+const taxonomy = this.getExamTaxonomy(examId, examData);
+const modules = this.getModuleNames(metadata.modules).join(' ');
+const resources = (Array.isArray(metadata.resources) ? metadata.resources : [])
+	.map(resource => `${resource?.name || ''} ${resource?.url || ''}`)
+	.join(' ');
+return [
+	examId,
+	metadata.name,
+	metadata.fullName,
+	metadata.description,
+	metadata.badge,
+	taxonomy.vendor,
+	taxonomy.certificationCode,
+	taxonomy.productFamily,
+	taxonomy.contentType,
+	taxonomy.status,
+	taxonomy.level,
+	taxonomy.domains.join(' '),
+	modules,
+	resources
+].join(' ').toLowerCase();
+}
+
+getFilteredSortedExams() {
+const entries = Array.from(this.availableExams.entries()).filter(([examId, examData]) => {
+	const taxonomy = this.getExamTaxonomy(examId, examData);
+	const query = String(this.libraryState.query || '').trim().toLowerCase();
+	if (query && !this.getExamSearchText(examId, examData).includes(query)) return false;
+	if (this.libraryState.vendor && taxonomy.vendor !== this.libraryState.vendor) return false;
+	if (this.libraryState.domain && !taxonomy.domains.includes(this.libraryState.domain)) return false;
+	if (this.libraryState.level && taxonomy.level !== this.libraryState.level) return false;
+	if (this.libraryState.status && taxonomy.status !== this.libraryState.status) return false;
+	return true;
+});
+
+entries.sort((left, right) => this.compareLibraryEntries(left, right));
+return new Map(entries);
+}
+
+compareLibraryEntries(left, right) {
+const sort = this.libraryState.sort || 'recommended';
+const leftMetadata = left[1]?.metadata || {};
+const rightMetadata = right[1]?.metadata || {};
+const leftName = String(leftMetadata.name || left[0]).toLowerCase();
+const rightName = String(rightMetadata.name || right[0]).toLowerCase();
+if (sort === 'az') return leftName.localeCompare(rightName);
+if (sort === 'questions-desc') return this.getTotalQuestionCount(right[1]) - this.getTotalQuestionCount(left[1]) || leftName.localeCompare(rightName);
+if (sort === 'duration-asc') return Number(leftMetadata.duration || 0) - Number(rightMetadata.duration || 0) || leftName.localeCompare(rightName);
+if (sort === 'duration-desc') return Number(rightMetadata.duration || 0) - Number(leftMetadata.duration || 0) || leftName.localeCompare(rightName);
+return 0;
+}
+
+getTotalQuestionCount(examData) {
+const metadata = examData?.metadata || {};
+return Number(metadata.totalQuestions || metadata.questionCount || examData?.questions?.length || 0);
+}
+
+updateLibraryResultCount(visibleCount, totalCount) {
+if (!this.libraryResultCount) return;
+const total = Number(totalCount || 0);
+const visible = Number(visibleCount || 0);
+if (total === 0) {
+	this.libraryResultCount.textContent = '';
+	return;
+}
+this.libraryResultCount.textContent = visible === total
+	? `${total} exam${total === 1 ? '' : 's'} available`
+	: `Showing ${visible} of ${total} exams`;
+}
+
+refreshLibrary() {
+this.readLibraryControls();
+this.saveLibraryState();
+this.updateLibraryFilterPanel();
+this.renderExamCards(this.getFilteredSortedExams());
+this.highlightSelectedCard(this.selectedExamId);
 }
 
 updateHeroStats(exams) {
@@ -203,6 +462,70 @@ parent.appendChild(element);
 return element;
 }
 
+formatTaxonomyLabel(value) {
+const text = String(value || '').trim();
+if (!text) return '';
+return text
+	.replace(/[-_]+/g, ' ')
+	.replace(/\s+/g, ' ')
+	.replace(/\b\w/g, letter => letter.toUpperCase());
+}
+
+formatCommercialStatus(status) {
+const normalized = String(status || '').trim().toLowerCase();
+return {
+	free: 'Free',
+	preview: 'Preview',
+	pro: 'Pro',
+	'pro-preview': 'Pro preview',
+	retired: 'Retired'
+}[normalized] || this.formatTaxonomyLabel(status || 'Free');
+}
+
+createExamTaxonomyChip(kind, label, iconClass, title) {
+const chip = document.createElement('span');
+chip.className = `exam-taxonomy-chip exam-taxonomy-chip--${kind}`;
+chip.title = title;
+chip.appendChild(this.createIcon(iconClass));
+this.appendTextElement(chip, 'span', '', label);
+return chip;
+}
+
+createExamTaxonomy(examId, examData, options = {}) {
+const taxonomy = this.getExamTaxonomy(examId, examData);
+const wrapper = document.createElement('div');
+const variant = options.variant || 'card';
+wrapper.className = `exam-taxonomy exam-taxonomy--${variant}`;
+wrapper.setAttribute('aria-label', 'Exam taxonomy');
+
+const chips = [
+	['code', taxonomy.certificationCode, 'fas fa-certificate', 'Certification code'],
+	['vendor', taxonomy.vendor, 'fas fa-building', 'Vendor'],
+	['level', taxonomy.level, 'fas fa-layer-group', 'Level'],
+	['status', this.formatCommercialStatus(taxonomy.status), 'fas fa-tag', 'Commercial status']
+];
+
+if (variant === 'details') {
+	chips.push(['content', this.formatTaxonomyLabel(taxonomy.contentType), 'fas fa-file-lines', 'Content type']);
+	if (taxonomy.productFamily) chips.push(['family', taxonomy.productFamily, 'fas fa-sitemap', 'Product family']);
+}
+
+const visibleDomainCount = variant === 'details' ? 3 : 1;
+taxonomy.domains.slice(0, visibleDomainCount).forEach(domain => {
+	chips.push(['domain', domain, 'fas fa-compass', 'Domain']);
+});
+if (taxonomy.domains.length > visibleDomainCount) {
+	chips.push(['domain-more', `+${taxonomy.domains.length - visibleDomainCount}`, 'fas fa-ellipsis', taxonomy.domains.slice(visibleDomainCount).join(', ')]);
+}
+
+chips.forEach(([kind, label, iconClass, title]) => {
+	if (!label) return;
+	wrapper.appendChild(this.createExamTaxonomyChip(kind, label, iconClass, title));
+});
+
+return wrapper;
+}
+
 createExamStat(number, label) {
 const stat = document.createElement('div');
 stat.className = 'exam-stat';
@@ -242,6 +565,7 @@ card.appendChild(previewFlag);
 card.appendChild(this.createIcon(metadata.icon || 'fas fa-book', 'exam-icon'));
 this.appendTextElement(card, 'div', 'exam-title', metadata.name || examId.toUpperCase());
 this.appendTextElement(card, 'div', 'exam-subtitle', metadata.fullName || 'Custom Exam');
+card.appendChild(this.createExamTaxonomy(examId, examData));
 
 const stats = document.createElement('div');
 stats.className = 'exam-stats';
@@ -549,6 +873,10 @@ this.placeDetailsPanel(examId);
 // Populate details
 document.getElementById('details-exam-name').textContent = metadata.name || examId.toUpperCase();
 document.getElementById('details-exam-subtitle').textContent = metadata.fullName || 'Practice exam';
+const detailsTaxonomy = document.getElementById('details-exam-taxonomy');
+if (detailsTaxonomy) {
+	detailsTaxonomy.replaceChildren(this.createExamTaxonomy(examId, examData, { variant: 'details' }));
+}
 document.getElementById('details-exam-duration').textContent = `${metadata.duration || 45} min`;
 document.getElementById('details-exam-questions').textContent = `${metadata.questionCount || examData.questions.length}`;
 document.getElementById('details-exam-pass-score').textContent = `${metadata.passScore || 70}%`;
@@ -1456,23 +1784,18 @@ if (document.getElementById('compact-import-btn')) return;
 // Create compact import button/card
 const importCard = document.createElement('div');
 importCard.id = 'compact-import-btn';
-importCard.className = 'exam-card custom';
+importCard.className = 'exam-card custom exam-card-import';
 importCard.style.cssText = 'cursor:pointer;';
 
-importCard.innerHTML = `
-<div class="exam-badge">Import</div>
-<i aria-hidden="true" class="fas fa-cloud-upload-alt exam-icon"></i>
-<div class="exam-title">Import Exam</div>
-<div class="exam-subtitle">Add new exam packs</div>
-<div class="exam-stats">
-	<div class="exam-stat">
-		<span class="exam-stat-label">Drag & Drop</span>
-	</div>
-	<div class="exam-stat">
-		<span class="exam-stat-label">or Browse</span>
-	</div>
-</div>
-`;
+this.appendTextElement(importCard, 'div', 'exam-badge', 'Import');
+importCard.appendChild(this.createIcon('fas fa-cloud-upload-alt', 'exam-icon'));
+this.appendTextElement(importCard, 'div', 'exam-title', 'Import Exam');
+this.appendTextElement(importCard, 'div', 'exam-subtitle', 'Add packs');
+const importHint = document.createElement('div');
+importHint.className = 'exam-import-hint';
+importHint.appendChild(this.createIcon('fas fa-file-arrow-up'));
+importHint.appendChild(document.createTextNode('Drop or browse'));
+importCard.appendChild(importHint);
 
 // Add click handler
 importCard.addEventListener('click', () => {
@@ -1519,6 +1842,26 @@ this.fileInput.click();
 }
 
 setupEventListeners() {
+const refreshLibraryFromControls = () => this.refreshLibrary();
+this.librarySearchInput?.addEventListener('input', refreshLibraryFromControls);
+this.libraryVendorFilter?.addEventListener('change', refreshLibraryFromControls);
+this.libraryDomainFilter?.addEventListener('change', refreshLibraryFromControls);
+this.libraryLevelFilter?.addEventListener('change', refreshLibraryFromControls);
+this.libraryStatusFilter?.addEventListener('change', refreshLibraryFromControls);
+this.librarySort?.addEventListener('change', refreshLibraryFromControls);
+this.libraryFilterToggle?.addEventListener('click', () => {
+	this.libraryState.filtersCollapsed = !this.libraryState.filtersCollapsed;
+	this.saveLibraryState();
+	this.updateLibraryFilterPanel();
+});
+this.libraryClearFilters?.addEventListener('click', () => {
+	const filtersCollapsed = Boolean(this.libraryState.filtersCollapsed);
+	this.libraryState = this.defaultLibraryState();
+	this.libraryState.filtersCollapsed = filtersCollapsed;
+	this.syncLibraryControls();
+	this.refreshLibrary();
+});
+
 // Drag & Drop on drop zone
 this.dropZone.addEventListener('dragover', (e) => {
 e.preventDefault();
