@@ -215,3 +215,95 @@ def build_crosslinks(meta: dict, all_exams: list) -> str:
         "      </ul>\n"
         "    </section>"
     )
+
+
+def page_title(meta: dict) -> str:
+    return f"{exam_code(meta)} Practice Exam (Free, No Sign-up) | Examplar"
+
+
+def page_description(meta: dict) -> str:
+    code = exam_code(meta)
+    full = meta.get("fullName") or code
+    count = meta.get("totalQuestions") or meta.get("questionCount")
+    count_txt = f"{count} free practice questions" if count else "free practice questions"
+    return (
+        f"Free {code} practice exam for {full}. {count_txt}, original and "
+        "syllabus-aligned. No account, works offline, your data stays in your browser."
+    )
+
+
+def build_jsonld(meta: dict) -> str:
+    code = exam_code(meta)
+    url = f"{SITE}/exams/{meta['id']}/"
+    duration = meta.get("duration") or 45
+    graph = [
+        {
+            "@type": "Course",
+            "@id": f"{url}#course",
+            "name": f"{code} Practice Exam",
+            "description": page_description(meta),
+            "url": url,
+            "inLanguage": meta.get("language", "en"),
+            "isAccessibleForFree": True,
+            "provider": {"@type": "Organization", "name": "Examplar", "url": f"{SITE}/"},
+            "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD", "category": "Free"},
+            "hasCourseInstance": {
+                "@type": "CourseInstance",
+                "courseMode": "online",
+                "courseWorkload": f"PT{duration}M",
+            },
+        },
+        {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{SITE}/"},
+                {"@type": "ListItem", "position": 2, "name": "Exams", "item": f"{SITE}/exams/"},
+                {"@type": "ListItem", "position": 3, "name": code, "item": url},
+            ],
+        },
+        {
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": question,
+                    "acceptedAnswer": {"@type": "Answer", "text": answer},
+                }
+                for question, answer in faq_pairs(meta)
+            ],
+        },
+    ]
+    return json.dumps({"@context": "https://schema.org", "@graph": graph}, indent=2)
+
+
+def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
+    code = exam_code(meta)
+    url = f"{SITE}/exams/{meta['id']}/"
+    full = meta.get("fullName") or code
+    intro = (
+        f"Practice for {full} the private way. Original, syllabus-aligned questions "
+        "you can run entirely in your browser, offline, with no account and no tracking."
+    )
+    mapping = {
+        "lang": esc(meta.get("language", "en")),
+        "title": esc(page_title(meta)),
+        "description": esc(page_description(meta)),
+        "canonical": url,
+        "og_title": esc(page_title(meta)),
+        "og_description": esc(page_description(meta)),
+        "og_url": url,
+        "og_image": OG_IMAGE,
+        "theme_color": THEME_COLOR,
+        "exam_code": esc(code),
+        "full_name": esc(full),
+        "intro": esc(intro),
+        "cta_url": f"{SITE}/exam.html?exam={esc(meta['id'])}",
+        "facts": build_facts(meta),
+        "domains": build_domains(meta),
+        "modules": build_modules(meta),
+        "resources": build_resources(meta),
+        "faq": build_faq(meta),
+        "crosslinks": build_crosslinks(meta, all_exams),
+        "jsonld": build_jsonld(meta),
+    }
+    return Template(template).substitute(mapping)

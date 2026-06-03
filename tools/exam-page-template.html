@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="$lang">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="$theme_color">
+  <meta name="description" content="$description">
+  <link rel="canonical" href="$canonical">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Examplar">
+  <meta property="og:title" content="$og_title">
+  <meta property="og:description" content="$og_description">
+  <meta property="og:url" content="$og_url">
+  <meta property="og:image" content="$og_image">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="$og_title">
+  <meta name="twitter:description" content="$og_description">
+  <meta name="twitter:image" content="$og_image">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/assets/media/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/assets/media/favicon-64.png">
+  <title>$title</title>
+  <link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="/assets/css/app-footer.css">
+  <link rel="stylesheet" href="/assets/css/exam-landing.css">
+  <script type="application/ld+json">
+$jsonld
+  </script>
+</head>
+<body class="exam-landing">
+  <header class="landing-topbar">
+    <a class="landing-brand" href="/">
+      <img src="/assets/media/examplar-mark.png" alt="Examplar" width="40" height="36" decoding="async">
+      <span>Examplar</span>
+    </a>
+  </header>
+  <main class="landing-main">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a> <span aria-hidden="true">/</span>
+      <a href="/exams/">Exams</a> <span aria-hidden="true">/</span>
+      <span aria-current="page">$exam_code</span>
+    </nav>
+    <header class="landing-hero">
+      <h1>$exam_code Practice Exam</h1>
+      <p class="landing-subhead">$full_name</p>
+      <p class="landing-intro">$intro</p>
+      <a class="landing-cta" href="$cta_url"><i aria-hidden="true" class="fas fa-play"></i> Start practicing free</a>
+    </header>
+$facts
+$domains
+$modules
+$resources
+$faq
+$crosslinks
+  </main>
+  <footer class="landing-footer app-footer" aria-label="Site links">
+    <div class="app-footer-inner">
+      <nav class="app-footer-links" aria-label="Site links">
+        <a href="/">Examplar home</a>
+        <a href="/exams/">All practice exams</a>
+        <a href="/privacy-and-storage.html">Privacy &amp; storage</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

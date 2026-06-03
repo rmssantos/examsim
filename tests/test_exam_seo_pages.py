@@ -82,5 +82,28 @@ class FragmentTests(unittest.TestCase):
         self.assertNotIn("/exams/sc900/", out)
 
 
+class RenderTests(unittest.TestCase):
+    def _render(self):
+        template = (ROOT / "tools" / "exam-page-template.html").read_text(encoding="utf-8")
+        return gen.render_exam_page(SAMPLE, [SAMPLE], template)
+
+    def test_jsonld_is_valid_with_expected_types(self):
+        payload = json.loads(gen.build_jsonld(SAMPLE))
+        types = {node["@type"] for node in payload["@graph"]}
+        self.assertEqual(types, {"Course", "BreadcrumbList", "FAQPage"})
+
+    def test_page_has_core_seo_markup(self):
+        page = self._render()
+        self.assertIn("<title>SC-900 Practice Exam (Free, No Sign-up) | Examplar</title>", page)
+        self.assertIn('<link rel="canonical" href="https://examplar.app/exams/sc900/">', page)
+        self.assertIn("<h1>SC-900 Practice Exam</h1>", page)
+        self.assertIn('href="https://examplar.app/exam.html?exam=sc900"', page)
+        self.assertIn('application/ld+json', page)
+        self.assertIn("Microsoft Entra", page)  # modules section present
+
+    def test_page_has_no_unsubstituted_placeholders(self):
+        self.assertNotIn("$", self._render())
+
+
 if __name__ == "__main__":
     unittest.main()
