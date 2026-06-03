@@ -66,8 +66,8 @@ def build_facts(meta: dict) -> str:
         ("Level", meta.get("level") or meta.get("badge")),
         ("Questions per attempt", meta.get("questionCount")),
         ("Question bank", meta.get("totalQuestions")),
-        ("Time limit", f"{meta.get('duration')} min" if meta.get("duration") else None),
-        ("Pass score", f"{meta.get('passScore')}%" if meta.get("passScore") else None),
+        ("Time limit", f"{meta.get('duration')} min" if meta.get("duration") is not None else None),
+        ("Pass score", f"{meta.get('passScore')}%" if meta.get("passScore") is not None else None),
     ]
     rows = [
         f'      <tr><th scope="row">{esc(label)}</th><td>{esc(value)}</td></tr>'
@@ -152,6 +152,7 @@ def build_resources(meta: dict) -> str:
 
 
 def faq_pairs(meta: dict) -> list:
+    """Return (question, answer) pairs as plain text. Callers must HTML-escape before markup."""
     code = exam_code(meta)
     full = meta.get("fullName") or code
     count = meta.get("totalQuestions") or meta.get("questionCount")
@@ -202,7 +203,7 @@ def build_crosslinks(meta: dict, all_exams: list) -> str:
     if not others:
         return ""
     links = "\n".join(
-        f'      <li><a href="{SITE}/exams/{esc(e["id"])}/">'
+        f'      <li><a href="{SITE}/exams/{esc(e.get("id", ""))}/">'
         f"{esc(exam_code(e))} practice exam</a></li>"
         for e in others
     )
