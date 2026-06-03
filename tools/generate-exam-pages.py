@@ -273,7 +273,11 @@ def build_jsonld(meta: dict) -> str:
             ],
         },
     ]
-    return json.dumps({"@context": "https://schema.org", "@graph": graph}, indent=2)
+    raw = json.dumps({"@context": "https://schema.org", "@graph": graph}, indent=2)
+    # Escape "</" so a metadata value containing "</script>" cannot break out of the
+    # surrounding <script type="application/ld+json"> block. "<\/" is valid JSON and
+    # parses back to "</".
+    return raw.replace("</", "<\\/")
 
 
 def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
@@ -284,13 +288,15 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
         f"Practice for {full} the private way. Original, syllabus-aligned questions "
         "you can run entirely in your browser, offline, with no account and no tracking."
     )
+    title = esc(page_title(meta))
+    description = esc(page_description(meta))
     mapping = {
         "lang": esc(meta.get("language", "en")),
-        "title": esc(page_title(meta)),
-        "description": esc(page_description(meta)),
+        "title": title,
+        "description": description,
         "canonical": url,
-        "og_title": esc(page_title(meta)),
-        "og_description": esc(page_description(meta)),
+        "og_title": title,
+        "og_description": description,
         "og_url": url,
         "og_image": OG_IMAGE,
         "theme_color": THEME_COLOR,
