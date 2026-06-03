@@ -10,10 +10,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class Sprint1ReadinessTests(unittest.TestCase):
-    def test_service_worker_uses_v31_and_network_first_for_mutable_exam_assets(self):
+    def test_service_worker_versioned_and_network_first_for_mutable_exam_assets(self):
         text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
 
-        self.assertIn("examsim-pwa-v3.1", text)
+        # Version-agnostic: any examsim-pwa-vX.Y is fine (bumped on releases to
+        # purge stale caches); pinning the exact number made this brittle.
+        self.assertRegex(text, r"examsim-pwa-v\d+\.\d+")
         self.assertIn("./assets/js/secure-transfer.js", text)
         for path in (
             "/manifest.webmanifest",

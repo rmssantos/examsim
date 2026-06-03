@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'examsim-pwa-v3.1';
+const CACHE_VERSION = 'examsim-pwa-v3.2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -43,6 +43,7 @@ const CORE_ASSETS = [
   './assets/css/legal-page.css',
   './assets/css/index-inline.css',
   './assets/css/editor-styles.css',
+  './assets/css/exam-landing.css',
   './assets/media/favicon-64.png',
   './assets/media/apple-touch-icon.png',
   './assets/media/icon-192.png',
@@ -91,7 +92,8 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/css/app-footer.css',
   './assets/css/legal-page.css',
   './assets/css/index-inline.css',
-  './assets/css/editor-styles.css'
+  './assets/css/editor-styles.css',
+  './assets/css/exam-landing.css'
 ];
 
 function sameOrigin(url) {

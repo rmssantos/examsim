@@ -213,6 +213,13 @@ class ThemeTests(unittest.TestCase):
         css = (ROOT / "assets" / "css" / "exam-landing.css").read_text(encoding="utf-8")
         self.assertIn("body.exam-landing.dark-mode", css)
 
+    def test_service_worker_serves_landing_css_fresh(self):
+        # exam-landing.css must be precached AND network-first (like the app's
+        # other CSS) so style changes appear without a force-refresh. Listing it
+        # in both CORE_ASSETS and APP_SHELL_NETWORK_FIRST_ASSETS = two mentions.
+        sw = (ROOT / "service-worker.js").read_text(encoding="utf-8")
+        self.assertGreaterEqual(sw.count("assets/css/exam-landing.css"), 2)
+
 
 class PricingTests(unittest.TestCase):
     def _render(self, meta):
