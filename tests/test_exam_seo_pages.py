@@ -164,5 +164,12 @@ class StyleTests(unittest.TestCase):
         self.assertIn(".hub-grid", css)
 
 
+class HomepageLinkTests(unittest.TestCase):
+    def test_homepage_footer_links_to_exams_hub(self):
+        html_out = (ROOT / "index.html").read_text(encoding="utf-8")
+        self.assertIn('href="/exams/"', html_out)
+        self.assertIn("Practice exams", html_out)
+
+
 if __name__ == "__main__":
     unittest.main()
