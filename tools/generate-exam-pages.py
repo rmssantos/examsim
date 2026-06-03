@@ -12,8 +12,24 @@ from __future__ import annotations
 
 import html
 import json
+import re
 from pathlib import Path
 from string import Template
+
+# Exam ids become directory names and URL segments, so accept only safe slugs.
+SAFE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
+
+
+def http_url(value, fallback=None):
+    """Return value only if it is an http(s) URL; otherwise return fallback.
+
+    Generated pages embed metadata URLs in href attributes. HTML-escaping alone
+    does not stop schemes like javascript:/data:, so restrict to http(s).
+    """
+    text = str(value or "").strip()
+    if text[:7].lower() == "http://" or text[:8].lower() == "https://":
+        return text
+    return fallback
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMS_SRC = ROOT / "user-content" / "exams"
@@ -50,11 +66,18 @@ def load_exams(index_path: Path = INDEX_JSON, src: Path = EXAMS_SRC) -> list:
     """Load metadata for every id in index.json; skip ids without metadata."""
     exams = []
     for exam_id in load_exam_ids(index_path):
+        if not SAFE_ID.match(str(exam_id)):
+            print(f"warning: skipping {exam_id!r} (unsafe exam id)")
+            continue
         meta = load_metadata(exam_id, src)
         if meta is None:
             print(f"warning: skipping {exam_id} (no metadata.json)")
             continue
-        meta.setdefault("id", exam_id)
+        # The index/folder id is the source of truth for the directory and URL;
+        # never trust a divergent id from inside metadata.json.
+        if meta.get("id") and meta["id"] != exam_id:
+            print(f"warning: {exam_id} metadata id {meta['id']!r} overridden to match folder")
+        meta["id"] = exam_id
         exams.append(meta)
     return exams
 
@@ -139,7 +162,7 @@ def build_modules(meta: dict) -> str:
 def build_resources(meta: dict) -> str:
     links = []
     for resource in meta.get("resources") or []:
-        url = resource.get("url")
+        url = http_url(resource.get("url"))
         name = resource.get("name")
         if not url or not name:
             continue
@@ -286,13 +309,15 @@ def _parse_price(price: str) -> tuple:
 
 def build_pro(meta: dict) -> str:
     """Upsell section for pro/preview packs; empty string for fully free packs."""
+    if is_free(meta):
+        return ""
     pro = meta.get("pro")
     if not pro:
         return ""
     code = exam_code(meta)
     title = esc(pro.get("title", f"{code} Complete"))
     price = esc(pro.get("price", ""))
-    url = esc(pro.get("url", "#"))
+    url = esc(http_url(pro.get("url"), "#"))
     questions = pro.get("questions")
     qs_txt = f"all {esc(questions)} questions" if questions else "the complete question bank"
     highlights = [h for h in (pro.get("highlights") or []) if h]
@@ -319,16 +344,18 @@ def build_jsonld(meta: dict) -> str:
     url = f"{SITE}/exams/{meta['id']}/"
     duration = meta.get("duration") or 45
     # The preview is always free to start; pro/preview packs add a paid full pack.
-    offers = [{"@type": "Offer", "price": "0", "priceCurrency": "USD", "category": "Free"}]
+    # Use one currency for both offers (the paid pack's) so structured-data
+    # validators don't see a free USD offer next to a paid EUR one.
     pro = meta.get("pro") or {}
-    if pro.get("price"):
-        amount, currency = _parse_price(pro["price"])
+    amount, currency = _parse_price(pro["price"]) if pro.get("price") else (None, "USD")
+    offers = [{"@type": "Offer", "price": "0", "priceCurrency": currency, "category": "Free"}]
+    if amount is not None:
         offers.append({
             "@type": "Offer",
             "price": amount,
             "priceCurrency": currency,
             "category": "Full pack",
-            "url": pro.get("url", url),
+            "url": http_url(pro.get("url"), url),
         })
     graph = [
         {

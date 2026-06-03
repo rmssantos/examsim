@@ -262,6 +262,62 @@ class PricingTests(unittest.TestCase):
             self.assertNotIn("dump", blob.lower())
             self.assertNotIn("—", blob)
 
+    def test_preview_jsonld_uses_one_currency(self):
+        payload = json.loads(gen.build_jsonld(SAMPLE_PRO))
+        course = next(n for n in payload["@graph"] if n["@type"] == "Course")
+        currencies = {o["priceCurrency"] for o in course["offers"]}
+        self.assertEqual(currencies, {"EUR"})  # free + paid share the paid currency
+
+
+class HardeningTests(unittest.TestCase):
+    def test_http_url_allows_only_http_schemes(self):
+        self.assertEqual(gen.http_url("https://x.test/a"), "https://x.test/a")
+        self.assertEqual(gen.http_url("http://x.test"), "http://x.test")
+        self.assertIsNone(gen.http_url("javascript:alert(1)"))
+        self.assertIsNone(gen.http_url("data:text/html,x"))
+        self.assertEqual(gen.http_url("javascript:alert(1)", "#"), "#")
+
+    def test_unsafe_exam_id_is_skipped(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            src = tmp_path / "src"
+            (src / "sc900").mkdir(parents=True)
+            (src / "index.json").write_text(json.dumps(["sc900", "../evil"]), encoding="utf-8")
+            (src / "sc900" / "metadata.json").write_text(json.dumps(SAMPLE), encoding="utf-8")
+            exams = gen.load_exams(index_path=src / "index.json", src=src)
+            self.assertEqual([e["id"] for e in exams], ["sc900"])
+
+    def test_metadata_id_is_forced_to_folder_id(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            src = tmp_path / "src"
+            (src / "sc900").mkdir(parents=True)
+            (src / "index.json").write_text(json.dumps(["sc900"]), encoding="utf-8")
+            rogue = dict(SAMPLE, id="../../escape")
+            (src / "sc900" / "metadata.json").write_text(json.dumps(rogue), encoding="utf-8")
+            exams = gen.load_exams(index_path=src / "index.json", src=src)
+            self.assertEqual(exams[0]["id"], "sc900")
+
+    def test_resources_skip_non_http_urls(self):
+        meta = dict(SAMPLE, resources=[
+            {"name": "Bad", "url": "javascript:alert(1)"},
+            {"name": "Good", "url": "https://learn.microsoft.com/ok"},
+        ])
+        out = gen.build_resources(meta)
+        self.assertIn("https://learn.microsoft.com/ok", out)
+        self.assertNotIn("javascript:", out)
+
+    def test_build_pro_empty_for_free_pack_even_with_pro_block(self):
+        free_with_pro = dict(SAMPLE, pro={"title": "X", "price": "9 EUR", "url": "https://x"})
+        self.assertTrue(gen.is_free(free_with_pro))
+        self.assertEqual(gen.build_pro(free_with_pro), "")
+
+    def test_build_pro_rejects_non_http_url(self):
+        meta = dict(SAMPLE_PRO, pro=dict(SAMPLE_PRO["pro"], url="javascript:alert(1)"))
+        out = gen.build_pro(meta)
+        self.assertNotIn("javascript:", out)
+        self.assertIn('href="#"', out)
+
 
 if __name__ == "__main__":
     unittest.main()
