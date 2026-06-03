@@ -27,7 +27,7 @@ jobs:
           node-version: '22'
 
       - name: Compile Python tools
-        run: python -m py_compile server.py tools/generate-exam-data-js.py tools/inject-analytics-secret.py tools/validate-exam-packs.py
+        run: python -m py_compile server.py tools/generate-exam-data-js.py tools/generate-exam-pages.py tools/inject-analytics-secret.py tools/validate-exam-packs.py
 
       - name: Check JavaScript syntax
         run: |
