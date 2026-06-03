@@ -198,12 +198,12 @@ def build_faq(meta: dict) -> str:
     )
 
 
-def build_crosslinks(meta: dict, all_exams: list) -> str:
+def build_crosslinks(meta: dict, all_exams: list, root: str = "../../") -> str:
     others = [e for e in all_exams if e.get("id") != meta.get("id")]
     if not others:
         return ""
     links = "\n".join(
-        f'      <li><a href="{SITE}/exams/{esc(e.get("id", ""))}/">'
+        f'      <li><a href="{root}exams/{esc(e.get("id", ""))}/index.html">'
         f"{esc(exam_code(e))} practice exam</a></li>"
         for e in others
     )
@@ -283,6 +283,10 @@ def build_jsonld(meta: dict) -> str:
 def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
     code = exam_code(meta)
     url = f"{SITE}/exams/{meta['id']}/"
+    # Exam pages live at /exams/<id>/, so site-root assets and pages are two
+    # levels up. Relative paths keep the pages working when opened directly
+    # (file://), served via server.py, or deployed at the domain root.
+    root = "../../"
     full = meta.get("fullName") or code
     intro = (
         f"Practice for {full} the private way. Original, syllabus-aligned questions "
@@ -303,13 +307,14 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
         "exam_code": esc(code),
         "full_name": esc(full),
         "intro": esc(intro),
-        "cta_url": f"{SITE}/exam.html?exam={esc(meta['id'])}",
+        "root": root,
+        "cta_url": f"{root}exam.html?exam={esc(meta['id'])}",
         "facts": build_facts(meta),
         "domains": build_domains(meta),
         "modules": build_modules(meta),
         "resources": build_resources(meta),
         "faq": build_faq(meta),
-        "crosslinks": build_crosslinks(meta, all_exams),
+        "crosslinks": build_crosslinks(meta, all_exams, root),
         "jsonld": build_jsonld(meta),
     }
     return Template(template).substitute(mapping)
@@ -332,8 +337,10 @@ def render_sitemap(all_exams: list) -> str:
 
 
 def render_hub(all_exams: list) -> str:
+    # The hub lives at /exams/, so site-root assets and pages are one level up.
+    root = "../"
     cards = "\n".join(
-        f'      <li><a class="hub-card" href="{SITE}/exams/{esc(e["id"])}/">'
+        f'      <li><a class="hub-card" href="{esc(e["id"])}/index.html">'
         f'<span class="hub-code">{esc(exam_code(e))}</span>'
         f'<span class="hub-name">{esc(e.get("fullName") or exam_code(e))}</span></a></li>'
         for e in all_exams
@@ -358,24 +365,24 @@ def render_hub(all_exams: list) -> str:
   <meta property="og:url" content="{SITE}/exams/">
   <meta property="og:image" content="{OG_IMAGE}">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="apple-touch-icon" href="/assets/media/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="64x64" href="/assets/media/favicon-64.png">
+  <link rel="manifest" href="{root}manifest.webmanifest">
+  <link rel="apple-touch-icon" href="{root}assets/media/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="{root}assets/media/favicon-64.png">
   <title>All practice exams | Examplar</title>
-  <link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css">
-  <link rel="stylesheet" href="/assets/css/app-footer.css">
-  <link rel="stylesheet" href="/assets/css/exam-landing.css">
+  <link rel="stylesheet" href="{root}assets/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="{root}assets/css/app-footer.css">
+  <link rel="stylesheet" href="{root}assets/css/exam-landing.css">
 </head>
 <body class="exam-landing">
   <header class="landing-topbar">
-    <a class="landing-brand" href="/">
-      <img src="/assets/media/examplar-mark.png" alt="Examplar" width="40" height="36" decoding="async">
+    <a class="landing-brand" href="{root}index.html">
+      <img src="{root}assets/media/examplar-mark.png" alt="Examplar" width="40" height="36" decoding="async">
       <span>Examplar</span>
     </a>
   </header>
   <main class="landing-main">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
-      <a href="/">Home</a> <span aria-hidden="true">/</span>
+      <a href="{root}index.html">Home</a> <span aria-hidden="true">/</span>
       <span aria-current="page">Exams</span>
     </nav>
     <header class="landing-hero">
@@ -389,8 +396,8 @@ def render_hub(all_exams: list) -> str:
   <footer class="landing-footer app-footer" aria-label="Site links">
     <div class="app-footer-inner">
       <nav class="app-footer-links" aria-label="Site links">
-        <a href="/">Examplar home</a>
-        <a href="/privacy-and-storage.html">Privacy &amp; storage</a>
+        <a href="{root}index.html">Examplar home</a>
+        <a href="{root}privacy-and-storage.html">Privacy &amp; storage</a>
       </nav>
     </div>
   </footer>

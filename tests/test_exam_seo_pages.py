@@ -97,7 +97,10 @@ class RenderTests(unittest.TestCase):
         self.assertIn("<title>SC-900 Practice Exam (Free, No Sign-up) | Examplar</title>", page)
         self.assertIn('<link rel="canonical" href="https://examplar.app/exams/sc900/">', page)
         self.assertIn("<h1>SC-900 Practice Exam</h1>", page)
-        self.assertIn('href="https://examplar.app/exam.html?exam=sc900"', page)
+        # Assets and in-app links are relative so the page works via file://,
+        # server.py, and the deployed root; canonical/og stay absolute.
+        self.assertIn('href="../../exam.html?exam=sc900"', page)
+        self.assertIn('href="../../assets/css/exam-landing.css"', page)
         self.assertIn('application/ld+json', page)
         self.assertIn("Microsoft Entra", page)  # modules section present
 
@@ -116,8 +119,8 @@ class SiteTests(unittest.TestCase):
 
     def test_hub_links_every_exam(self):
         html_out = gen.render_hub([SAMPLE, dict(SAMPLE, id="az900", certificationCode="AZ-900")])
-        self.assertIn("/exams/sc900/", html_out)
-        self.assertIn("/exams/az900/", html_out)
+        self.assertIn('href="sc900/index.html"', html_out)
+        self.assertIn('href="az900/index.html"', html_out)
 
     def test_write_site_produces_files_for_missing_metadata_safely(self):
         with tempfile.TemporaryDirectory() as tmp:

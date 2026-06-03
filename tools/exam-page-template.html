@@ -17,28 +17,28 @@
   <meta name="twitter:title" content="$og_title">
   <meta name="twitter:description" content="$og_description">
   <meta name="twitter:image" content="$og_image">
-  <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="apple-touch-icon" href="/assets/media/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="64x64" href="/assets/media/favicon-64.png">
+  <link rel="manifest" href="${root}manifest.webmanifest">
+  <link rel="apple-touch-icon" href="${root}assets/media/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="${root}assets/media/favicon-64.png">
   <title>$title</title>
-  <link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css">
-  <link rel="stylesheet" href="/assets/css/app-footer.css">
-  <link rel="stylesheet" href="/assets/css/exam-landing.css">
+  <link rel="stylesheet" href="${root}assets/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="${root}assets/css/app-footer.css">
+  <link rel="stylesheet" href="${root}assets/css/exam-landing.css">
   <script type="application/ld+json">
 $jsonld
   </script>
 </head>
 <body class="exam-landing">
   <header class="landing-topbar">
-    <a class="landing-brand" href="/">
-      <img src="/assets/media/examplar-mark.png" alt="Examplar" width="40" height="36" decoding="async">
+    <a class="landing-brand" href="${root}index.html">
+      <img src="${root}assets/media/examplar-mark.png" alt="Examplar" width="40" height="36" decoding="async">
       <span>Examplar</span>
     </a>
   </header>
   <main class="landing-main">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
-      <a href="/">Home</a> <span aria-hidden="true">/</span>
-      <a href="/exams/">Exams</a> <span aria-hidden="true">/</span>
+      <a href="${root}index.html">Home</a> <span aria-hidden="true">/</span>
+      <a href="${root}exams/index.html">Exams</a> <span aria-hidden="true">/</span>
       <span aria-current="page">$exam_code</span>
     </nav>
     <header class="landing-hero">
@@ -57,9 +57,9 @@ $crosslinks
   <footer class="landing-footer app-footer" aria-label="Site links">
     <div class="app-footer-inner">
       <nav class="app-footer-links" aria-label="Site links">
-        <a href="/">Examplar home</a>
-        <a href="/exams/">All practice exams</a>
-        <a href="/privacy-and-storage.html">Privacy &amp; storage</a>
+        <a href="${root}index.html">Examplar home</a>
+        <a href="${root}exams/index.html">All practice exams</a>
+        <a href="${root}privacy-and-storage.html">Privacy &amp; storage</a>
       </nav>
     </div>
   </footer>
