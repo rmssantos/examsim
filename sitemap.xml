@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://examplar.app/</loc>
-    <lastmod>2026-06-03</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://examplar.app/privacy-and-storage.html</loc>
-    <lastmod>2026-06-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.3</priority>
-  </url>
+  <url><loc>https://examplar.app/</loc><priority>1.0</priority></url>
+  <url><loc>https://examplar.app/exams/</loc><priority>0.9</priority></url>
+  <url><loc>https://examplar.app/exams/sc900/</loc><priority>0.8</priority></url>
+  <url><loc>https://examplar.app/exams/ab730/</loc><priority>0.8</priority></url>
+  <url><loc>https://examplar.app/exams/ab731/</loc><priority>0.8</priority></url>
+  <url><loc>https://examplar.app/exams/az900/</loc><priority>0.8</priority></url>
+  <url><loc>https://examplar.app/exams/az104/</loc><priority>0.8</priority></url>
+  <url><loc>https://examplar.app/privacy-and-storage.html</loc><priority>0.3</priority></url>
 </urlset>
