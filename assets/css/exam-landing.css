@@ -1,0 +1,86 @@
+/* Landing pages for SEO (exams/index.html and exams/<id>/index.html). */
+body.exam-landing {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #0f172a;
+  background: #f8fafc;
+  line-height: 1.6;
+}
+.exam-landing .landing-topbar {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  background: #1e3c72;
+}
+.exam-landing .landing-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+}
+.exam-landing .landing-main {
+  width: min(880px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 48px;
+}
+.exam-landing .breadcrumbs {
+  font-size: 0.9rem;
+  color: #475569;
+  margin-bottom: 16px;
+}
+.exam-landing .breadcrumbs a { color: #1e3c72; text-decoration: none; }
+.exam-landing .landing-hero h1 { font-size: 2.1rem; margin: 0 0 4px; }
+.exam-landing .landing-subhead { font-size: 1.15rem; color: #334155; margin: 0 0 16px; }
+.exam-landing .landing-intro { font-size: 1.05rem; color: #334155; }
+.exam-landing .landing-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px 22px;
+  background: #1e3c72;
+  color: #fff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.exam-landing .landing-cta:hover { background: #16305c; }
+.exam-landing .exam-section { margin-top: 32px; }
+.exam-landing .exam-section h2 { font-size: 1.35rem; margin-bottom: 12px; }
+.exam-landing .exam-facts {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 24px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+.exam-landing .exam-facts caption {
+  text-align: left;
+  font-weight: 600;
+  padding: 12px 16px;
+  background: #eef2f7;
+}
+.exam-landing .exam-facts th,
+.exam-landing .exam-facts td { text-align: left; padding: 10px 16px; border-top: 1px solid #e2e8f0; }
+.exam-landing .exam-facts th { width: 45%; color: #475569; font-weight: 600; }
+.exam-landing .exam-domains,
+.exam-landing .exam-modules,
+.exam-landing .exam-resources,
+.exam-landing .exam-crosslinks { padding-left: 20px; }
+.exam-landing .exam-domains li,
+.exam-landing .exam-modules li,
+.exam-landing .exam-resources li,
+.exam-landing .exam-crosslinks li { margin: 6px 0; }
+.exam-landing .domain-weight { color: #1e3c72; font-weight: 600; }
+.exam-landing .faq-item { background: #fff; border-radius: 8px; padding: 10px 16px; margin: 8px 0; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06); }
+.exam-landing .faq-item summary { cursor: pointer; font-weight: 600; }
+.exam-landing .hub-grid { list-style: none; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); margin-top: 24px; }
+.exam-landing .hub-card { display: flex; flex-direction: column; gap: 4px; padding: 18px; background: #fff; border-radius: 12px; text-decoration: none; color: inherit; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08); }
+.exam-landing .hub-card:hover { box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12); }
+.exam-landing .hub-code { font-weight: 700; color: #1e3c72; }
+.exam-landing .hub-name { font-size: 0.92rem; color: #475569; }
+.exam-landing .landing-footer { margin-top: 48px; }

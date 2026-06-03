@@ -156,5 +156,13 @@ class SiteTests(unittest.TestCase):
             )
 
 
+class StyleTests(unittest.TestCase):
+    def test_landing_css_exists_and_scopes_to_landing(self):
+        css = (ROOT / "assets" / "css" / "exam-landing.css").read_text(encoding="utf-8")
+        self.assertIn(".exam-landing", css)
+        self.assertIn(".landing-cta", css)
+        self.assertIn(".hub-grid", css)
+
+
 if __name__ == "__main__":
     unittest.main()
