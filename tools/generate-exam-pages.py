@@ -59,16 +59,25 @@ def load_exams(index_path: Path = INDEX_JSON, src: Path = EXAMS_SRC) -> list:
     return exams
 
 
+def is_free(meta: dict) -> bool:
+    """True for fully free packs; False for pro/preview packs with a paid upgrade."""
+    return meta.get("commercialStatus", "free") == "free"
+
+
 def build_facts(meta: dict) -> str:
+    bank_label = "Question bank" if is_free(meta) else "Free preview questions"
     pairs = [
         ("Vendor", meta.get("vendor")),
         ("Certification", exam_code(meta)),
         ("Level", meta.get("level") or meta.get("badge")),
         ("Questions per attempt", meta.get("questionCount")),
-        ("Question bank", meta.get("totalQuestions")),
+        (bank_label, meta.get("totalQuestions")),
         ("Time limit", f"{meta.get('duration')} min" if meta.get("duration") is not None else None),
         ("Pass score", f"{meta.get('passScore')}%" if meta.get("passScore") is not None else None),
     ]
+    pro = meta.get("pro") or {}
+    if pro.get("questions"):
+        pairs.append(("Full pack", f"{pro['questions']} questions"))
     rows = [
         f'      <tr><th scope="row">{esc(label)}</th><td>{esc(value)}</td></tr>'
         for label, value in pairs
@@ -156,13 +165,34 @@ def faq_pairs(meta: dict) -> list:
     code = exam_code(meta)
     full = meta.get("fullName") or code
     count = meta.get("totalQuestions") or meta.get("questionCount")
-    bank = f"{count} practice questions" if count else "a bank of practice questions"
-    return [
-        (
-            f"Is the {code} practice exam free?",
+    pro = meta.get("pro") or {}
+
+    if is_free(meta):
+        free_answer = (
             f"Yes. The {code} practice exam on Examplar is completely free, with no "
-            "account and no sign-up.",
-        ),
+            "account and no sign-up."
+        )
+        bank = f"{count} practice questions" if count else "a bank of practice questions"
+        count_answer = f"The {code} pack ships {bank} covering every objective domain."
+    else:
+        full_pack = pro.get("questions")
+        price = pro.get("price")
+        free_answer = (
+            f"The {count}-question {code} preview is free, with no account. "
+            f"The complete {full_pack}-question pack is a one-time {price}."
+            if count and full_pack and price
+            else f"The {code} preview is free. The complete pack is a one-time purchase."
+        )
+        count_answer = (
+            f"The free preview includes {count} questions. The full "
+            f"{pro.get('title', code + ' Complete')} pack includes {full_pack} questions "
+            "with detailed explanations and study mode."
+            if count and full_pack
+            else "The free preview is a sample; the full pack covers every objective."
+        )
+
+    return [
+        (f"Is the {code} practice exam free?", free_answer),
         (
             f"Are these real {code} exam questions?",
             f"No. These are original, syllabus-aligned questions written to match the "
@@ -173,10 +203,7 @@ def faq_pairs(meta: dict) -> list:
             "Yes. Examplar runs fully in your browser and works offline. Your answers "
             "and progress never leave your device.",
         ),
-        (
-            f"How many {code} questions are included?",
-            f"The {code} pack ships {bank} covering every objective domain.",
-        ),
+        (f"How many {code} questions are included?", count_answer),
     ]
 
 
@@ -218,10 +245,19 @@ def build_crosslinks(meta: dict, all_exams: list, root: str = "../../") -> str:
 
 
 def page_title(meta: dict) -> str:
-    return f"{exam_code(meta)} Practice Exam (Free, No Sign-up) | Examplar"
+    code = exam_code(meta)
+    if is_free(meta):
+        return f"{code} Practice Exam (Free, No Sign-up) | Examplar"
+    count = meta.get("questionCount") or meta.get("totalQuestions")
+    if count:
+        return f"{code} Practice Exam (Free {count}-Question Preview) | Examplar"
+    return f"{code} Practice Exam (Free Preview) | Examplar"
 
 
 def page_description(meta: dict) -> str:
+    authored = meta.get("description")
+    if authored:
+        return authored
     code = exam_code(meta)
     full = meta.get("fullName") or code
     count = meta.get("totalQuestions") or meta.get("questionCount")
@@ -232,10 +268,68 @@ def page_description(meta: dict) -> str:
     )
 
 
+def page_kicker(meta: dict) -> str:
+    return "Free practice exam" if is_free(meta) else "Free preview"
+
+
+def cta_label(meta: dict) -> str:
+    return "Start practicing free" if is_free(meta) else "Start the free preview"
+
+
+def _parse_price(price: str) -> tuple:
+    """Split a price like '19 EUR' into ('19', 'EUR'); default currency EUR."""
+    parts = str(price or "").split()
+    amount = parts[0] if parts else "0"
+    currency = parts[1] if len(parts) > 1 else "EUR"
+    return amount, currency
+
+
+def build_pro(meta: dict) -> str:
+    """Upsell section for pro/preview packs; empty string for fully free packs."""
+    pro = meta.get("pro")
+    if not pro:
+        return ""
+    code = exam_code(meta)
+    title = esc(pro.get("title", f"{code} Complete"))
+    price = esc(pro.get("price", ""))
+    url = esc(pro.get("url", "#"))
+    questions = pro.get("questions")
+    qs_txt = f"all {esc(questions)} questions" if questions else "the complete question bank"
+    highlights = [h for h in (pro.get("highlights") or []) if h]
+    if highlights:
+        items = "\n".join(f"      <li>{esc(h)}</li>" for h in highlights)
+        highlights_html = f'    <ul class="pro-highlights">\n{items}\n    </ul>\n'
+    else:
+        highlights_html = ""
+    price_html = f' One-time <span class="pro-price">{price}</span>.' if price else ""
+    return (
+        '    <section class="exam-pro" aria-labelledby="pro-h">\n'
+        f"      <h2 id=\"pro-h\">Get {title}</h2>\n"
+        f"      <p>Unlock {qs_txt} with detailed explanations for every answer and "
+        f"study mode.{price_html}</p>\n"
+        f"{highlights_html}"
+        f'      <a class="pro-cta" href="{url}" rel="nofollow noopener" target="_blank">'
+        "Unlock the full pack</a>\n"
+        "    </section>"
+    )
+
+
 def build_jsonld(meta: dict) -> str:
     code = exam_code(meta)
     url = f"{SITE}/exams/{meta['id']}/"
     duration = meta.get("duration") or 45
+    # The preview is always free to start; pro/preview packs add a paid full pack.
+    offers = [{"@type": "Offer", "price": "0", "priceCurrency": "USD", "category": "Free"}]
+    pro = meta.get("pro") or {}
+    if pro.get("price"):
+        amount, currency = _parse_price(pro["price"])
+        offers.append({
+            "@type": "Offer",
+            "price": amount,
+            "priceCurrency": currency,
+            "category": "Full pack",
+            "url": pro.get("url", url),
+        })
     graph = [
         {
             "@type": "Course",
@@ -246,7 +340,7 @@ def build_jsonld(meta: dict) -> str:
             "inLanguage": meta.get("language", "en"),
             "isAccessibleForFree": True,
             "provider": {"@type": "Organization", "name": "Examplar", "url": f"{SITE}/"},
-            "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD", "category": "Free"},
+            "offers": offers if len(offers) > 1 else offers[0],
             "hasCourseInstance": {
                 "@type": "CourseInstance",
                 "courseMode": "online",
@@ -288,10 +382,24 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
     # (file://), served via server.py, or deployed at the domain root.
     root = "../../"
     full = meta.get("fullName") or code
-    intro = (
-        f"Practice for {full} the private way. Original, syllabus-aligned questions "
-        "you can run entirely in your browser, offline, with no account and no tracking."
-    )
+    if is_free(meta):
+        intro = (
+            f"Practice for {full} the private way. Original, syllabus-aligned questions "
+            "you can run entirely in your browser, offline, with no account and no tracking."
+        )
+    else:
+        count = meta.get("totalQuestions") or meta.get("questionCount")
+        full_pack = (meta.get("pro") or {}).get("questions")
+        preview_txt = f"Free {count}-question preview of {full}. " if count else f"Free preview of {full}. "
+        unlock_txt = (
+            f"Unlock the complete {full_pack}-question pack for detailed explanations and study mode."
+            if full_pack
+            else "Unlock the complete pack for detailed explanations and study mode."
+        )
+        intro = (
+            f"{preview_txt}Original, syllabus-aligned questions you can run in your browser, "
+            f"offline, with no account. {unlock_txt}"
+        )
     title = esc(page_title(meta))
     description = esc(page_description(meta))
     mapping = {
@@ -307,12 +415,15 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
         "exam_code": esc(code),
         "full_name": esc(full),
         "intro": esc(intro),
+        "kicker": esc(page_kicker(meta)),
+        "cta_label": esc(cta_label(meta)),
         "root": root,
         "cta_url": f"{root}exam.html?exam={esc(meta['id'])}",
         "facts": build_facts(meta),
         "domains": build_domains(meta),
         "modules": build_modules(meta),
         "resources": build_resources(meta),
+        "pro": build_pro(meta),
         "faq": build_faq(meta),
         "crosslinks": build_crosslinks(meta, all_exams, root),
         "jsonld": build_jsonld(meta),
@@ -339,12 +450,16 @@ def render_sitemap(all_exams: list) -> str:
 def render_hub(all_exams: list) -> str:
     # The hub lives at /exams/, so site-root assets and pages are one level up.
     root = "../"
-    cards = "\n".join(
-        f'      <li><a class="hub-card" href="{esc(e["id"])}/index.html">'
-        f'<span class="hub-code">{esc(exam_code(e))}</span>'
-        f'<span class="hub-name">{esc(e.get("fullName") or exam_code(e))}</span></a></li>'
-        for e in all_exams
-    )
+    def card(e: dict) -> str:
+        badge = "" if is_free(e) else '<span class="hub-badge">Free preview</span>'
+        return (
+            f'      <li><a class="hub-card" href="{esc(e["id"])}/index.html">'
+            f'<span class="hub-code">{esc(exam_code(e))}</span>'
+            f'<span class="hub-name">{esc(e.get("fullName") or exam_code(e))}</span>'
+            f"{badge}</a></li>"
+        )
+
+    cards = "\n".join(card(e) for e in all_exams)
     description = (
         "Free, private, offline practice exams for cloud and security certifications. "
         "Original questions, no account, your data stays in your browser."
@@ -370,8 +485,8 @@ def render_hub(all_exams: list) -> str:
   <link rel="icon" type="image/png" sizes="64x64" href="{root}assets/media/favicon-64.png">
   <title>All practice exams | Examplar</title>
   <link rel="stylesheet" href="{root}assets/vendor/fontawesome/css/all.min.css">
-  <link rel="stylesheet" href="{root}assets/css/app-footer.css">
   <link rel="stylesheet" href="{root}assets/css/exam-landing.css">
+  <script src="{root}assets/js/legal-page.js" defer></script>
 </head>
 <body class="exam-landing">
   <header class="landing-topbar">
@@ -379,6 +494,9 @@ def render_hub(all_exams: list) -> str:
       <img src="{root}assets/media/examplar-mark.png" alt="Examplar" width="40" height="36" decoding="async">
       <span>Examplar</span>
     </a>
+    <button id="legalThemeToggle" class="landing-theme-toggle" type="button" title="Switch to dark mode" aria-label="Switch to dark mode">
+      <i id="legalThemeIcon" aria-hidden="true" class="fas fa-moon"></i>
+    </button>
   </header>
   <main class="landing-main">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -386,6 +504,7 @@ def render_hub(all_exams: list) -> str:
       <span aria-current="page">Exams</span>
     </nav>
     <header class="landing-hero">
+      <span class="landing-kicker"><i aria-hidden="true" class="fas fa-graduation-cap"></i> Certification practice</span>
       <h1>Practice exams</h1>
       <p class="landing-intro">{esc(description)}</p>
     </header>
@@ -393,13 +512,11 @@ def render_hub(all_exams: list) -> str:
 {cards}
     </ul>
   </main>
-  <footer class="landing-footer app-footer" aria-label="Site links">
-    <div class="app-footer-inner">
-      <nav class="app-footer-links" aria-label="Site links">
-        <a href="{root}index.html">Examplar home</a>
-        <a href="{root}privacy-and-storage.html">Privacy &amp; storage</a>
-      </nav>
-    </div>
+  <footer class="landing-footer">
+    <nav class="landing-footer-links" aria-label="Site links">
+      <a href="{root}index.html">Examplar home</a>
+      <a href="{root}privacy-and-storage.html">Privacy &amp; storage</a>
+    </nav>
   </footer>
 </body>
 </html>

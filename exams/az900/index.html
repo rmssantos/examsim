@@ -4,26 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#1e3c72">
-  <meta name="description" content="Free AZ-900 practice exam for Microsoft Azure Fundamentals. 120 free practice questions, original and syllabus-aligned. No account, works offline, your data stays in your browser.">
+  <meta name="description" content="Original AZ-900 study bank with questions written from scratch using public Microsoft Learn documentation. It does not contain real exam questions.">
   <link rel="canonical" href="https://examplar.app/exams/az900/">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Examplar">
   <meta property="og:title" content="AZ-900 Practice Exam (Free, No Sign-up) | Examplar">
-  <meta property="og:description" content="Free AZ-900 practice exam for Microsoft Azure Fundamentals. 120 free practice questions, original and syllabus-aligned. No account, works offline, your data stays in your browser.">
+  <meta property="og:description" content="Original AZ-900 study bank with questions written from scratch using public Microsoft Learn documentation. It does not contain real exam questions.">
   <meta property="og:url" content="https://examplar.app/exams/az900/">
   <meta property="og:image" content="https://examplar.app/assets/media/og-image.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="AZ-900 Practice Exam (Free, No Sign-up) | Examplar">
-  <meta name="twitter:description" content="Free AZ-900 practice exam for Microsoft Azure Fundamentals. 120 free practice questions, original and syllabus-aligned. No account, works offline, your data stays in your browser.">
+  <meta name="twitter:description" content="Original AZ-900 study bank with questions written from scratch using public Microsoft Learn documentation. It does not contain real exam questions.">
   <meta name="twitter:image" content="https://examplar.app/assets/media/og-image.png">
   <link rel="manifest" href="../../manifest.webmanifest">
   <link rel="apple-touch-icon" href="../../assets/media/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="64x64" href="../../assets/media/favicon-64.png">
   <title>AZ-900 Practice Exam (Free, No Sign-up) | Examplar</title>
   <link rel="stylesheet" href="../../assets/vendor/fontawesome/css/all.min.css">
-  <link rel="stylesheet" href="../../assets/css/app-footer.css">
   <link rel="stylesheet" href="../../assets/css/exam-landing.css">
+  <script src="../../assets/js/legal-page.js" defer></script>
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -32,7 +32,7 @@
       "@type": "Course",
       "@id": "https://examplar.app/exams/az900/#course",
       "name": "AZ-900 Practice Exam",
-      "description": "Free AZ-900 practice exam for Microsoft Azure Fundamentals. 120 free practice questions, original and syllabus-aligned. No account, works offline, your data stays in your browser.",
+      "description": "Original AZ-900 study bank with questions written from scratch using public Microsoft Learn documentation. It does not contain real exam questions.",
       "url": "https://examplar.app/exams/az900/",
       "inLanguage": "en",
       "isAccessibleForFree": true,
@@ -123,6 +123,9 @@
       <img src="../../assets/media/examplar-mark.png" alt="Examplar" width="40" height="36" decoding="async">
       <span>Examplar</span>
     </a>
+    <button id="legalThemeToggle" class="landing-theme-toggle" type="button" title="Switch to dark mode" aria-label="Switch to dark mode">
+      <i id="legalThemeIcon" aria-hidden="true" class="fas fa-moon"></i>
+    </button>
   </header>
   <main class="landing-main">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -131,10 +134,14 @@
       <span aria-current="page">AZ-900</span>
     </nav>
     <header class="landing-hero">
+      <span class="landing-kicker"><i aria-hidden="true" class="fas fa-circle-check"></i> Free practice exam</span>
       <h1>AZ-900 Practice Exam</h1>
       <p class="landing-subhead">Microsoft Azure Fundamentals</p>
       <p class="landing-intro">Practice for Microsoft Azure Fundamentals the private way. Original, syllabus-aligned questions you can run entirely in your browser, offline, with no account and no tracking.</p>
-      <a class="landing-cta" href="../../exam.html?exam=az900"><i aria-hidden="true" class="fas fa-play"></i> Start practicing free</a>
+      <div class="hero-cta-row">
+        <a class="landing-cta" href="../../exam.html?exam=az900"><i aria-hidden="true" class="fas fa-play"></i> Start practicing free</a>
+        <a class="landing-cta-ghost" href="../../exams/index.html"><i aria-hidden="true" class="fas fa-layer-group"></i> Browse all exams</a>
+      </div>
     </header>
     <table class="exam-facts">
       <caption>Exam at a glance</caption>
@@ -171,6 +178,7 @@
       <li><a href="https://learn.microsoft.com/en-us/azure/" rel="nofollow noopener" target="_blank">Azure documentation</a></li>
       </ul>
     </section>
+
     <section class="exam-section faq" aria-labelledby="faq-h">
       <h2 id="faq-h">Frequently asked questions</h2>
       <details class="faq-item">
@@ -200,14 +208,12 @@
       </ul>
     </section>
   </main>
-  <footer class="landing-footer app-footer" aria-label="Site links">
-    <div class="app-footer-inner">
-      <nav class="app-footer-links" aria-label="Site links">
-        <a href="../../index.html">Examplar home</a>
-        <a href="../../exams/index.html">All practice exams</a>
-        <a href="../../privacy-and-storage.html">Privacy &amp; storage</a>
-      </nav>
-    </div>
+  <footer class="landing-footer">
+    <nav class="landing-footer-links" aria-label="Site links">
+      <a href="../../index.html">Examplar home</a>
+      <a href="../../exams/index.html">All practice exams</a>
+      <a href="../../privacy-and-storage.html">Privacy &amp; storage</a>
+    </nav>
   </footer>
 </body>
 </html>

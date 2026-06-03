@@ -19,8 +19,8 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../assets/media/favicon-64.png">
   <title>All practice exams | Examplar</title>
   <link rel="stylesheet" href="../assets/vendor/fontawesome/css/all.min.css">
-  <link rel="stylesheet" href="../assets/css/app-footer.css">
   <link rel="stylesheet" href="../assets/css/exam-landing.css">
+  <script src="../assets/js/legal-page.js" defer></script>
 </head>
 <body class="exam-landing">
   <header class="landing-topbar">
@@ -28,6 +28,9 @@
       <img src="../assets/media/examplar-mark.png" alt="Examplar" width="40" height="36" decoding="async">
       <span>Examplar</span>
     </a>
+    <button id="legalThemeToggle" class="landing-theme-toggle" type="button" title="Switch to dark mode" aria-label="Switch to dark mode">
+      <i id="legalThemeIcon" aria-hidden="true" class="fas fa-moon"></i>
+    </button>
   </header>
   <main class="landing-main">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -35,6 +38,7 @@
       <span aria-current="page">Exams</span>
     </nav>
     <header class="landing-hero">
+      <span class="landing-kicker"><i aria-hidden="true" class="fas fa-graduation-cap"></i> Certification practice</span>
       <h1>Practice exams</h1>
       <p class="landing-intro">Free, private, offline practice exams for cloud and security certifications. Original questions, no account, your data stays in your browser.</p>
     </header>
@@ -43,16 +47,14 @@
       <li><a class="hub-card" href="ab730/index.html"><span class="hub-code">AB-730</span><span class="hub-name">Microsoft Certified: AI Business Professional</span></a></li>
       <li><a class="hub-card" href="ab731/index.html"><span class="hub-code">AB-731</span><span class="hub-name">Microsoft Certified: AI Transformation Leader</span></a></li>
       <li><a class="hub-card" href="az900/index.html"><span class="hub-code">AZ-900</span><span class="hub-name">Microsoft Azure Fundamentals</span></a></li>
-      <li><a class="hub-card" href="az104/index.html"><span class="hub-code">AZ-104</span><span class="hub-name">Microsoft Azure Administrator</span></a></li>
+      <li><a class="hub-card" href="az104/index.html"><span class="hub-code">AZ-104</span><span class="hub-name">Microsoft Azure Administrator</span><span class="hub-badge">Free preview</span></a></li>
     </ul>
   </main>
-  <footer class="landing-footer app-footer" aria-label="Site links">
-    <div class="app-footer-inner">
-      <nav class="app-footer-links" aria-label="Site links">
-        <a href="../index.html">Examplar home</a>
-        <a href="../privacy-and-storage.html">Privacy &amp; storage</a>
-      </nav>
-    </div>
+  <footer class="landing-footer">
+    <nav class="landing-footer-links" aria-label="Site links">
+      <a href="../index.html">Examplar home</a>
+      <a href="../privacy-and-storage.html">Privacy &amp; storage</a>
+    </nav>
   </footer>
 </body>
 </html>

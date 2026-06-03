@@ -40,6 +40,30 @@ SAMPLE = {
     ],
 }
 
+# A pro/preview pack: free 20-question preview plus a paid full pack.
+SAMPLE_PRO = {
+    "id": "az104",
+    "name": "AZ-104",
+    "fullName": "Microsoft Azure Administrator",
+    "certificationCode": "AZ-104",
+    "vendor": "Microsoft",
+    "level": "Associate",
+    "language": "en",
+    "duration": 60,
+    "questionCount": 20,
+    "totalQuestions": 20,
+    "passScore": 70,
+    "commercialStatus": "pro-preview",
+    "modules": [{"name": "Virtual Machines"}],
+    "pro": {
+        "title": "AZ-104 Complete",
+        "questions": 300,
+        "price": "19 EUR",
+        "url": "https://examplar.gumroad.com/l/az104-complete",
+        "highlights": ["300+ original questions", "Detailed explanations"],
+    },
+}
+
 
 class PrimitiveTests(unittest.TestCase):
     def test_esc_escapes_html(self):
@@ -172,6 +196,64 @@ class HomepageLinkTests(unittest.TestCase):
         html_out = (ROOT / "index.html").read_text(encoding="utf-8")
         self.assertIn('href="/exams/"', html_out)
         self.assertIn("Practice exams", html_out)
+
+
+class ThemeTests(unittest.TestCase):
+    def _render(self, meta):
+        template = (ROOT / "tools" / "exam-page-template.html").read_text(encoding="utf-8")
+        return gen.render_exam_page(meta, [meta], template)
+
+    def test_pages_wire_shared_theme_toggle(self):
+        page = self._render(SAMPLE)
+        self.assertIn('id="legalThemeToggle"', page)
+        self.assertIn('id="legalThemeIcon"', page)
+        self.assertIn("assets/js/legal-page.js", page)
+
+    def test_landing_css_supports_dark_mode(self):
+        css = (ROOT / "assets" / "css" / "exam-landing.css").read_text(encoding="utf-8")
+        self.assertIn("body.exam-landing.dark-mode", css)
+
+
+class PricingTests(unittest.TestCase):
+    def _render(self, meta):
+        template = (ROOT / "tools" / "exam-page-template.html").read_text(encoding="utf-8")
+        return gen.render_exam_page(meta, [meta], template)
+
+    def test_free_pack_is_marked_free(self):
+        self.assertTrue(gen.is_free(SAMPLE))
+        page = self._render(SAMPLE)
+        self.assertIn("(Free, No Sign-up)", page)
+        self.assertNotIn("19 EUR", page)
+        self.assertEqual(gen.build_pro(SAMPLE), "")
+
+    def test_preview_pack_shows_paid_upgrade_not_fully_free(self):
+        self.assertFalse(gen.is_free(SAMPLE_PRO))
+        page = self._render(SAMPLE_PRO)
+        self.assertIn("Preview", page)            # title reflects preview
+        self.assertIn("19 EUR", page)             # price shown
+        self.assertIn("AZ-104 Complete", page)    # pro pack name
+        self.assertIn("Unlock the full pack", page)
+        self.assertNotIn("completely free", page)  # must not over-claim
+
+    def test_preview_jsonld_has_free_and_paid_offers(self):
+        payload = json.loads(gen.build_jsonld(SAMPLE_PRO))
+        course = next(n for n in payload["@graph"] if n["@type"] == "Course")
+        offers = course["offers"]
+        self.assertIsInstance(offers, list)
+        prices = {o["price"] for o in offers}
+        self.assertIn("0", prices)
+        self.assertIn("19", prices)
+
+    def test_free_jsonld_has_single_free_offer(self):
+        payload = json.loads(gen.build_jsonld(SAMPLE))
+        course = next(n for n in payload["@graph"] if n["@type"] == "Course")
+        self.assertEqual(course["offers"]["price"], "0")
+
+    def test_preview_copy_avoids_brand_taboo_terms(self):
+        for question, answer in gen.faq_pairs(SAMPLE_PRO):
+            blob = question + answer
+            self.assertNotIn("dump", blob.lower())
+            self.assertNotIn("—", blob)
 
 
 if __name__ == "__main__":
