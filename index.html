@@ -3,6 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#1e3c72">
 	<meta name="description" content="Practice certification exams privately and offline with Examplar. Original, syllabus-aligned questions for SC-900, AZ-900, AB-730 and more. Free, open-source, no account, and your data stays in your browser.">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="Examplar">
@@ -33,6 +34,46 @@
 	<script src="assets/vendor/jszip/jszip.min.js" defer></script>
 
 	<link rel="stylesheet" href="assets/css/index-inline.css">
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@graph": [
+			{
+				"@type": "Organization",
+				"@id": "https://examplar.app/#organization",
+				"name": "Examplar",
+				"url": "https://examplar.app/",
+				"logo": "https://examplar.app/assets/media/logo.png"
+			},
+			{
+				"@type": "WebSite",
+				"@id": "https://examplar.app/#website",
+				"url": "https://examplar.app/",
+				"name": "Examplar",
+				"inLanguage": "en",
+				"publisher": { "@id": "https://examplar.app/#organization" }
+			},
+			{
+				"@type": "WebApplication",
+				"@id": "https://examplar.app/#app",
+				"name": "Examplar",
+				"url": "https://examplar.app/",
+				"applicationCategory": "EducationalApplication",
+				"operatingSystem": "Any (modern web browser)",
+				"browserRequirements": "Requires JavaScript. Works offline once loaded.",
+				"description": "A private, offline, open-source engine for certification exam practice. Study the built-in packs or build your own. No account, and your data stays in your browser.",
+				"inLanguage": "en",
+				"isAccessibleForFree": true,
+				"offers": {
+					"@type": "Offer",
+					"price": "0",
+					"priceCurrency": "USD"
+				},
+				"publisher": { "@id": "https://examplar.app/#organization" }
+			}
+		]
+	}
+	</script>
 </head>
 <body>
 	<div class="container">
@@ -457,6 +498,10 @@
 						<span>Offline-ready. Browser edits stay local unless exported.</span>
 					</p>
 					<nav class="app-footer-links" aria-label="Project links">
+						<a href="/exams/">
+							<i aria-hidden="true" class="fas fa-list"></i>
+							<span>Practice exams</span>
+						</a>
 						<a href="https://github.com/rmssantos/examsim" target="_blank" rel="noopener noreferrer">
 							<i aria-hidden="true" class="fab fa-github"></i>
 							<span>Source</span>

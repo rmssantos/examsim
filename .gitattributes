@@ -4,3 +4,9 @@
 # otherwise change the bytes and break the manifest check in CI.
 user-content/exams/*.json text eol=lf
 user-content/exams/**/*.json text eol=lf
+
+# Generated SEO landing pages and sitemap: pin LF so the anti-drift check
+# (tests/test_exam_seo_pages.py) compares identical bytes on every platform.
+exams/**/*.html text eol=lf
+sitemap.xml text eol=lf
+robots.txt text eol=lf

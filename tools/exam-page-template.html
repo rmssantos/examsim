@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="$lang">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="$theme_color">
+  <meta name="description" content="$description">
+  <link rel="canonical" href="$canonical">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Examplar">
+  <meta property="og:title" content="$og_title">
+  <meta property="og:description" content="$og_description">
+  <meta property="og:url" content="$og_url">
+  <meta property="og:image" content="$og_image">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="$og_title">
+  <meta name="twitter:description" content="$og_description">
+  <meta name="twitter:image" content="$og_image">
+  <link rel="manifest" href="${root}manifest.webmanifest">
+  <link rel="apple-touch-icon" href="${root}assets/media/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="${root}assets/media/favicon-64.png">
+  <title>$title</title>
+  <link rel="stylesheet" href="${root}assets/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="${root}assets/css/exam-landing.css">
+  <script src="${root}assets/js/legal-page.js" defer></script>
+  <script type="application/ld+json">
+$jsonld
+  </script>
+</head>
+<body class="exam-landing">
+  <header class="landing-topbar">
+    <a class="landing-brand" href="${root}index.html">
+      <img src="${root}assets/media/examplar-mark.png" alt="Examplar" width="40" height="36" decoding="async">
+      <span>Examplar</span>
+    </a>
+    <button id="legalThemeToggle" class="landing-theme-toggle" type="button" title="Switch to dark mode" aria-label="Switch to dark mode">
+      <i id="legalThemeIcon" aria-hidden="true" class="fas fa-moon"></i>
+    </button>
+  </header>
+  <main class="landing-main">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="${root}index.html">Home</a> <span aria-hidden="true">/</span>
+      <a href="${root}exams/index.html">Exams</a> <span aria-hidden="true">/</span>
+      <span aria-current="page">$exam_code</span>
+    </nav>
+    <header class="landing-hero">
+      <span class="landing-kicker"><i aria-hidden="true" class="fas fa-circle-check"></i> $kicker</span>
+      <h1>$exam_code Practice Exam</h1>
+      <p class="landing-subhead">$full_name</p>
+      <p class="landing-intro">$intro</p>
+      <div class="hero-cta-row">
+        <a class="landing-cta" href="$cta_url"><i aria-hidden="true" class="fas fa-play"></i> $cta_label</a>
+        <a class="landing-cta-ghost" href="${root}exams/index.html"><i aria-hidden="true" class="fas fa-layer-group"></i> Browse all exams</a>
+      </div>
+    </header>
+$facts
+$domains
+$modules
+$resources
+$pro
+$faq
+$crosslinks
+  </main>
+  <footer class="landing-footer">
+    <nav class="landing-footer-links" aria-label="Site links">
+      <a href="${root}index.html">Examplar home</a>
+      <a href="${root}exams/index.html">All practice exams</a>
+      <a href="${root}privacy-and-storage.html">Privacy &amp; storage</a>
+    </nav>
+  </footer>
+</body>
+</html>

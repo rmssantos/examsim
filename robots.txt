@@ -1,0 +1,8 @@
+# robots.txt for https://examplar.app
+# Crawlers are welcome. App screens (exam.html, editor.html) carry their own
+# noindex meta tag, so they are intentionally left crawlable here.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://examplar.app/sitemap.xml

@@ -37,6 +37,9 @@ jobs:
           fi
             python tools/inject-analytics-secret.py
 
+      - name: Generate per-exam SEO pages
+        run: python tools/generate-exam-pages.py
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
