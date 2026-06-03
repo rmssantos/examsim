@@ -313,3 +313,115 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
         "jsonld": build_jsonld(meta),
     }
     return Template(template).substitute(mapping)
+
+
+def render_sitemap(all_exams: list) -> str:
+    entries = [(f"{SITE}/", "1.0"), (f"{SITE}/exams/", "0.9")]
+    entries += [(f"{SITE}/exams/{e['id']}/", "0.8") for e in all_exams]
+    entries.append((f"{SITE}/privacy-and-storage.html", "0.3"))
+    body = "\n".join(
+        f"  <url><loc>{loc}</loc><priority>{priority}</priority></url>"
+        for loc, priority in entries
+    )
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{body}\n"
+        "</urlset>\n"
+    )
+
+
+def render_hub(all_exams: list) -> str:
+    cards = "\n".join(
+        f'      <li><a class="hub-card" href="{SITE}/exams/{esc(e["id"])}/">'
+        f'<span class="hub-code">{esc(exam_code(e))}</span>'
+        f'<span class="hub-name">{esc(e.get("fullName") or exam_code(e))}</span></a></li>'
+        for e in all_exams
+    )
+    description = (
+        "Free, private, offline practice exams for cloud and security certifications. "
+        "Original questions, no account, your data stays in your browser."
+    )
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="{THEME_COLOR}">
+  <meta name="description" content="{esc(description)}">
+  <link rel="canonical" href="{SITE}/exams/">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Examplar">
+  <meta property="og:title" content="All practice exams | Examplar">
+  <meta property="og:description" content="{esc(description)}">
+  <meta property="og:url" content="{SITE}/exams/">
+  <meta property="og:image" content="{OG_IMAGE}">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/assets/media/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/assets/media/favicon-64.png">
+  <title>All practice exams | Examplar</title>
+  <link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="/assets/css/app-footer.css">
+  <link rel="stylesheet" href="/assets/css/exam-landing.css">
+</head>
+<body class="exam-landing">
+  <header class="landing-topbar">
+    <a class="landing-brand" href="/">
+      <img src="/assets/media/examplar-mark.png" alt="Examplar" width="40" height="36" decoding="async">
+      <span>Examplar</span>
+    </a>
+  </header>
+  <main class="landing-main">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a> <span aria-hidden="true">/</span>
+      <span aria-current="page">Exams</span>
+    </nav>
+    <header class="landing-hero">
+      <h1>Practice exams</h1>
+      <p class="landing-intro">{esc(description)}</p>
+    </header>
+    <ul class="hub-grid">
+{cards}
+    </ul>
+  </main>
+  <footer class="landing-footer app-footer" aria-label="Site links">
+    <div class="app-footer-inner">
+      <nav class="app-footer-links" aria-label="Site links">
+        <a href="/">Examplar home</a>
+        <a href="/privacy-and-storage.html">Privacy &amp; storage</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
+"""
+
+
+def write_site(repo_root: Path = ROOT, src: Path = EXAMS_SRC, index_path: Path = INDEX_JSON,
+               template_path: Path = TEMPLATE_PATH) -> int:
+    exams = load_exams(index_path, src)
+    if not exams:
+        raise SystemExit("no exams with metadata found")
+    template = template_path.read_text(encoding="utf-8")
+    out_dir = repo_root / "exams"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for meta in exams:
+        page = render_exam_page(meta, exams, template)
+        exam_dir = out_dir / meta["id"]
+        exam_dir.mkdir(parents=True, exist_ok=True)
+        (exam_dir / "index.html").write_text(page, encoding="utf-8", newline="\n")
+        print(f"wrote exams/{meta['id']}/index.html")
+    (out_dir / "index.html").write_text(render_hub(exams), encoding="utf-8", newline="\n")
+    (repo_root / "sitemap.xml").write_text(render_sitemap(exams), encoding="utf-8", newline="\n")
+    print(f"wrote exams/index.html and sitemap.xml ({len(exams)} exams)")
+    return 0
+
+
+def main() -> int:
+    return write_site(ROOT)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

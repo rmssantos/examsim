@@ -105,5 +105,56 @@ class RenderTests(unittest.TestCase):
         self.assertNotIn("$", self._render())
 
 
+class SiteTests(unittest.TestCase):
+    def test_sitemap_lists_home_hub_and_each_exam(self):
+        xml = gen.render_sitemap([SAMPLE, dict(SAMPLE, id="az900")])
+        self.assertIn("<loc>https://examplar.app/</loc>", xml)
+        self.assertIn("<loc>https://examplar.app/exams/</loc>", xml)
+        self.assertIn("<loc>https://examplar.app/exams/sc900/</loc>", xml)
+        self.assertIn("<loc>https://examplar.app/exams/az900/</loc>", xml)
+        self.assertIn("<loc>https://examplar.app/privacy-and-storage.html</loc>", xml)
+
+    def test_hub_links_every_exam(self):
+        html_out = gen.render_hub([SAMPLE, dict(SAMPLE, id="az900", certificationCode="AZ-900")])
+        self.assertIn("/exams/sc900/", html_out)
+        self.assertIn("/exams/az900/", html_out)
+
+    def test_write_site_produces_files_for_missing_metadata_safely(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            src = tmp_path / "src"
+            (src / "sc900").mkdir(parents=True)
+            (src / "index.json").write_text(json.dumps(["sc900", "ghost"]), encoding="utf-8")
+            (src / "sc900" / "metadata.json").write_text(json.dumps(SAMPLE), encoding="utf-8")
+            out = tmp_path / "out"
+            gen.write_site(out, src=src, index_path=src / "index.json")
+            self.assertTrue((out / "exams" / "sc900" / "index.html").is_file())
+            self.assertFalse((out / "exams" / "ghost").exists())  # missing metadata skipped
+            self.assertTrue((out / "sitemap.xml").is_file())
+
+    def test_committed_output_is_up_to_date(self):
+        """Anti-drift: regenerate into a temp dir and compare to committed files."""
+        def norm(text):
+            return text.replace("\r\n", "\n")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            gen.write_site(tmp_path)  # real source, temp output
+            for generated in (tmp_path / "exams").rglob("*.html"):
+                rel = generated.relative_to(tmp_path)
+                committed = ROOT / rel
+                self.assertTrue(committed.is_file(), f"missing {rel}; run the generator")
+                self.assertEqual(
+                    norm(committed.read_text(encoding="utf-8")),
+                    norm(generated.read_text(encoding="utf-8")),
+                    f"{rel} is stale; run: python tools/generate-exam-pages.py",
+                )
+            self.assertEqual(
+                norm((ROOT / "sitemap.xml").read_text(encoding="utf-8")),
+                norm((tmp_path / "sitemap.xml").read_text(encoding="utf-8")),
+                "sitemap.xml is stale; run: python tools/generate-exam-pages.py",
+            )
+
+
 if __name__ == "__main__":
     unittest.main()
