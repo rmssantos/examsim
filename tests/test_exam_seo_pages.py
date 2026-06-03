@@ -50,5 +50,37 @@ class PrimitiveTests(unittest.TestCase):
         self.assertEqual(gen.exam_code({"id": "x", "name": "X-1"}), "X-1")
 
 
+class FragmentTests(unittest.TestCase):
+    def test_facts_table_has_known_rows(self):
+        html_out = gen.build_facts(SAMPLE)
+        self.assertIn("Microsoft", html_out)
+        self.assertIn("45 min", html_out)
+        self.assertIn("70%", html_out)
+        self.assertIn("<table", html_out)
+
+    def test_sections_render_when_present(self):
+        self.assertIn("Microsoft Entra", gen.build_modules(SAMPLE))
+        self.assertIn("10-15%", gen.build_domains(SAMPLE))
+        self.assertIn("learn.microsoft.com", gen.build_resources(SAMPLE))
+
+    def test_sections_empty_when_absent(self):
+        bare = {"id": "x", "name": "X-1"}
+        self.assertEqual(gen.build_modules(bare), "")
+        self.assertEqual(gen.build_domains(bare), "")
+        self.assertEqual(gen.build_resources(bare), "")
+
+    def test_faq_pairs_avoid_brand_taboo_terms(self):
+        for question, answer in gen.faq_pairs(SAMPLE):
+            blob = (question + answer).lower()
+            self.assertNotIn("dump", blob)
+            self.assertNotIn("—", question + answer)  # no em-dash
+
+    def test_crosslinks_exclude_self(self):
+        other = dict(SAMPLE, id="az900", name="AZ-900", certificationCode="AZ-900")
+        out = gen.build_crosslinks(SAMPLE, [SAMPLE, other])
+        self.assertIn("/exams/az900/", out)
+        self.assertNotIn("/exams/sc900/", out)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -57,3 +57,160 @@ def load_exams(index_path: Path = INDEX_JSON, src: Path = EXAMS_SRC) -> list:
         meta.setdefault("id", exam_id)
         exams.append(meta)
     return exams
+
+
+def build_facts(meta: dict) -> str:
+    pairs = [
+        ("Vendor", meta.get("vendor")),
+        ("Certification", exam_code(meta)),
+        ("Level", meta.get("level") or meta.get("badge")),
+        ("Questions per attempt", meta.get("questionCount")),
+        ("Question bank", meta.get("totalQuestions")),
+        ("Time limit", f"{meta.get('duration')} min" if meta.get("duration") else None),
+        ("Pass score", f"{meta.get('passScore')}%" if meta.get("passScore") else None),
+    ]
+    rows = [
+        f'      <tr><th scope="row">{esc(label)}</th><td>{esc(value)}</td></tr>'
+        for label, value in pairs
+        if value not in (None, "")
+    ]
+    if not rows:
+        return ""
+    body = "\n".join(rows)
+    return (
+        '    <table class="exam-facts">\n'
+        "      <caption>Exam at a glance</caption>\n"
+        f"{body}\n"
+        "    </table>"
+    )
+
+
+def build_domains(meta: dict) -> str:
+    domains = meta.get("objectiveDomains") or []
+    items = []
+    for domain in domains:
+        name = esc(domain.get("name", ""))
+        code = esc(domain.get("code", ""))
+        weight = domain.get("weightRange")
+        label = f"{code}: {name}" if code else name
+        weight_html = f' <span class="domain-weight">{esc(weight)}</span>' if weight else ""
+        items.append(f"      <li>{label}{weight_html}</li>")
+    if not items:
+        return ""
+    body = "\n".join(items)
+    return (
+        '    <section class="exam-section" aria-labelledby="domains-h">\n'
+        '      <h2 id="domains-h">Objective domains</h2>\n'
+        '      <ul class="exam-domains">\n'
+        f"{body}\n"
+        "      </ul>\n"
+        "    </section>"
+    )
+
+
+def build_modules(meta: dict) -> str:
+    modules = meta.get("modules") or []
+    items = "\n".join(
+        f"      <li>{esc(module.get('name', ''))}</li>"
+        for module in modules
+        if module.get("name")
+    )
+    if not items:
+        return ""
+    return (
+        '    <section class="exam-section" aria-labelledby="modules-h">\n'
+        '      <h2 id="modules-h">Topics covered</h2>\n'
+        '      <ul class="exam-modules">\n'
+        f"{items}\n"
+        "      </ul>\n"
+        "    </section>"
+    )
+
+
+def build_resources(meta: dict) -> str:
+    links = []
+    for resource in meta.get("resources") or []:
+        url = resource.get("url")
+        name = resource.get("name")
+        if not url or not name:
+            continue
+        links.append(
+            f'      <li><a href="{esc(url)}" rel="nofollow noopener" '
+            f'target="_blank">{esc(name)}</a></li>'
+        )
+    if not links:
+        return ""
+    body = "\n".join(links)
+    return (
+        '    <section class="exam-section" aria-labelledby="resources-h">\n'
+        '      <h2 id="resources-h">Official resources</h2>\n'
+        '      <ul class="exam-resources">\n'
+        f"{body}\n"
+        "      </ul>\n"
+        "    </section>"
+    )
+
+
+def faq_pairs(meta: dict) -> list:
+    code = exam_code(meta)
+    full = meta.get("fullName") or code
+    count = meta.get("totalQuestions") or meta.get("questionCount")
+    bank = f"{count} practice questions" if count else "a bank of practice questions"
+    return [
+        (
+            f"Is the {code} practice exam free?",
+            f"Yes. The {code} practice exam on Examplar is completely free, with no "
+            "account and no sign-up.",
+        ),
+        (
+            f"Are these real {code} exam questions?",
+            f"No. These are original, syllabus-aligned questions written to match the "
+            f"official objectives for {full}. They are not copied from the live exam.",
+        ),
+        (
+            "Does my data stay private?",
+            "Yes. Examplar runs fully in your browser and works offline. Your answers "
+            "and progress never leave your device.",
+        ),
+        (
+            f"How many {code} questions are included?",
+            f"The {code} pack ships {bank} covering every objective domain.",
+        ),
+    ]
+
+
+def build_faq(meta: dict) -> str:
+    items = []
+    for question, answer in faq_pairs(meta):
+        items.append(
+            '      <details class="faq-item">\n'
+            f"        <summary>{esc(question)}</summary>\n"
+            f"        <p>{esc(answer)}</p>\n"
+            "      </details>"
+        )
+    body = "\n".join(items)
+    return (
+        '    <section class="exam-section faq" aria-labelledby="faq-h">\n'
+        '      <h2 id="faq-h">Frequently asked questions</h2>\n'
+        f"{body}\n"
+        "    </section>"
+    )
+
+
+def build_crosslinks(meta: dict, all_exams: list) -> str:
+    others = [e for e in all_exams if e.get("id") != meta.get("id")]
+    if not others:
+        return ""
+    links = "\n".join(
+        f'      <li><a href="{SITE}/exams/{esc(e["id"])}/">'
+        f"{esc(exam_code(e))} practice exam</a></li>"
+        for e in others
+    )
+    return (
+        '    <section class="exam-section" aria-labelledby="more-h">\n'
+        '      <h2 id="more-h">More practice exams</h2>\n'
+        '      <ul class="exam-crosslinks">\n'
+        f"{links}\n"
+        "      </ul>\n"
+        "    </section>"
+    )
