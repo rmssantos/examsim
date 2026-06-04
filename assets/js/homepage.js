@@ -730,7 +730,26 @@ overlay.addEventListener('click', (e) => {
 if (e.target === overlay) this.closeProModal();
 });
 this._proModalKeyHandler = (e) => {
-if (e.key === 'Escape') this.closeProModal();
+if (e.key === 'Escape') {
+this.closeProModal();
+return;
+}
+
+if (e.key !== 'Tab') return;
+
+const focusable = Array.from(dialog.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+.filter((element) => !element.hidden && element.offsetParent !== null);
+if (focusable.length === 0) return;
+
+const first = focusable[0];
+const last = focusable[focusable.length - 1];
+if (e.shiftKey && document.activeElement === first) {
+e.preventDefault();
+last.focus();
+} else if (!e.shiftKey && document.activeElement === last) {
+e.preventDefault();
+first.focus();
+}
 };
 document.addEventListener('keydown', this._proModalKeyHandler);
 document.body.appendChild(overlay);

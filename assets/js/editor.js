@@ -197,7 +197,7 @@
             <label class="yn-radio"><input type="radio" name="yn-${idx}" data-idx="${idx}" value="0" class="yn-correct"> Yes</label>
             <label class="yn-radio"><input type="radio" name="yn-${idx}" data-idx="${idx}" value="1" class="yn-correct"> No</label>
           </div>
-          <button type="button" class="btn danger opt-del" data-idx="${idx}"><i class="fas fa-trash"></i></button>
+          <button type="button" class="btn danger opt-del" data-idx="${idx}" aria-label="Delete statement ${idx + 1}" title="Delete statement ${idx + 1}"><i class="fas fa-trash" aria-hidden="true"></i></button>
         `;
         optWrap.appendChild(row);
       });
@@ -220,14 +220,14 @@
           row.innerHTML = `
             <span class="sequence-order-num">${idx + 1}.</span>
             <input type="text" data-idx="${idx}" class="opt-text" value="${escapeHtml(opt)}">
-            <button type="button" class="btn danger opt-del" data-idx="${idx}"><i class="fas fa-trash"></i></button>
+            <button type="button" class="btn danger opt-del" data-idx="${idx}" aria-label="Delete sequence option ${idx + 1}" title="Delete sequence option ${idx + 1}"><i class="fas fa-trash" aria-hidden="true"></i></button>
           `;
         } else {
           // For other types: show checkbox + text
           row.innerHTML = `
             <input type="text" data-idx="${idx}" class="opt-text" value="${escapeHtml(opt)}">
             <label class="small"><input type="checkbox" class="opt-correct" data-idx="${idx}"> Correct</label>
-            <button type="button" class="btn danger opt-del" data-idx="${idx}"><i class="fas fa-trash"></i></button>
+            <button type="button" class="btn danger opt-del" data-idx="${idx}" aria-label="Delete option ${idx + 1}" title="Delete option ${idx + 1}"><i class="fas fa-trash" aria-hidden="true"></i></button>
           `;
         }
 
