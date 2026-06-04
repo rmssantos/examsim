@@ -1556,9 +1556,11 @@ class MultiExamSimulator {
             wrap.className = 'ddselect-wrap';
             const source = document.createElement('div');
             source.className = 'ddselect-source';
+            source.setAttribute('role', 'group');
             source.setAttribute('aria-label', 'Available options');
             const target = document.createElement('div');
             target.className = 'ddselect-target';
+            target.setAttribute('role', 'group');
             target.setAttribute('aria-label', 'Selected options');
             const targetTitle = document.createElement('div');
             targetTitle.className = 'ddselect-title';
@@ -2246,7 +2248,7 @@ class MultiExamSimulator {
         const statusIcon = document.getElementById('result-status-icon');
         const statusText = document.getElementById('result-status');
         if (statusIcon) {
-            statusIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            statusIcon.innerHTML = '<i class="fas fa-check-circle" aria-hidden="true"></i>';
             statusIcon.className = 'status-icon studied';
         }
         if (statusText) {
@@ -2308,12 +2310,12 @@ class MultiExamSimulator {
         const statusText = document.getElementById('result-status');
 
         if (passed) {
-            statusIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            statusIcon.innerHTML = '<i class="fas fa-check-circle" aria-hidden="true"></i>';
             statusIcon.className = 'status-icon passed';
             statusText.textContent = 'PASSED';
             statusText.className = 'result-status result-status-chip passed';
         } else {
-            statusIcon.innerHTML = '<i class="fas fa-exclamation"></i>';
+            statusIcon.innerHTML = '<i class="fas fa-exclamation" aria-hidden="true"></i>';
             statusIcon.className = 'status-icon failed';
             statusText.textContent = 'FAILED';
             statusText.className = 'result-status result-status-chip failed';

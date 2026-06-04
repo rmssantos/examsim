@@ -53,6 +53,8 @@ class MobileA11yReadinessTests(unittest.TestCase):
         self.assertIn("['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)", js)
         self.assertIn("#options-container .ddselect-btn, #options-container .chip-remove", js)
         self.assertIn("controls[nextIndex].focus();", js)
+        self.assertIn("source.setAttribute('role', 'group');", js)
+        self.assertIn("target.setAttribute('role', 'group');", js)
         self.assertIn("btn.setAttribute('aria-label', `Select option", js)
         self.assertIn("rm.setAttribute('aria-label', `Remove selection", js)
         self.assertIn("icon.setAttribute('aria-hidden', 'true');", js)
@@ -99,8 +101,15 @@ class MobileA11yReadinessTests(unittest.TestCase):
         js = (ROOT / "assets/js/script-multi-exam.js").read_text(encoding="utf-8")
         show_results_start = js.index("    showResults(score, passed")
         show_results_block = js[show_results_start : js.index("const summaryCard", show_results_start)]
-        self.assertIn('statusIcon.innerHTML = \'<i class="fas fa-exclamation"></i>\';', show_results_block)
+        self.assertIn(
+            'statusIcon.innerHTML = \'<i class="fas fa-exclamation" aria-hidden="true"></i>\';',
+            show_results_block,
+        )
         self.assertNotIn("fa-times-circle", show_results_block)
+
+        show_study_start = js.index("    showStudyResults(accuracy")
+        show_study_block = js[show_study_start : js.index("if (statusText)", show_study_start)]
+        self.assertIn('aria-hidden="true"', show_study_block)
 
 
 if __name__ == "__main__":
