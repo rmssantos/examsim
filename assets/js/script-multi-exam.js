@@ -49,19 +49,32 @@ class QuestionNavigator {
         if (!grid) return;
 
         grid.innerHTML = '';
+        grid.setAttribute('aria-label', 'Question navigator');
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < questions.length; i++) {
             const btn = document.createElement('button');
+            btn.type = 'button';
             btn.textContent = i + 1;
-            btn.title = 'Question ' + (i + 1);
+            const state = [];
 
-            if (i === currentIndex) btn.classList.add('nav-current');
+            if (i === currentIndex) {
+                btn.classList.add('nav-current');
+                btn.setAttribute('aria-current', 'step');
+                state.push('current');
+            }
             if (isExamAnswerProvided(selectedAnswers[i])) {
                 btn.classList.add('nav-answered');
+                state.push('answered');
             }
             if (markedForReview && markedForReview.has(i)) {
                 btn.classList.add('nav-marked');
+                state.push('marked for review');
             }
+            if (state.length === 0) state.push('unanswered');
+
+            const label = `Question ${i + 1}, ${state.join(', ')}`;
+            btn.title = label;
+            btn.setAttribute('aria-label', label);
 
             btn.addEventListener('click', () => onJump(i));
             fragment.appendChild(btn);
@@ -71,7 +84,11 @@ class QuestionNavigator {
 
     toggle() {
         const nav = document.getElementById('question-navigator');
-        if (nav) window.ExamApp.setElementHidden(nav, !nav.hidden && !nav.classList.contains('is-hidden'));
+        if (!nav) return;
+        const shouldHide = !nav.hidden && !nav.classList.contains('is-hidden');
+        window.ExamApp.setElementHidden(nav, shouldHide);
+        const toggle = document.getElementById('toggle-navigator');
+        if (toggle) toggle.setAttribute('aria-expanded', String(!shouldHide));
     }
 }
 
@@ -769,8 +786,24 @@ class MultiExamSimulator {
                         }
                     }
                 }
+            } else if (questionType === 'DRAG_DROP_SELECT') {
+                if (keyIndex !== -1) {
+                    this.selectOptionByIndex(keyIndex);
+                } else if (['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) {
+                    const controls = Array.from(document.querySelectorAll('#options-container .ddselect-btn, #options-container .chip-remove'));
+                    if (controls.length) {
+                        e.preventDefault();
+                        const activeIndex = controls.indexOf(document.activeElement);
+                        let nextIndex = activeIndex >= 0 ? activeIndex : 0;
+                        if (e.key === 'ArrowUp') nextIndex = Math.max(0, nextIndex - 1);
+                        if (e.key === 'ArrowDown') nextIndex = Math.min(controls.length - 1, nextIndex + 1);
+                        if (e.key === 'Home') nextIndex = 0;
+                        if (e.key === 'End') nextIndex = controls.length - 1;
+                        controls[nextIndex].focus();
+                    }
+                }
             } else {
-                // DRAG_DROP_SELECT, RADIO, CHECKBOX
+                // RADIO, CHECKBOX
                 if (keyIndex !== -1) {
                     this.selectOptionByIndex(keyIndex);
                 }
@@ -1523,8 +1556,10 @@ class MultiExamSimulator {
             wrap.className = 'ddselect-wrap';
             const source = document.createElement('div');
             source.className = 'ddselect-source';
+            source.setAttribute('aria-label', 'Available options');
             const target = document.createElement('div');
             target.className = 'ddselect-target';
+            target.setAttribute('aria-label', 'Selected options');
             const targetTitle = document.createElement('div');
             targetTitle.className = 'ddselect-title';
             targetTitle.textContent = 'Your selections';
@@ -1546,7 +1581,15 @@ class MultiExamSimulator {
                         btn.type = 'button';
                         btn.className = 'ddselect-btn';
                         btn.dataset.optionIndex = idx;
-                        btn.innerHTML = `<span class="option-letter">${String.fromCharCode(65 + idx)}</span><span class="option-text">${this.escapeHtml(opt)}</span>`;
+                        const optionLetter = String.fromCharCode(65 + idx);
+                        btn.setAttribute('aria-label', `Select option ${optionLetter}: ${opt}`);
+                        const letter = document.createElement('span');
+                        letter.className = 'option-letter';
+                        letter.textContent = optionLetter;
+                        const text = document.createElement('span');
+                        text.className = 'option-text';
+                        text.textContent = opt;
+                        btn.replaceChildren(letter, text);
                         btn.addEventListener('click', () => {
                             if (sel.length < required && !sel.includes(idx)) {
                                 sel.push(idx);
@@ -1561,12 +1604,21 @@ class MultiExamSimulator {
                 sel.forEach((idx, pos) => {
                     const chip = document.createElement('div');
                     chip.className = 'ddselect-chip';
-                    chip.innerHTML = `<span class="chip-index">${pos + 1}.</span> <span class="chip-text">${this.escapeHtml(question.options[idx])}</span>`;
+                    const chipIndex = document.createElement('span');
+                    chipIndex.className = 'chip-index';
+                    chipIndex.textContent = `${pos + 1}.`;
+                    const chipText = document.createElement('span');
+                    chipText.className = 'chip-text';
+                    chipText.textContent = question.options[idx];
                     const rm = document.createElement('button');
                     rm.type = 'button';
                     rm.className = 'chip-remove';
                     rm.dataset.optionIndex = idx;
-                    rm.innerHTML = '<i class="fas fa-times"></i>';
+                    rm.setAttribute('aria-label', `Remove selection ${pos + 1}: ${question.options[idx]}`);
+                    const icon = document.createElement('i');
+                    icon.className = 'fas fa-times';
+                    icon.setAttribute('aria-hidden', 'true');
+                    rm.appendChild(icon);
                     rm.addEventListener('click', () => {
                         const i = sel.indexOf(idx);
                         if (i >= 0) sel.splice(i, 1);
@@ -1574,6 +1626,8 @@ class MultiExamSimulator {
                         render();
                         this.handleAnswerChanged();
                     });
+                    chip.appendChild(chipIndex);
+                    chip.appendChild(chipText);
                     chip.appendChild(rm);
                     target.appendChild(chip);
                 });

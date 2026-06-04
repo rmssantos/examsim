@@ -353,6 +353,13 @@
     border-radius: 6px;
     cursor: pointer;
     margin-bottom: 8px;
+    min-height: 44px;
+}
+
+.ddselect-btn:focus-visible,
+.chip-remove:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
 }
 
 .ddselect-chip {
@@ -381,6 +388,8 @@
     border-radius: 4px;
     cursor: pointer;
     margin-left: 6px;
+    min-width: 36px;
+    min-height: 36px;
 }
 
 .dark-mode .ddselect-source,
@@ -392,6 +401,13 @@
 .dark-mode .ddselect-chip {
     background: #1f1f1f;
     border-color: #444;
+}
+
+[data-theme="dark"] .ddselect-btn:focus-visible,
+.dark-mode .ddselect-btn:focus-visible,
+[data-theme="dark"] .chip-remove:focus-visible,
+.dark-mode .chip-remove:focus-visible {
+    outline-color: #00d4ff;
 }
 
 /* Matrix solution formatting */
