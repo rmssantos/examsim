@@ -2860,6 +2860,10 @@ body:has(#results-screen.screen.active) .container {
 }
 
 @media (max-width: 760px) {
+    body:has(#exam-screen.screen.active) .theme-controls {
+        display: none;
+    }
+
     body:has(#exam-screen.screen.active) .container,
     body:has(#results-screen.screen.active) .container {
         padding: 0;
@@ -2874,21 +2878,52 @@ body:has(#results-screen.screen.active) .container {
     }
 
     .exam-header {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 0.45rem 0.55rem;
+        padding: 0.5rem 0.65rem;
         border-radius: 0;
     }
 
     .exam-info-header {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        align-items: center;
         justify-content: space-between;
+        gap: 0.5rem;
+        margin-bottom: 0;
     }
 
     #current-exam-badge,
     .exam-header .exam-badge {
-        max-width: 60vw;
+        max-width: min(46vw, 11rem);
+        padding: 0.36rem 0.58rem;
+    }
+
+    #switch-exam {
+        flex-shrink: 0;
+        padding: 0.36rem 0.58rem;
     }
 
     .exam-progress {
+        min-width: 0;
         grid-template-columns: 1fr auto auto;
+        gap: 0.4rem;
+    }
+
+    .exam-progress .progress-bar {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .exam-progress #question-counter {
+        padding: 0.36rem 0.58rem;
+        white-space: nowrap;
+    }
+
+    .exam-header .exam-timer {
+        min-width: 5.7rem;
+        padding: 0.42rem 0.62rem;
     }
 
     .question-container {

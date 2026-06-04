@@ -66,6 +66,23 @@ class MobileA11yReadinessTests(unittest.TestCase):
         self.assertIn('aria-label="Delete option ${idx + 1}"', js)
         self.assertIn('<i class="fas fa-trash" aria-hidden="true"></i>', js)
 
+    def test_mobile_exam_header_uses_compact_two_row_layout(self):
+        css = (ROOT / "assets/css/exam-enhancements.css").read_text(encoding="utf-8")
+        mobile_block = css[css.index("@media (max-width: 760px)") :]
+
+        self.assertRegex(
+            mobile_block,
+            r"\.exam-header\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto;",
+        )
+        self.assertRegex(mobile_block, r"\.exam-info-header\s*\{[\s\S]*?flex-direction:\s*row;")
+        self.assertRegex(mobile_block, r"\.exam-info-header\s*\{[\s\S]*?grid-column:\s*1\s*/\s*-1;")
+        self.assertRegex(mobile_block, r"\.exam-progress\s*\{[\s\S]*?grid-template-columns:\s*1fr\s+auto\s+auto;")
+        self.assertRegex(mobile_block, r"\.exam-header\s+\.exam-timer\s*\{[\s\S]*?min-width:\s*5\.7rem;")
+        self.assertRegex(
+            mobile_block,
+            r"body:has\(#exam-screen\.screen\.active\)\s+\.theme-controls\s*\{[\s\S]*?display:\s*none;",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
