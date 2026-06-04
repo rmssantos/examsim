@@ -83,6 +83,25 @@ class MobileA11yReadinessTests(unittest.TestCase):
             r"body:has\(#exam-screen\.screen\.active\)\s+\.theme-controls\s*\{[\s\S]*?display:\s*none;",
         )
 
+    def test_results_summary_uses_compact_score_panel(self):
+        css = (ROOT / "assets/css/exam-enhancements.css").read_text(encoding="utf-8")
+        results_block = css[css.index("#results-screen .summary-visuals") : css.index("/* Metrics row styling */")]
+
+        self.assertIn("#results-screen .summary-visuals", results_block)
+        self.assertRegex(results_block, r"grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto")
+        self.assertRegex(results_block, r"#results-screen\s+\.score-ring\s*\{[\s\S]*?height:\s*76px")
+        self.assertRegex(results_block, r"#results-screen\s+\.score-ring\s*\{[\s\S]*?border-radius:\s*14px")
+        self.assertNotIn("conic-gradient", results_block)
+        self.assertRegex(results_block, r"#results-screen\s+\.status-icon\s*\{[\s\S]*?height:\s*76px")
+        self.assertRegex(results_block, r"#results-screen\s+\.status-icon\s*\{[\s\S]*?border-radius:\s*14px")
+        self.assertRegex(results_block, r"#results-screen\s+\.status-icon\s*\{[\s\S]*?animation:\s*none")
+
+        js = (ROOT / "assets/js/script-multi-exam.js").read_text(encoding="utf-8")
+        show_results_start = js.index("    showResults(score, passed")
+        show_results_block = js[show_results_start : js.index("const summaryCard", show_results_start)]
+        self.assertIn('statusIcon.innerHTML = \'<i class="fas fa-exclamation"></i>\';', show_results_block)
+        self.assertNotIn("fa-times-circle", show_results_block)
+
 
 if __name__ == "__main__":
     unittest.main()

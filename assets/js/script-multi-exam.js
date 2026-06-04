@@ -2313,7 +2313,7 @@ class MultiExamSimulator {
             statusText.textContent = 'PASSED';
             statusText.className = 'result-status result-status-chip passed';
         } else {
-            statusIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
+            statusIcon.innerHTML = '<i class="fas fa-exclamation"></i>';
             statusIcon.className = 'status-icon failed';
             statusText.textContent = 'FAILED';
             statusText.className = 'result-status result-status-chip failed';
