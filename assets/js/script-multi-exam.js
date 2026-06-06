@@ -1320,6 +1320,13 @@ class MultiExamSimulator {
             .replace(/\n/g, '<br>')
             .replace(/✑/g, '•');
 
+        // Convert Markdown links [text](https://...) to safe anchors.
+        // URLs are restricted to http(s); link text was already HTML-escaped above.
+        formattedText = formattedText.replace(
+            /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+            '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+        );
+
         // Restore image HTML from tokens
         imageTokens.forEach((html, i) => {
             formattedText = formattedText.replace(`__IMG_TOKEN_${i}__`, html);

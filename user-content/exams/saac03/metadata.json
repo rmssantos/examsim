@@ -1,0 +1,104 @@
+{
+  "id": "saac03",
+  "name": "SAA-C03",
+  "fullName": "AWS Certified Solutions Architect - Associate",
+  "description": "Free 25-question preview pack for the AWS Certified Solutions Architect - Associate (SAA-C03) exam. Original questions written from public AWS documentation; these are not real exam questions. Examplar is not affiliated with or endorsed by Amazon Web Services. Unlock the full pack for the complete rotating question pool, detailed explanations, and study mode.",
+  "duration": 50,
+  "questionCount": 25,
+  "totalQuestions": 25,
+  "passScore": 72,
+  "language": "en",
+  "schemaVersion": "1.1",
+  "badge": "Associate",
+  "icon": "fab fa-aws",
+  "vendor": "Amazon Web Services",
+  "certificationCode": "SAA-C03",
+  "domains": [
+    "Cloud",
+    "AWS",
+    "Architecture"
+  ],
+  "level": "Associate",
+  "productFamily": "AWS",
+  "contentType": "preview",
+  "commercialStatus": "pro-preview",
+  "contentOrigin": "original",
+  "modules": [
+    {
+      "icon": "fas fa-user-shield",
+      "name": "IAM & Account Security"
+    },
+    {
+      "icon": "fas fa-network-wired",
+      "name": "VPC & Networking"
+    },
+    {
+      "icon": "fas fa-server",
+      "name": "Compute, Scaling & Load Balancing"
+    },
+    {
+      "icon": "fas fa-database",
+      "name": "Storage & S3"
+    },
+    {
+      "icon": "fas fa-table",
+      "name": "Databases"
+    },
+    {
+      "icon": "fas fa-arrows-split-up-and-left",
+      "name": "Decoupling & Integration"
+    },
+    {
+      "icon": "fas fa-globe",
+      "name": "Edge, DNS & Content Delivery"
+    },
+    {
+      "icon": "fas fa-stream",
+      "name": "Data Ingestion & Analytics"
+    },
+    {
+      "icon": "fas fa-lock",
+      "name": "Security & Encryption"
+    },
+    {
+      "icon": "fas fa-rotate",
+      "name": "Resilience & Disaster Recovery"
+    },
+    {
+      "icon": "fas fa-tags",
+      "name": "Cost Optimization"
+    }
+  ],
+  "resources": [
+    {
+      "icon": "fas fa-book",
+      "name": "SAA-C03 Exam Guide & Certification Page",
+      "url": "https://aws.amazon.com/certification/certified-solutions-architect-associate/"
+    },
+    {
+      "icon": "fas fa-file-lines",
+      "name": "AWS Documentation",
+      "url": "https://docs.aws.amazon.com/"
+    },
+    {
+      "icon": "fas fa-graduation-cap",
+      "name": "AWS Well-Architected Framework",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html"
+    }
+  ],
+  "preview": true,
+  "pro": {
+    "title": "SAA-C03 Complete",
+    "questions": 250,
+    "price": "19 EUR",
+    "url": "https://examplar.gumroad.com/l/SAA-C03-complete",
+    "highlights": [
+      "250+ original questions across all four SAA-C03 domains",
+      "Rotating mock exams so every attempt feels fresh",
+      "Detailed explanation for the correct answer and every distractor",
+      "Official AWS documentation links on every question",
+      "Study mode with weak-area focus",
+      "Free updates when the exam changes"
+    ]
+  }
+}
