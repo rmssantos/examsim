@@ -7,7 +7,7 @@
         connectionString: '__APPINSIGHTS_CONNECTION_STRING__',
         optOutKey: 'exam_analytics_opt_out',
         analyticsVersion: '1.0.0',
-        publicExamIds: Object.freeze(['ab730', 'ab731', 'sc900', 'az900', 'az104'])
+        publicExamIds: Object.freeze(['ab730', 'ab731', 'sc900', 'az900', 'az104', 'saac03'])
     });
 
     const connection = parseConnectionString(CONFIG.connectionString);
