@@ -26,6 +26,8 @@ The public deployment (`examplar.app`, also reachable at `rmssantos.github.io/ex
 - Attempt history/review opened counts and Study missed started counts
 - Import started/completed/failed counts
 - Progress export and editor import/export actions
+- Campaign attribution from the `ref`, `utm_source`, `utm_medium`, and `utm_campaign` query parameters
+- External referrer hostname only (for example, `producthunt.com`), without the full referring URL or path
 
 In Application Insights, page visits are recorded as native page views (`pageViews`). Product actions such as exam starts/completions and imports are recorded as custom events (`customEvents`).
 
@@ -37,6 +39,8 @@ In Application Insights, page visits are recorded as native page views (`pageVie
 - Attempt review availability flag and missed-study question count
 - Duration bucket (`<5m`, `5-15m`, `15-30m`, `30m+`)
 - Question count and coarse file size/type buckets for imports
+- Sanitized campaign source, medium, campaign name, and `ref` label when present
+- External referrer hostname when the browser provides one
 
 **Not collected:**
 - Names, emails, or account identifiers
@@ -45,6 +49,7 @@ In Application Insights, page visits are recorded as native page views (`pageVie
 - Question IDs, attempt review records, Study Mode per-question records, ease factors, due dates, or personal study history
 - Imported exam IDs, imported exam content, ZIP contents, filenames, or browser storage exports
 - Local progress history beyond aggregate completion events
+- Full referrer URLs, referring paths, arbitrary query parameters, IP-derived identity, or persistent attribution profiles
 
 Analytics can be turned off from the small **Privacy settings** control on the online site. The preference is stored in `localStorage['exam_analytics_opt_out'] = 'true'` in that browser.
 
