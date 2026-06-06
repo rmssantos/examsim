@@ -20,7 +20,7 @@ const fs = require('fs');
 const vm = require('vm');
 const source = fs.readFileSync(process.argv[1], 'utf8');
 const start = source.indexOf('const OFFICIAL_DOCUMENTATION_HOSTS');
-const end = source.indexOf('\n\nclass TimerManager');
+const end = source.indexOf('class TimerManager', start);
 if (start < 0 || end < 0) throw new Error('documentation URL helper not found');
 
 const sandbox = { URL };
