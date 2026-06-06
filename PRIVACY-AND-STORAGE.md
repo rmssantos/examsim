@@ -26,7 +26,7 @@ The public deployment (`examplar.app`, also reachable at `rmssantos.github.io/ex
 - Attempt history/review opened counts and Study missed started counts
 - Import started/completed/failed counts
 - Progress export and editor import/export actions
-- Campaign attribution from the `ref`, `utm_source`, `utm_medium`, and `utm_campaign` query parameters
+- Campaign attribution from simple, sanitized labels in the `ref`, `utm_source`, `utm_medium`, and `utm_campaign` query parameters; values resembling emails, URLs, or paths are discarded
 - External referrer hostname only (for example, `producthunt.com`), without the full referring URL or path
 
 In Application Insights, page visits are recorded as native page views (`pageViews`). Product actions such as exam starts/completions and imports are recorded as custom events (`customEvents`).

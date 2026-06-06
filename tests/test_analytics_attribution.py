@@ -108,6 +108,23 @@ console.log(JSON.stringify({
         self.assertNotIn("token", properties)
         self.assertNotIn("utm_content", properties)
 
+    def test_pii_urls_and_paths_in_approved_parameters_are_rejected(self):
+        result = self.run_attribution_case(
+            "https://examplar.app/?ref=user%40example.com"
+            "&utm_source=https%3A%2F%2Fevil.example%2Fcampaign"
+            "&utm_medium=partner%2Faffiliate"
+            "&utm_campaign=Safe-Launch_2026",
+            "",
+        )
+
+        self.assertEqual(
+            {"campaign_name": "safe-launch_2026"},
+            result["attribution"],
+        )
+        self.assertNotIn("acquisition_ref", result["pageProperties"])
+        self.assertNotIn("campaign_source", result["pageProperties"])
+        self.assertNotIn("campaign_medium", result["pageProperties"])
+
     def test_same_site_and_invalid_referrers_are_not_collected(self):
         same_site = self.run_attribution_case(
             "https://examplar.app/exams/",

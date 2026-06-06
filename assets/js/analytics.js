@@ -111,8 +111,8 @@
                 utm_campaign: 'campaign_name'
             };
             Object.entries(campaignParameters).forEach(([parameter, property]) => {
-                const value = normalizeString(params.get(parameter), 80);
-                if (value) properties[property] = value.toLowerCase();
+                const value = sanitizeAttributionValue(params.get(parameter));
+                if (value) properties[property] = value;
             });
         } catch (_) {
             // Ignore malformed or unavailable page URLs.
@@ -135,6 +135,14 @@
         }
 
         return properties;
+    }
+
+    function sanitizeAttributionValue(value) {
+        const raw = String(value ?? '').trim();
+        if (!raw || raw.length > 80 || !/^[A-Za-z0-9][A-Za-z0-9 _.-]*$/.test(raw)) {
+            return '';
+        }
+        return normalizeString(raw, 80).toLowerCase();
     }
 
     function normalizeString(value, maxLength = 80) {
@@ -573,6 +581,7 @@
             fileSizeBucket,
             privacyNotesUrl,
             attributionProperties,
+            sanitizeAttributionValue,
             buildEnvelope,
             buildPageViewEnvelope
         })
