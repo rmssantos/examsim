@@ -6,7 +6,7 @@
     const CONFIG = Object.freeze({
         connectionString: '__APPINSIGHTS_CONNECTION_STRING__',
         optOutKey: 'exam_analytics_opt_out',
-        analyticsVersion: '1.0.0',
+        analyticsVersion: '1.1.0',
         publicExamIds: Object.freeze(['ab730', 'ab731', 'sc900', 'az900', 'az104', 'saac03'])
     });
 
@@ -99,6 +99,52 @@
         }
     }
 
+    function attributionProperties() {
+        const properties = {};
+
+        try {
+            const params = new URL(window.location.href).searchParams;
+            const campaignParameters = {
+                ref: 'acquisition_ref',
+                utm_source: 'campaign_source',
+                utm_medium: 'campaign_medium',
+                utm_campaign: 'campaign_name'
+            };
+            Object.entries(campaignParameters).forEach(([parameter, property]) => {
+                const value = sanitizeAttributionValue(params.get(parameter));
+                if (value) properties[property] = value;
+            });
+        } catch (_) {
+            // Ignore malformed or unavailable page URLs.
+        }
+
+        try {
+            const referrer = new URL(String(document.referrer || ''));
+            const hostname = referrer.hostname.toLowerCase();
+            const isSamePublicSite = isPublicSiteHost(hostname) && isPublicSiteHost();
+            if (
+                ['http:', 'https:'].includes(referrer.protocol)
+                && hostname
+                && hostname !== String(window.location.hostname || '').toLowerCase()
+                && !isSamePublicSite
+            ) {
+                properties.referrer_host = hostname;
+            }
+        } catch (_) {
+            // Direct visits and invalid referrers have no attribution property.
+        }
+
+        return properties;
+    }
+
+    function sanitizeAttributionValue(value) {
+        const raw = String(value ?? '').trim();
+        if (!raw || raw.length > 80 || !/^[A-Za-z0-9][A-Za-z0-9 _.-]*$/.test(raw)) {
+            return '';
+        }
+        return normalizeString(raw, 80).toLowerCase();
+    }
+
     function normalizeString(value, maxLength = 80) {
         return String(value ?? '')
             .replace(/[\r\n\t]+/g, ' ')
@@ -184,7 +230,8 @@
             deployment: 'github_pages',
             page: pageNameFromPath(),
             path: currentPath(),
-            analytics_version: CONFIG.analyticsVersion
+            analytics_version: CONFIG.analyticsVersion,
+            ...attributionProperties()
         };
     }
 
@@ -407,7 +454,7 @@
         dialog.appendChild(title);
 
         const description = document.createElement('p');
-        description.textContent = 'The online version collects aggregate visits and exam usage metrics. It does not collect questions, answers, imported files, filenames, names, emails, or a persistent visitor ID.';
+        description.textContent = 'The online version collects aggregate visits, campaign attribution, and exam usage metrics. Attribution is limited to approved campaign parameters and the external referrer hostname. It does not collect questions, answers, imported files, filenames, names, emails, full referrer URLs, or a persistent visitor ID.';
         dialog.appendChild(description);
 
         const status = document.createElement('div');
@@ -533,6 +580,8 @@
             durationBucket,
             fileSizeBucket,
             privacyNotesUrl,
+            attributionProperties,
+            sanitizeAttributionValue,
             buildEnvelope,
             buildPageViewEnvelope
         })
