@@ -315,6 +315,12 @@ def is_safe_image_name(value: str) -> bool:
 
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
+    if path.suffix.lower() == ".json":
+        # JSON pack files are pinned to LF in .gitattributes. Canonicalize CRLF
+        # here as well so manifests generated or checked on Windows match CI.
+        digest.update(path.read_bytes().replace(b"\r\n", b"\n"))
+        return digest.hexdigest()
+
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(65536), b""):
             digest.update(chunk)

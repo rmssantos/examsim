@@ -111,6 +111,11 @@ class ManifestTests(unittest.TestCase):
             clean = run_validator(root, "--check-manifest")
             self.assertEqual(clean.returncode, 0, clean.stdout)
 
+            dump_path = exam_dir / "dump.json"
+            dump_path.write_bytes(dump_path.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"))
+            different_line_endings = run_validator(root, "--check-manifest")
+            self.assertEqual(different_line_endings.returncode, 0, different_line_endings.stdout)
+
             (exam_dir / "dump.json").write_text(
                 json.dumps([{"id": "q1", "question": "changed", "question_type": "STANDARD", "options": ["3", "4"], "correct": 1}]),
                 encoding="utf-8",

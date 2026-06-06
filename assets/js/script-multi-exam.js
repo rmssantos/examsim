@@ -1,6 +1,26 @@
 ﻿// Multi-Exam Simulator - Generic Exam Support
 // Supports categorized images (question images vs explanation images)
 
+const OFFICIAL_DOCUMENTATION_HOSTS = Object.freeze([
+    'docs.aws.amazon.com',
+    'aws.amazon.com',
+    'learn.microsoft.com'
+]);
+
+function isOfficialDocumentationUrl(value) {
+    try {
+        const parsed = new URL(String(value || ''));
+        if (parsed.protocol !== 'https:') return false;
+
+        const hostname = parsed.hostname.toLowerCase();
+        return OFFICIAL_DOCUMENTATION_HOSTS.some(
+            allowed => hostname === allowed || hostname.endsWith(`.${allowed}`)
+        );
+    } catch (_) {
+        return false;
+    }
+}
+
 class TimerManager {
     constructor() {
         this.timer = null;
@@ -1320,11 +1340,13 @@ class MultiExamSimulator {
             .replace(/\n/g, '<br>')
             .replace(/✑/g, '•');
 
-        // Convert Markdown links [text](https://...) to safe anchors.
-        // URLs are restricted to http(s); link text was already HTML-escaped above.
+        // Only trusted documentation hosts become clickable. Imported packs can
+        // contain arbitrary Markdown, so other URLs remain escaped literal text.
         formattedText = formattedText.replace(
             /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-            '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+            (match, label, url) => isOfficialDocumentationUrl(url)
+                ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${label}</a>`
+                : match
         );
 
         // Restore image HTML from tokens
