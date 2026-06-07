@@ -594,9 +594,8 @@ startButton.appendChild(this.createIcon('fas fa-play'));
 startButton.appendChild(document.createTextNode(' Start'));
 startButton.addEventListener('click', async (e) => {
 	e.stopPropagation();
-	if (await this.selectExam(examId)) {
-		await this.startSelectedExam();
-	}
+	const selectionPromise = this.selectExam(examId);
+	await this.startSelectedExam('exam', selectionPromise);
 });
 actions.appendChild(startButton);
 
@@ -607,9 +606,8 @@ studyButton.appendChild(this.createIcon('fas fa-brain'));
 studyButton.appendChild(document.createTextNode(' Study'));
 studyButton.addEventListener('click', async (e) => {
 	e.stopPropagation();
-	if (await this.selectExam(examId)) {
-		await this.startSelectedExam('study');
-	}
+	const selectionPromise = this.selectExam(examId);
+	await this.startSelectedExam('study', selectionPromise);
 });
 
 if (metadata.pro) {
@@ -1107,17 +1105,28 @@ this.scrollToExamLibrary();
 }
 }
 
-async startSelectedExam(mode = 'exam') {
+async startSelectedExam(mode = 'exam', selectionPromise = null) {
 	if (!this.selectedExamId) {
 		window.showCustomAlert('Select an Exam', 'Please select an exam card from the library before proceeding.', 'warning');
 		return false;
 	}
 
 	const examId = this.selectedExamId;
+	const examWindow = window.open('', '_blank');
+	if (!examWindow) {
+		window.showCustomAlert('Popup blocked', 'Allow popups for Examplar, then try again.', 'warning');
+		return false;
+	}
+
 	let examData;
 	try {
+		if (selectionPromise && !await selectionPromise) {
+			examWindow.close();
+			return false;
+		}
 		examData = await window.ExamApp.ensureExamLoaded(examId);
 	} catch (error) {
+		examWindow.close();
 		window.showCustomAlert('Exam unavailable', `Could not load ${examId}: ${error.message}`, 'error');
 		return false;
 	}
@@ -1136,6 +1145,7 @@ async startSelectedExam(mode = 'exam') {
 			: moduleNames;
 
 		if (selectedModules.length === 0) {
+			examWindow.close();
 			window.showCustomAlert('No Modules Selected', 'Please select at least one module to start practicing.', 'warning');
 			return false;
 		}
@@ -1145,13 +1155,16 @@ async startSelectedExam(mode = 'exam') {
 
 	const simulator = window.ExamApp?.examSimulator || window.examSimulator;
 	if (simulator?.currentExam !== examId) {
-		await this.selectExam(examId);
+		if (!await this.selectExam(examId)) {
+			examWindow.close();
+			return false;
+		}
 	}
 
 	const routeName = mode === 'study' ? 'study' : 'exam';
 	const url = window.ExamApp.router?.buildUrl(routeName, routeParams)
 		|| `exam.html?${new URLSearchParams(routeParams).toString()}`;
-	window.open(url, '_blank');
+	examWindow.location.href = url;
 	return true;
 }
 

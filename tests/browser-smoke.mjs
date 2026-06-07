@@ -24,6 +24,52 @@ try {
     'Homepage startup must not download question dumps.'
   );
 
+  await page.evaluate(() => {
+    const ensureExamLoaded = window.ExamApp.ensureExamLoaded.bind(window.ExamApp);
+    let releaseLoad;
+    const loadGate = new Promise((resolve) => {
+      releaseLoad = resolve;
+    });
+    window.__popupTest = {
+      calls: [],
+      windows: [],
+      loadStarted: false,
+      releaseLoad
+    };
+    window.ExamApp.ensureExamLoaded = async (...args) => {
+      window.__popupTest.loadStarted = true;
+      await loadGate;
+      return ensureExamLoaded(...args);
+    };
+    window.open = (url, target) => {
+      const popup = {
+        location: { href: url },
+        closed: false,
+        close() { this.closed = true; }
+      };
+      window.__popupTest.calls.push({ url, target });
+      window.__popupTest.windows.push(popup);
+      return popup;
+    };
+  });
+
+  const sc900Start = page.locator('.exam-card[data-exam="sc900"] .exam-card-start');
+  await sc900Start.click();
+  await page.waitForFunction(() => window.__popupTest.calls.length === 1, null, { timeout: 1500 });
+  assert.equal(
+    await page.evaluate(() => window.__popupTest.calls[0].url),
+    '',
+    'Start must reserve a blank tab before awaiting the question dump.'
+  );
+  assert.equal(
+    await page.evaluate(() => window.__popupTest.loadStarted),
+    true,
+    'Exam loading must start after the popup is reserved.'
+  );
+  await page.evaluate(() => window.__popupTest.releaseLoad());
+  await page.waitForFunction(() => window.userExams?.sc900?.loaded === true);
+  await page.waitForFunction(() => window.__popupTest.windows[0].location.href.includes('exam=sc900'));
+
   const az900Card = page.locator('.exam-card[data-exam="az900"]');
   assert.equal(await az900Card.count(), 1);
   await az900Card.click();

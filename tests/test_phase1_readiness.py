@@ -19,6 +19,7 @@ def run_node(script: str) -> subprocess.CompletedProcess:
         encoding="utf-8",
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
+        timeout=15,
     )
 
 

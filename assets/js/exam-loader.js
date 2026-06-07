@@ -128,10 +128,10 @@ window.userExams = window.ExamApp.userExams;
             throw new Error('Invalid exam id.');
         }
 
-        if (!Object.prototype.hasOwnProperty.call(window.userExams, examId)) {
+        const existing = Object.getOwnPropertyDescriptor(window.userExams, examId)?.value;
+        if (!existing) {
             throw new Error(`Exam ${examId} is not available.`);
         }
-        const existing = window.userExams[examId];
         if (Array.isArray(existing.questions)) {
             existing.loaded = true;
             return existing;
