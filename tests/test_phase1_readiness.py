@@ -203,13 +203,14 @@ class SupplyChainTests(unittest.TestCase):
                 for ref in refs:
                     self.assertRegex(ref, r"^[0-9a-f]{40}$")
 
-    def test_codeql_and_dependabot_are_configured(self):
-        codeql = (ROOT / ".github" / "workflows" / "codeql.yml").read_text(encoding="utf-8")
+    def test_dependabot_is_configured_without_duplicate_codeql_workflow(self):
         dependabot = (ROOT / ".github" / "dependabot.yml").read_text(encoding="utf-8")
-        self.assertIn("javascript-typescript", codeql)
-        self.assertIn("python", codeql)
         self.assertIn("package-ecosystem: github-actions", dependabot)
         self.assertIn("package-ecosystem: npm", dependabot)
+        self.assertFalse(
+            (ROOT / ".github" / "workflows" / "codeql.yml").exists(),
+            "The repository uses GitHub CodeQL Default Setup; do not add a conflicting workflow.",
+        )
 
     def test_primary_page_script_policies_do_not_allow_arbitrary_inline_code(self):
         for page_name in ("index.html", "exam.html", "editor.html"):
