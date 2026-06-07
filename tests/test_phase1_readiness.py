@@ -16,6 +16,7 @@ def run_node(script: str) -> subprocess.CompletedProcess:
         ["node", "-e", script],
         cwd=ROOT,
         text=True,
+        encoding="utf-8",
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
@@ -95,6 +96,112 @@ class MetadataFirstLoaderTests(unittest.TestCase):
         result = run_node(script)
         self.assertEqual(result.returncode, 0, result.stdout)
         self.assertIn("metadata-first loader passed", result.stdout)
+
+    def test_loader_never_treats_inherited_registry_properties_as_exams(self):
+        script = textwrap.dedent(
+            """
+            const fs = require('fs');
+            const vm = require('vm');
+            global.window = {
+              ExamApp: {
+                userExams: {},
+                isSafeExamId() { return true; },
+                validateExamData() { return { valid: true, errors: [] }; },
+                log() {},
+                warn() {}
+              }
+            };
+            global.fetch = async url => {
+              if (url.endsWith('/index.json')) {
+                return { ok: true, async json() { return []; } };
+              }
+              return { ok: false, async text() { return ''; } };
+            };
+            global.DOMParser = class {
+              parseFromString() {
+                return { querySelectorAll() { return []; } };
+              }
+            };
+
+            Object.prototype.questions = [];
+            Object.prototype.loaded = false;
+            vm.runInThisContext(fs.readFileSync('assets/js/exam-loader.js', 'utf8'));
+            (async () => {
+              await window.ExamApp.examsLoadedPromise;
+              let rejected = false;
+              try {
+                await window.ExamApp.ensureExamLoaded('__proto__');
+              } catch (_) {
+                rejected = true;
+              }
+              if (!rejected) throw new Error('inherited exam id was accepted');
+              if (Object.prototype.loaded !== false) {
+                throw new Error('Object.prototype was modified');
+              }
+              console.log('inherited registry properties rejected');
+            })().finally(() => {
+              delete Object.prototype.questions;
+              delete Object.prototype.loaded;
+            }).catch(error => { console.error(error); process.exitCode = 1; });
+            """
+        )
+        result = run_node(script)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("inherited registry properties rejected", result.stdout)
+
+    def test_exam_init_uses_a_constant_console_error_format(self):
+        script = textwrap.dedent(
+            """
+            const fs = require('fs');
+            const vm = require('vm');
+            const originalConsole = console;
+            let domReady;
+            let loggedArgs;
+            global.console = {
+              error(...args) { loggedArgs = args; },
+              log() {},
+              warn() {}
+            };
+            global.alert = () => {};
+            global.setTimeout = () => {};
+            global.document = {
+              body: { dataset: {} },
+              getElementById() { return null; },
+              addEventListener(event, callback) {
+                if (event === 'DOMContentLoaded') domReady = callback;
+              }
+            };
+            global.window = {
+              ExamApp: {
+                router: { getRoute() { return { page: 'exam' }; } },
+                isSafeExamId() { return true; },
+                async ensureExamLoaded() { throw new Error('load failed'); },
+                log() {}
+              },
+              location: { search: '?exam=user-controlled', href: '' },
+              close() {},
+              closed: true
+            };
+
+            vm.runInThisContext(fs.readFileSync('assets/js/exam-init.js', 'utf8'));
+            (async () => {
+              await domReady();
+              if (!loggedArgs || loggedArgs[0] !== '❌ Failed to load exam:') {
+                throw new Error(`console format was not constant: ${JSON.stringify(loggedArgs)}`);
+              }
+              if (loggedArgs[1] !== 'user-controlled') {
+                throw new Error(`exam id was not logged as data: ${JSON.stringify(loggedArgs)}`);
+              }
+              originalConsole.log('constant console format passed');
+            })().catch(error => {
+              originalConsole.error(error);
+              process.exitCode = 1;
+            });
+            """
+        )
+        result = run_node(script)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("constant console format passed", result.stdout)
 
     def test_consumers_ensure_questions_before_using_them(self):
         homepage = (ROOT / "assets" / "js" / "homepage.js").read_text(encoding="utf-8")
