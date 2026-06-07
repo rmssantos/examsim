@@ -1,12 +1,12 @@
 // Privacy-conscious analytics for the public GitHub Pages deployment.
-// Sends aggregate product metrics only; no visitor ID, questions, answers, filenames, or imported content.
+// Sends bounded product telemetry; no visitor ID, questions, answers, filenames, or imported content.
 (function () {
     'use strict';
 
     const CONFIG = Object.freeze({
         connectionString: '__APPINSIGHTS_CONNECTION_STRING__',
         optOutKey: 'exam_analytics_opt_out',
-        analyticsVersion: '1.1.0',
+        analyticsVersion: '1.2.0',
         publicExamIds: Object.freeze(['ab730', 'ab731', 'sc900', 'az900', 'az104', 'saac03'])
     });
 
@@ -69,7 +69,7 @@
         if (!isPublicSiteHost()) return 'Analytics are off outside the public site.';
         if (isOptedOut()) return 'Analytics are off in this browser.';
         if (!hasValidConnection()) return 'Analytics are unavailable in this build.';
-        return 'Analytics are on for aggregate site metrics.';
+        return 'Analytics are on for limited site metrics.';
     }
 
     function pageNameFromPath(pathname = window.location.pathname) {
@@ -326,6 +326,28 @@
         });
     }
 
+    function trackProUnlockClicked(examId) {
+        return trackEvent('pro_unlock_clicked', {
+            ...getExamProperties(examId),
+            placement: 'exam_card'
+        });
+    }
+
+    function trackProModalOpened(examId) {
+        return trackEvent('pro_modal_opened', getExamProperties(examId));
+    }
+
+    function trackProPurchaseClicked(examId) {
+        return trackEvent('pro_purchase_clicked', {
+            ...getExamProperties(examId),
+            store: 'gumroad'
+        });
+    }
+
+    function trackProImportClicked(examId) {
+        return trackEvent('pro_import_clicked', getExamProperties(examId));
+    }
+
     function trackStudyStarted(examId, details = {}) {
         return trackEvent('study_started', getExamProperties(examId), {
             question_count: details.questionCount,
@@ -454,7 +476,7 @@
         dialog.appendChild(title);
 
         const description = document.createElement('p');
-        description.textContent = 'The online version collects aggregate visits, campaign attribution, and exam usage metrics. Attribution is limited to approved campaign parameters and the external referrer hostname. It does not collect questions, answers, imported files, filenames, names, emails, full referrer URLs, or a persistent visitor ID.';
+        description.textContent = 'The online version collects limited visit, campaign attribution, exam usage, and commercial interaction events. Azure can add coarse location and client metadata. It does not collect questions, answers, imported files, filenames, names, emails, full referrer URLs, or a persistent visitor ID.';
         dialog.appendChild(description);
 
         const status = document.createElement('div');
@@ -561,6 +583,10 @@
         trackPageView,
         trackExamStarted,
         trackExamCompleted,
+        trackProUnlockClicked,
+        trackProModalOpened,
+        trackProPurchaseClicked,
+        trackProImportClicked,
         trackStudyStarted,
         trackStudyQuestionAnswered,
         trackStudyCompleted,

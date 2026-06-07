@@ -61,9 +61,10 @@
       </div>
 
       <h2>Online analytics</h2>
-      <p>The public deployment can send limited aggregate analytics to Azure Application Insights. Analytics is not initialized on localhost, private self-hosted URLs, or file URLs.</p>
+      <p>The public deployment can send limited product telemetry events to Azure Application Insights. The private dashboard reports aggregate trends but can also inspect individual event timestamps with Azure-derived coarse location/client metadata. Analytics is not initialized on localhost, private self-hosted URLs, or file URLs.</p>
       <ul>
-        <li>Collected: page views, exam started/completed counts, study mode counts, import counts, progress export actions, coarse score/duration buckets, simple sanitized labels from approved campaign parameters (<code>ref</code>, <code>utm_source</code>, <code>utm_medium</code>, <code>utm_campaign</code>), and the external referrer hostname. Values resembling emails, URLs, or paths are discarded.</li>
+        <li>Collected: page views, exam started/completed counts, study mode counts, import counts, progress export actions, unlock, pro modal, purchase-link, and import-activation counts, coarse score/duration buckets, simple sanitized labels from approved campaign parameters (<code>ref</code>, <code>utm_source</code>, <code>utm_medium</code>, <code>utm_campaign</code>), and the external referrer hostname. Values resembling emails, URLs, or paths are discarded.</li>
+        <li>Azure Application Insights temporarily uses the sender IP to derive coarse country, region, and city information, then does not store the full IP address under the configured default behavior. Azure can also attach browser, operating system, device type, and device model metadata to telemetry.</li>
         <li>Bundled exam labels are restricted to <code>ab730</code>, <code>ab731</code>, <code>sc900</code>, <code>az900</code>, <code>az104</code>, and <code>saac03</code>. Every other exam is reported only as <code>imported</code>.</li>
         <li>Not collected: full referrer URLs or paths, arbitrary query parameters, question text, options, answers, explanations, selected responses, imported content, filenames, personal study records, persistent visitor IDs, names, or emails.</li>
         <li>You can turn analytics off from the Privacy settings control on the online site.</li>
