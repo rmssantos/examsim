@@ -618,6 +618,7 @@ unlockButton.appendChild(this.createIcon('fas fa-unlock'));
 unlockButton.appendChild(document.createTextNode(' Unlock'));
 unlockButton.addEventListener('click', (e) => {
 e.stopPropagation();
+window.ExamApp?.analytics?.trackProUnlockClicked?.(examId);
 this.showProModal(examId, metadata);
 });
 actions.appendChild(unlockButton);
@@ -655,6 +656,7 @@ showProModal(examId, metadata) {
 const pro = (metadata && metadata.pro) || {};
 const returnFocus = (document.activeElement instanceof HTMLElement) ? document.activeElement : null;
 this.closeProModal();
+window.ExamApp?.analytics?.trackProModalOpened?.(examId);
 
 const overlay = document.createElement('div');
 overlay.className = 'pro-modal-overlay';
@@ -703,6 +705,9 @@ buy.target = '_blank';
 buy.rel = 'noopener noreferrer';
 buy.appendChild(this.createIcon('fas fa-store'));
 buy.appendChild(document.createTextNode(' Get the full pack' + (pro.price ? ' (' + pro.price + ')' : '')));
+buy.addEventListener('click', () => {
+window.ExamApp?.analytics?.trackProPurchaseClicked?.(examId);
+});
 dialog.appendChild(buy);
 
 const divider = document.createElement('div');
@@ -720,6 +725,7 @@ importBtn.className = 'pro-modal-import';
 importBtn.appendChild(this.createIcon('fas fa-file-import'));
 importBtn.appendChild(document.createTextNode(' Import & activate'));
 importBtn.addEventListener('click', () => {
+window.ExamApp?.analytics?.trackProImportClicked?.(examId);
 this.closeProModal();
 this.triggerFileImport();
 });
