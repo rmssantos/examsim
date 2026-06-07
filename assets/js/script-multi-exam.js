@@ -1366,6 +1366,16 @@ class MultiExamSimulator {
             .replace(/'/g, '&#39;');
     }
 
+    // Render a "Source" link to the question's reference, only when it points to an
+    // allowlisted official documentation host (same trust gate as inline doc links).
+    renderReferenceLink(question) {
+        const ref = question && this.safeUrl(question.reference);
+        if (!ref || !isOfficialDocumentationUrl(ref)) return '';
+        let host = 'documentation';
+        try { host = new URL(ref).hostname.replace(/^www\./, ''); } catch (_) {}
+        return `<div class="explanation-source"><i class="fas fa-book" aria-hidden="true"></i> <strong>Source:</strong> <a href="${this.escapeHtml(ref)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(host)}</a></div>`;
+    }
+
     displayOptions(question) {
         const container = document.getElementById('options-container');
         container.innerHTML = '';
@@ -1766,10 +1776,11 @@ class MultiExamSimulator {
             correctAnswerDiv.innerHTML = `<strong>Correct Answer:</strong> ${String.fromCharCode(65 + correctAnswer)}. ${this.escapeHtml(question.options[correctAnswer])}`;
         }
 
+        const referenceHtml = this.renderReferenceLink(question);
         if (question.explanation) {
-            explanationDiv.innerHTML = `<strong>Explanation:</strong><br>${this.formatQuestionText(question.explanation)}`;
+            explanationDiv.innerHTML = `<strong>Explanation:</strong><br>${this.formatQuestionText(question.explanation)}${referenceHtml}`;
         } else {
-            explanationDiv.innerHTML = '';
+            explanationDiv.innerHTML = referenceHtml;
         }
 
         // Display explanation images
@@ -2483,13 +2494,14 @@ class MultiExamSimulator {
                             <span class="review-label">Correct Answer:</span>
                             <span class="review-value correct">${correctAnswerText}</span>
                         </div>` : ''}
-                        ${(question.explanation || (question.explanation_images && question.explanation_images.length > 0)) ? `
+                        ${(question.explanation || question.reference || (question.explanation_images && question.explanation_images.length > 0)) ? `
                         <div class="review-explanation-box" data-q-index="${index}">
                             ${question.explanation ? `
                             <span class="review-label">Justification:</span>
                             <span class="explanation-text">${this.formatQuestionText(question.explanation)}</span>
                             ` : ''}
                             <div class="review-explanation-images explanation-images-container"></div>
+                            ${this.renderReferenceLink(question)}
                         </div>
                         ` : ''}
                     </div>

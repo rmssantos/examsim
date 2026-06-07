@@ -1,3 +1,7 @@
+// Internal PWA cache-bust counter, intentionally independent of the product version.
+// The product/release version is the source of truth in CHANGELOG.md and the README
+// badge (currently 2.0.1). Bump the vX.Y below on any deploy that changes cached assets;
+// tests/test_sprint1_readiness.py enforces the examsim-pwa-vX.Y format.
 const CACHE_VERSION = 'examsim-pwa-v3.3';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
