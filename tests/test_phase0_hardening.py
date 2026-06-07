@@ -160,8 +160,66 @@ class ProgressBoundaryTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout)
         self.assertIn("rejected invalid progress", result.stdout)
 
+    def test_progress_normalizer_rejects_negative_numeric_answers(self):
+        script = utils_bootstrap(
+            """
+            for (const userAnswer of [-1, [0, -1]]) {
+              const progress = {
+                attempts: [{
+                  score: 50,
+                  questionResults: [{
+                    questionId: 'q1',
+                    order: 1,
+                    userAnswer,
+                    correct: false,
+                    skipped: false
+                  }]
+                }]
+              };
+              if (window.ExamApp.normalizeProgressRecord(progress) !== null) {
+                throw new Error(`negative answer accepted: ${JSON.stringify(userAnswer)}`);
+              }
+            }
+            console.log('rejected negative answers');
+            """
+        )
+        result = run_node(script)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("rejected negative answers", result.stdout)
+
 
 class EncryptedEnvelopeTests(unittest.TestCase):
+    def test_cli_base64_preflight_rejects_oversized_input_before_decode(self):
+        script = textwrap.dedent(
+            """
+            const fs = require('fs');
+            const vm = require('vm');
+            const source = fs.readFileSync('tools/encrypt-pack.js', 'utf8');
+            const start = source.indexOf('function decodeBase64');
+            const end = source.indexOf('\\nfunction isEncryptedEnvelope', start);
+            if (start < 0 || end < 0) throw new Error('decodeBase64 source not found');
+
+            const context = {
+              Buffer: {
+                from() {
+                  throw new Error('oversized input reached Buffer.from');
+                }
+              }
+            };
+            vm.createContext(context);
+            vm.runInContext(
+              `${source.slice(start, end)}
+               result = decodeBase64('A'.repeat(24), null, 4);`,
+              context
+            );
+            if (context.result !== null) throw new Error('oversized input accepted');
+            console.log('oversized base64 rejected before decode');
+            """
+        )
+        result = run_node(script)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("oversized base64 rejected before decode", result.stdout)
+
     def test_browser_envelope_validator_rejects_algorithm_and_iteration_changes(self):
         script = textwrap.dedent(
             """

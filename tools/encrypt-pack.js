@@ -106,6 +106,7 @@ function decodeBase64(value, expectedBytes = null, maxBytes = MAX_ENCRYPTED_BYTE
   ) {
     return null;
   }
+  if (value.length > Math.ceil(maxBytes / 3) * 4) return null;
   const bytes = Buffer.from(value, 'base64');
   if (bytes.toString('base64') !== value) return null;
   if (expectedBytes !== null && bytes.length !== expectedBytes) return null;

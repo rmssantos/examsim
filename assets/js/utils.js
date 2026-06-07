@@ -231,11 +231,11 @@ window.ExamApp.normalizeProgressRecord = function normalizeProgressRecord(progre
     };
     const normalizeAnswer = (answer) => {
         if (answer === null || answer === undefined || answer === '') return null;
-        if (Number.isInteger(answer) && Math.abs(answer) <= limits.maxQuestions) return answer;
+        if (Number.isInteger(answer) && answer >= 0 && answer <= limits.maxQuestions) return answer;
         if (typeof answer === 'string' && answer.length <= limits.maxProgressStringLength) return answer;
         if (!Array.isArray(answer) || answer.length > limits.maxQuestions) return undefined;
         const values = answer.map((value) => {
-            if (Number.isInteger(value) && Math.abs(value) <= limits.maxQuestions) return value;
+            if (Number.isInteger(value) && value >= 0 && value <= limits.maxQuestions) return value;
             if (typeof value === 'string' && value.length <= limits.maxProgressStringLength) return value;
             return undefined;
         });
