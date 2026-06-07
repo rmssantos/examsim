@@ -32,8 +32,17 @@ document.addEventListener('DOMContentLoaded', async function() {
   const pageMode = route.page === 'study' || params.get('mode') === 'study' ? 'study' : 'exam';
 
   if (!window.ExamApp.isSafeExamId(examId)) {
-    console.error(`❌ Invalid exam id: ${examId}`);
+    console.error('❌ Invalid exam id:', examId);
     alert('Invalid exam id. Please select an exam from the homepage.');
+    closeExamTab();
+    return;
+  }
+
+  try {
+    await window.ExamApp.ensureExamLoaded(examId);
+  } catch (error) {
+    console.error('❌ Failed to load exam:', examId, error);
+    alert(`Exam ${examId} could not be loaded. Please return to the homepage and try again.`);
     closeExamTab();
     return;
   }
@@ -167,7 +176,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     }
   } else {
-    console.error(`❌ Failed to load exam: ${examId}`);
+    console.error('❌ Failed to load exam:', examId);
     alert(`Exam ${examId} not found. Please import it first or check if it's activated.`);
   }
 });

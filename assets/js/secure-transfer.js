@@ -8,8 +8,11 @@
     const ENVELOPE_FORMAT = 'examsim-encrypted';
     const ENVELOPE_VERSION = 1;
     const KDF_ITERATIONS = 210000;
+    const MIN_KDF_ITERATIONS = 100000;
+    const MAX_KDF_ITERATIONS = 1000000;
     const SALT_BYTES = 16;
     const IV_BYTES = 12;
+    const MAX_ENCRYPTED_BYTES = 8 * 1024 * 1024;
     const MIN_PASSPHRASE_LENGTH = 8;
 
     const encoder = new TextEncoder();
@@ -40,6 +43,25 @@
             bytes[i] = binary.charCodeAt(i);
         }
         return bytes;
+    }
+
+    function decodeBase64(value, expectedBytes = null, maxBytes = MAX_ENCRYPTED_BYTES) {
+        if (
+            typeof value !== 'string'
+            || value.length === 0
+            || value.length % 4 !== 0
+            || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(value)
+        ) {
+            return null;
+        }
+        try {
+            const bytes = fromBase64(value);
+            if (expectedBytes !== null && bytes.length !== expectedBytes) return null;
+            if (bytes.length > maxBytes) return null;
+            return bytes;
+        } catch (_) {
+            return null;
+        }
     }
 
     function bufferToHex(buffer) {
@@ -96,10 +118,18 @@
         return Boolean(
             value
             && typeof value === 'object'
+            && !Array.isArray(value)
             && value.format === ENVELOPE_FORMAT
-            && typeof value.data === 'string'
-            && typeof value.salt === 'string'
-            && typeof value.iv === 'string'
+            && value.version === ENVELOPE_VERSION
+            && value.kdf === 'PBKDF2'
+            && value.hash === 'SHA-256'
+            && value.cipher === 'AES-GCM'
+            && Number.isInteger(value.iterations)
+            && value.iterations >= MIN_KDF_ITERATIONS
+            && value.iterations <= MAX_KDF_ITERATIONS
+            && decodeBase64(value.salt, SALT_BYTES, SALT_BYTES) !== null
+            && decodeBase64(value.iv, IV_BYTES, IV_BYTES) !== null
+            && decodeBase64(value.data, null, MAX_ENCRYPTED_BYTES)?.length >= 16
         );
     }
 
@@ -107,18 +137,16 @@
         if (!isEncryptedEnvelope(envelope)) {
             throw new Error('This file is not a valid ExamSim encrypted export.');
         }
-        const iterations = Number.isInteger(envelope.iterations) && envelope.iterations > 0
-            ? envelope.iterations
-            : KDF_ITERATIONS;
-        const salt = fromBase64(envelope.salt);
-        const iv = fromBase64(envelope.iv);
-        const key = await deriveKey(passphrase, salt, iterations);
+        const salt = decodeBase64(envelope.salt, SALT_BYTES, SALT_BYTES);
+        const iv = decodeBase64(envelope.iv, IV_BYTES, IV_BYTES);
+        const encryptedData = decodeBase64(envelope.data, null, MAX_ENCRYPTED_BYTES);
+        const key = await deriveKey(passphrase, salt, envelope.iterations);
         let plaintext;
         try {
             plaintext = await getCrypto().subtle.decrypt(
                 { name: 'AES-GCM', iv },
                 key,
-                fromBase64(envelope.data)
+                encryptedData
             );
         } catch (error) {
             throw new Error('Decryption failed. The passphrase is wrong or the file is corrupted.');
@@ -288,6 +316,8 @@
         ENVELOPE_FORMAT,
         ENVELOPE_VERSION,
         KDF_ITERATIONS,
+        MIN_KDF_ITERATIONS,
+        MAX_KDF_ITERATIONS,
         MIN_PASSPHRASE_LENGTH,
         encrypt,
         decrypt,

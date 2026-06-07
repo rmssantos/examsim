@@ -48,7 +48,7 @@
     return loadMaster(exam);
   }
 
-  function setActiveExam(newExamId, options = {}) {
+  async function setActiveExam(newExamId, options = {}) {
     if (!newExamId) return false;
 
     const { skipUnsavedCheck = false, force = false } = options;
@@ -65,6 +65,16 @@
         if ($('#examSelect')) {
           $('#examSelect').value = state.exam;
         }
+        return false;
+      }
+    }
+
+    if (newExamId !== 'custom' && window.ExamApp.ensureExamLoaded) {
+      try {
+        await window.ExamApp.ensureExamLoaded(newExamId);
+      } catch (error) {
+        notify(`Could not load ${newExamId}: ${error.message}`);
+        if ($('#examSelect')) $('#examSelect').value = state.exam;
         return false;
       }
     }
@@ -1453,8 +1463,8 @@
 
   // Bind events
   function bind(){
-    $('#examSelect').addEventListener('change', ()=>{
-      setActiveExam($('#examSelect').value);
+    $('#examSelect').addEventListener('change', async ()=>{
+      await setActiveExam($('#examSelect').value);
     });
     $('#searchInput').addEventListener('input', ()=>{ applyFilter(); renderList(); });
 
@@ -1613,10 +1623,10 @@
     });
   }
 
-  document.addEventListener('editorExamListReady', (event) => {
+  document.addEventListener('editorExamListReady', async (event) => {
     const preferredExam = event?.detail?.defaultExamId || ($('#examSelect')?.value) || state.exam;
     if (preferredExam) {
-      setActiveExam(preferredExam, { skipUnsavedCheck: true });
+      await setActiveExam(preferredExam, { skipUnsavedCheck: true });
     }
   });
 

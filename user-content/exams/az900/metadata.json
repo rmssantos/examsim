@@ -22,6 +22,75 @@
   "contentType": "practice-exam",
   "commercialStatus": "free",
   "contentOrigin": "original",
+  "contentReview": {
+    "lastReviewed": "2026-06-07",
+    "reviewCadence": "quarterly",
+    "sourceOfTruth": "Microsoft Learn AZ-900 study guide and certification page",
+    "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-900",
+    "objectiveVersion": "Skills measured as of January 14, 2026",
+    "reviewScope": [
+      "official study guide objectives",
+      "module coverage mapping",
+      "schema validation"
+    ],
+    "notes": "Original practice content based on public Microsoft Learn objectives. It does not reproduce Microsoft exam or practice assessment questions."
+  },
+  "objectiveDomains": [
+    {
+      "code": "AZ900-1",
+      "name": "Describe cloud concepts",
+      "weightRange": "25-30%",
+      "source": "Microsoft Learn AZ-900 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-900",
+      "mappedModules": [
+        "Cloud Computing Concepts",
+        "Benefits of Cloud Services",
+        "Cloud Service Types"
+      ]
+    },
+    {
+      "code": "AZ900-2",
+      "name": "Describe Azure architecture and services",
+      "weightRange": "35-40%",
+      "source": "Microsoft Learn AZ-900 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-900",
+      "mappedModules": [
+        "Core Azure Architecture",
+        "Compute & Networking",
+        "Storage Services",
+        "Identity, Access & Security"
+      ]
+    },
+    {
+      "code": "AZ900-3",
+      "name": "Describe Azure management and governance",
+      "weightRange": "30-35%",
+      "source": "Microsoft Learn AZ-900 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-900",
+      "mappedModules": [
+        "Cost Management",
+        "Governance & Compliance",
+        "Management & Deployment Tools",
+        "Monitoring Tools"
+      ]
+    }
+  ],
+  "coverageReview": {
+    "method": "Modules mapped to the AZ-900 skills measured as of January 14, 2026.",
+    "observedModuleCounts": {
+      "Cloud Computing Concepts": 10,
+      "Benefits of Cloud Services": 10,
+      "Cloud Service Types": 9,
+      "Core Azure Architecture": 14,
+      "Compute & Networking": 13,
+      "Storage Services": 12,
+      "Identity, Access & Security": 15,
+      "Cost Management": 10,
+      "Governance & Compliance": 10,
+      "Management & Deployment Tools": 9,
+      "Monitoring Tools": 8
+    }
+  },
   "modules": [
     {
       "icon": "fas fa-cloud",

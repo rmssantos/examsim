@@ -1,3 +1,23 @@
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 20000;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #123b70;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-150%);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 3px solid #00c4ff;
+  outline-offset: 2px;
+}
+
 .app-nav-action {
   display: inline-flex;
   align-items: center;

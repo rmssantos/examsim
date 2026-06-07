@@ -1,123 +1,80 @@
 /**
- * Exam Loader - Dynamically loads exams from JSON files
- * No more hardcoded exam-data.js files!
+ * Exam Loader - metadata-first discovery with on-demand question loading.
  *
- * This module automatically:
- * - Discovers exam directories in user-content/exams/
- * - Loads dump.json and metadata.json from each directory
- * - Checks browser storage for imported exams
- * - Populates window.userExams with all available exams
+ * Bundled packs register their metadata at startup. Their dump.json is fetched
+ * only when a page needs the questions. Browser-stored imports remain fully
+ * loaded and override bundled entries with the same ID.
  */
 
-// Initialize user exams container
 window.ExamApp = window.ExamApp || {};
 window.ExamApp.userExams = window.ExamApp.userExams || {};
-window.userExams = window.ExamApp.userExams; // backwards compat
+window.userExams = window.ExamApp.userExams;
 
-// Main loader function
-window.ExamApp.loadAllExams = async function() {
-    window.ExamApp.log('🔍 Discovering exams...');
+(function configureExamLoader() {
+    const inFlightLoads = new Map();
 
-    // Try to discover exam directories automatically
-    let examDirs = [];
-
-    try {
-        // Try JSON index first (if server provides one)
-        const indexResponse = await fetch('user-content/exams/index.json');
-        if (indexResponse.ok) {
-            const examList = await indexResponse.json();
-            if (Array.isArray(examList)) {
-                examDirs = examList.filter((examId) => window.ExamApp.isSafeExamId(examId));
-                window.ExamApp.log('✓ Loaded exam list from index.json:', examDirs);
-            }
-        }
-    } catch (e) {
-        // index.json not available, fall through
+    function hasImages(questions) {
+        return Array.isArray(questions) && questions.some((question) => (
+            (Array.isArray(question.question_images) && question.question_images.length > 0)
+            || (Array.isArray(question.explanation_images) && question.explanation_images.length > 0)
+            || String(question.question || '').includes('![')
+            || String(question.explanation || '').includes('![')
+        ));
     }
 
-    if (examDirs.length === 0) {
+    async function discoverBundledExamIds() {
         try {
-            // Fallback: try to parse directory listing HTML
+            const indexResponse = await fetch('user-content/exams/index.json');
+            if (indexResponse.ok) {
+                const examList = await indexResponse.json();
+                if (Array.isArray(examList)) {
+                    return examList.filter((examId) => window.ExamApp.isSafeExamId(examId));
+                }
+            }
+        } catch (_) {
+            // Fall through to directory discovery for local servers.
+        }
+
+        try {
             const response = await fetch('user-content/exams/');
-            if (response.ok) {
-                const html = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const links = doc.querySelectorAll('a');
-                const dirs = [];
-                links.forEach(link => {
-                    const name = link.textContent.trim().replace(/\/$/, '');
-                    if (window.ExamApp.isSafeExamId(name)) {
-                        dirs.push(name);
-                    }
-                });
-                examDirs = dirs;
-                if (examDirs.length > 0) {
-                    window.ExamApp.log('✓ Auto-discovered exam directories:', examDirs);
-                }
-            }
-        } catch (e) {
-            window.ExamApp.log('Directory listing not available, using localStorage exams only');
+            if (!response.ok) return [];
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            return Array.from(doc.querySelectorAll('a'))
+                .map((link) => link.textContent.trim().replace(/\/$/, ''))
+                .filter((examId) => window.ExamApp.isSafeExamId(examId));
+        } catch (_) {
+            window.ExamApp.log('Directory listing not available, using browser-stored exams only');
+            return [];
         }
     }
 
-    // Load each exam from dump.json
-    const loadPromises = examDirs.map(async (examId) => {
+    async function registerBundledExam(examId) {
         try {
-            if (!window.ExamApp.isSafeExamId(examId)) {
-                window.ExamApp.warn(`Skipping invalid exam id: ${examId}`);
+            const metadataResponse = await fetch(`user-content/exams/${examId}/metadata.json`);
+            if (!metadataResponse.ok) {
+                window.ExamApp.warn(`Skipping ${examId}: metadata.json not found`);
                 return;
             }
-
-            // Fetch dump.json
-            const dumpResponse = await fetch(`user-content/exams/${examId}/dump.json`);
-            if (!dumpResponse.ok) {
-                window.ExamApp.log(`✗ ${examId}: dump.json not found`);
-                return;
-            }
-
-            let questions = await dumpResponse.json();
-
-            // Handle both formats: [{...}] and {questions: [...]}
-            if (questions.questions) {
-                questions = questions.questions;
-            }
-
-            // Try to fetch metadata.json (optional)
-            let metadata = null;
-            try {
-                const metadataResponse = await fetch(`user-content/exams/${examId}/metadata.json`);
-                if (metadataResponse.ok) {
-                    metadata = await metadataResponse.json();
-                }
-            } catch (e) {
-                // Metadata is optional, will be generated by examManager
-            }
-
-            const validation = window.ExamApp.validateExamData(questions, metadata);
-            if (!validation.valid) {
-                console.error(`✗ ${examId}: invalid exam data`, validation.errors.slice(0, 10));
-                return;
-            }
-
-            // Store in window.userExams
+            const metadata = await metadataResponse.json();
             window.userExams[examId] = {
-                questions: questions,
-                metadata: metadata
+                questions: null,
+                metadata,
+                source: 'bundled',
+                storage: 'network',
+                loaded: false,
+                hasImages: Boolean(metadata?.hasImages)
             };
-
-            window.ExamApp.log(`✓ Loaded ${examId}: ${questions.length} questions`);
+            window.ExamApp.log(`Registered ${examId} metadata`);
         } catch (error) {
-            console.error(`✗ Failed to load ${examId}:`, error);
+            console.error(`Failed to load metadata for ${examId}:`, error);
         }
-    });
+    }
 
-    // Wait for all exams to load
-    await Promise.all(loadPromises);
+    async function loadStoredExams() {
+        if (!window.ExamApp.examStorage) return;
 
-    // Also check browser storage for imported exams and local edits.
-    window.ExamApp.log('🔍 Checking browser storage for imported exams...');
-    if (window.ExamApp.examStorage) {
         try {
             const storedExamIds = await window.ExamApp.examStorage.listExamIds();
             for (const examId of storedExamIds) {
@@ -125,26 +82,24 @@ window.ExamApp.loadAllExams = async function() {
                     window.ExamApp.warn(`Skipping invalid stored exam id: ${examId}`);
                     continue;
                 }
-
                 try {
                     const storedExam = await window.ExamApp.examStorage.getExam(examId);
                     if (!storedExam || !Array.isArray(storedExam.questions)) continue;
-
                     const validation = window.ExamApp.validateExamData(storedExam.questions, storedExam.metadata);
                     if (!validation.valid) {
-                        console.error(`✗ Failed to load ${examId} from browser storage: invalid data`, validation.errors.slice(0, 10));
+                        console.error(`Failed to load ${examId} from browser storage: invalid data`, validation.errors.slice(0, 10));
                         continue;
                     }
-
                     window.userExams[examId] = {
                         questions: storedExam.questions,
                         metadata: storedExam.metadata,
-                        source: storedExam.source || 'unknown',
-                        storage: storedExam.storage || 'browser'
+                        source: storedExam.source || 'imported',
+                        storage: storedExam.storage || 'browser',
+                        loaded: true,
+                        hasImages: hasImages(storedExam.questions)
                     };
-                    window.ExamApp.log(`✓ Loaded ${examId} from ${storedExam.storage || 'browser storage'}: ${storedExam.questions.length} questions`);
                 } catch (error) {
-                    console.error(`✗ Failed to load ${examId} from browser storage:`, error);
+                    console.error(`Failed to load ${examId} from browser storage:`, error);
                 }
             }
         } catch (error) {
@@ -153,17 +108,68 @@ window.ExamApp.loadAllExams = async function() {
 
         try {
             const progressExamIds = await window.ExamApp.examStorage.listProgressExamIds();
-            await Promise.all(progressExamIds.map(examId => window.ExamApp.examStorage.getProgress(examId)));
+            await Promise.all(progressExamIds.map((examId) => window.ExamApp.examStorage.getProgress(examId)));
         } catch (error) {
             window.ExamApp.warn('Failed to migrate browser progress storage:', error);
         }
     }
 
-    window.ExamApp.log('✅ All exams loaded:', Object.keys(window.userExams));
-    return window.userExams;
-};
-window.loadAllExams = window.ExamApp.loadAllExams; // backwards compat
+    window.ExamApp.loadAllExams = async function loadAllExams() {
+        window.ExamApp.log('Discovering exam metadata...');
+        const examDirs = await discoverBundledExamIds();
+        await Promise.all(examDirs.map(registerBundledExam));
+        await loadStoredExams();
+        window.ExamApp.log('Exam metadata loaded:', Object.keys(window.userExams));
+        return window.userExams;
+    };
 
-// Export as a promise for async/await usage
-window.ExamApp.examsLoadedPromise = window.ExamApp.loadAllExams();
-window.examsLoadedPromise = window.ExamApp.examsLoadedPromise; // backwards compat
+    window.ExamApp.ensureExamLoaded = async function ensureExamLoaded(examId) {
+        if (!window.ExamApp.isSafeExamId(examId)) {
+            throw new Error('Invalid exam id.');
+        }
+
+        const existing = Object.getOwnPropertyDescriptor(window.userExams, examId)?.value;
+        if (!existing) {
+            throw new Error(`Exam ${examId} is not available.`);
+        }
+        if (Array.isArray(existing.questions)) {
+            existing.loaded = true;
+            return existing;
+        }
+        if (existing.source !== 'bundled') {
+            throw new Error(`Exam ${examId} has no question data.`);
+        }
+        if (inFlightLoads.has(examId)) return inFlightLoads.get(examId);
+
+        const loadPromise = (async () => {
+            const dumpResponse = await fetch(`user-content/exams/${examId}/dump.json`);
+            if (!dumpResponse.ok) {
+                throw new Error(`Could not load questions for ${examId}.`);
+            }
+            const rawDump = await dumpResponse.json();
+            const questions = Array.isArray(rawDump) ? rawDump : rawDump?.questions;
+            const validation = window.ExamApp.validateExamData(questions, existing.metadata);
+            if (!validation.valid) {
+                throw new Error(`Invalid questions for ${examId}: ${validation.errors.slice(0, 3).join('; ')}`);
+            }
+
+            existing.questions = questions;
+            existing.loaded = true;
+            existing.hasImages = hasImages(questions) || Boolean(existing.metadata?.hasImages);
+            window.ExamApp.log(`Loaded ${examId}: ${questions.length} questions`);
+            return existing;
+        })();
+
+        inFlightLoads.set(examId, loadPromise);
+        try {
+            return await loadPromise;
+        } finally {
+            inFlightLoads.delete(examId);
+        }
+    };
+
+    window.loadAllExams = window.ExamApp.loadAllExams;
+    window.ensureExamLoaded = window.ExamApp.ensureExamLoaded;
+    window.ExamApp.examsLoadedPromise = window.ExamApp.loadAllExams();
+    window.examsLoadedPromise = window.ExamApp.examsLoadedPromise;
+})();

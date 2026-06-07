@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1e3c72">
   <meta name="robots" content="noindex, follow">
   <meta name="description" content="Take practice certification exams with multiple question types and instant feedback in Examplar.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.applicationinsights.azure.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.applicationinsights.azure.com; object-src 'none'; base-uri 'self'; form-action 'self'">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/media/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="64x64" href="assets/media/favicon-64.png">
@@ -19,12 +19,13 @@
   <link href="assets/vendor/fontawesome/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   <div class="theme-controls">
     <button class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
       <i aria-hidden="true" class="fas fa-moon theme-icon"></i>
     </button>
   </div>
-  <div class="container">
+  <main id="main-content" class="container" tabindex="-1">
     <!-- Minimal shell that only shows the exam UI -->
     <div id="exam-screen" class="screen active">
       <div class="exam-header">
@@ -210,7 +211,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
   <script src="assets/js/router.js"></script>
   <script src="assets/js/pwa.js"></script>
   <script src="assets/js/utils.js"></script>

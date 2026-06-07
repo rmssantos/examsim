@@ -1825,7 +1825,7 @@
   {
     "id": 115,
     "module": "Adoption, Licensing, and Change Strategy",
-    "question": "For each adoption statement, indicate whether it is correct.",
+    "question": "For each statement about sustaining an AI rollout, indicate whether it is correct.",
     "statements": [
       "Champions can share practical patterns.",
       "Licensing should align to user scenarios and value.",

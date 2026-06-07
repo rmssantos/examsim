@@ -32,7 +32,7 @@ The public deployment (`examplar.app`, also reachable at `rmssantos.github.io/ex
 In Application Insights, page visits are recorded as native page views (`pageViews`). Product actions such as exam starts/completions and imports are recorded as custom events (`customEvents`).
 
 **Collected event properties:**
-- Public bundled exam ID (`ab730`, `ab731`, `sc900`, `az900`, or `az104`) or generic `imported`
+- Public bundled exam ID (`ab730`, `ab731`, `sc900`, `az900`, `az104`, or `saac03`) or generic `imported`
 - Pass/fail result
 - Score bucket (`0-49`, `50-69`, `70-89`, `90-100`)
 - Study accuracy bucket, due/new/weak queue counts, and correct/reviewed counts
@@ -67,7 +67,7 @@ The public/static deployment only serves static files:
 - ❌ Receive uploaded dumps
 - ❌ Track users in local/self-hosted mode
 - ❌ Share data between users
-- ❌ Send any data anywhere
+- ❌ Receive the aggregate analytics sent directly by the public-site browser to Azure Application Insights
 
 When you run `python server.py` locally, it also exposes a same-origin local image upload endpoint (`PUT /__upload_images`) used by the editor to copy image files into `user-content/exams/<examId>/images/`. This endpoint accepts image files only, validates the filename/content, enforces the 10 MB image limit, and does not receive or persist exam dumps.
 
@@ -388,7 +388,7 @@ User → Browser storage
 **A:** No, unless students manually export and share their progress JSON files.
 
 ### Q: What about GDPR/privacy laws?
-**A:** Since no data is sent to servers, there are no GDPR concerns. All data is local.
+**A:** Exam content and personal study data stay local, but the public deployment sends limited aggregate telemetry to Azure Application Insights. Privacy, consent, processor, retention, and deletion obligations still need to be assessed for each deployment and jurisdiction.
 
 ### Q: Can I self-host this privately?
 **A:** Yes! Run on your own server. No external services needed.
@@ -435,7 +435,7 @@ PUT /api/user-data       ← Doesn't exist!
 This exam simulator is designed with **privacy-by-default**:
 
 - ✅ **100% client-side** data storage
-- ✅ **No personal tracking** - the public site sends only anonymous aggregate metrics (opt-out anytime); self-hosted and offline send nothing
+- ✅ **No account/profile tracking** - the public site sends limited aggregate metrics without a custom persistent visitor ID (opt-out anytime); self-hosted and offline use does not initialize analytics
 - ✅ **No user database**
 - ✅ **Your content is never collected** - questions, answers, imported files, and progress stay in your browser
 - ✅ **Complete isolation** between users

@@ -31,8 +31,11 @@ const { subtle } = webcrypto;
 const ENVELOPE_FORMAT = 'examsim-encrypted';
 const ENVELOPE_VERSION = 1;
 const KDF_ITERATIONS = 210000;
+const MIN_KDF_ITERATIONS = 100000;
+const MAX_KDF_ITERATIONS = 1000000;
 const SALT_BYTES = 16;
 const IV_BYTES = 12;
+const MAX_ENCRYPTED_BYTES = 8 * 1024 * 1024;
 const MIN_PASSPHRASE_LENGTH = 8;
 
 function parseArgs(argv) {
@@ -94,20 +97,54 @@ async function encrypt(data, passphrase) {
   };
 }
 
+function decodeBase64(value, expectedBytes = null, maxBytes = MAX_ENCRYPTED_BYTES) {
+  if (
+    typeof value !== 'string'
+    || value.length === 0
+    || value.length % 4 !== 0
+    || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(value)
+  ) {
+    return null;
+  }
+  if (value.length > Math.ceil(maxBytes / 3) * 4) return null;
+  const bytes = Buffer.from(value, 'base64');
+  if (bytes.toString('base64') !== value) return null;
+  if (expectedBytes !== null && bytes.length !== expectedBytes) return null;
+  if (bytes.length > maxBytes) return null;
+  return bytes;
+}
+
+function isEncryptedEnvelope(envelope) {
+  return Boolean(
+    envelope
+    && typeof envelope === 'object'
+    && !Array.isArray(envelope)
+    && envelope.format === ENVELOPE_FORMAT
+    && envelope.version === ENVELOPE_VERSION
+    && envelope.kdf === 'PBKDF2'
+    && envelope.hash === 'SHA-256'
+    && envelope.cipher === 'AES-GCM'
+    && Number.isInteger(envelope.iterations)
+    && envelope.iterations >= MIN_KDF_ITERATIONS
+    && envelope.iterations <= MAX_KDF_ITERATIONS
+    && decodeBase64(envelope.salt, SALT_BYTES, SALT_BYTES) !== null
+    && decodeBase64(envelope.iv, IV_BYTES, IV_BYTES) !== null
+    && (decodeBase64(envelope.data, null, MAX_ENCRYPTED_BYTES)?.length || 0) >= 16
+  );
+}
+
 async function decrypt(envelope, passphrase) {
-  if (!envelope || envelope.format !== ENVELOPE_FORMAT) {
+  if (!isEncryptedEnvelope(envelope)) {
     throw new Error('Input is not a valid ExamSim encrypted envelope.');
   }
-  const iterations = Number.isInteger(envelope.iterations) && envelope.iterations > 0
-    ? envelope.iterations
-    : KDF_ITERATIONS;
-  const salt = Buffer.from(envelope.salt, 'base64');
-  const iv = Buffer.from(envelope.iv, 'base64');
-  const key = await deriveKey(passphrase, salt, iterations);
+  const salt = decodeBase64(envelope.salt, SALT_BYTES, SALT_BYTES);
+  const iv = decodeBase64(envelope.iv, IV_BYTES, IV_BYTES);
+  const data = decodeBase64(envelope.data, null, MAX_ENCRYPTED_BYTES);
+  const key = await deriveKey(passphrase, salt, envelope.iterations);
   const plaintext = await subtle.decrypt(
     { name: 'AES-GCM', iv },
     key,
-    Buffer.from(envelope.data, 'base64')
+    data
   );
   return JSON.parse(new TextDecoder().decode(plaintext));
 }
