@@ -3,7 +3,7 @@
 > **A universal, offline-capable exam practice platform with dynamic question types, visual editor, and comprehensive progress tracking.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/rmssantos/examsim)
+[![Version](https://img.shields.io/badge/version-2.0.1-blue.svg)](https://github.com/rmssantos/examsim)
 
 ---
 

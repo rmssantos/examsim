@@ -432,3 +432,7 @@
         transition-duration: 0.01ms !important;
     }
 }
+
+/* Source/reference link shown under an explanation or review justification */
+.explanation-source { margin-top: 10px; font-size: 0.85em; opacity: 0.85; }
+.explanation-source i { margin-right: 4px; }

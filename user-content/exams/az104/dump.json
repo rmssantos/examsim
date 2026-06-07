@@ -11,6 +11,7 @@
     ],
     "correct": 1,
     "explanation": "A dynamic group uses membership rules based on attributes (for example department equals Sales) to automatically add or remove users or devices. An assigned group requires administrators to add members manually.",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/users/groups-create-rule",
     "question_type": "STANDARD"
   },
   {
@@ -25,6 +26,7 @@
     ],
     "correct": 1,
     "explanation": "Self-service password reset (SSPR) lets users reset or unlock their accounts on their own after verifying their identity, reducing help desk load. Conditional Access and MFA control access but do not provide self-service reset.",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-sspr-howitworks",
     "question_type": "STANDARD"
   },
   {
@@ -39,6 +41,7 @@
     ],
     "correct": 1,
     "explanation": "The Contributor role can create and manage all types of resources but cannot grant access to others (it cannot manage role assignments). Owner can manage resources and assign roles, while User Access Administrator only manages access.",
+    "reference": "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles",
     "question_type": "STANDARD"
   },
   {
@@ -56,6 +59,7 @@
       1
     ],
     "explanation": "RBAC assignments are inherited downward, so a subscription-scope role applies to its resource groups and resources (Yes). Permissions are additive across assignments (Yes). Deny assignments take precedence over role assignments, so they are not overridden (No). Note: Yes maps to 0 and No maps to 1.",
+    "reference": "https://learn.microsoft.com/en-us/azure/role-based-access-control/overview",
     "question_type": "YES_NO_MATRIX"
   },
   {
@@ -70,6 +74,7 @@
     ],
     "correct": 0,
     "explanation": "A CanNotDelete lock allows authorized users to read and modify a resource but blocks deletion. A ReadOnly lock would also prevent modifications, which is more restrictive than required here.",
+    "reference": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources",
     "question_type": "STANDARD"
   },
   {
@@ -84,6 +89,7 @@
     ],
     "correct": 1,
     "explanation": "Management groups are containers that let you organize multiple subscriptions and apply governance conditions like Azure Policy and RBAC at scale. Policies and role assignments applied to a management group are inherited by the subscriptions beneath it.",
+    "reference": "https://learn.microsoft.com/en-us/azure/governance/management-groups/overview",
     "question_type": "STANDARD"
   },
   {
@@ -98,6 +104,7 @@
     ],
     "correct": 0,
     "explanation": "A shared access signature (SAS) grants limited, time-bound access to specific storage resources and operations without exposing the account keys. Sharing the account key grants full, unrestricted access and should be avoided.",
+    "reference": "https://learn.microsoft.com/en-us/azure/storage/common/storage-sas-overview",
     "question_type": "STANDARD"
   },
   {
@@ -112,6 +119,7 @@
     ],
     "correct": 3,
     "explanation": "Geo-zone-redundant storage (GZRS) writes data synchronously across availability zones in the primary region and also replicates asynchronously to a secondary region, combining the benefits of ZRS and geo-replication.",
+    "reference": "https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy",
     "question_type": "STANDARD"
   },
   {
@@ -126,6 +134,7 @@
     ],
     "correct": 1,
     "explanation": "A lifecycle management policy uses rules to automatically move blobs to cooler tiers (cool, cold, archive) or delete them after a defined period, helping optimize storage costs without manual intervention.",
+    "reference": "https://learn.microsoft.com/en-us/azure/storage/blobs/lifecycle-management-overview",
     "question_type": "STANDARD"
   },
   {
@@ -140,6 +149,7 @@
     ],
     "correct": 0,
     "explanation": "Soft delete retains deleted blobs (and optionally containers) for a configurable retention period, allowing recovery before they are permanently removed. Encryption and firewalls protect data but do not aid recovery from deletion.",
+    "reference": "https://learn.microsoft.com/en-us/azure/storage/blobs/soft-delete-blob-overview",
     "question_type": "STANDARD"
   },
   {
@@ -154,6 +164,7 @@
     ],
     "correct": 1,
     "explanation": "ARM templates and Bicep are declarative: you describe the desired end state, and deployments are idempotent, so re-running the same template produces the same result rather than creating duplicates. They can also express dependencies between resources.",
+    "reference": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/overview",
     "question_type": "STANDARD"
   },
   {
@@ -168,6 +179,7 @@
     ],
     "correct": 1,
     "explanation": "An availability set distributes VMs across multiple fault domains and update domains within a datacenter, protecting against localized hardware failures and host updates. Availability zones protect against datacenter-level failures across a region.",
+    "reference": "https://learn.microsoft.com/en-us/azure/virtual-machines/availability-set-overview",
     "question_type": "STANDARD"
   },
   {
@@ -182,6 +194,7 @@
     ],
     "correct": 0,
     "explanation": "With managed disks, Azure manages the underlying storage accounts for you, improving reliability and simplifying scaling and management. Unmanaged disks require you to create and manage storage accounts yourself.",
+    "reference": "https://learn.microsoft.com/en-us/azure/virtual-machines/managed-disks-overview",
     "question_type": "STANDARD"
   },
   {
@@ -196,6 +209,7 @@
     ],
     "correct": 1,
     "explanation": "Azure Container Instances (ACI) runs containers on demand without requiring you to provision or manage virtual machines or orchestrators, making it ideal for simple, short-lived, or burst workloads. AKS is suited to complex, orchestrated workloads.",
+    "reference": "https://learn.microsoft.com/en-us/azure/container-instances/container-instances-overview",
     "question_type": "STANDARD"
   },
   {
@@ -214,6 +228,7 @@
       2
     ],
     "explanation": "Deployment slots let you deploy to a staging slot, warm it up, and swap into production with minimal downtime, and you can roll back by swapping again. They do not reduce the App Service plan cost; slots run within the same plan.",
+    "reference": "https://learn.microsoft.com/en-us/azure/app-service/deploy-staging-slots",
     "question_type": "MULTI"
   },
   {
@@ -228,6 +243,7 @@
     ],
     "correct": 1,
     "explanation": "Virtual network peering connects two virtual networks, allowing resources in each to communicate privately using the Microsoft backbone network, as if they were in the same network. It does not provide encryption at rest or public DNS resolution.",
+    "reference": "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-peering-overview",
     "question_type": "STANDARD"
   },
   {
@@ -242,6 +258,7 @@
     ],
     "correct": 0,
     "explanation": "A network security group (NSG) contains security rules that allow or deny inbound and outbound traffic based on source, destination, port, and protocol, and can be associated with subnets or network interfaces.",
+    "reference": "https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview",
     "question_type": "STANDARD"
   },
   {
@@ -261,6 +278,7 @@
     ],
     "drag_select_required": 2,
     "explanation": "Azure Bastion brokers RDP/SSH through the portal without a public IP, and connecting over a private IP through a VPN or ExpressRoute also avoids exposing the VM publicly. Using a public IP defeats the goal, and NSG rules or locks are not connectivity methods.",
+    "reference": "https://learn.microsoft.com/en-us/azure/bastion/bastion-overview",
     "question_type": "DRAG_DROP_SELECT"
   },
   {
@@ -275,6 +293,7 @@
     ],
     "correct": 1,
     "explanation": "Azure Application Gateway is a layer 7 (application layer) load balancer that supports URL-based routing, TLS/SSL termination, and a web application firewall. Azure Load Balancer operates at layer 4 and distributes traffic based on IP and port.",
+    "reference": "https://learn.microsoft.com/en-us/azure/application-gateway/overview",
     "question_type": "STANDARD"
   },
   {
@@ -294,6 +313,7 @@
       3
     ],
     "explanation": "Azure Site Recovery orchestrates regional failover. You create a Recovery Services vault, enable replication of the VM to a secondary region, run a non-disruptive test failover to validate the plan, and finally perform an actual failover during an outage.",
+    "reference": "https://learn.microsoft.com/en-us/azure/site-recovery/site-recovery-overview",
     "question_type": "SEQUENCE"
   }
 ]
