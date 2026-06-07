@@ -78,16 +78,9 @@
   "hasImages": false,
   "contentReview": {
     "lastReviewed": "2026-05-20",
-    "reviewCadence": "quarterly",
     "sourceOfTruth": "Microsoft Learn certification page and practice assessment",
     "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/",
-    "objectiveVersion": "Microsoft Learn objectives reviewed 2026-05-20",
-    "reviewScope": [
-      "schema validation",
-      "module coverage mapping",
-      "official objective alignment"
-    ],
-    "notes": "Question bank validated structurally against the simulator schema. Product naming and objective alignment should be reviewed quarterly."
+    "objectiveVersion": "Microsoft Learn objectives reviewed 2026-05-20"
   },
   "objectiveDomains": [
     {
@@ -136,20 +129,5 @@
         "Risk & Compliance Solutions"
       ]
     }
-  ],
-  "coverageReview": {
-    "method": "Modules mapped to official SC-900 objective domains; individual question-level mapping is optional future metadata.",
-    "observedModuleCounts": {
-      "Microsoft Entra": 41,
-      "Security, Compliance & Identity Concepts": 19,
-      "Azure Security": 18,
-      "Microsoft Defender XDR": 18,
-      "Microsoft Purview Compliance": 14,
-      "Microsoft Defender for Cloud": 10,
-      "Microsoft Sentinel": 10,
-      "Risk & Compliance Solutions": 10,
-      "Data Lifecycle & Records": 6,
-      "Service Trust & Privacy": 4
-    }
-  }
+  ]
 }

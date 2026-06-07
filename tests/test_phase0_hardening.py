@@ -375,15 +375,15 @@ class ContentAndReleaseMetadataTests(unittest.TestCase):
         for exam_id in public_ids:
             self.assertIn(f"`{exam_id}`", privacy)
 
-    def test_live_pro_pack_review_statuses_match_documented_evidence(self):
+    def test_live_pro_pack_metadata_excludes_internal_review_statuses(self):
         az104 = json.loads(
             (ROOT / "user-content" / "exams" / "az104" / "metadata.json").read_text(encoding="utf-8")
         )
         saac03 = json.loads(
             (ROOT / "user-content" / "exams" / "saac03" / "metadata.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(az104["pro"]["reviewStatus"], "released-sme-review-pending")
-        self.assertEqual(saac03["pro"]["reviewStatus"], "released-reviewed")
+        self.assertNotIn("reviewStatus", az104["pro"])
+        self.assertNotIn("reviewStatus", saac03["pro"])
 
 
 if __name__ == "__main__":

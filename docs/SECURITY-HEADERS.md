@@ -2,8 +2,7 @@
 
 The HTML pages include a meta CSP so local and static use gets a baseline policy.
 The current GitHub Pages deployment does not configure HTTP response headers, so
-the production edge should add the headers below before account, sync, or paid
-content APIs are introduced.
+deployments behind a configurable production edge should add the headers below.
 
 ## Recommended baseline
 

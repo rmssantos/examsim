@@ -223,8 +223,9 @@ def faq_pairs(meta: dict) -> list:
         ),
         (
             "Does my data stay private?",
-            "Yes. Examplar runs fully in your browser and works offline. Your answers "
-            "and progress never leave your device.",
+            "Questions, answers, imported content, and progress remain in your browser. "
+            "The public site uses limited opt-out product telemetry; local and private "
+            "self-hosted use does not initialize analytics.",
         ),
         (f"How many {code} questions are included?", count_answer),
     ]
@@ -287,7 +288,8 @@ def page_description(meta: dict) -> str:
     count_txt = f"{count} free practice questions" if count else "free practice questions"
     return (
         f"Free {code} practice exam for {full}. {count_txt}, original and "
-        "syllabus-aligned. No account, works offline, your data stays in your browser."
+        "syllabus-aligned. No account required and offline-capable after the first load. "
+        "Study data remains in your browser."
     )
 
 
@@ -411,8 +413,9 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
     full = meta.get("fullName") or code
     if is_free(meta):
         intro = (
-            f"Practice for {full} the private way. Original, syllabus-aligned questions "
-            "you can run entirely in your browser, offline, with no account and no tracking."
+            f"Practice for {full} with original, syllabus-aligned questions. No account "
+            "is required, and the app remains available offline after its files are cached. "
+            "The public site uses limited opt-out telemetry."
         )
     else:
         count = meta.get("totalQuestions") or meta.get("questionCount")
@@ -425,7 +428,7 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
         )
         intro = (
             f"{preview_txt}Original, syllabus-aligned questions you can run in your browser, "
-            f"offline, with no account. {unlock_txt}"
+            f"with no account and offline access after the app is cached. {unlock_txt}"
         )
     title = esc(page_title(meta))
     description = esc(page_description(meta))
@@ -488,8 +491,8 @@ def render_hub(all_exams: list) -> str:
 
     cards = "\n".join(card(e) for e in all_exams)
     description = (
-        "Free, private, offline practice exams for cloud and security certifications. "
-        "Original questions, no account, your data stays in your browser."
+        "Free, local-first, offline-capable practice exams for cloud and security "
+        "certifications. Original questions and no account required."
     )
     return f"""<!DOCTYPE html>
 <html lang="en">

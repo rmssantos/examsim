@@ -1,468 +1,116 @@
-# Privacy & Data Storage
+# Privacy and Data Storage
 
-## 🔒 Critical Information: Your Data Stays Local
+This document describes the data behavior of Examplar's public deployment and
+local/self-hosted use.
 
-### TL;DR
-**Exam content, answers, progress, imports, and images stay in the user's browser storage (`localStorage` for small settings and IndexedDB for larger local data). Each user's study data is isolated and private.**
+## Summary
 
-The public GitHub Pages version uses aggregate analytics to understand visits and exam usage. It does not collect question text, answers, imported files, filenames, personal study data, names, emails, or a persistent visitor ID. Local/offline use does not send analytics.
+Exam content, selected answers, imported files, images, progress, attempt review
+records, Study Mode data, and editor changes remain in the user's browser
+storage.
 
-Editing and saving questions in the browser changes only that user's local copy. To publish exam corrections for everyone, export the updated JSON and open a pull request; to request a correction without editing JSON, open a GitHub issue.
+The public deployment sends limited product telemetry to Azure Application
+Insights. Analytics can be disabled from the Privacy settings control.
 
-> ⚠️ **Content policy:** The public repo never ships proprietary exam content. Keep exam packs in private storage and only copy them locally when you need them.
+Analytics is not initialized on `localhost`, `127.0.0.1`, private self-hosted
+URLs, or `file://` URLs.
 
----
+## Browser Storage
 
-## How It Works
+Examplar uses:
 
-### Online Analytics
+- IndexedDB for imported packs, images, progress, and recent attempt review
+  records;
+- localStorage for small settings, analytics opt-out, activation state, and
+  legacy compatibility;
+- Cache Storage for app files needed for offline access.
 
-The public deployment (`examplar.app`, also reachable at `rmssantos.github.io/examsim`) sends limited aggregate events to Azure Application Insights / Azure Monitor. Analytics is enabled by default for the online site only and is not initialized on `localhost`, `127.0.0.1`, private self-hosted URLs, or `file://`.
+Browser storage is isolated by site origin and browser profile. Clearing site
+data can remove imports and progress. Use the export actions when a backup is
+needed.
 
-**Collected events:**
-- Page views for the home, exam, and editor pages
-- Exam started and exam completed counts
-- Study Mode started/completed counts and aggregate answer-check counts
-- Attempt history/review opened counts and Study missed started counts
-- Import started/completed/failed counts
-- Progress export and editor import/export actions
-- Campaign attribution from simple, sanitized labels in the `ref`, `utm_source`, `utm_medium`, and `utm_campaign` query parameters; values resembling emails, URLs, or paths are discarded
-- External referrer hostname only (for example, `producthunt.com`), without the full referring URL or path
+## Public-Site Telemetry
 
-In Application Insights, page visits are recorded as native page views (`pageViews`). Product actions such as exam starts/completions and imports are recorded as custom events (`customEvents`).
+The public deployment can collect:
 
-**Collected event properties:**
-- Public bundled exam ID (`ab730`, `ab731`, `sc900`, `az900`, `az104`, or `saac03`) or generic `imported`
-- Pass/fail result
-- Score bucket (`0-49`, `50-69`, `70-89`, `90-100`)
-- Study accuracy bucket, due/new/weak queue counts, and correct/reviewed counts
-- Attempt review availability flag and missed-study question count
-- Duration bucket (`<5m`, `5-15m`, `15-30m`, `30m+`)
-- Question count and coarse file size/type buckets for imports
-- Sanitized campaign source, medium, campaign name, and `ref` label when present
-- External referrer hostname when the browser provides one
+- page views;
+- exam and Study Mode start/completion events;
+- attempt review and missed-question study actions;
+- import success/failure and coarse file size/type buckets;
+- progress and editor import/export actions;
+- unlock, pro modal, purchase-link, and import-activation counts;
+- pass/fail, coarse score and duration buckets;
+- sanitized `ref`, `utm_source`, `utm_medium`, and `utm_campaign` labels;
+- external referrer hostname without the full URL or path.
 
-**Not collected:**
-- Names, emails, or account identifiers
-- Persistent visitor IDs or custom session IDs
-- Question text, options, answers, explanations, or selected responses
-- Question IDs, attempt review records, Study Mode per-question records, ease factors, due dates, or personal study history
-- Imported exam IDs, imported exam content, ZIP contents, filenames, or browser storage exports
-- Local progress history beyond aggregate completion events
-- Full referrer URLs, referring paths, arbitrary query parameters, IP-derived identity, or persistent attribution profiles
+Bundled exam labels are restricted to `ab730`, `ab731`, `sc900`, `az900`,
+`az104`, and `saac03`. Other exam IDs are reported only as `imported`.
 
-Analytics can be turned off from the small **Privacy settings** control on the online site. The preference is stored in `localStorage['exam_analytics_opt_out'] = 'true'` in that browser.
+Azure Application Insights temporarily uses the sender IP to derive coarse
+country, region, and city information. Under the configured default behavior,
+the full IP address is not stored. Azure can also attach browser, operating
+system, device type, and device model metadata.
 
-The analytics workspace is configured with 30-day retention.
+Authorized maintainers can inspect event timestamps and this coarse metadata for
+operational analysis. The analytics workspace is configured with 30-day
+retention.
 
-### Server Role
-The public/static deployment only serves static files:
-- HTML pages (index.html, exam.html, editor.html)
-- CSS stylesheets
-- JavaScript files
-- Images (if placed in `user-content/exams/*/images/`)
+## Data Not Collected
 
-**The server does NOT:**
-- ❌ Store user data
-- ❌ Receive uploaded dumps
-- ❌ Track users in local/self-hosted mode
-- ❌ Share data between users
-- ❌ Receive the aggregate analytics sent directly by the public-site browser to Azure Application Insights
+Examplar telemetry does not intentionally collect:
 
-When you run `python server.py` locally, it also exposes a same-origin local image upload endpoint (`PUT /__upload_images`) used by the editor to copy image files into `user-content/exams/<examId>/images/`. This endpoint accepts image files only, validates the filename/content, enforces the 10 MB image limit, and does not receive or persist exam dumps.
+- names, emails, account identifiers, or a custom persistent visitor ID;
+- question text, options, answers, explanations, or selected responses;
+- imported content, ZIP contents, filenames, or browser-storage exports;
+- question IDs, per-question Study Mode records, due dates, or attempt details;
+- full referrer URLs, paths, or arbitrary query parameters;
+- license keys or payment details.
 
----
+Sanitizers discard campaign values resembling emails, URLs, or paths.
 
-## Multi-User Scenario
+## Analytics Choice
 
-### Scenario: Empty Server
+The public site initializes analytics by default. Use the Privacy settings
+control to opt out. The preference is stored in:
 
-```
-Server (completely empty, no dumps)
-├── index.html
-├── exam.html
-├── *.js
-├── *.css
-└── user-content/exams/ (empty folder)
+```text
+localStorage['exam_analytics_opt_out'] = 'true'
 ```
 
-### User A Connects
+Changing or clearing browser storage can reset that preference.
 
-1. Opens `http://your-server:8000`
-2. Sees "No exams found" message
-3. Drags `ai900-dump.json` onto the page
-4. **Dump is saved to User A's browser storage**
-5. User A sees the AI-900 exam card
-6. Can take exams, track progress, etc.
+## Local and Self-Hosted Use
 
-**Where is the data?**
-- ✅ User A's browser → IndexedDB exam content, with legacy `localStorage` fallback when needed
-- ❌ NOT on the server
-- ❌ NOT in any database
-- ❌ NOT accessible to anyone else
+Local and private self-hosted URLs do not initialize the public analytics
+client.
 
-### User B Connects (Same Server)
+Running `python server.py` exposes a same-origin local image upload endpoint used
+by the editor. The endpoint accepts image files only, validates names and
+content, enforces the configured size limit, and writes into
+`user-content/exams/<exam-id>/images/`. It does not receive or persist exam
+dumps.
 
-1. Opens `http://your-server:8000` (same URL as User A)
-2. Sees "No exams found" message (empty!)
-3. **Cannot see User A's imported dumps**
-4. Must import their own dumps separately
-5. Their data is also stored locally in their browser
+A self-hosted server can pre-install public or authorized exam packs. Those
+static files are visible to users of that deployment, while each user's progress
+and private imports remain in that user's browser profile.
 
-**Result:**
-- User A has AI-900 in their browser
-- User B sees nothing (empty server)
-- **Complete isolation between users**
+## Offline Behavior
 
----
+After the application shell is cached, installed pages and assets can be used
+without a network connection. Content not previously cached may still require a
+connection.
 
-## Data Storage Locations
+## Publishing Corrections
 
-### Client-Side (Browser Storage)
+Edits made in the browser affect only that browser profile. To publish a
+correction for everyone:
 
-All data is stored in the user's browser:
+1. export the corrected content;
+2. remove private or proprietary material;
+3. open a pull request or GitHub issue.
 
-```javascript
-// Imported questions and larger local exam content
-IndexedDB['ExamContentDB'].exams
+## Deployment Responsibilities
 
-// Imported images
-IndexedDB['ExamImagesDB'].images
-IndexedDB['ExamImagesDB'].image_metadata
-
-// Detailed progress and recent attempt review summaries
-IndexedDB['ExamContentDB'].progress
-
-// Legacy compatibility fallback for older browser data
-localStorage['custom_ai900_questions']
-localStorage['exam_metadata_ai900']
-localStorage['ai900_progress']
-
-// Settings
-localStorage['exam_activation_config']  // Which exams are visible
-localStorage['theme']                   // Dark/light mode preference
-localStorage['exam_analytics_opt_out']  // Online analytics preference
-```
-
-Existing `localStorage` exams and progress are read for backwards compatibility and migrated opportunistically into IndexedDB after a successful load. The legacy keys may remain as a compatibility mirror; they are not uploaded anywhere.
-
-**Location on disk:**
-- Browser storage is scoped by site/origin and browser profile.
-- Chrome/Edge, Firefox, and Safari store `localStorage`, IndexedDB, and Cache Storage under their profile storage folders.
-- Clearing site data, browser data, or the browser profile can remove both `localStorage` and IndexedDB data.
-
-### Server-Side (Optional Pre-Installed Exams)
-
-The ONLY way to share exams with all users is to **pre-install** them on the server (inside a private, access-controlled deployment):
-
-```
-user-content/exams/
-├── ai900/              ← Example private exam ID
-│   ├── dump.json         ← This will be visible to ALL users
-│   ├── metadata.json
-│   └── images/
-└── ai102/
-    └── ...
-```
-
-**When server mode detects these folders:**
-- ALL users see these exams automatically
-- No import needed
-- Exams are served as static files (read-only)
-- Each user's progress is still stored locally in their browser
-
----
-
-## Privacy Implications
-
-### ✅ What IS Private
-
-1. **User-imported exams** - Only visible to the user who imported them
-2. **Progress data** - Stored locally, never sent to server; recent attempts include lightweight review data with question IDs, selected answers, and correct/skipped status
-3. **Editor-created questions** - Saved in the user's browser storage
-4. **Theme preferences** - Local to each browser
-5. **Exam activation settings** - Local to each user
-
-### ⚠️ What is NOT Private (if pre-installed on server)
-
-1. **Server-side exam folders** in `user-content/exams/`
-   - Visible to ALL users
-   - Anyone with server access can read the files
-   - Questions are served as static files
-
----
-
-## Use Cases
-
-### Case 1: Shared Learning Platform
-
-**Scenario:** Teacher wants students to practice together
-
-**Setup:**
-```bash
-# Teacher installs exams on server
-user-content/exams/
-├── ai900/
-│   ├── dump.json    ← All students see this
-│   └── metadata.json
-```
-
-**Result:**
-- ✅ All students see AI-900 exam
-- ✅ Each student's progress is private (localStorage)
-- ✅ No data sharing between students
-- ✅ Teacher cannot see individual progress
-
-### Case 2: Personal Study (Most Secure)
-
-**Scenario:** User wants complete privacy
-
-**Setup:**
-- Empty server (no pre-installed exams)
-- User imports dumps via drag & drop
-
-**Result:**
-- ✅ All data in user's browser only
-- ✅ Server has zero knowledge of exams
-- ✅ No one else can access the data
-- ✅ Even server admin cannot see user data
-
-### Case 3: Organization Exam Platform
-
-**Scenario:** Company deploys exam simulator for certification prep
-
-**Setup:**
-```bash
-# Admin pre-installs official exams
-user-content/exams/
-├── azure-fundamentals/
-├── azure-admin/
-└── azure-developer/
-```
-
-**Result:**
-- ✅ All employees see the same exams
-- ✅ Each employee's progress is private
-- ✅ No central tracking or monitoring
-- ✅ Fully offline capable
-
----
-
-## Security Considerations
-
-### What the Server Admin Can See
-
-**With server access, admin can:**
-- ✅ Read pre-installed exam files in `user-content/exams/`
-- ✅ See which exams are available on the server
-- ✅ Access server logs (HTTP requests)
-
-**Admin CANNOT see:**
-- ❌ User-imported dumps (stored in browser storage)
-- ❌ User progress or scores
-- ❌ User answers or attempt history
-- ❌ Which users imported what
-- ❌ User theme preferences
-
-### What Other Users Can See
-
-**Users can:**
-- ✅ See pre-installed exams on the server
-
-**Users CANNOT see:**
-- ❌ Other users' imported dumps
-- ❌ Other users' progress
-- ❌ Other users' browser storage data
-- ❌ Anything from other users' browsers
-
----
-
-## Technical Details
-
-### How Browser Storage Works
-
-```javascript
-// When user imports a dump via drag & drop
-async importJsonFile(file) {
-    const text = await file.text();
-    const data = JSON.parse(text);
-    let examId = file.name.replace(/\.(json|zip)$/i, '');
-
-    // Store in browser storage (client-side ONLY)
-    await window.examManager.importExam(examId, data);
-
-    // This creates:
-    // IndexedDB['ExamContentDB'].exams[examId]
-    // Optional legacy localStorage mirror for backwards compatibility
-}
-```
-
-**Key points:**
-1. Data never leaves the browser
-2. No HTTP POST to server
-3. No network requests for user data
-4. Everything stays in browser memory/storage
-
-### Network Traffic Analysis
-
-**When user imports a dump:**
-```
-Browser → [LOCAL OPERATION] → localStorage
-```
-
-or, for newer imports:
-
-```
-Browser → [LOCAL OPERATION] → IndexedDB
-```
-
-**NO network traffic to server!**
-
-**When user takes an exam:**
-```
-Browser → Reads from browser storage → Displays questions
-Browser → Saves progress → browser storage
-```
-
-**NO network traffic to server!**
-
-**Only network requests:**
-- GET `index.html` (initial page load)
-- GET `exam.html` (when starting exam)
-- GET `*.js`, `*.css` (static assets)
-- GET `images/*.jpg` (if exam has images)
-
-**All static files, no user data transmitted!**
-
----
-
-## Comparison with Other Platforms
-
-### Traditional Exam Platforms
-
-```
-User → Server → Database
-     ↓
-  Server knows everything:
-  - Who took which exam
-  - Scores and progress
-  - Time spent
-  - Wrong answers
-```
-
-### This Simulator
-
-```
-User → Browser storage
-     ↓
-  Server knows nothing:
-  - No user tracking
-  - No progress monitoring
-  - No centralized data
-  - Complete privacy
-```
-
----
-
-## FAQ
-
-### Q: Can the server admin see my progress?
-**A:** No. Progress is stored in your browser storage only (`IndexedDB`, with legacy `localStorage` fallback/mirror for older data).
-
-### Q: If I import a dump, can other users see it?
-**A:** No. Your imported dumps are private to your browser.
-
-### Q: How do I share an exam with others?
-**A:** Export as JSON from editor, send file, others import via drag & drop. Or pre-install on server.
-
-### Q: What if I clear my browser data?
-**A:** All your imported exams and progress will be lost. Export progress before clearing.
-
-### Q: Can I use this on multiple computers?
-**A:** Yes, but data doesn't sync. Import dumps separately on each computer.
-
-### Q: Is my data backed up?
-**A:** No. Use "Export Progress" to backup your progress data manually.
-
-### Q: Can teacher see student progress?
-**A:** No, unless students manually export and share their progress JSON files.
-
-### Q: What about GDPR/privacy laws?
-**A:** Exam content and personal study data stay local, but the public deployment sends limited aggregate telemetry to Azure Application Insights. Privacy, consent, processor, retention, and deletion obligations still need to be assessed for each deployment and jurisdiction.
-
-### Q: Can I self-host this privately?
-**A:** Yes! Run on your own server. No external services needed.
-
-### Q: Does this work offline?
-**A:** Yes, after initial load. All functionality works without internet.
-
----
-
-## Verification Steps
-
-### Prove It Yourself
-
-1. **Open browser DevTools (F12)**
-2. **Go to Application tab**
-3. **Select IndexedDB**
-4. **Import a dump**
-5. **Open `ExamContentDB` and watch the `exams` store populate**
-6. **Check Network tab** - No POST requests for user data!
-
-### Network Monitoring
-
-```bash
-# Monitor network traffic while using the app
-# You'll see ONLY:
-GET /index.html
-GET /exam.html
-GET /assets/js/script-multi-exam.js
-GET /assets/css/style-new.css
-GET /images/question1.jpg
-
-# You will NOT see:
-POST /api/save-progress  ← Doesn't exist!
-POST /api/upload-dump    ← Doesn't exist!
-PUT /api/user-data       ← Doesn't exist!
-```
-
-**There are NO API endpoints to receive user data!**
-
----
-
-## Conclusion
-
-This exam simulator is designed with **privacy-by-default**:
-
-- ✅ **100% client-side** data storage
-- ✅ **No account/profile tracking** - the public site sends limited aggregate metrics without a custom persistent visitor ID (opt-out anytime); self-hosted and offline use does not initialize analytics
-- ✅ **No user database**
-- ✅ **Your content is never collected** - questions, answers, imported files, and progress stay in your browser
-- ✅ **Complete isolation** between users
-- ✅ **Fully offline** after initial load
-- ✅ **No third-party cookies** or trackers
-- ✅ **Open source** - verify the code yourself
-
-**Your data is YOUR data. It stays in YOUR browser.**
-
----
-
-## For System Administrators
-
-If you're deploying this for multiple users:
-
-### To Share Exams With Everyone
-Place exams in `user-content/exams/` on the server
-
-### To Keep User Data Private
-Do NOT modify the code to add any:
-- Database connections
-- API endpoints
-- User tracking
-- Central storage
-
-The app is intentionally designed with no server-side data storage. Keep it that way!
-
----
-
-**Questions? See [README.md](./README.md) or [CONTRIBUTING.md](./CONTRIBUTING.md)**
+Self-hosters are responsible for their own privacy notice, consent model,
+retention, processor agreements, and legal obligations. Configuration may
+change the behavior described here.

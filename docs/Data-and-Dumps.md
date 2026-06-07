@@ -1,6 +1,6 @@
 # Data Formats and Question Schema
 
-> ℹ️ **Examples only:** This document references IDs like `ai900`/`ai102` purely as placeholders. The public repository does **not** include official dumps—store them privately and import them locally.
+> **Examples only:** This document uses generic sample IDs. Only publish content that you created or are authorized to redistribute.
 
 ## Question Data Structure
 
@@ -209,11 +209,11 @@ Pre-installed exams visible to all users:
 
 ```
 user-content/exams/
-├── ai900/
+├── sample100/
 │   ├── dump.json         ← Questions (required)
 │   ├── metadata.json     ← Exam info (optional)
 │   └── images/           ← Images (optional)
-└── ai102/
+└── sample200/
     └── (same structure)
 ```
 
@@ -225,9 +225,9 @@ Optional `metadata.json` provides rich exam information:
 
 ```json
 {
-  "id": "ai900",
-  "name": "AI-900",
-  "fullName": "Azure AI Fundamentals",
+  "id": "sample100",
+  "name": "SAMPLE-100",
+  "fullName": "Sample Fundamentals",
   "duration": 45,
   "questionCount": 45,
   "totalQuestions": 137,
@@ -235,7 +235,7 @@ Optional `metadata.json` provides rich exam information:
   "badge": "Fundamentals",
   "icon": "fas fa-brain",
   "vendor": "Microsoft",
-  "certificationCode": "AI-900",
+  "certificationCode": "SAMPLE-100",
   "domains": ["AI", "Cloud"],
   "level": "Fundamentals",
   "productFamily": "Azure",
@@ -260,7 +260,7 @@ Optional `metadata.json` provides rich exam information:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | string | Exam identifier (must match folder name) |
-| `name` | string | Short name (e.g., "AI-900") |
+| `name` | string | Short name (e.g., "SAMPLE-100") |
 | `fullName` | string | Full exam name |
 | `duration` | number | Exam duration in minutes |
 | `questionCount` | number | Questions per exam attempt |

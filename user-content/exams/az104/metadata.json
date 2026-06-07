@@ -25,16 +25,9 @@
   "contentOrigin": "original",
   "contentReview": {
     "lastReviewed": "2026-06-07",
-    "reviewCadence": "quarterly",
     "sourceOfTruth": "Microsoft Learn AZ-104 study guide and certification page",
     "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-104",
-    "objectiveVersion": "Skills measured as of April 17, 2026",
-    "reviewScope": [
-      "official study guide objectives",
-      "preview module coverage mapping",
-      "schema validation"
-    ],
-    "notes": "This metadata covers the public preview. The paid pack has a separate release review record and still requires independent SME sign-off."
+    "objectiveVersion": "Skills measured as of April 17, 2026"
   },
   "objectiveDomains": [
     {
@@ -98,26 +91,6 @@
       ]
     }
   ],
-  "coverageReview": {
-    "method": "Public preview modules mapped to the AZ-104 skills measured as of April 17, 2026.",
-    "observedModuleCounts": {
-      "Microsoft Entra Users & Groups": 2,
-      "Access to Azure Resources (RBAC)": 2,
-      "Subscriptions & Governance": 2,
-      "Storage Access & Security": 1,
-      "Storage Accounts": 1,
-      "Azure Files & Blob Storage": 2,
-      "ARM Templates & Bicep": 1,
-      "Virtual Machines": 2,
-      "Containers": 1,
-      "Azure App Service": 1,
-      "Virtual Networking": 1,
-      "Network Security": 2,
-      "Name Resolution & Load Balancing": 1,
-      "Monitoring": 0,
-      "Backup & Recovery": 1
-    }
-  },
   "modules": [
     {
       "icon": "fas fa-users",
@@ -203,7 +176,6 @@
     "questions": 300,
     "price": "19 EUR",
     "url": "https://examplar.gumroad.com/l/az104-complete",
-    "reviewStatus": "released-sme-review-pending",
     "highlights": [
       "300+ original questions across every exam objective",
       "Detailed explanation for the correct answer and every distractor",
