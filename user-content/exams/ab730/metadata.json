@@ -74,6 +74,7 @@
     "reviewCadence": "quarterly",
     "sourceOfTruth": "Microsoft Learn AB-730 study guide and certification page",
     "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-730",
+    "objectiveVersion": "Microsoft Learn objectives reviewed 2026-05-20",
     "reviewScope": [
       "official study guide objectives",
       "training path coverage",

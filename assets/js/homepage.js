@@ -592,10 +592,11 @@ startButton.type = 'button';
 startButton.className = 'exam-card-start';
 startButton.appendChild(this.createIcon('fas fa-play'));
 startButton.appendChild(document.createTextNode(' Start'));
-startButton.addEventListener('click', (e) => {
+startButton.addEventListener('click', async (e) => {
 	e.stopPropagation();
-	this.selectExam(examId);
-	this.startSelectedExam();
+	if (await this.selectExam(examId)) {
+		await this.startSelectedExam();
+	}
 });
 actions.appendChild(startButton);
 
@@ -604,10 +605,11 @@ studyButton.type = 'button';
 studyButton.className = 'exam-card-study';
 studyButton.appendChild(this.createIcon('fas fa-brain'));
 studyButton.appendChild(document.createTextNode(' Study'));
-studyButton.addEventListener('click', (e) => {
+studyButton.addEventListener('click', async (e) => {
 	e.stopPropagation();
-	this.selectExam(examId);
-	this.startSelectedExam('study');
+	if (await this.selectExam(examId)) {
+		await this.startSelectedExam('study');
+	}
 });
 
 if (metadata.pro) {
@@ -644,7 +646,7 @@ deleteBtn.addEventListener('click', (e) => {
 
 card.addEventListener('click', (e) => {
 if (!e.target.closest('.exam-delete')) {
-	this.selectExam(examId);
+	void this.selectExam(examId);
 }
 });
 
@@ -778,32 +780,40 @@ const cardClasses = {
 return cardClasses[String(examId || '').toLowerCase()] || 'custom';
 }
 
-selectExam(examId) {
-// Update the global exam simulator with the selected exam
-if (window.examSimulator) {
-window.examSimulator.currentExam = examId;
-
-// Load exam data into the simulator
-const examData = window.userExams[examId];
-if (examData) {
-	window.examSimulator.examData[examId] = {
-		name: examData.metadata.name,
-		fullName: examData.metadata.fullName,
-		duration: examData.metadata.duration,
-		questionCount: examData.metadata.questionCount,
-		passScore: examData.metadata.passScore,
-		questions: examData.questions,
-		modules: examData.metadata.modules || [],
-		resources: examData.metadata.resources || []
-	};
-}
-}
-
-// Always update UI regardless of examSimulator state
+async selectExam(examId) {
+const initialExamData = window.userExams[examId];
+if (!initialExamData) return false;
 this.selectedExamId = examId;
 this.highlightSelectedCard(examId);
 this.showExamDetailsPlaceholder(examId);
 this.refreshHeroPreview();
+
+try {
+	const examData = await window.ExamApp.ensureExamLoaded(examId);
+	if (window.examSimulator) {
+		const metadata = examData.metadata || {};
+		window.examSimulator.currentExam = examId;
+		window.examSimulator.examData[examId] = {
+			name: metadata.name || examId.toUpperCase(),
+			fullName: metadata.fullName || `Custom Exam: ${examId}`,
+			duration: metadata.duration || 60,
+			questionCount: metadata.questionCount || Math.min(examData.questions.length, 45),
+			passScore: metadata.passScore || 70,
+			questions: examData.questions,
+			modules: metadata.modules || [],
+			resources: metadata.resources || []
+		};
+	}
+	if (this.selectedExamId === examId) {
+		this.showExamDetailsPlaceholder(examId);
+		await this.updateDetailsStudySummary(examId);
+	}
+	return true;
+} catch (error) {
+	window.ExamApp.warn(`Failed to load ${examId}:`, error);
+	window.showCustomAlert('Exam unavailable', `Could not load ${examId}: ${error.message}`, 'error');
+	return false;
+}
 }
 
 showExamInfo(examId) {
@@ -818,7 +828,10 @@ const imagesEl = document.getElementById('exam-images');
 
 document.getElementById('current-exam-name').textContent = metadata.name || examId.toUpperCase();
 if (durationEl) durationEl.textContent = `${metadata.duration || 45} minutes`;
-if (questionsEl) questionsEl.textContent = `${metadata.questionCount || examData.questions.length} questions`;
+if (questionsEl) {
+const total = Array.isArray(examData.questions) ? examData.questions.length : metadata.totalQuestions;
+questionsEl.textContent = `${metadata.questionCount || total || 0} questions`;
+}
 if (passScoreEl) passScoreEl.textContent = `${metadata.passScore || 70}%`;
 if (imagesEl) {
 imagesEl.textContent = examData.hasImages ? 'Includes images' : 'No images detected';
@@ -894,7 +907,8 @@ if (detailsTaxonomy) {
 	detailsTaxonomy.replaceChildren(this.createExamTaxonomy(examId, examData, { variant: 'details' }));
 }
 document.getElementById('details-exam-duration').textContent = `${metadata.duration || 45} min`;
-document.getElementById('details-exam-questions').textContent = `${metadata.questionCount || examData.questions.length}`;
+const questions = Array.isArray(examData.questions) ? examData.questions : [];
+document.getElementById('details-exam-questions').textContent = `${metadata.questionCount || metadata.totalQuestions || questions.length}`;
 document.getElementById('details-exam-pass-score').textContent = `${metadata.passScore || 70}%`;
 document.getElementById('details-exam-images').textContent = examData.hasImages ? 'Yes' : 'No';
 
@@ -915,7 +929,7 @@ modulesList.className = 'modules-list selectable-list';
 modulesList.dataset.exam = examId;
 
 const moduleQuestionCounts = new Map();
-examData.questions.forEach(question => {
+questions.forEach(question => {
 	const moduleKey = this.normalizeModuleName(question.module).toLowerCase();
 	if (!moduleKey) return;
 	moduleQuestionCounts.set(moduleKey, (moduleQuestionCounts.get(moduleKey) || 0) + 1);
@@ -997,7 +1011,7 @@ metadata.modules.forEach(module => {
 
 	const badgeSpan = document.createElement('span');
 	badgeSpan.className = 'module-qcount-badge';
-	badgeSpan.textContent = `${qCount} Qs`;
+	badgeSpan.textContent = questions.length ? `${qCount} Qs` : 'Load to count';
 
 	li.appendChild(contentWrapper);
 	li.appendChild(badgeSpan);
@@ -1093,44 +1107,52 @@ this.scrollToExamLibrary();
 }
 }
 
-startSelectedExam(mode = 'exam') {
+async startSelectedExam(mode = 'exam') {
 	if (!this.selectedExamId) {
 		window.showCustomAlert('Select an Exam', 'Please select an exam card from the library before proceeding.', 'warning');
-		return;
+		return false;
 	}
 
-	const examData = window.userExams[this.selectedExamId];
+	const examId = this.selectedExamId;
+	let examData;
+	try {
+		examData = await window.ExamApp.ensureExamLoaded(examId);
+	} catch (error) {
+		window.showCustomAlert('Exam unavailable', `Could not load ${examId}: ${error.message}`, 'error');
+		return false;
+	}
 	const metadata = examData?.metadata || {};
 	const moduleNames = this.getModuleNames(metadata.modules);
-	const routeParams = { exam: this.selectedExamId };
+	const routeParams = { exam: examId };
 	if (mode === 'study') {
 		routeParams.mode = 'study';
 	}
 
 	if (moduleNames.length > 0) {
 		const modulesList = document.getElementById('details-modules-list');
-		const panelMatchesExam = modulesList?.dataset.exam === this.selectedExamId;
+		const panelMatchesExam = modulesList?.dataset.exam === examId;
 		const selectedModules = panelMatchesExam
 			? Array.from(modulesList.querySelectorAll('li.checked')).map(li => li.dataset.module).filter(Boolean)
 			: moduleNames;
 
 		if (selectedModules.length === 0) {
 			window.showCustomAlert('No Modules Selected', 'Please select at least one module to start practicing.', 'warning');
-			return;
+			return false;
 		}
 
 		routeParams.modules = JSON.stringify(selectedModules);
 	}
 
 	const simulator = window.ExamApp?.examSimulator || window.examSimulator;
-	if (simulator?.currentExam !== this.selectedExamId) {
-		this.selectExam(this.selectedExamId);
+	if (simulator?.currentExam !== examId) {
+		await this.selectExam(examId);
 	}
 
 	const routeName = mode === 'study' ? 'study' : 'exam';
 	const url = window.ExamApp.router?.buildUrl(routeName, routeParams)
 		|| `exam.html?${new URLSearchParams(routeParams).toString()}`;
 	window.open(url, '_blank');
+	return true;
 }
 
 updateSelectedQuestionsCount(examId) {
@@ -1138,25 +1160,27 @@ updateSelectedQuestionsCount(examId) {
 	if (!examData) return;
 
 	const metadata = examData.metadata || {};
+	const questions = Array.isArray(examData.questions) ? examData.questions : [];
 	const modulesList = document.getElementById('details-modules-list');
 		if (!modulesList) return;
 	const checkedItems = modulesList.querySelectorAll('li.checked');
 
 	if (!metadata.modules || metadata.modules.length === 0) {
-		const total = examData.questions.length;
+		const total = questions.length || metadata.totalQuestions || metadata.questionCount || 0;
 		document.getElementById('details-exam-questions').textContent = `${metadata.questionCount || total}`;
 		return;
 	}
+	if (!questions.length) return;
 
 	const selectedModuleNames = Array.from(checkedItems)
 		.map(li => this.normalizeModuleName(li.dataset.module).toLowerCase())
 		.filter(Boolean);
 
-	const selectedPoolCount = examData.questions.filter(q => {
+	const selectedPoolCount = questions.filter(q => {
 		return q.module && selectedModuleNames.includes(q.module.trim().toLowerCase());
 	}).length;
 
-	const totalPoolCount = examData.questions.length;
+	const totalPoolCount = questions.length;
 
 	document.getElementById('details-exam-questions').textContent = `${selectedPoolCount} / ${totalPoolCount}`;
 }
@@ -1266,7 +1290,7 @@ this.refreshHeroPreview();
 }
 
 async getStudySummary(examId) {
-const examData = this.availableExams.get(examId) || window.userExams[examId];
+const examData = window.userExams[examId] || this.availableExams.get(examId);
 const questions = Array.isArray(examData?.questions) ? examData.questions : [];
 if (!questions.length || !window.ExamApp.studyStorage) return null;
 try {
@@ -1959,6 +1983,31 @@ throw new Error('Unsupported file type. Please use .json or .zip files.');
 }
 }
 
+async ensureJsZipLoaded() {
+if (window.JSZip) return window.JSZip;
+if (this.jsZipLoadPromise) return this.jsZipLoadPromise;
+
+this.jsZipLoadPromise = new Promise((resolve, reject) => {
+	const script = document.createElement('script');
+	script.src = 'assets/vendor/jszip/jszip.min.js';
+	script.async = true;
+	script.onload = () => {
+		if (window.JSZip) {
+			resolve(window.JSZip);
+		} else {
+			reject(new Error('ZIP support failed to initialize.'));
+		}
+	};
+	script.onerror = () => reject(new Error('ZIP support could not be loaded.'));
+	document.head.appendChild(script);
+}).catch((error) => {
+	this.jsZipLoadPromise = null;
+	throw error;
+});
+
+return this.jsZipLoadPromise;
+}
+
 async importJsonFile(file) {
 const text = await file.text();
 let data = JSON.parse(text);
@@ -2004,25 +2053,30 @@ async restoreProgressBackup(backup) {
 const storage = window.ExamApp && window.ExamApp.examStorage;
 let restored = 0;
 let skipped = 0;
-for (const [rawId, progress] of Object.entries(backup.exams)) {
+const entries = Object.entries(backup.exams);
+if (entries.length > window.ExamApp.EXAM_LIMITS.maxProgressExams) {
+throw new Error(`Progress backup contains too many exams. Maximum is ${window.ExamApp.EXAM_LIMITS.maxProgressExams}.`);
+}
+for (const [rawId, progress] of entries) {
 const examId = window.ExamApp.normalizeExamId(rawId);
 if (!examId || !window.ExamApp.isSafeExamId(examId)) {
 	skipped++;
 	continue;
 }
-if (!progress || typeof progress !== 'object' || !Array.isArray(progress.attempts)) {
+const normalizedProgress = window.ExamApp.normalizeProgressRecord(progress);
+if (!normalizedProgress) {
 	skipped++;
 	continue;
 }
 try {
 	if (storage && typeof storage.putLegacyProgress === 'function') {
-		storage.putLegacyProgress(examId, progress);
+		storage.putLegacyProgress(examId, normalizedProgress);
 	} else {
-		localStorage.setItem(`${examId}_progress`, JSON.stringify(progress));
+		localStorage.setItem(`${examId}_progress`, JSON.stringify(normalizedProgress));
 	}
 	window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.progress, examId);
 	if (storage && typeof storage.putProgress === 'function') {
-		await storage.putProgress(examId, progress).catch(() => {});
+		await storage.putProgress(examId, normalizedProgress).catch(() => {});
 	}
 	restored++;
 } catch (error) {
@@ -2036,13 +2090,15 @@ this.showNotification(`✅ Restored progress for ${restored} exam(s)${suffix}.`)
 }
 
 async importZipFile(file) {
+await this.ensureJsZipLoaded();
 if (!window.JSZip) {
 throw new Error('ZIP support is unavailable (JSZip not loaded).');
 }
 
 this.showImportProgress();
 const zip = await JSZip.loadAsync(file);
-const dumpEntry = this.findZipEntry(zip, /(^|\/)dump\.json$/i);
+const inspected = window.ExamApp.inspectZipEntries(zip);
+const { dumpEntry, metadataEntry, imageFiles } = inspected;
 if (!dumpEntry) {
 throw new Error('ZIP file missing dump.json.');
 }
@@ -2055,7 +2111,6 @@ throw new Error('dump.json must contain an array of questions.');
 }
 
 let metadata = null;
-const metadataEntry = this.findZipEntry(zip, /(^|\/)metadata\.json$/i);
 if (metadataEntry) {
 const metadataText = await metadataEntry.async('string');
 metadata = JSON.parse(metadataText);
@@ -2074,33 +2129,6 @@ await window.examManager.importExam(examId, { questions, metadata });
 
 // Extract images from ZIP to local directory
 window.ExamApp.log(`🔍 Scanning ZIP for images in exam: ${examId}`);
-const imageFiles = [];
-let totalImageBytes = 0;
-const limits = window.ExamApp.EXAM_LIMITS;
-
-zip.forEach((relativePath, entry) => {
-if (entry.dir) return;
-const normalized = relativePath.toLowerCase();
-if (normalized.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-// Handle both forward slash and backslash (Windows ZIP paths)
-const fileName = relativePath.replace(/\\/g, '/').split('/').pop();
-if (!window.ExamApp.isSafeImageFileName(fileName)) return;
-const imageBytes = entry._data?.uncompressedSize || 0;
-if (imageBytes > limits.maxImageBytes) {
-throw new Error(`Image ${fileName} is too large. Maximum size is ${Math.round(limits.maxImageBytes / 1024 / 1024)} MB.`);
-}
-totalImageBytes += imageBytes;
-imageFiles.push({ fileName, entry });
-}
-});
-
-if (imageFiles.length > limits.maxImages) {
-throw new Error(`ZIP contains too many images. Maximum is ${limits.maxImages}.`);
-}
-if (totalImageBytes > limits.maxTotalImageBytes) {
-throw new Error(`ZIP images are too large in total. Maximum is ${Math.round(limits.maxTotalImageBytes / 1024 / 1024)} MB.`);
-}
-
 window.ExamApp.log(`📊 Found ${imageFiles.length} images in ZIP`);
 
 if (imageFiles.length > 0 && window.imageStorage) {

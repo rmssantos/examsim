@@ -216,7 +216,7 @@ def main():
     # Try to open browser
     try:
         webbrowser.open(f"http://{HOST}:{PORT}/")
-    except:
+    except Exception:
         print("Could not open browser automatically")
         print(f"Please open: http://{HOST}:{PORT}/")
 

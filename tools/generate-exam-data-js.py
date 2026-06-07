@@ -36,7 +36,7 @@ def generate_exam_data_js(exam_id):
         with open(metadata_file, 'r', encoding='utf-8') as f:
             metadata = json.load(f)
     else:
-        print(f"[WARN] metadata.json not found, generating default...")
+        print("[WARN] metadata.json not found, generating default...")
         metadata = generate_default_metadata(exam_id, questions)
 
     # Update totalQuestions in metadata
@@ -118,8 +118,8 @@ def main():
         print("[SUCCESS] exam-data.js generated!")
         print("=" * 60)
         print("\nNext steps:")
-        print(f"1. Refresh the editor to load new data")
-        print(f"2. Or restart the server: python server.py")
+        print("1. Refresh the editor to load new data")
+        print("2. Or restart the server: python server.py")
     else:
         print("\n[ERROR] Failed to generate exam-data.js")
         sys.exit(1)

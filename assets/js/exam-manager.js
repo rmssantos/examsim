@@ -129,12 +129,16 @@ class ExamManager {
                 examData = await this.loadFromLocalStorage(examId);
             }
 
-            if (examData && examData.questions && examData.questions.length > 0) {
+            if (examData && (Array.isArray(examData.questions) || examData.metadata)) {
+                const questions = Array.isArray(examData.questions) ? examData.questions : null;
                 return {
                     id: examId,
-                    questions: examData.questions,
-                    metadata: examData.metadata || this.generateMetadata(examId, examData.questions),
-                    hasImages: this.detectImages(examData.questions)
+                    questions,
+                    metadata: examData.metadata || this.generateMetadata(examId, questions || []),
+                    hasImages: examData.hasImages || this.detectImages(questions),
+                    loaded: Array.isArray(questions),
+                    source: examData.source,
+                    storage: examData.storage
                 };
             }
         } catch (error) {
@@ -153,13 +157,16 @@ class ExamManager {
 
                 // Generate metadata if not provided
                 let metadata = examData.metadata;
-                if (!metadata || Object.keys(metadata).length === 0) {
+                if ((!metadata || Object.keys(metadata).length === 0) && Array.isArray(examData.questions)) {
                     metadata = this.generateMetadata(examId, examData.questions);
                 }
 
                 return {
                     questions: examData.questions,
-                    metadata: metadata
+                    metadata,
+                    hasImages: examData.hasImages,
+                    source: examData.source,
+                    storage: examData.storage
                 };
             }
         } catch (error) {
@@ -241,7 +248,7 @@ class ExamManager {
 
     // Detect if exam has images
     detectImages(questions) {
-        return questions.some(q =>
+        return Array.isArray(questions) && questions.some(q =>
             (q.question_images && q.question_images.length > 0) ||
             (q.explanation_images && q.explanation_images.length > 0) ||
             q.question.includes('![') || // Markdown images

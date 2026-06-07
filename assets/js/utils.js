@@ -14,10 +14,17 @@ function escapeHtml(text) {
 window.ExamApp.EXAM_LIMITS = Object.freeze({
     maxJsonBytes: 5 * 1024 * 1024,
     maxZipBytes: 50 * 1024 * 1024,
+    maxZipEntries: 512,
+    maxZipUncompressedBytes: 120 * 1024 * 1024,
     maxQuestions: 1000,
     maxImages: 250,
     maxImageBytes: 10 * 1024 * 1024,
     maxTotalImageBytes: 100 * 1024 * 1024,
+    maxProgressExams: 100,
+    maxProgressAttempts: 500,
+    maxProgressQuestionResults: 1000,
+    maxProgressModules: 50,
+    maxProgressStringLength: 5000,
     maxTextLength: 20000,
     maxOptionLength: 5000,
     allowedImageExtensions: Object.freeze(['jpg', 'jpeg', 'png', 'gif', 'webp']),
@@ -122,6 +129,200 @@ window.ExamApp.getImageMimeType = function getImageMimeType(fileName) {
         webp: 'image/webp'
     };
     return mimeTypes[extension] || null;
+};
+
+window.ExamApp.inspectZipEntries = function inspectZipEntries(zip) {
+    if (!zip || typeof zip.forEach !== 'function') {
+        throw new Error('Invalid ZIP archive.');
+    }
+
+    const limits = window.ExamApp.EXAM_LIMITS;
+    let entryCount = 0;
+    let totalBytes = 0;
+    let totalImageBytes = 0;
+    let dumpEntry = null;
+    let metadataEntry = null;
+    const imageFiles = [];
+
+    zip.forEach((relativePath, entry) => {
+        entryCount += 1;
+        if (entryCount > limits.maxZipEntries) {
+            throw new Error(`ZIP contains too many entries. Maximum is ${limits.maxZipEntries}.`);
+        }
+        if (entry.dir) return;
+
+        const normalized = String(relativePath || entry.name || '')
+            .replace(/\\/g, '/')
+            .replace(/^\/+/, '');
+        const uncompressedSize = Number(entry?._data?.uncompressedSize);
+        if (!Number.isSafeInteger(uncompressedSize) || uncompressedSize < 0) {
+            throw new Error(`Unable to verify the uncompressed size of ${normalized || 'a ZIP entry'}.`);
+        }
+
+        totalBytes += uncompressedSize;
+        if (totalBytes > limits.maxZipUncompressedBytes) {
+            throw new Error(`ZIP expands beyond the ${Math.round(limits.maxZipUncompressedBytes / 1024 / 1024)} MB safety limit.`);
+        }
+
+        if (/(^|\/)dump\.json$/i.test(normalized)) {
+            if (uncompressedSize > limits.maxJsonBytes) {
+                throw new Error(`dump.json is too large. Maximum size is ${Math.round(limits.maxJsonBytes / 1024 / 1024)} MB.`);
+            }
+            if (!dumpEntry || normalized.length < dumpEntry.normalizedPath.length) {
+                dumpEntry = { entry, normalizedPath: normalized };
+            }
+        }
+
+        if (/(^|\/)metadata\.json$/i.test(normalized)) {
+            if (uncompressedSize > limits.maxJsonBytes) {
+                throw new Error(`metadata.json is too large. Maximum size is ${Math.round(limits.maxJsonBytes / 1024 / 1024)} MB.`);
+            }
+            if (!metadataEntry || normalized.length < metadataEntry.normalizedPath.length) {
+                metadataEntry = { entry, normalizedPath: normalized };
+            }
+        }
+
+        if (/\.(jpg|jpeg|png|gif|webp)$/i.test(normalized)) {
+            const fileName = normalized.split('/').pop();
+            if (!window.ExamApp.isSafeImageFileName(fileName)) return;
+            if (uncompressedSize > limits.maxImageBytes) {
+                throw new Error(`Image ${fileName} is too large. Maximum size is ${Math.round(limits.maxImageBytes / 1024 / 1024)} MB.`);
+            }
+            totalImageBytes += uncompressedSize;
+            imageFiles.push({ fileName, entry });
+            if (imageFiles.length > limits.maxImages) {
+                throw new Error(`ZIP contains too many images. Maximum is ${limits.maxImages}.`);
+            }
+            if (totalImageBytes > limits.maxTotalImageBytes) {
+                throw new Error(`ZIP images are too large in total. Maximum is ${Math.round(limits.maxTotalImageBytes / 1024 / 1024)} MB.`);
+            }
+        }
+    });
+
+    return {
+        dumpEntry: dumpEntry?.entry || null,
+        metadataEntry: metadataEntry?.entry || null,
+        imageFiles,
+        entryCount,
+        totalBytes
+    };
+};
+
+window.ExamApp.normalizeProgressRecord = function normalizeProgressRecord(progress) {
+    const limits = window.ExamApp.EXAM_LIMITS;
+    if (!progress || typeof progress !== 'object' || Array.isArray(progress) || !Array.isArray(progress.attempts)) {
+        return null;
+    }
+    if (progress.attempts.length > limits.maxProgressAttempts) return null;
+
+    const isFiniteNumber = (value, min, max) => (
+        typeof value === 'number'
+        && Number.isFinite(value)
+        && value >= min
+        && value <= max
+    );
+    const isInteger = (value, min, max) => Number.isInteger(value) && value >= min && value <= max;
+    const normalizeString = (value, maxLength = limits.maxProgressStringLength) => {
+        if (typeof value !== 'string' || value.length > maxLength) return null;
+        return value;
+    };
+    const normalizeAnswer = (answer) => {
+        if (answer === null || answer === undefined || answer === '') return null;
+        if (Number.isInteger(answer) && Math.abs(answer) <= limits.maxQuestions) return answer;
+        if (typeof answer === 'string' && answer.length <= limits.maxProgressStringLength) return answer;
+        if (!Array.isArray(answer) || answer.length > limits.maxQuestions) return undefined;
+        const values = answer.map((value) => {
+            if (Number.isInteger(value) && Math.abs(value) <= limits.maxQuestions) return value;
+            if (typeof value === 'string' && value.length <= limits.maxProgressStringLength) return value;
+            return undefined;
+        });
+        return values.includes(undefined) ? undefined : values;
+    };
+
+    const attempts = [];
+    for (const source of progress.attempts) {
+        if (!source || typeof source !== 'object' || Array.isArray(source)) return null;
+        if (!isFiniteNumber(source.score, 0, 100)) return null;
+        if (source.date !== undefined && (
+            typeof source.date !== 'string'
+            || source.date.length > 64
+            || Number.isNaN(Date.parse(source.date))
+        )) return null;
+        if (source.passed !== undefined && typeof source.passed !== 'boolean') return null;
+        if (source.timeSpent !== undefined && !isFiniteNumber(source.timeSpent, 0, 525600)) return null;
+
+        const attempt = {
+            score: source.score,
+            passed: source.passed === true,
+            timeSpent: source.timeSpent === undefined ? 0 : source.timeSpent
+        };
+
+        if (source.attemptId !== undefined) {
+            const attemptId = normalizeString(source.attemptId, 200);
+            if (attemptId === null) return null;
+            attempt.attemptId = attemptId;
+        }
+        if (source.date !== undefined) attempt.date = source.date;
+
+        for (const field of ['questionCount', 'correctCount', 'incorrectCount', 'skippedCount']) {
+            if (source[field] === undefined) continue;
+            if (!isInteger(source[field], 0, limits.maxQuestions)) return null;
+            attempt[field] = source[field];
+        }
+
+        if (source.hasReviewDetails !== undefined) {
+            if (typeof source.hasReviewDetails !== 'boolean') return null;
+            attempt.hasReviewDetails = source.hasReviewDetails;
+        }
+
+        if (source.questionResults !== undefined) {
+            if (!Array.isArray(source.questionResults) || source.questionResults.length > limits.maxProgressQuestionResults) {
+                return null;
+            }
+            attempt.questionResults = [];
+            for (const sourceResult of source.questionResults) {
+                if (!sourceResult || typeof sourceResult !== 'object' || Array.isArray(sourceResult)) return null;
+                const questionId = normalizeString(String(sourceResult.questionId ?? ''), 200);
+                const answer = normalizeAnswer(sourceResult.userAnswer);
+                if (
+                    !questionId
+                    || !isInteger(sourceResult.order, 1, limits.maxProgressQuestionResults)
+                    || answer === undefined
+                    || typeof sourceResult.correct !== 'boolean'
+                    || typeof sourceResult.skipped !== 'boolean'
+                ) return null;
+                attempt.questionResults.push({
+                    questionId,
+                    order: sourceResult.order,
+                    userAnswer: answer,
+                    correct: sourceResult.correct,
+                    skipped: sourceResult.skipped
+                });
+            }
+        }
+
+        if (source.modules !== undefined && source.modules !== null) {
+            if (!Array.isArray(source.modules) || source.modules.length > limits.maxProgressModules) return null;
+            const modules = source.modules.map((module) => normalizeString(module, 200));
+            if (modules.includes(null)) return null;
+            attempt.modules = modules;
+        } else if (source.modules === null) {
+            attempt.modules = null;
+        }
+
+        attempts.push(attempt);
+    }
+
+    const derivedBestScore = attempts.reduce((best, attempt) => Math.max(best, attempt.score), 0);
+    const derivedTotalPassed = attempts.filter((attempt) => attempt.passed).length;
+    if (progress.bestScore !== undefined && !isFiniteNumber(progress.bestScore, 0, 100)) return null;
+    if (progress.totalPassed !== undefined && !isInteger(progress.totalPassed, 0, attempts.length)) return null;
+
+    return {
+        attempts,
+        bestScore: progress.bestScore === undefined ? derivedBestScore : progress.bestScore,
+        totalPassed: progress.totalPassed === undefined ? derivedTotalPassed : progress.totalPassed
+    };
 };
 
 window.ExamApp.setElementHidden = function setElementHidden(element, hidden) {

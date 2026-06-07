@@ -23,6 +23,101 @@
   "contentType": "preview",
   "commercialStatus": "pro-preview",
   "contentOrigin": "original",
+  "contentReview": {
+    "lastReviewed": "2026-06-07",
+    "reviewCadence": "quarterly",
+    "sourceOfTruth": "Microsoft Learn AZ-104 study guide and certification page",
+    "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-104",
+    "objectiveVersion": "Skills measured as of April 17, 2026",
+    "reviewScope": [
+      "official study guide objectives",
+      "preview module coverage mapping",
+      "schema validation"
+    ],
+    "notes": "This metadata covers the public preview. The paid pack has a separate release review record and still requires independent SME sign-off."
+  },
+  "objectiveDomains": [
+    {
+      "code": "AZ104-1",
+      "name": "Manage Azure identities and governance",
+      "weightRange": "20-25%",
+      "source": "Microsoft Learn AZ-104 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-104",
+      "mappedModules": [
+        "Microsoft Entra Users & Groups",
+        "Access to Azure Resources (RBAC)",
+        "Subscriptions & Governance"
+      ]
+    },
+    {
+      "code": "AZ104-2",
+      "name": "Implement and manage storage",
+      "weightRange": "15-20%",
+      "source": "Microsoft Learn AZ-104 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-104",
+      "mappedModules": [
+        "Storage Access & Security",
+        "Storage Accounts",
+        "Azure Files & Blob Storage"
+      ]
+    },
+    {
+      "code": "AZ104-3",
+      "name": "Deploy and manage Azure compute resources",
+      "weightRange": "20-25%",
+      "source": "Microsoft Learn AZ-104 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-104",
+      "mappedModules": [
+        "ARM Templates & Bicep",
+        "Virtual Machines",
+        "Containers",
+        "Azure App Service"
+      ]
+    },
+    {
+      "code": "AZ104-4",
+      "name": "Implement and manage virtual networking",
+      "weightRange": "15-20%",
+      "source": "Microsoft Learn AZ-104 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-104",
+      "mappedModules": [
+        "Virtual Networking",
+        "Network Security",
+        "Name Resolution & Load Balancing"
+      ]
+    },
+    {
+      "code": "AZ104-5",
+      "name": "Monitor and maintain Azure resources",
+      "weightRange": "10-15%",
+      "source": "Microsoft Learn AZ-104 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-104",
+      "mappedModules": [
+        "Monitoring",
+        "Backup & Recovery"
+      ]
+    }
+  ],
+  "coverageReview": {
+    "method": "Public preview modules mapped to the AZ-104 skills measured as of April 17, 2026.",
+    "observedModuleCounts": {
+      "Microsoft Entra Users & Groups": 2,
+      "Access to Azure Resources (RBAC)": 2,
+      "Subscriptions & Governance": 2,
+      "Storage Access & Security": 1,
+      "Storage Accounts": 1,
+      "Azure Files & Blob Storage": 2,
+      "ARM Templates & Bicep": 1,
+      "Virtual Machines": 2,
+      "Containers": 1,
+      "Azure App Service": 1,
+      "Virtual Networking": 1,
+      "Network Security": 2,
+      "Name Resolution & Load Balancing": 1,
+      "Monitoring": 0,
+      "Backup & Recovery": 1
+    }
+  },
   "modules": [
     {
       "icon": "fas fa-users",
@@ -108,6 +203,7 @@
     "questions": 300,
     "price": "19 EUR",
     "url": "https://examplar.gumroad.com/l/az104-complete",
+    "reviewStatus": "released-sme-review-pending",
     "highlights": [
       "300+ original questions across every exam objective",
       "Detailed explanation for the correct answer and every distractor",

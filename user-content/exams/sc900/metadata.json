@@ -81,6 +81,7 @@
     "reviewCadence": "quarterly",
     "sourceOfTruth": "Microsoft Learn certification page and practice assessment",
     "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/",
+    "objectiveVersion": "Microsoft Learn objectives reviewed 2026-05-20",
     "reviewScope": [
       "schema validation",
       "module coverage mapping",

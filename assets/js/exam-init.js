@@ -38,6 +38,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     return;
   }
 
+  try {
+    await window.ExamApp.ensureExamLoaded(examId);
+  } catch (error) {
+    console.error(`❌ Failed to load exam: ${examId}`, error);
+    alert(`Exam ${examId} could not be loaded. Please return to the homepage and try again.`);
+    closeExamTab();
+    return;
+  }
+
   window.ExamApp.log(`📚 Loading exam: ${examId}`);
 
   // Set image loader to current exam
