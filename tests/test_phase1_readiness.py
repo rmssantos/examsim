@@ -23,6 +23,36 @@ def run_node(script: str) -> subprocess.CompletedProcess:
 
 
 class MetadataFirstLoaderTests(unittest.TestCase):
+    def test_exam_ids_reject_prototype_property_names(self):
+        script = textwrap.dedent(
+            """
+            const fs = require('fs');
+            const vm = require('vm');
+            global.window = {
+              location: { hostname: 'localhost', search: '' }
+            };
+            global.localStorage = {
+              getItem() { return null; },
+              setItem() {}
+            };
+            global.document = {};
+
+            vm.runInThisContext(fs.readFileSync('assets/js/utils.js', 'utf8'));
+            for (const examId of ['__proto__', 'prototype', 'constructor', 'CONSTRUCTOR']) {
+              if (window.ExamApp.isSafeExamId(examId)) {
+                throw new Error(`reserved exam id accepted: ${examId}`);
+              }
+            }
+            if (!window.ExamApp.isSafeExamId('az-104')) {
+              throw new Error('normal exam id was rejected');
+            }
+            console.log('reserved exam ids rejected');
+            """
+        )
+        result = run_node(script)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("reserved exam ids rejected", result.stdout)
+
     def test_bundled_exam_dump_is_lazy_and_concurrent_requests_are_deduplicated(self):
         script = textwrap.dedent(
             """

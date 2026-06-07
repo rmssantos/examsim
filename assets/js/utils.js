@@ -87,7 +87,10 @@ window.ExamApp.removeFromRegistry = function removeFromRegistry(key, examId) {
 };
 
 window.ExamApp.isSafeExamId = function isSafeExamId(value) {
-    return /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(String(value || '').trim());
+    const examId = String(value || '').trim();
+    const reservedIds = ['__proto__', 'prototype', 'constructor'];
+    return !reservedIds.includes(examId.toLowerCase())
+        && /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(examId);
 };
 
 window.ExamApp.normalizeExamId = function normalizeExamId(value) {
