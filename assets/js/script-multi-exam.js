@@ -1379,7 +1379,7 @@ class MultiExamSimulator {
     // Cross-sell a recommended paid pack on the results screen (e.g. CLF-C02 -> SAA-C03).
     renderRecommendedPro(metadata) {
         const rec = metadata && metadata.recommendedPro;
-        const url = rec && this.safeExternalUrl(rec.url);
+        const url = rec && this.safeUrl(rec.url);
         if (!url) return '';
         const title = this.escapeHtml(rec.title || 'Recommended pack');
         const blurb = this.escapeHtml(rec.blurb || '');
