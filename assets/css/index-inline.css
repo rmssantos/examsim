@@ -1412,10 +1412,13 @@ pointer-events: none;
 .home-tools-label{display:block;color:var(--text-light);font-size:.85rem;margin-bottom:.65rem}
 
 
-/* vendor brand mark on exam cards (topic icon stays; small vendor logo top-left) */
-.exam-card .exam-vendor{position:absolute;top:10px;left:10px;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:15px;background:rgba(0,0,0,.045);border:1px solid var(--border);color:var(--text-light);z-index:2}
-.exam-card .exam-vendor .fa-aws{color:#ff9900}
-.exam-card .exam-vendor .fa-microsoft{color:#00a4ef}
-.exam-card .exam-vendor .fa-google{color:#4285f4}
-[data-theme="dark"] .exam-card .exam-vendor,
-.dark-mode .exam-card .exam-vendor{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
+
+/* vendor brand mark: small provider seal on the corner of the topic icon */
+.exam-icon-wrap{position:relative;display:inline-block;align-self:flex-start;width:-moz-fit-content;width:fit-content;line-height:1;margin-bottom:.4rem}
+.exam-icon-wrap .exam-icon{margin-bottom:0}
+.exam-icon-wrap .exam-vendor{position:absolute;right:-7px;bottom:-3px;width:19px;height:19px;border-radius:50%;display:grid;place-items:center;font-size:10px;background:var(--card-bg);border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.3);color:var(--text-light)}
+.exam-icon-wrap .exam-vendor .fa-aws{color:#ff9900}
+.exam-icon-wrap .exam-vendor .fa-microsoft{color:#00a4ef}
+.exam-icon-wrap .exam-vendor .fa-google{color:#4285f4}
+[data-theme="dark"] .exam-icon-wrap .exam-vendor,
+.dark-mode .exam-icon-wrap .exam-vendor{background:#2a3340;border-color:rgba(255,255,255,.15)}

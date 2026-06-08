@@ -559,16 +559,6 @@ deleteBtn.appendChild(this.createIcon('fas fa-eye-slash'));
 card.appendChild(deleteBtn);
 
 this.appendTextElement(card, 'div', 'exam-badge', metadata.badge || 'Custom');
-const vendorBrand = this.vendorBrandIcon(metadata.vendor);
-const iconIsBrand = String(metadata.icon || '').startsWith('fab ');
-if (vendorBrand && !iconIsBrand) {
-const vendorMark = document.createElement('div');
-vendorMark.className = 'exam-vendor';
-vendorMark.title = metadata.vendor;
-vendorMark.setAttribute('aria-label', `Vendor: ${metadata.vendor}`);
-vendorMark.appendChild(this.createIcon(vendorBrand));
-card.appendChild(vendorMark);
-}
 if (metadata.preview) {
 card.classList.add('exam-card--preview');
 const previewFlag = document.createElement('div');
@@ -577,7 +567,19 @@ previewFlag.appendChild(this.createIcon('fas fa-gift'));
 previewFlag.appendChild(document.createTextNode(' Free sample'));
 card.appendChild(previewFlag);
 }
-card.appendChild(this.createIcon(metadata.icon || 'fas fa-book', 'exam-icon'));
+const iconWrap = document.createElement('div');
+iconWrap.className = 'exam-icon-wrap';
+iconWrap.appendChild(this.createIcon(metadata.icon || 'fas fa-book', 'exam-icon'));
+const vendorBrand = this.vendorBrandIcon(metadata.vendor);
+if (vendorBrand && !String(metadata.icon || '').startsWith('fab ')) {
+const vendorMark = document.createElement('span');
+vendorMark.className = 'exam-vendor';
+vendorMark.title = metadata.vendor;
+vendorMark.setAttribute('aria-label', `Vendor: ${metadata.vendor}`);
+vendorMark.appendChild(this.createIcon(vendorBrand));
+iconWrap.appendChild(vendorMark);
+}
+card.appendChild(iconWrap);
 this.appendTextElement(card, 'div', 'exam-title', metadata.name || examId.toUpperCase());
 this.appendTextElement(card, 'div', 'exam-subtitle', metadata.fullName || 'Custom Exam');
 card.appendChild(this.createExamTaxonomy(examId, examData));
