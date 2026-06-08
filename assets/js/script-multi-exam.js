@@ -1369,11 +1369,26 @@ class MultiExamSimulator {
     // Render a "Source" link to the question's reference, only when it points to an
     // allowlisted official documentation host (same trust gate as inline doc links).
     renderReferenceLink(question) {
-        const ref = question && this.safeUrl(question.reference);
-        if (!ref || !isOfficialDocumentationUrl(ref)) return '';
-        let host = 'documentation';
-        try { host = new URL(ref).hostname.replace(/^www\./, ''); } catch (_) {}
-        return `<div class="explanation-source"><i class="fas fa-book" aria-hidden="true"></i> <strong>Source:</strong> <a href="${this.escapeHtml(ref)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(host)}</a></div>`;
+        if (!question) return '';
+        const raw = Array.isArray(question.references) && question.references.length
+            ? question.references : [question.reference];
+        const hrefs = [];
+        const seen = new Set();
+        for (const r of raw) {
+            const ref = this.safeUrl(r);
+            if (!ref || !isOfficialDocumentationUrl(ref) || seen.has(ref)) continue;
+            seen.add(ref);
+            hrefs.push(ref);
+        }
+        if (!hrefs.length) return '';
+        if (hrefs.length === 1) {
+            let host = 'documentation';
+            try { host = new URL(hrefs[0]).hostname.replace(/^www\./, ''); } catch (_) {}
+            const link = `<a href="${this.escapeHtml(hrefs[0])}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(host)}</a>`;
+            return `<div class="explanation-source"><i class="fas fa-book" aria-hidden="true"></i> <strong>Source:</strong> ${link}</div>`;
+        }
+        const links = hrefs.map((h, i) => `<a href="${this.escapeHtml(h)}" target="_blank" rel="noopener noreferrer">${i + 1}</a>`).join(' &middot; ');
+        return `<div class="explanation-source"><i class="fas fa-book" aria-hidden="true"></i> <strong>Sources:</strong> ${links}</div>`;
     }
 
     // Cross-sell a recommended paid pack on the results screen (e.g. CLF-C02 -> SAA-C03).

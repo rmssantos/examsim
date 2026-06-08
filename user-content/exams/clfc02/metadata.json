@@ -38,7 +38,8 @@
       "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html",
       "mappedModules": [
         "Cloud Value & Economics",
-        "Well-Architected & Design Principles",
+        "Well-Architected Pillars",
+        "Cloud Design Principles",
         "Cloud Migration & Adoption"
       ]
     },
@@ -89,8 +90,12 @@
       "name": "Cloud Value & Economics"
     },
     {
+      "icon": "fas fa-columns",
+      "name": "Well-Architected Pillars"
+    },
+    {
       "icon": "fas fa-drafting-compass",
-      "name": "Well-Architected & Design Principles"
+      "name": "Cloud Design Principles"
     },
     {
       "icon": "fas fa-truck-moving",
