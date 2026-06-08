@@ -1418,3 +1418,10 @@ pointer-events: none;
 .exam-library-section .section-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
 .exam-library-section .section-header .library-filter-toggle{flex:none;margin:0}
 .library-controls.filters-collapsed .library-control-topline{display:none}
+
+/* Light mode: distinguish the panels (they were all white with ~6% borders, blending into one block).
+   Mirror dark mode: white board, nested panels in a distinct shade with visible borders. */
+body:not(.dark-mode) .home-board{border-color:rgba(30,60,114,.12)}
+body:not(.dark-mode) .exam-library-section{background:#eef2f8;border:1px solid rgba(30,60,114,.16)}
+body:not(.dark-mode) .home-step{background:#eef2f8;border-color:rgba(30,60,114,.15)}
+body:not(.dark-mode) .getting-started-card{background:#eef2f8;border:1px solid rgba(30,60,114,.16)}
