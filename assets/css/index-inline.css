@@ -1420,14 +1420,14 @@ pointer-events: none;
 .library-controls.filters-collapsed .library-control-topline{display:none}
 
 /* ===== Light mode: soft, lightly-tinted card fills + dark text. Dark mode keeps the strong gradient. ===== */
-body:not(.dark-mode) .exam-card.exam-sc900{background:linear-gradient(135deg,#dbeafe 0%,#cffafe 100%)}
-body:not(.dark-mode) .exam-card.exam-ab730{background:linear-gradient(135deg,#d1fae5 0%,#dcfce7 100%)}
-body:not(.dark-mode) .exam-card.exam-ab731{background:linear-gradient(135deg,#ffe4e6 0%,#fee2e2 100%)}
-body:not(.dark-mode) .exam-card.custom{background:linear-gradient(135deg,#ede9fe 0%,#fce7f3 100%)}
+body:not(.dark-mode) .exam-card.exam-sc900{background:linear-gradient(135deg,#bfdbfe 0%,#a5f3fc 100%)}
+body:not(.dark-mode) .exam-card.exam-ab730{background:linear-gradient(135deg,#a7f3d0 0%,#bbf7d0 100%)}
+body:not(.dark-mode) .exam-card.exam-ab731{background:linear-gradient(135deg,#fecdd3 0%,#fecaca 100%)}
+body:not(.dark-mode) .exam-card.custom{background:linear-gradient(135deg,#ddd6fe 0%,#fbcfe8 100%)}
 body:not(.dark-mode) .exam-card.exam-sc900,
 body:not(.dark-mode) .exam-card.exam-ab730,
 body:not(.dark-mode) .exam-card.exam-ab731,
-body:not(.dark-mode) .exam-card.custom{border:1px solid rgba(30,41,59,.1);box-shadow:0 1px 3px rgba(30,60,114,.06)}
+body:not(.dark-mode) .exam-card.custom{border:1px solid rgba(30,41,59,.12);box-shadow:none}
 body:not(.dark-mode) .exam-card .exam-title,
 body:not(.dark-mode) .exam-card .exam-stat-number{color:#1f2733}
 body:not(.dark-mode) .exam-card .exam-subtitle{color:#475569}
