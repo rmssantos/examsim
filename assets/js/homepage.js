@@ -531,6 +531,14 @@ this.appendTextElement(stat, 'span', 'exam-stat-label', label);
 return stat;
 }
 
+vendorBrandIcon(vendor) {
+const v = String(vendor || '').toLowerCase();
+if (v.includes('amazon') || v.includes('aws')) return 'fab fa-aws';
+if (v.includes('microsoft')) return 'fab fa-microsoft';
+if (v.includes('google')) return 'fab fa-google';
+return '';
+}
+
 createExamCard(examId, examData) {
 const metadata = examData.metadata || {};
 const questionCount = metadata.questionCount || 45;
@@ -551,6 +559,16 @@ deleteBtn.appendChild(this.createIcon('fas fa-eye-slash'));
 card.appendChild(deleteBtn);
 
 this.appendTextElement(card, 'div', 'exam-badge', metadata.badge || 'Custom');
+const vendorBrand = this.vendorBrandIcon(metadata.vendor);
+const iconIsBrand = String(metadata.icon || '').startsWith('fab ');
+if (vendorBrand && !iconIsBrand) {
+const vendorMark = document.createElement('div');
+vendorMark.className = 'exam-vendor';
+vendorMark.title = metadata.vendor;
+vendorMark.setAttribute('aria-label', `Vendor: ${metadata.vendor}`);
+vendorMark.appendChild(this.createIcon(vendorBrand));
+card.appendChild(vendorMark);
+}
 if (metadata.preview) {
 card.classList.add('exam-card--preview');
 const previewFlag = document.createElement('div');

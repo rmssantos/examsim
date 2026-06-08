@@ -1410,3 +1410,12 @@ pointer-events: none;
 /* demoted tools row at the bottom of the home board */
 .home-tools{margin:1.6rem 0 .5rem;padding-top:1.1rem;border-top:1px solid var(--border)}
 .home-tools-label{display:block;color:var(--text-light);font-size:.85rem;margin-bottom:.65rem}
+
+
+/* vendor brand mark on exam cards (topic icon stays; small vendor logo top-left) */
+.exam-card .exam-vendor{position:absolute;top:10px;left:10px;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:15px;background:rgba(0,0,0,.045);border:1px solid var(--border);color:var(--text-light);z-index:2}
+.exam-card .exam-vendor .fa-aws{color:#ff9900}
+.exam-card .exam-vendor .fa-microsoft{color:#00a4ef}
+.exam-card .exam-vendor .fa-google{color:#4285f4}
+[data-theme="dark"] .exam-card .exam-vendor,
+.dark-mode .exam-card .exam-vendor{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
