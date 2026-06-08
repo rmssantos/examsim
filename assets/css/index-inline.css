@@ -1452,3 +1452,10 @@ body:not(.dark-mode) .exam-library-section{background:transparent}
 body:not(.dark-mode) .exam-card,
 body:not(.dark-mode) .exam-card:hover,
 body:not(.dark-mode) .exam-card.selected{box-shadow:none !important}
+
+/* Shadow by theme: none in light, clear shadow in dark (explicit, wins) */
+body:not(.dark-mode) .exam-card,
+body:not(.dark-mode) .exam-card:hover,
+body:not(.dark-mode) .exam-card.selected{box-shadow:none !important}
+body.dark-mode .exam-card{box-shadow:0 8px 24px rgba(0,0,0,.42) !important}
+body.dark-mode .exam-card:hover{box-shadow:0 12px 30px rgba(0,0,0,.55) !important}
