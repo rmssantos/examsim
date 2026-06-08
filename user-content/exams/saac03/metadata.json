@@ -25,16 +25,9 @@
   "contentOrigin": "original",
   "contentReview": {
     "lastReviewed": "2026-06-07",
-    "reviewCadence": "quarterly",
     "sourceOfTruth": "AWS Certified Solutions Architect - Associate SAA-C03 exam guide",
     "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/solutions-architect-associate-03.html",
-    "objectiveVersion": "SAA-C03 exam guide reviewed June 7, 2026",
-    "reviewScope": [
-      "official exam guide domains",
-      "preview module coverage mapping",
-      "schema validation"
-    ],
-    "notes": "This metadata covers the public preview. Original questions are based on public AWS documentation and do not reproduce live exam questions."
+    "objectiveVersion": "SAA-C03 exam guide reviewed June 7, 2026"
   },
   "objectiveDomains": [
     {
@@ -90,22 +83,6 @@
       ]
     }
   ],
-  "coverageReview": {
-    "method": "Public preview modules mapped to the four domains in the current AWS SAA-C03 exam guide.",
-    "observedModuleCounts": {
-      "IAM & Account Security": 2,
-      "VPC & Networking": 2,
-      "Compute, Scaling & Load Balancing": 2,
-      "Storage & S3": 3,
-      "Databases": 4,
-      "Decoupling & Integration": 3,
-      "Edge, DNS & Content Delivery": 2,
-      "Data Ingestion & Analytics": 1,
-      "Security & Encryption": 3,
-      "Resilience & Disaster Recovery": 1,
-      "Cost Optimization": 2
-    }
-  },
   "modules": [
     {
       "icon": "fas fa-user-shield",
@@ -175,7 +152,6 @@
     "questions": 250,
     "price": "19 EUR",
     "url": "https://examplar.gumroad.com/l/SAA-C03-complete",
-    "reviewStatus": "released-reviewed",
     "highlights": [
       "250+ original questions across all four SAA-C03 domains",
       "Rotating mock exams so every attempt feels fresh",

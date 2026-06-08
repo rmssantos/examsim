@@ -72,16 +72,9 @@
   "hasImages": false,
   "contentReview": {
     "lastReviewed": "2026-05-20",
-    "reviewCadence": "quarterly",
     "sourceOfTruth": "Microsoft Learn AB-731 study guide and certification page",
     "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-731",
-    "objectiveVersion": "Microsoft Learn objectives reviewed 2026-05-20",
-    "reviewScope": [
-      "official study guide objectives",
-      "training path coverage",
-      "schema validation"
-    ],
-    "notes": "Original practice content based on public Microsoft Learn objectives. It does not reproduce Microsoft exam or practice assessment questions."
+    "objectiveVersion": "Microsoft Learn objectives reviewed 2026-05-20"
   },
   "objectiveDomains": [
     {
@@ -117,16 +110,5 @@
         "Adoption, Licensing, and Change Strategy"
       ]
     }
-  ],
-  "coverageReview": {
-    "method": "Modules mapped to the published AB-731 objective domains and official AB-731T00 learning paths.",
-    "observedModuleCounts": {
-      "Generative AI Business Value": 23,
-      "Solution Design, Prompting, Grounding, and Data": 22,
-      "Microsoft Copilot and Microsoft 365 AI": 22,
-      "Microsoft Foundry and Azure AI Services": 23,
-      "Responsible AI Governance": 16,
-      "Adoption, Licensing, and Change Strategy": 14
-    }
-  }
+  ]
 }

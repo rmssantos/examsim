@@ -71,16 +71,9 @@
   "hasImages": false,
   "contentReview": {
     "lastReviewed": "2026-05-20",
-    "reviewCadence": "quarterly",
     "sourceOfTruth": "Microsoft Learn AB-730 study guide and certification page",
     "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-730",
-    "objectiveVersion": "Microsoft Learn objectives reviewed 2026-05-20",
-    "reviewScope": [
-      "official study guide objectives",
-      "training path coverage",
-      "schema validation"
-    ],
-    "notes": "Original practice content based on public Microsoft Learn objectives. It does not reproduce Microsoft exam or practice assessment questions."
+    "objectiveVersion": "Microsoft Learn objectives reviewed 2026-05-20"
   },
   "objectiveDomains": [
     {
@@ -116,16 +109,5 @@
         "Data, Meetings, and Collaboration"
       ]
     }
-  ],
-  "coverageReview": {
-    "method": "Modules mapped to the published AB-730 objective domains and official AB-730T00 learning path.",
-    "observedModuleCounts": {
-      "Generative AI Fundamentals": 18,
-      "Responsible AI and Data Protection": 16,
-      "Prompting and Conversation Management": 25,
-      "Copilot Agents and Extensibility": 20,
-      "Business Content Creation": 21,
-      "Data, Meetings, and Collaboration": 20
-    }
-  }
+  ]
 }

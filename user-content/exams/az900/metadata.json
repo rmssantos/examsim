@@ -24,16 +24,9 @@
   "contentOrigin": "original",
   "contentReview": {
     "lastReviewed": "2026-06-07",
-    "reviewCadence": "quarterly",
     "sourceOfTruth": "Microsoft Learn AZ-900 study guide and certification page",
     "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-900",
-    "objectiveVersion": "Skills measured as of January 14, 2026",
-    "reviewScope": [
-      "official study guide objectives",
-      "module coverage mapping",
-      "schema validation"
-    ],
-    "notes": "Original practice content based on public Microsoft Learn objectives. It does not reproduce Microsoft exam or practice assessment questions."
+    "objectiveVersion": "Skills measured as of January 14, 2026"
   },
   "objectiveDomains": [
     {
@@ -75,22 +68,6 @@
       ]
     }
   ],
-  "coverageReview": {
-    "method": "Modules mapped to the AZ-900 skills measured as of January 14, 2026.",
-    "observedModuleCounts": {
-      "Cloud Computing Concepts": 10,
-      "Benefits of Cloud Services": 10,
-      "Cloud Service Types": 9,
-      "Core Azure Architecture": 14,
-      "Compute & Networking": 13,
-      "Storage Services": 12,
-      "Identity, Access & Security": 15,
-      "Cost Management": 10,
-      "Governance & Compliance": 10,
-      "Management & Deployment Tools": 9,
-      "Monitoring Tools": 8
-    }
-  },
   "modules": [
     {
       "icon": "fas fa-cloud",

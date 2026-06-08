@@ -306,7 +306,7 @@ class ContentGovernanceTests(unittest.TestCase):
                 review = metadata.get("contentReview")
                 self.assertIsInstance(review, dict)
                 self.assertRegex(review.get("lastReviewed", ""), r"^\d{4}-\d{2}-\d{2}$")
-                self.assertIn(review.get("reviewCadence"), {"monthly", "quarterly", "biannual", "annual"})
+                self.assertTrue(review.get("sourceOfTruth"))
                 self.assertRegex(review.get("sourceUrl", ""), r"^https://")
                 self.assertTrue(review.get("objectiveVersion"))
 
