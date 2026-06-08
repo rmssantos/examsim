@@ -1404,7 +1404,7 @@ class MultiExamSimulator {
         if (!url) return '';
         const title = this.escapeHtml(rec.title || 'Recommended pack');
         const blurb = this.escapeHtml(rec.blurb || '');
-        return `<div class="recommended-pro"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> <strong>${title}</strong><p>${blurb}</p><a class="recommended-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer">View pack</a></div>`;
+        return `<div class="recommended-pro"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> <strong>${title}</strong><p>${blurb}</p><a class="recommended-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener noreferrer">View pack</a></div>`;
     }
 
     displayOptions(question) {
