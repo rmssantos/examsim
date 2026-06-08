@@ -108,10 +108,6 @@
 									<i aria-hidden="true" class="fas fa-play"></i>
 									<span>Start practicing for free</span>
 								</a>
-								<a href="#exam-selection" class="hero-cta-ghost">
-									<span>Browse exams</span>
-									<i aria-hidden="true" class="fas fa-arrow-right"></i>
-								</a>
 							</div>
 						</div>
 						<aside class="hero-proof" aria-label="Library at a glance">
@@ -141,10 +137,17 @@
 						</aside>
 					</div>
 				</header>
+					<!-- How it works -->
+					<ol class="home-steps" aria-label="How Examplar works">
+						<li class="home-step"><span class="home-step-n">1</span><div><h3>Pick an exam</h3><p>Choose from the free library below. No setup.</p></div></li>
+						<li class="home-step"><span class="home-step-n">2</span><div><h3>Practice</h3><p>Timed exam or study mode, with explanations and sources.</p></div></li>
+						<li class="home-step"><span class="home-step-n">3</span><div><h3>Review &amp; track</h3><p>See your readiness and weak areas after each attempt.</p></div></li>
+					</ol>
+
 
 				<!-- Quick Actions Bar -->
 				<div class="quick-actions">
-					<button id="hero-import-btn" class="action-btn primary" type="button">
+					<button id="hero-import-btn" class="action-btn secondary" type="button">
 						<i aria-hidden="true" class="fas fa-cloud-arrow-up"></i>
 						<span>Import Exam</span>
 					</button>
@@ -362,6 +365,18 @@
 
 					<!-- Sidebar - Hidden in new layout -->
 					<aside class="sidebar is-hidden">
+						<!-- First-run: consolidated getting-started (shown only with no selection and no history) -->
+						<div id="home-getting-started" class="getting-started-card is-hidden">
+							<div class="gs-icon"><i aria-hidden="true" class="fas fa-circle-play"></i></div>
+							<h3>You're all set &mdash; pick an exam to begin</h3>
+							<p>Choose any free exam above and start. Your readiness, best score and weak areas show up here after your first attempt.</p>
+							<ul class="gs-points">
+								<li><i aria-hidden="true" class="fas fa-bolt"></i> No setup, no account</li>
+								<li><i aria-hidden="true" class="fas fa-wifi"></i> Works offline after first load</li>
+								<li><i aria-hidden="true" class="fas fa-lock"></i> Your progress stays on this device</li>
+							</ul>
+							<a href="#exam-selection" class="gs-cta"><i aria-hidden="true" class="fas fa-play"></i> Browse the library</a>
+						</div>
 						<!-- Preview Card -->
 						<div class="preview-card" id="hero-preview">
 							<div class="preview-header">

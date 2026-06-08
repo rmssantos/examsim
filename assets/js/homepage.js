@@ -555,8 +555,8 @@ if (metadata.preview) {
 card.classList.add('exam-card--preview');
 const previewFlag = document.createElement('div');
 previewFlag.className = 'exam-preview-flag';
-previewFlag.appendChild(this.createIcon('fas fa-lock'));
-previewFlag.appendChild(document.createTextNode(' Preview'));
+previewFlag.appendChild(this.createIcon('fas fa-gift'));
+previewFlag.appendChild(document.createTextNode(' Free sample'));
 card.appendChild(previewFlag);
 }
 card.appendChild(this.createIcon(metadata.icon || 'fas fa-book', 'exam-icon'));
@@ -1218,6 +1218,17 @@ const examId = this.selectedExamId || fallbackExamId;
 const examData = examId ? (this.availableExams.get(examId) || window.userExams[examId]) : null;
 const metadata = examData?.metadata || {};
 const stats = examId ? this.getProgressStats(examId) : null;
+
+// First-run consolidation: when there is no selection and no history, show one
+// warm "getting started" panel instead of two cold boxes (preview + progress).
+const isColdStart = !this.selectedExamId && !fallbackExamId;
+const setHidden = (id, hide) => {
+	const el = document.getElementById(id);
+	if (el) window.ExamApp.setElementHidden(el, hide);
+};
+setHidden('home-getting-started', !isColdStart);
+setHidden('hero-preview', isColdStart);
+setHidden('home-progress-section', isColdStart);
 
 if (examData) {
 this.previewExamName.textContent = metadata.name || examId.toUpperCase();
