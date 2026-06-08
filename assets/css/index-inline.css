@@ -1417,3 +1417,11 @@ body:not(.dark-mode) .getting-started-card{background:#eef2f8;border:1px solid r
 [data-theme="dark"] .exam-library-section,.dark-mode .exam-library-section{background:rgba(40,50,70,.55)}
 [data-theme="dark"] .exam-library-section,.dark-mode .exam-library-section,
 [data-theme="dark"] .getting-started-card,.dark-mode .getting-started-card{box-shadow:0 10px 28px rgba(0,0,0,.32);border-color:rgba(255,255,255,.12)}
+
+/* Review minors */
+/* #9: surface the hero's primary CTA (was display:none) so there is a clear top-of-page action */
+.hero-banner .hero-cta-row{display:flex}
+/* #8: reserve space at the card bottom so the hover action bar doesn't cover the content */
+.exam-card{padding-bottom:2.5rem}
+/* #10: stronger contrast for the "N exams available" label in light mode */
+body:not(.dark-mode) .library-result-count{color:#475569}
