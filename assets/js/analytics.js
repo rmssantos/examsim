@@ -7,7 +7,7 @@
         connectionString: '__APPINSIGHTS_CONNECTION_STRING__',
         optOutKey: 'exam_analytics_opt_out',
         analyticsVersion: '1.2.0',
-        publicExamIds: Object.freeze(['ab730', 'ab731', 'sc900', 'az900', 'az104', 'saac03'])
+        publicExamIds: Object.freeze(['ab730', 'ab731', 'sc900', 'az900', 'az104', 'saac03', 'clfc02'])
     });
 
     const connection = parseConnectionString(CONFIG.connectionString);
@@ -326,10 +326,10 @@
         });
     }
 
-    function trackProUnlockClicked(examId) {
+    function trackProUnlockClicked(examId, placement = 'exam_card') {
         return trackEvent('pro_unlock_clicked', {
             ...getExamProperties(examId),
-            placement: 'exam_card'
+            placement
         });
     }
 

@@ -590,6 +590,7 @@ class MultiExamSimulator {
                 passScore: metadata.passScore || 70,
                 questions: fromMemory.questions,
                 modules: metadata.modules || [],
+                recommendedPro: metadata.recommendedPro || null,
                 resources: metadata.resources || []
             };
             return true;
@@ -616,6 +617,7 @@ class MultiExamSimulator {
                 passScore: metadata.passScore || 70,
                 questions,
                 modules: metadata.modules || [],
+                recommendedPro: metadata.recommendedPro || null,
                 resources: metadata.resources || []
             };
             return true;
@@ -1387,7 +1389,11 @@ class MultiExamSimulator {
             const link = `<a href="${this.escapeHtml(hrefs[0])}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(host)}</a>`;
             return `<div class="explanation-source"><i class="fas fa-book" aria-hidden="true"></i> <strong>Source:</strong> ${link}</div>`;
         }
-        const links = hrefs.map((h, i) => `<a href="${this.escapeHtml(h)}" target="_blank" rel="noopener noreferrer">${i + 1}</a>`).join(' &middot; ');
+        const links = hrefs.map((h, i) => {
+            let host = 'documentation';
+            try { host = new URL(h).hostname.replace(/^www\./, ''); } catch (_) {}
+            return `<a href="${this.escapeHtml(h)}" target="_blank" rel="noopener noreferrer" aria-label="Source ${i + 1} (${this.escapeHtml(host)})">Source ${i + 1}</a>`;
+        }).join(' &middot; ');
         return `<div class="explanation-source"><i class="fas fa-book" aria-hidden="true"></i> <strong>Sources:</strong> ${links}</div>`;
     }
 
@@ -2436,13 +2442,17 @@ class MultiExamSimulator {
         this.generateDetailedReview();
 
         // Recommended next pack (cross-sell), shown only when metadata provides one
+        const recMeta = this.examData[this.currentExam];
         const recSlot = document.getElementById('results-recommended-pro');
         if (recSlot) {
-            recSlot.innerHTML = this.renderRecommendedPro(this.examData[this.currentExam]);
+            recSlot.innerHTML = this.renderRecommendedPro(recMeta);
             const cta = recSlot.querySelector('.recommended-pro-cta');
-            if (cta) cta.addEventListener('click', () => {
-                window.ExamApp?.analytics?.trackProUnlockClicked?.(this.currentExam);
-            });
+            if (cta) {
+                const targetExam = (recMeta && recMeta.recommendedPro && recMeta.recommendedPro.examId) || this.currentExam;
+                cta.addEventListener('click', () => {
+                    window.ExamApp?.analytics?.trackProUnlockClicked?.(targetExam, 'results_recommended_pro');
+                });
+            }
         }
 
         // Save progress

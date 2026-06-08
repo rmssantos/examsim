@@ -23,6 +23,11 @@ class ClfC02PackTests(unittest.TestCase):
                 isinstance(ref, str) and ref.startswith("https://docs.aws.amazon.com/"),
                 f"{q.get('id')}: bad reference {ref!r}",
             )
+            for extra in q.get("references", []):
+                self.assertTrue(
+                    isinstance(extra, str) and extra.startswith("https://docs.aws.amazon.com/"),
+                    f"{q.get('id')}: bad references[] entry {extra!r}",
+                )
             self.assertTrue(q.get("explanation"), f"{q.get('id')}: missing explanation")
 
     def test_only_supported_clf_formats(self):
