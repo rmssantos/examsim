@@ -1447,3 +1447,8 @@ body:not(.dark-mode) .exam-card.selected .exam-subtitle{color:#475569}
 /* Light mode: tint the content panel so pastel cards gain definition (instead of pale-on-white) */
 body:not(.dark-mode) .home-board{background:linear-gradient(180deg,#ccd8ea 0%,#bccce2 100%)}
 body:not(.dark-mode) .exam-library-section{background:transparent}
+
+/* No shadow on cards in light mode (any state) */
+body:not(.dark-mode) .exam-card,
+body:not(.dark-mode) .exam-card:hover,
+body:not(.dark-mode) .exam-card.selected{box-shadow:none !important}
