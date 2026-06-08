@@ -1427,7 +1427,7 @@ body:not(.dark-mode) .exam-card.custom{background:linear-gradient(135deg,#ede9fe
 body:not(.dark-mode) .exam-card.exam-sc900,
 body:not(.dark-mode) .exam-card.exam-ab730,
 body:not(.dark-mode) .exam-card.exam-ab731,
-body:not(.dark-mode) .exam-card.custom{border:1px solid rgba(30,41,59,.08);box-shadow:0 6px 18px rgba(30,60,114,.06)}
+body:not(.dark-mode) .exam-card.custom{border:1px solid rgba(30,41,59,.1);box-shadow:0 1px 3px rgba(30,60,114,.06)}
 body:not(.dark-mode) .exam-card .exam-title,
 body:not(.dark-mode) .exam-card .exam-stat-number{color:#1f2733}
 body:not(.dark-mode) .exam-card .exam-subtitle{color:#475569}
@@ -1443,3 +1443,7 @@ body:not(.dark-mode) .exam-card:hover .exam-title,
 body:not(.dark-mode) .exam-card.selected .exam-title{color:#1f2733}
 body:not(.dark-mode) .exam-card:hover .exam-subtitle,
 body:not(.dark-mode) .exam-card.selected .exam-subtitle{color:#475569}
+
+/* Light mode: tint the content panel so pastel cards gain definition (instead of pale-on-white) */
+body:not(.dark-mode) .home-board{background:linear-gradient(180deg,#ccd8ea 0%,#bccce2 100%)}
+body:not(.dark-mode) .exam-library-section{background:transparent}
