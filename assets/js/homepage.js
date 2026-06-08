@@ -2355,8 +2355,8 @@ const modal = document.getElementById('exam-config-modal');
 const openBtn = document.getElementById('manage-exams-btn');
 const closeBtn = document.getElementById('close-config-modal');
 
-openBtn.addEventListener('click', () => this.openConfigModal());
-closeBtn.addEventListener('click', () => this.closeConfigModal());
+openBtn?.addEventListener('click', () => this.openConfigModal());
+closeBtn?.addEventListener('click', () => this.closeConfigModal());
 
 // Close on backdrop click
 modal.addEventListener('click', (e) => {
