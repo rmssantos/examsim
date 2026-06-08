@@ -567,19 +567,10 @@ previewFlag.appendChild(this.createIcon('fas fa-gift'));
 previewFlag.appendChild(document.createTextNode(' Free sample'));
 card.appendChild(previewFlag);
 }
-const iconWrap = document.createElement('div');
-iconWrap.className = 'exam-icon-wrap';
-iconWrap.appendChild(this.createIcon(metadata.icon || 'fas fa-book', 'exam-icon'));
-const vendorBrand = this.vendorBrandIcon(metadata.vendor);
-if (vendorBrand && !String(metadata.icon || '').startsWith('fab ')) {
-const vendorMark = document.createElement('span');
-vendorMark.className = 'exam-vendor';
-vendorMark.title = metadata.vendor;
-vendorMark.setAttribute('aria-label', `Vendor: ${metadata.vendor}`);
-vendorMark.appendChild(this.createIcon(vendorBrand));
-iconWrap.appendChild(vendorMark);
-}
-card.appendChild(iconWrap);
+// Use the vendor brand logo as the main icon (same style as SAA-C03), falling
+// back to the per-exam topic icon when there is no known vendor brand.
+const mainIcon = this.vendorBrandIcon(metadata.vendor) || metadata.icon || 'fas fa-book';
+card.appendChild(this.createIcon(mainIcon, 'exam-icon'));
 this.appendTextElement(card, 'div', 'exam-title', metadata.name || examId.toUpperCase());
 this.appendTextElement(card, 'div', 'exam-subtitle', metadata.fullName || 'Custom Exam');
 card.appendChild(this.createExamTaxonomy(examId, examData));

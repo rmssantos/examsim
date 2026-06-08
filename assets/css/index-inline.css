@@ -1413,12 +1413,3 @@ pointer-events: none;
 
 
 
-/* vendor brand mark: small provider seal on the corner of the topic icon */
-.exam-icon-wrap{position:relative;display:inline-block;align-self:flex-start;width:-moz-fit-content;width:fit-content;line-height:1;margin-bottom:.4rem}
-.exam-icon-wrap .exam-icon{margin-bottom:0}
-.exam-icon-wrap .exam-vendor{position:absolute;right:-7px;bottom:-3px;width:19px;height:19px;border-radius:50%;display:grid;place-items:center;font-size:10px;background:var(--card-bg);border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.3);color:var(--text-light)}
-.exam-icon-wrap .exam-vendor .fa-aws{color:#ff9900}
-.exam-icon-wrap .exam-vendor .fa-microsoft{color:#00a4ef}
-.exam-icon-wrap .exam-vendor .fa-google{color:#4285f4}
-[data-theme="dark"] .exam-icon-wrap .exam-vendor,
-.dark-mode .exam-icon-wrap .exam-vendor{background:#2a3340;border-color:rgba(255,255,255,.15)}
