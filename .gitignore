@@ -43,6 +43,8 @@ user-content/exams/*
 !user-content/exams/az104/**
 !user-content/exams/saac03/
 !user-content/exams/saac03/**
+!user-content/exams/clfc02/
+!user-content/exams/clfc02/**
 
 # Private exam backups/zips (keep local only)
 user-content/*.zip
