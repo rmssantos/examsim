@@ -108,10 +108,6 @@
 									<i aria-hidden="true" class="fas fa-play"></i>
 									<span>Start practicing for free</span>
 								</a>
-								<a href="#exam-selection" class="hero-cta-ghost">
-									<span>Browse exams</span>
-									<i aria-hidden="true" class="fas fa-arrow-right"></i>
-								</a>
 							</div>
 						</div>
 						<aside class="hero-proof" aria-label="Library at a glance">
@@ -141,26 +137,14 @@
 						</aside>
 					</div>
 				</header>
+					<!-- How it works -->
+					<ol class="home-steps" aria-label="How Examplar works">
+						<li class="home-step"><span class="home-step-n">1</span><div><h3>Pick an exam</h3><p>Choose from the free library below. No setup.</p></div></li>
+						<li class="home-step"><span class="home-step-n">2</span><div><h3>Practice</h3><p>Timed exam or study mode, with explanations and sources.</p></div></li>
+						<li class="home-step"><span class="home-step-n">3</span><div><h3>Review &amp; track</h3><p>See your readiness and weak areas after each attempt.</p></div></li>
+					</ol>
 
-				<!-- Quick Actions Bar -->
-				<div class="quick-actions">
-					<button id="hero-import-btn" class="action-btn primary" type="button">
-						<i aria-hidden="true" class="fas fa-cloud-arrow-up"></i>
-						<span>Import Exam</span>
-					</button>
-					<a href="editor.html" data-route="editor" class="action-btn secondary">
-						<i aria-hidden="true" class="fas fa-pen-ruler"></i>
-						<span>Create / Edit Exams</span>
-					</a>
-					<button id="hero-view-progress" class="action-btn ghost" type="button">
-						<i aria-hidden="true" class="fas fa-chart-line"></i>
-						<span>View Progress</span>
-					</button>
-					<button id="hero-manage-exams" class="action-btn ghost" type="button">
-						<i aria-hidden="true" class="fas fa-sliders-h"></i>
-						<span>Manage Exams</span>
-					</button>
-				</div>
+
 
 				<!-- Main Content Grid -->
 				<div class="content-grid">
@@ -172,6 +156,12 @@
 									<h2><i aria-hidden="true" class="fas fa-layer-group"></i> Exam Library</h2>
 									<p class="section-subtitle">Select an exam to start practicing</p>
 								</div>
+									<button id="library-filter-toggle" class="library-filter-toggle" type="button" aria-expanded="false" aria-controls="library-search-control library-advanced-filters" aria-label="Show search and filters" title="Show search and filters">
+										<i aria-hidden="true" class="fas fa-bars"></i>
+										<span id="library-filter-toggle-label">Search & filters</span>
+										<strong id="library-filter-count" class="library-filter-count is-hidden">0</strong>
+										<i aria-hidden="true" class="fas fa-chevron-up library-filter-chevron"></i>
+									</button>
 							</div>
 							<div class="library-controls filters-collapsed" id="library-controls" aria-label="Exam library filters">
 								<div class="library-control-topline">
@@ -180,12 +170,6 @@
 										<span class="sr-only">Search exams</span>
 										<input id="library-search" type="search" autocomplete="off" placeholder="Search exams, vendors, domains, modules...">
 									</label>
-									<button id="library-filter-toggle" class="library-filter-toggle" type="button" aria-expanded="false" aria-controls="library-search-control library-advanced-filters" aria-label="Show search and filters" title="Show search and filters">
-										<i aria-hidden="true" class="fas fa-bars"></i>
-										<span id="library-filter-toggle-label">Search & filters</span>
-										<strong id="library-filter-count" class="library-filter-count is-hidden">0</strong>
-										<i aria-hidden="true" class="fas fa-chevron-up library-filter-chevron"></i>
-									</button>
 								</div>
 								<div id="library-advanced-filters" class="library-advanced-filters" aria-hidden="true" inert>
 									<div class="library-filter-row">
@@ -361,7 +345,19 @@
 					</div>
 
 					<!-- Sidebar - Hidden in new layout -->
-					<aside class="sidebar is-hidden">
+					<aside class="sidebar">
+						<!-- First-run: consolidated getting-started (shown only with no selection and no history) -->
+						<div id="home-getting-started" class="getting-started-card is-hidden">
+							<div class="gs-icon"><i aria-hidden="true" class="fas fa-circle-play"></i></div>
+							<h3>You're all set &mdash; pick an exam to begin</h3>
+							<p>Choose any free exam above and start. Your readiness, best score and weak areas show up here after your first attempt.</p>
+							<ul class="gs-points">
+								<li><i aria-hidden="true" class="fas fa-bolt"></i> No setup, no account</li>
+								<li><i aria-hidden="true" class="fas fa-wifi"></i> Works offline after first load</li>
+								<li><i aria-hidden="true" class="fas fa-lock"></i> Your progress stays on this device</li>
+							</ul>
+							<a href="#exam-selection" class="gs-cta"><i aria-hidden="true" class="fas fa-play"></i> Browse the library</a>
+						</div>
 						<!-- Preview Card -->
 						<div class="preview-card" id="hero-preview">
 							<div class="preview-header">
@@ -478,18 +474,31 @@
 								</button>
 							</div>
 						</div>
-
-						<div class="exam-management-buttons">
-							<button id="manage-exams-btn" class="btn-outline-sm">
-								<i aria-hidden="true" class="fas fa-cog"></i> Manage Exams
-							</button>
-							<a href="editor.html" data-route="editor" class="btn-outline-sm">
-								<i aria-hidden="true" class="fas fa-edit"></i> Create / Edit Exams
-							</a>
-						</div>
-					</div>
+					</aside>
 				</div>
-			</section>
+								<!-- Library tools (demoted to the bottom) -->
+					<div class="home-tools">
+						<span class="home-tools-label">Bring your own packs or manage your library</span>
+						<div class="quick-actions">
+					<button id="hero-import-btn" class="action-btn secondary" type="button">
+						<i aria-hidden="true" class="fas fa-cloud-arrow-up"></i>
+						<span>Import Exam</span>
+					</button>
+					<a href="editor.html" data-route="editor" class="action-btn secondary">
+						<i aria-hidden="true" class="fas fa-pen-ruler"></i>
+						<span>Create / Edit Exams</span>
+					</a>
+					<button id="hero-view-progress" class="action-btn ghost" type="button">
+						<i aria-hidden="true" class="fas fa-chart-line"></i>
+						<span>View Progress</span>
+					</button>
+					<button id="hero-manage-exams" class="action-btn ghost" type="button">
+						<i aria-hidden="true" class="fas fa-sliders-h"></i>
+						<span>Manage Exams</span>
+					</button>
+				</div>
+					</div>
+				</section>
 			<footer class="app-footer" aria-label="Project and privacy links">
 				<div class="app-footer-inner">
 					<p class="app-footer-note">

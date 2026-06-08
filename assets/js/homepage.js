@@ -106,6 +106,7 @@ async loadAvailableExams() {
 try {
 const exams = await window.examManager.detectAvailableExams();
 this.availableExams = exams;
+this.buildExamPalette(exams);
 window.ExamApp.log('Detected exams:', exams.size, 'exams');
 window.ExamApp.log('Exam IDs:', Array.from(exams.keys()));
 window.ExamApp.log('All window.userExams:', window.userExams ? Object.keys(window.userExams) : []);
@@ -541,6 +542,15 @@ const totalQuestions = hasDeclaredTotalQuestions ? declaredTotalQuestions : ques
 const card = document.createElement('div');
 card.className = `exam-card ${this.getCardClass(examId)}`;
 card.dataset.exam = examId;
+// Keyboard parity for the clickable card body (it selects/previews the exam).
+card.tabIndex = 0;
+card.setAttribute('aria-label', `${metadata.name || examId} — view details`);
+card.addEventListener('keydown', (e) => {
+	if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('button, a')) {
+		e.preventDefault();
+		void this.selectExam(examId);
+	}
+});
 
 const deleteBtn = document.createElement('button');
 deleteBtn.className = 'exam-delete';
@@ -775,13 +785,32 @@ this._proModalReturnFocus = null;
 if (returnFocus && document.contains(returnFocus)) returnFocus.focus();
 }
 
+// Map each exam to one of a curated, contrast-checked palette (exam-c0..c11),
+// assigning by position in the sorted id list (coprime step) so colours are
+// distinct across the library; falls back to a hashed slot for unknown ids.
 getCardClass(examId) {
-const cardClasses = {
-	sc900: 'exam-sc900',
-	ab730: 'exam-ab730',
-	ab731: 'exam-ab731'
-};
-return cardClasses[String(examId || '').toLowerCase()] || 'custom';
+const idx = this.examPalette && this.examPalette[examId] != null
+	? this.examPalette[examId]
+	: this.examHash(examId) % 12;
+return 'exam-c' + idx;
+}
+
+buildExamPalette(exams) {
+this.examPalette = {};
+Array.from(exams.keys()).sort().forEach((id, n) => {
+	this.examPalette[id] = (n * 5) % 12;
+});
+}
+
+examHash(examId) {
+const s = String(examId || '');
+let h = 2166136261; // FNV-1a + avalanche so near-identical ids land far apart
+for (let i = 0; i < s.length; i++) {
+	h ^= s.charCodeAt(i);
+	h = Math.imul(h, 16777619);
+}
+h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995); h ^= h >>> 15;
+return h >>> 0;
 }
 
 async selectExam(examId) {
@@ -1218,6 +1247,17 @@ const examId = this.selectedExamId || fallbackExamId;
 const examData = examId ? (this.availableExams.get(examId) || window.userExams[examId]) : null;
 const metadata = examData?.metadata || {};
 const stats = examId ? this.getProgressStats(examId) : null;
+
+// First-run consolidation: when there is no selection and no history, show one
+// warm "getting started" panel instead of two cold boxes (preview + progress).
+const isColdStart = !this.selectedExamId && !fallbackExamId;
+const setHidden = (id, hide) => {
+	const el = document.getElementById(id);
+	if (el) window.ExamApp.setElementHidden(el, hide);
+};
+setHidden('home-getting-started', !isColdStart);
+setHidden('hero-preview', isColdStart);
+setHidden('home-progress-section', isColdStart);
 
 if (examData) {
 this.previewExamName.textContent = metadata.name || examId.toUpperCase();
@@ -2333,8 +2373,8 @@ const modal = document.getElementById('exam-config-modal');
 const openBtn = document.getElementById('manage-exams-btn');
 const closeBtn = document.getElementById('close-config-modal');
 
-openBtn.addEventListener('click', () => this.openConfigModal());
-closeBtn.addEventListener('click', () => this.closeConfigModal());
+openBtn?.addEventListener('click', () => this.openConfigModal());
+closeBtn?.addEventListener('click', () => this.closeConfigModal());
 
 // Close on backdrop click
 modal.addEventListener('click', (e) => {

@@ -310,21 +310,19 @@ margin-bottom: 8px;
 }
 
 /* Dynamic exam card variations */
-.exam-card.exam-sc900 {
-background: linear-gradient(135deg, #0f4c81 0%, #137c8b 100%);
-}
-
-.exam-card.exam-ab730 {
-background: linear-gradient(135deg, #0f766e 0%, #16a34a 100%);
-}
-
-.exam-card.exam-ab731 {
-background: linear-gradient(135deg, #92400e 0%, #be123c 100%);
-}
-
-.exam-card.custom {
-background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
-}
+/* Curated, contrast-checked palette (white text passes WCAG AA on every card, both themes) */
+.exam-card.exam-c0{background:linear-gradient(135deg,#7f1d1d 0%,#c0392b 100%)}
+.exam-card.exam-c1{background:linear-gradient(135deg,#7c2d12 0%,#cf4914 100%)}
+.exam-card.exam-c2{background:linear-gradient(135deg,#5c3c00 0%,#8a5a00 100%)}
+.exam-card.exam-c3{background:linear-gradient(135deg,#3f4d0a 0%,#5c7a13 100%)}
+.exam-card.exam-c4{background:linear-gradient(135deg,#14532d 0%,#1e8449 100%)}
+.exam-card.exam-c5{background:linear-gradient(135deg,#0f3d3a 0%,#0e8074 100%)}
+.exam-card.exam-c6{background:linear-gradient(135deg,#0c4a6e 0%,#0e7aa0 100%)}
+.exam-card.exam-c7{background:linear-gradient(135deg,#1e3a8a 0%,#1f6fc4 100%)}
+.exam-card.exam-c8{background:linear-gradient(135deg,#312e81 0%,#4f46c4 100%)}
+.exam-card.exam-c9{background:linear-gradient(135deg,#4c1d95 0%,#7c3aed 100%)}
+.exam-card.exam-c10{background:linear-gradient(135deg,#6b1a6e 0%,#a02fb0 100%)}
+.exam-card.exam-c11{background:linear-gradient(135deg,#831843 0%,#be1d63 100%)}
 
 .exam-card.loading {
 opacity: 0.7;
@@ -370,25 +368,7 @@ pointer-events: none;
     color: #94a3b8;
 }
 
-[data-theme="dark"] .exam-card.custom,
-.dark-mode .exam-card.custom {
-    background: linear-gradient(135deg, #5b21b6 0%, #be185d 100%);
-}
 
-[data-theme="dark"] .exam-card.exam-sc900,
-.dark-mode .exam-card.exam-sc900 {
-    background: linear-gradient(135deg, #0b335f 0%, #0f5f6c 100%);
-}
-
-[data-theme="dark"] .exam-card.exam-ab730,
-.dark-mode .exam-card.exam-ab730 {
-    background: linear-gradient(135deg, #115e59 0%, #15803d 100%);
-}
-
-[data-theme="dark"] .exam-card.exam-ab731,
-.dark-mode .exam-card.exam-ab731 {
-    background: linear-gradient(135deg, #78350f 0%, #9f1239 100%);
-}
 
 /* Config/Manage Exams Modal */
 .config-modal-overlay {
@@ -1380,3 +1360,85 @@ pointer-events: none;
     background: rgba(56, 189, 248, 0.12);
     color: #7dd3fc;
 }
+
+
+/* ---- First-run clarity (feat/home-first-run-clarity) ---- */
+.home-steps{list-style:none;margin:1.1rem 0 .25rem;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.home-step{display:flex;gap:12px;align-items:flex-start;background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.home-step-n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;line-height:1}
+.home-step h3{margin:0 0 2px;font-size:.95rem}
+.home-step p{margin:0;color:var(--text-light);font-size:.82rem;line-height:1.35}
+@media (max-width:760px){.home-steps{grid-template-columns:1fr}}
+
+.getting-started-card{background:linear-gradient(135deg,rgba(0,102,204,.07),rgba(0,188,242,.07));border:1px solid var(--border);border-radius:20px;padding:1.6rem}
+.getting-started-card .gs-icon{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;display:grid;place-items:center;font-size:20px;margin-bottom:.7rem}
+.getting-started-card h3{margin:0 0 .35rem;font-size:1.15rem}
+.getting-started-card>p{margin:0 0 .95rem;color:var(--text-light);line-height:1.45}
+.getting-started-card .gs-points{list-style:none;margin:0 0 1.1rem;padding:0;display:flex;flex-direction:column;gap:.45rem}
+.getting-started-card .gs-points li{display:flex;align-items:center;gap:.6rem;font-size:.92rem}
+.getting-started-card .gs-points i{color:var(--primary);width:16px;text-align:center}
+.getting-started-card .gs-cta{display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;text-decoration:none;font-weight:700;padding:.7rem 1.2rem;border-radius:12px}
+.getting-started-card .gs-cta:hover{filter:brightness(1.05)}
+
+
+/* dark-mode parity for first-run elements (match real panels, not raw --card-bg) */
+[data-theme="dark"] .home-step,
+.dark-mode .home-step{background:rgba(44,55,72,.98);border-color:rgba(255,255,255,.08)}
+[data-theme="dark"] .getting-started-card,
+.dark-mode .getting-started-card{background:linear-gradient(135deg,rgba(15,23,42,.96),rgba(30,41,59,.96));border-color:rgba(0,188,242,.25)}
+
+/* demoted tools row at the bottom of the home board */
+.home-tools{margin:1.6rem 0 .5rem;padding-top:1.1rem;border-top:1px solid var(--border)}
+.home-tools-label{display:block;color:var(--text-light);font-size:.85rem;margin-bottom:.65rem}
+
+
+
+
+/* Compact: Search & filters toggle sits on the Exam Library header row */
+.exam-library-section .section-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.exam-library-section .section-header .library-filter-toggle{flex:none;margin:0}
+.library-controls.filters-collapsed .library-control-topline{display:none}
+
+/* Light mode: distinguish the panels (they were all white with ~6% borders, blending into one block).
+   Mirror dark mode: white board, nested panels in a distinct shade with visible borders. */
+body:not(.dark-mode) .home-board{border-color:rgba(30,60,114,.12)}
+body:not(.dark-mode) .exam-library-section{background:#eef2f8;border:1px solid rgba(30,60,114,.16)}
+body:not(.dark-mode) .home-step{background:#eef2f8;border-color:rgba(30,60,114,.15)}
+body:not(.dark-mode) .getting-started-card{background:#eef2f8;border:1px solid rgba(30,60,114,.16)}
+
+/* Bottom: center the library tools row, and match the footer width to the .home-board panel (1120px) */
+.home-tools{text-align:center}
+.home-tools .quick-actions{justify-content:center}
+.app-footer{width:min(1120px, 100%);max-width:none;margin-left:auto;margin-right:auto}
+
+/* Review fixes: text alignment, consistent radii, dark panel elevation */
+.getting-started-card{text-align:left;border-radius:14px}
+.exam-library-section{border-radius:14px}
+[data-theme="dark"] .exam-library-section,.dark-mode .exam-library-section{background:rgba(40,50,70,.55)}
+[data-theme="dark"] .exam-library-section,.dark-mode .exam-library-section,
+[data-theme="dark"] .getting-started-card,.dark-mode .getting-started-card{box-shadow:0 10px 28px rgba(0,0,0,.32);border-color:rgba(255,255,255,.12)}
+
+/* Review minors */
+/* #9: surface the hero's primary CTA (was display:none) so there is a clear top-of-page action */
+.hero-banner .hero-cta-row{display:flex}
+/* #8: reserve space at the card bottom so the hover action bar doesn't cover the content */
+.exam-card{padding-bottom:2.5rem}
+/* #10: stronger contrast for the "N exams available" label in light mode */
+body:not(.dark-mode) .library-result-count{color:#475569}
+
+/* Second-pass minors */
+/* a11y: visible focus ring on the keyboard-focusable card body */
+.exam-card:focus-visible{outline:2px solid var(--accent,#00bcf2);outline-offset:2px}
+/* light-mode elevation so nested panels read as raised surfaces (match dark) */
+body:not(.dark-mode) .home-step{box-shadow:0 4px 14px rgba(30,60,114,.07)}
+body:not(.dark-mode) .exam-library-section{box-shadow:0 6px 18px rgba(30,60,114,.07)}
+body:not(.dark-mode) .getting-started-card{box-shadow:0 6px 18px rgba(30,60,114,.10);border-color:rgba(30,60,114,.18)}
+
+/* Hero CTA: separate it from the trust chips above and make it less oversized */
+.hero-banner .hero-cta-row{margin-top:1rem}
+.hero-cta-primary{padding:0.55rem 1.15rem;font-size:0.9rem;border-radius:10px;box-shadow:0 6px 16px -8px rgba(0,188,242,0.55),inset 0 1px 0 rgba(255,255,255,0.4)}
+.hero-cta-primary i{font-size:0.85em}
+
+/* Consistency: give the Exam Information (.info-card) cards the same radius + light elevation */
+.info-card{border-radius:14px}
+body:not(.dark-mode) .info-card{box-shadow:0 4px 14px rgba(30,60,114,.07)}
