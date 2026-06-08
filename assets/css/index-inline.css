@@ -1413,3 +1413,8 @@ pointer-events: none;
 
 
 
+
+/* Compact: Search & filters toggle sits on the Exam Library header row */
+.exam-library-section .section-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.exam-library-section .section-header .library-filter-toggle{flex:none;margin:0}
+.library-controls.filters-collapsed .library-control-topline{display:none}
