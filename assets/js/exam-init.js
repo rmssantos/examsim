@@ -162,6 +162,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         passScore: metadata.passScore || 70,
         questions: questions,
         modules: metadata.modules || [],
+        recommendedPro: metadata.recommendedPro || null,
         selectedModules: isCustomModulePractice ? selectedModules : null
       };
 

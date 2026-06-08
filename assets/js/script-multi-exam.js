@@ -1376,6 +1376,16 @@ class MultiExamSimulator {
         return `<div class="explanation-source"><i class="fas fa-book" aria-hidden="true"></i> <strong>Source:</strong> <a href="${this.escapeHtml(ref)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(host)}</a></div>`;
     }
 
+    // Cross-sell a recommended paid pack on the results screen (e.g. CLF-C02 -> SAA-C03).
+    renderRecommendedPro(metadata) {
+        const rec = metadata && metadata.recommendedPro;
+        const url = rec && this.safeExternalUrl(rec.url);
+        if (!url) return '';
+        const title = this.escapeHtml(rec.title || 'Recommended pack');
+        const blurb = this.escapeHtml(rec.blurb || '');
+        return `<div class="recommended-pro"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> <strong>${title}</strong><p>${blurb}</p><a class="recommended-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer">View pack</a></div>`;
+    }
+
     displayOptions(question) {
         const container = document.getElementById('options-container');
         container.innerHTML = '';
@@ -2409,6 +2419,16 @@ class MultiExamSimulator {
 
         // Generate detailed review
         this.generateDetailedReview();
+
+        // Recommended next pack (cross-sell), shown only when metadata provides one
+        const recSlot = document.getElementById('results-recommended-pro');
+        if (recSlot) {
+            recSlot.innerHTML = this.renderRecommendedPro(this.examData[this.currentExam]);
+            const cta = recSlot.querySelector('.recommended-pro-cta');
+            if (cta) cta.addEventListener('click', () => {
+                window.ExamApp?.analytics?.trackProUnlockClicked?.(this.currentExam);
+            });
+        }
 
         // Save progress
         this.saveProgress(score, passed, timeSpent);

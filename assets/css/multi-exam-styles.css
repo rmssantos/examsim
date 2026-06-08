@@ -436,3 +436,9 @@
 /* Source/reference link shown under an explanation or review justification */
 .explanation-source { margin-top: 10px; font-size: 0.85em; opacity: 0.85; }
 .explanation-source i { margin-right: 4px; }
+
+
+/* Recommended-next cross-sell on the results screen */
+.recommended-pro { margin: 12px 0; padding: 14px 16px; border: 1px solid var(--line, #263a54); border-radius: 12px; }
+.recommended-pro p { margin: 6px 0 10px; font-size: 0.9em; opacity: 0.9; }
+.recommended-pro-cta { display: inline-block; font-weight: 600; }
