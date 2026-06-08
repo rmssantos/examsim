@@ -2450,7 +2450,7 @@ class MultiExamSimulator {
             if (cta) {
                 const targetExam = (recMeta && recMeta.recommendedPro && recMeta.recommendedPro.examId) || this.currentExam;
                 cta.addEventListener('click', () => {
-                    window.ExamApp?.analytics?.trackProUnlockClicked?.(targetExam, 'results_recommended_pro');
+                    window.ExamApp?.analytics?.trackRecommendedPackClicked?.(targetExam);
                 });
             }
         }

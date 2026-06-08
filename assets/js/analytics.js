@@ -326,10 +326,17 @@
         });
     }
 
-    function trackProUnlockClicked(examId, placement = 'exam_card') {
+    function trackProUnlockClicked(examId) {
         return trackEvent('pro_unlock_clicked', {
             ...getExamProperties(examId),
-            placement
+            placement: 'exam_card'
+        });
+    }
+
+    function trackRecommendedPackClicked(examId) {
+        return trackEvent('pro_unlock_clicked', {
+            ...getExamProperties(examId),
+            placement: 'results_recommended_pro'
         });
     }
 
@@ -584,6 +591,7 @@
         trackExamStarted,
         trackExamCompleted,
         trackProUnlockClicked,
+        trackRecommendedPackClicked,
         trackProModalOpened,
         trackProPurchaseClicked,
         trackProImportClicked,
