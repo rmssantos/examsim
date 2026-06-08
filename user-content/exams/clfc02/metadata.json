@@ -35,28 +35,52 @@
       "name": "Cloud Concepts",
       "weightRange": "24%",
       "source": "AWS CLF-C02 exam guide",
-      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html"
+      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html",
+      "mappedModules": [
+        "Cloud Value & Economics",
+        "Well-Architected & Design Principles",
+        "Cloud Migration & Adoption"
+      ]
     },
     {
       "code": "CLF-D2",
       "name": "Security and Compliance",
       "weightRange": "30%",
       "source": "AWS CLF-C02 exam guide",
-      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html"
+      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html",
+      "mappedModules": [
+        "Shared Responsibility Model",
+        "IAM & Access Management",
+        "Security Services & Compliance",
+        "Data Protection & Encryption"
+      ]
     },
     {
       "code": "CLF-D3",
       "name": "Cloud Technology and Services",
       "weightRange": "34%",
       "source": "AWS CLF-C02 exam guide",
-      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html"
+      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html",
+      "mappedModules": [
+        "Compute",
+        "Storage",
+        "Networking & Content Delivery",
+        "Databases",
+        "Global Infrastructure & Deployment",
+        "Management & Monitoring"
+      ]
     },
     {
       "code": "CLF-D4",
       "name": "Billing, Pricing, and Support",
       "weightRange": "12%",
       "source": "AWS CLF-C02 exam guide",
-      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html"
+      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html",
+      "mappedModules": [
+        "Pricing Models",
+        "Billing & Cost Management",
+        "Support & Resources"
+      ]
     }
   ],
   "modules": [
@@ -127,10 +151,9 @@
   ],
   "contentReview": {
     "lastReviewed": "2026-06-08",
-    "reviewCadence": "quarterly",
     "sourceOfTruth": "AWS Certified Cloud Practitioner CLF-C02 exam guide",
     "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html",
-    "reviewStatus": "sme-reviewed-accuracy"
+    "objectiveVersion": "CLF-C02 exam guide content outline"
   },
   "resources": [
     {
