@@ -106,6 +106,7 @@ async loadAvailableExams() {
 try {
 const exams = await window.examManager.detectAvailableExams();
 this.availableExams = exams;
+this.buildExamPalette(exams);
 window.ExamApp.log('Detected exams:', exams.size, 'exams');
 window.ExamApp.log('Exam IDs:', Array.from(exams.keys()));
 window.ExamApp.log('All window.userExams:', window.userExams ? Object.keys(window.userExams) : []);
@@ -541,7 +542,6 @@ const totalQuestions = hasDeclaredTotalQuestions ? declaredTotalQuestions : ques
 const card = document.createElement('div');
 card.className = `exam-card ${this.getCardClass(examId)}`;
 card.dataset.exam = examId;
-card.style.setProperty('--exam-hue', String(this.examHue(examId)));
 
 const deleteBtn = document.createElement('button');
 deleteBtn.className = 'exam-delete';
@@ -776,21 +776,32 @@ this._proModalReturnFocus = null;
 if (returnFocus && document.contains(returnFocus)) returnFocus.focus();
 }
 
-getCardClass() {
-return 'exam-themed';
+// Map each exam to one of a curated, contrast-checked palette (exam-c0..c11),
+// assigning by position in the sorted id list (coprime step) so colours are
+// distinct across the library; falls back to a hashed slot for unknown ids.
+getCardClass(examId) {
+const idx = this.examPalette && this.examPalette[examId] != null
+	? this.examPalette[examId]
+	: this.examHash(examId) % 12;
+return 'exam-c' + idx;
 }
 
-// Deterministic hue (0-359) from the exam id, so every exam gets its own
-// stable colour instead of everything falling back to one "custom" gradient.
-examHue(examId) {
+buildExamPalette(exams) {
+this.examPalette = {};
+Array.from(exams.keys()).sort().forEach((id, n) => {
+	this.examPalette[id] = (n * 5) % 12;
+});
+}
+
+examHash(examId) {
 const s = String(examId || '');
-let h = 2166136261; // FNV-1a so near-identical ids (ab730/ab731) get far-apart hues
+let h = 2166136261; // FNV-1a + avalanche so near-identical ids land far apart
 for (let i = 0; i < s.length; i++) {
 	h ^= s.charCodeAt(i);
 	h = Math.imul(h, 16777619);
 }
 h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995); h ^= h >>> 15;
-return (h >>> 0) % 360;
+return h >>> 0;
 }
 
 async selectExam(examId) {

@@ -310,9 +310,19 @@ margin-bottom: 8px;
 }
 
 /* Dynamic exam card variations */
-.exam-card.exam-themed {
-background: linear-gradient(135deg, hsl(var(--exam-hue, 265) 52% 34%) 0%, hsl(calc(var(--exam-hue, 265) + 26) 60% 50%) 100%);
-}
+/* Curated, contrast-checked palette (white text passes WCAG AA on every card, both themes) */
+.exam-card.exam-c0{background:linear-gradient(135deg,#7f1d1d 0%,#c0392b 100%)}
+.exam-card.exam-c1{background:linear-gradient(135deg,#7c2d12 0%,#cf4914 100%)}
+.exam-card.exam-c2{background:linear-gradient(135deg,#5c3c00 0%,#8a5a00 100%)}
+.exam-card.exam-c3{background:linear-gradient(135deg,#3f4d0a 0%,#5c7a13 100%)}
+.exam-card.exam-c4{background:linear-gradient(135deg,#14532d 0%,#1e8449 100%)}
+.exam-card.exam-c5{background:linear-gradient(135deg,#0f3d3a 0%,#0e8074 100%)}
+.exam-card.exam-c6{background:linear-gradient(135deg,#0c4a6e 0%,#0e7aa0 100%)}
+.exam-card.exam-c7{background:linear-gradient(135deg,#1e3a8a 0%,#1f6fc4 100%)}
+.exam-card.exam-c8{background:linear-gradient(135deg,#312e81 0%,#4f46c4 100%)}
+.exam-card.exam-c9{background:linear-gradient(135deg,#4c1d95 0%,#7c3aed 100%)}
+.exam-card.exam-c10{background:linear-gradient(135deg,#6b1a6e 0%,#a02fb0 100%)}
+.exam-card.exam-c11{background:linear-gradient(135deg,#831843 0%,#be1d63 100%)}
 
 .exam-card.loading {
 opacity: 0.7;
@@ -358,10 +368,7 @@ pointer-events: none;
     color: #94a3b8;
 }
 
-[data-theme="dark"] .exam-card.exam-themed,
-.dark-mode .exam-card.exam-themed {
-    background: linear-gradient(135deg, hsl(var(--exam-hue, 265) 46% 26%) 0%, hsl(calc(var(--exam-hue, 265) + 26) 52% 40%) 100%);
-}
+
 
 /* Config/Manage Exams Modal */
 .config-modal-overlay {
@@ -1403,3 +1410,10 @@ body:not(.dark-mode) .getting-started-card{background:#eef2f8;border:1px solid r
 .home-tools{text-align:center}
 .home-tools .quick-actions{justify-content:center}
 .app-footer{width:min(1120px, 100%);max-width:none;margin-left:auto;margin-right:auto}
+
+/* Review fixes: text alignment, consistent radii, dark panel elevation */
+.getting-started-card{text-align:left;border-radius:14px}
+.exam-library-section{border-radius:14px}
+[data-theme="dark"] .exam-library-section,.dark-mode .exam-library-section{background:rgba(40,50,70,.55)}
+[data-theme="dark"] .exam-library-section,.dark-mode .exam-library-section,
+[data-theme="dark"] .getting-started-card,.dark-mode .getting-started-card{box-shadow:0 10px 28px rgba(0,0,0,.32);border-color:rgba(255,255,255,.12)}
