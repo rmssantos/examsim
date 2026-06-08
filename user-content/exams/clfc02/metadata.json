@@ -35,7 +35,7 @@
       "name": "Cloud Concepts",
       "weightRange": "24%",
       "source": "AWS CLF-C02 exam guide",
-      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html",
+      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html",
       "mappedModules": [
         "Cloud Value & Economics",
         "Well-Architected & Design Principles",
@@ -47,7 +47,7 @@
       "name": "Security and Compliance",
       "weightRange": "30%",
       "source": "AWS CLF-C02 exam guide",
-      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html",
+      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html",
       "mappedModules": [
         "Shared Responsibility Model",
         "IAM & Access Management",
@@ -60,7 +60,7 @@
       "name": "Cloud Technology and Services",
       "weightRange": "34%",
       "source": "AWS CLF-C02 exam guide",
-      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html",
+      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html",
       "mappedModules": [
         "Compute",
         "Storage",
@@ -75,7 +75,7 @@
       "name": "Billing, Pricing, and Support",
       "weightRange": "12%",
       "source": "AWS CLF-C02 exam guide",
-      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html",
+      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html",
       "mappedModules": [
         "Pricing Models",
         "Billing & Cost Management",
@@ -152,14 +152,14 @@
   "contentReview": {
     "lastReviewed": "2026-06-08",
     "sourceOfTruth": "AWS Certified Cloud Practitioner CLF-C02 exam guide",
-    "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html",
+    "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html",
     "objectiveVersion": "CLF-C02 exam guide content outline"
   },
   "resources": [
     {
       "icon": "fas fa-book",
       "name": "AWS CLF-C02 Exam Guide",
-      "url": "https://docs.aws.amazon.com/aws-certification/latest/examguides/cloud-practitioner-02.html"
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html"
     },
     {
       "icon": "fas fa-graduation-cap",
