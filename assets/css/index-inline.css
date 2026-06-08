@@ -1425,3 +1425,11 @@ body:not(.dark-mode) .getting-started-card{background:#eef2f8;border:1px solid r
 .exam-card{padding-bottom:2.5rem}
 /* #10: stronger contrast for the "N exams available" label in light mode */
 body:not(.dark-mode) .library-result-count{color:#475569}
+
+/* Second-pass minors */
+/* a11y: visible focus ring on the keyboard-focusable card body */
+.exam-card:focus-visible{outline:2px solid var(--accent,#00bcf2);outline-offset:2px}
+/* light-mode elevation so nested panels read as raised surfaces (match dark) */
+body:not(.dark-mode) .home-step{box-shadow:0 4px 14px rgba(30,60,114,.07)}
+body:not(.dark-mode) .exam-library-section{box-shadow:0 6px 18px rgba(30,60,114,.07)}
+body:not(.dark-mode) .getting-started-card{box-shadow:0 6px 18px rgba(30,60,114,.10);border-color:rgba(30,60,114,.18)}

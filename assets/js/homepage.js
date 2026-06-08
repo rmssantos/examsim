@@ -542,6 +542,15 @@ const totalQuestions = hasDeclaredTotalQuestions ? declaredTotalQuestions : ques
 const card = document.createElement('div');
 card.className = `exam-card ${this.getCardClass(examId)}`;
 card.dataset.exam = examId;
+// Keyboard parity for the clickable card body (it selects/previews the exam).
+card.tabIndex = 0;
+card.setAttribute('aria-label', `${metadata.name || examId} — view details`);
+card.addEventListener('keydown', (e) => {
+	if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('button, a')) {
+		e.preventDefault();
+		void this.selectExam(examId);
+	}
+});
 
 const deleteBtn = document.createElement('button');
 deleteBtn.className = 'exam-delete';
