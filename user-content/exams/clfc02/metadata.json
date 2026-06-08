@@ -1,0 +1,185 @@
+{
+  "id": "clfc02",
+  "name": "CLF-C02",
+  "fullName": "AWS Certified Cloud Practitioner",
+  "description": "Free AWS Certified Cloud Practitioner (CLF-C02) practice exam. Original questions written from public AWS documentation, aligned to the official exam guide. Not real exam questions.",
+  "duration": 90,
+  "questionCount": 65,
+  "totalQuestions": 130,
+  "passScore": 70,
+  "language": "en",
+  "schemaVersion": "1.1",
+  "badge": "Foundational",
+  "icon": "fas fa-cloud",
+  "vendor": "AWS",
+  "certificationCode": "CLF-C02",
+  "domains": [
+    "Cloud",
+    "AWS",
+    "Fundamentals"
+  ],
+  "level": "Foundational",
+  "productFamily": "AWS",
+  "contentType": "practice-exam",
+  "commercialStatus": "free",
+  "contentOrigin": "original",
+  "recommendedPro": {
+    "examId": "saac03",
+    "title": "AWS SAA-C03 Complete",
+    "url": "https://examplar.gumroad.com/l/SAA-C03-complete",
+    "blurb": "Passed the fundamentals? Level up to AWS Solutions Architect with the SAA-C03 Complete pack."
+  },
+  "objectiveDomains": [
+    {
+      "code": "CLF-D1",
+      "name": "Cloud Concepts",
+      "weightRange": "24%",
+      "source": "AWS CLF-C02 exam guide",
+      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html",
+      "mappedModules": [
+        "Cloud Value & Economics",
+        "Well-Architected Pillars",
+        "Cloud Design Principles",
+        "Cloud Deployment & Service Models",
+        "Cloud Migration & Adoption"
+      ]
+    },
+    {
+      "code": "CLF-D2",
+      "name": "Security and Compliance",
+      "weightRange": "30%",
+      "source": "AWS CLF-C02 exam guide",
+      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html",
+      "mappedModules": [
+        "Shared Responsibility Model",
+        "IAM & Access Management",
+        "Security Services & Compliance",
+        "Data Protection & Encryption"
+      ]
+    },
+    {
+      "code": "CLF-D3",
+      "name": "Cloud Technology and Services",
+      "weightRange": "34%",
+      "source": "AWS CLF-C02 exam guide",
+      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html",
+      "mappedModules": [
+        "Compute",
+        "Storage",
+        "Networking & Content Delivery",
+        "Databases",
+        "Global Infrastructure & Deployment",
+        "Management & Monitoring"
+      ]
+    },
+    {
+      "code": "CLF-D4",
+      "name": "Billing, Pricing, and Support",
+      "weightRange": "12%",
+      "source": "AWS CLF-C02 exam guide",
+      "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html",
+      "mappedModules": [
+        "Pricing Models",
+        "Billing & Cost Management",
+        "Support & Resources"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "icon": "fas fa-coins",
+      "name": "Cloud Value & Economics"
+    },
+    {
+      "icon": "fas fa-columns",
+      "name": "Well-Architected Pillars"
+    },
+    {
+      "icon": "fas fa-drafting-compass",
+      "name": "Cloud Design Principles"
+    },
+    {
+      "icon": "fas fa-layer-group",
+      "name": "Cloud Deployment & Service Models"
+    },
+    {
+      "icon": "fas fa-truck-moving",
+      "name": "Cloud Migration & Adoption"
+    },
+    {
+      "icon": "fas fa-people-arrows",
+      "name": "Shared Responsibility Model"
+    },
+    {
+      "icon": "fas fa-id-badge",
+      "name": "IAM & Access Management"
+    },
+    {
+      "icon": "fas fa-shield-halved",
+      "name": "Security Services & Compliance"
+    },
+    {
+      "icon": "fas fa-lock",
+      "name": "Data Protection & Encryption"
+    },
+    {
+      "icon": "fas fa-server",
+      "name": "Compute"
+    },
+    {
+      "icon": "fas fa-database",
+      "name": "Storage"
+    },
+    {
+      "icon": "fas fa-network-wired",
+      "name": "Networking & Content Delivery"
+    },
+    {
+      "icon": "fas fa-table",
+      "name": "Databases"
+    },
+    {
+      "icon": "fas fa-globe",
+      "name": "Global Infrastructure & Deployment"
+    },
+    {
+      "icon": "fas fa-gauge-high",
+      "name": "Management & Monitoring"
+    },
+    {
+      "icon": "fas fa-tags",
+      "name": "Pricing Models"
+    },
+    {
+      "icon": "fas fa-file-invoice-dollar",
+      "name": "Billing & Cost Management"
+    },
+    {
+      "icon": "fas fa-headset",
+      "name": "Support & Resources"
+    }
+  ],
+  "contentReview": {
+    "lastReviewed": "2026-06-08",
+    "sourceOfTruth": "AWS Certified Cloud Practitioner CLF-C02 exam guide",
+    "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html",
+    "objectiveVersion": "CLF-C02 exam guide content outline"
+  },
+  "resources": [
+    {
+      "icon": "fas fa-book",
+      "name": "AWS CLF-C02 Exam Guide",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html"
+    },
+    {
+      "icon": "fas fa-graduation-cap",
+      "name": "AWS Certified Cloud Practitioner",
+      "url": "https://aws.amazon.com/certification/certified-cloud-practitioner/"
+    },
+    {
+      "icon": "fas fa-file-lines",
+      "name": "AWS documentation",
+      "url": "https://docs.aws.amazon.com/"
+    }
+  ]
+}

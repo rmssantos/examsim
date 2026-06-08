@@ -590,6 +590,7 @@ class MultiExamSimulator {
                 passScore: metadata.passScore || 70,
                 questions: fromMemory.questions,
                 modules: metadata.modules || [],
+                recommendedPro: metadata.recommendedPro || null,
                 resources: metadata.resources || []
             };
             return true;
@@ -616,6 +617,7 @@ class MultiExamSimulator {
                 passScore: metadata.passScore || 70,
                 questions,
                 modules: metadata.modules || [],
+                recommendedPro: metadata.recommendedPro || null,
                 resources: metadata.resources || []
             };
             return true;
@@ -1369,11 +1371,40 @@ class MultiExamSimulator {
     // Render a "Source" link to the question's reference, only when it points to an
     // allowlisted official documentation host (same trust gate as inline doc links).
     renderReferenceLink(question) {
-        const ref = question && this.safeUrl(question.reference);
-        if (!ref || !isOfficialDocumentationUrl(ref)) return '';
-        let host = 'documentation';
-        try { host = new URL(ref).hostname.replace(/^www\./, ''); } catch (_) {}
-        return `<div class="explanation-source"><i class="fas fa-book" aria-hidden="true"></i> <strong>Source:</strong> <a href="${this.escapeHtml(ref)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(host)}</a></div>`;
+        if (!question) return '';
+        const raw = Array.isArray(question.references) && question.references.length
+            ? question.references : [question.reference];
+        const hrefs = [];
+        const seen = new Set();
+        for (const r of raw) {
+            const ref = this.safeUrl(r);
+            if (!ref || !isOfficialDocumentationUrl(ref) || seen.has(ref)) continue;
+            seen.add(ref);
+            hrefs.push(ref);
+        }
+        if (!hrefs.length) return '';
+        if (hrefs.length === 1) {
+            let host = 'documentation';
+            try { host = new URL(hrefs[0]).hostname.replace(/^www\./, ''); } catch (_) {}
+            const link = `<a href="${this.escapeHtml(hrefs[0])}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(host)}</a>`;
+            return `<div class="explanation-source"><i class="fas fa-book" aria-hidden="true"></i> <strong>Source:</strong> ${link}</div>`;
+        }
+        const links = hrefs.map((h, i) => {
+            let host = 'documentation';
+            try { host = new URL(h).hostname.replace(/^www\./, ''); } catch (_) {}
+            return `<a href="${this.escapeHtml(h)}" target="_blank" rel="noopener noreferrer" aria-label="Source ${i + 1} (${this.escapeHtml(host)})">Source ${i + 1}</a>`;
+        }).join(' &middot; ');
+        return `<div class="explanation-source"><i class="fas fa-book" aria-hidden="true"></i> <strong>Sources:</strong> ${links}</div>`;
+    }
+
+    // Cross-sell a recommended paid pack on the results screen (e.g. CLF-C02 -> SAA-C03).
+    renderRecommendedPro(metadata) {
+        const rec = metadata && metadata.recommendedPro;
+        const url = rec && this.safeUrl(rec.url);
+        if (!url) return '';
+        const title = this.escapeHtml(rec.title || 'Recommended pack');
+        const blurb = this.escapeHtml(rec.blurb || '');
+        return `<div class="recommended-pro"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> <strong>${title}</strong><p>${blurb}</p><a class="recommended-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer">View pack</a></div>`;
     }
 
     displayOptions(question) {
@@ -2409,6 +2440,21 @@ class MultiExamSimulator {
 
         // Generate detailed review
         this.generateDetailedReview();
+
+        // Recommended next pack (cross-sell), shown only when metadata provides one
+        const recMeta = this.examData[this.currentExam];
+        const recSlot = document.getElementById('results-recommended-pro');
+        if (recSlot) {
+            recSlot.innerHTML = this.renderRecommendedPro(recMeta);
+            const cta = recSlot.querySelector('.recommended-pro-cta');
+            if (cta) {
+                // Attribute the click to the source exam (the one just completed); the
+                // 'results_recommended_pro' placement already identifies it as the cross-sell.
+                cta.addEventListener('click', () => {
+                    window.ExamApp?.analytics?.trackRecommendedPackClicked?.(this.currentExam);
+                });
+            }
+        }
 
         // Save progress
         this.saveProgress(score, passed, timeSpent);

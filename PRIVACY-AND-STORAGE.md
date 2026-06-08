@@ -44,7 +44,7 @@ The public deployment can collect:
 - external referrer hostname without the full URL or path.
 
 Bundled exam labels are restricted to `ab730`, `ab731`, `sc900`, `az900`,
-`az104`, and `saac03`. Other exam IDs are reported only as `imported`.
+`az104`, `saac03`, and `clfc02`. Other exam IDs are reported only as `imported`.
 
 Azure Application Insights temporarily uses the sender IP to derive coarse
 country, region, and city information. Under the configured default behavior,

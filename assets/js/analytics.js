@@ -7,7 +7,7 @@
         connectionString: '__APPINSIGHTS_CONNECTION_STRING__',
         optOutKey: 'exam_analytics_opt_out',
         analyticsVersion: '1.2.0',
-        publicExamIds: Object.freeze(['ab730', 'ab731', 'sc900', 'az900', 'az104', 'saac03'])
+        publicExamIds: Object.freeze(['ab730', 'ab731', 'sc900', 'az900', 'az104', 'saac03', 'clfc02'])
     });
 
     const connection = parseConnectionString(CONFIG.connectionString);
@@ -333,6 +333,13 @@
         });
     }
 
+    function trackRecommendedPackClicked(examId) {
+        return trackEvent('pro_unlock_clicked', {
+            ...getExamProperties(examId),
+            placement: 'results_recommended_pro'
+        });
+    }
+
     function trackProModalOpened(examId) {
         return trackEvent('pro_modal_opened', getExamProperties(examId));
     }
@@ -584,6 +591,7 @@
         trackExamStarted,
         trackExamCompleted,
         trackProUnlockClicked,
+        trackRecommendedPackClicked,
         trackProModalOpened,
         trackProPurchaseClicked,
         trackProImportClicked,

@@ -1,0 +1,2290 @@
+[
+  {
+    "id": "CLFC02-PRO-001",
+    "module": "Cloud Value & Economics",
+    "skill": "Define the value and economics of the AWS Cloud",
+    "question": "You are administering an AWS environment and need to replace a large fixed upfront server purchase with an expense you pay only as you consume capacity. Which option best meets the requirement?",
+    "options": [
+      "Economies of scale",
+      "Elasticity",
+      "Go global in minutes",
+      "Pay-as-you-go pricing"
+    ],
+    "correct": 3,
+    "explanation": "Pay-as-you-go pricing is correct because Pay-as-you-go converts fixed capital expense into variable expense billed only for what you use. Distractors: Economies of scale lowers prices as aggregated usage grows. Elasticity scales capacity up and down to match demand. Go global in minutes deploys to multiple Regions quickly.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-002",
+    "module": "Cloud Value & Economics",
+    "skill": "Define the value and economics of the AWS Cloud",
+    "question": "A design review identifies this requirement: get progressively lower prices because AWS aggregates demand from hundreds of thousands of customers. What should you configure?",
+    "options": [
+      "Go global in minutes",
+      "Total Cost of Ownership (TCO)",
+      "Economies of scale",
+      "Elasticity"
+    ],
+    "correct": 2,
+    "explanation": "Economies of scale is correct because Aggregated usage gives AWS economies of scale that translate into lower pay-as-you-go prices over time. Distractors: Go global in minutes deploys to multiple Regions quickly. Total Cost of Ownership (TCO) compares full on-premises versus cloud cost. Elasticity scales capacity up and down to match demand.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-003",
+    "module": "Cloud Value & Economics",
+    "skill": "Define the value and economics of the AWS Cloud",
+    "question": "Which AWS capability is the best fit when the requirement is to automatically add and remove capacity so you reduce paying for idle servers and avoid running short at peak?",
+    "options": [
+      "Stop spending on undifferentiated heavy lifting",
+      "Elasticity",
+      "Go global in minutes",
+      "Total Cost of Ownership (TCO)"
+    ],
+    "correct": 1,
+    "explanation": "Elasticity is correct because Elasticity acquires resources when needed and releases them when not, reducing over-provisioning. Distractors: Stop spending on undifferentiated heavy lifting removes data-center operational work. Go global in minutes deploys to multiple Regions quickly. Total Cost of Ownership (TCO) compares full on-premises versus cloud cost.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-004",
+    "module": "Cloud Value & Economics",
+    "skill": "Define the value and economics of the AWS Cloud",
+    "question": "Select the two configurations that best support these requirements: launch the same application in data centers on other continents within minutes; and provision a new test environment in minutes instead of waiting weeks for hardware.",
+    "options": [
+      "Stop spending on undifferentiated heavy lifting",
+      "Go global in minutes",
+      "Increased speed and agility",
+      "Elasticity",
+      "Total Cost of Ownership (TCO)"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "Go global in minutes is correct: AWS global infrastructure lets you deploy to multiple Regions worldwide quickly for lower latency to users. Increased speed and agility is correct: In the cloud new resources are a click away, cutting provisioning from weeks to minutes. Elasticity scales capacity up and down to match demand. Total Cost of Ownership (TCO) compares full on-premises versus cloud cost. Stop spending on undifferentiated heavy lifting removes data-center operational work.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+    "references": [
+      "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+      "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-005",
+    "module": "Cloud Value & Economics",
+    "skill": "Define the value and economics of the AWS Cloud",
+    "question": "An operations team wants to compare the relevant direct and indirect costs of running on premises versus on AWS. Which choice is most appropriate?",
+    "options": [
+      "Stop spending on undifferentiated heavy lifting",
+      "Increased speed and agility",
+      "Stop guessing capacity",
+      "Total Cost of Ownership (TCO)"
+    ],
+    "correct": 3,
+    "explanation": "Total Cost of Ownership (TCO) is correct because TCO compares relevant direct and indirect costs; AWS avoids physical data-center work, though customers still administer their workloads. Distractors: Stop spending on undifferentiated heavy lifting removes data-center operational work. Increased speed and agility makes new resources available in minutes. Stop guessing capacity removes the need to forecast capacity.",
+    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/migration-tools/business-case.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-006",
+    "module": "Cloud Value & Economics",
+    "skill": "Define the value and economics of the AWS Cloud",
+    "question": "During implementation, you must let engineers stop racking, powering, and cooling servers so they focus on the product. Which AWS feature should you choose?",
+    "options": [
+      "Stop guessing capacity",
+      "Pay-as-you-go pricing",
+      "Stop spending on undifferentiated heavy lifting",
+      "Increased speed and agility"
+    ],
+    "correct": 2,
+    "explanation": "Stop spending on undifferentiated heavy lifting is correct because AWS removes the undifferentiated work of running data centers so teams focus on what differentiates the business. Distractors: Stop guessing capacity removes the need to forecast capacity. Pay-as-you-go pricing bills only for what you consume. Increased speed and agility makes new resources available in minutes.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-007",
+    "module": "Cloud Value & Economics",
+    "skill": "Define the value and economics of the AWS Cloud",
+    "question": "An organization has the following requirement: provision a new test environment in minutes instead of waiting weeks for hardware. What is the least-complex correct option?",
+    "options": [
+      "Economies of scale",
+      "Increased speed and agility",
+      "Stop guessing capacity",
+      "Pay-as-you-go pricing"
+    ],
+    "correct": 1,
+    "explanation": "Increased speed and agility is correct because In the cloud new resources are a click away, cutting provisioning from weeks to minutes. Distractors: Economies of scale lowers prices as aggregated usage grows. Stop guessing capacity removes the need to forecast capacity. Pay-as-you-go pricing bills only for what you consume.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-008",
+    "module": "Cloud Value & Economics",
+    "skill": "Define the value and economics of the AWS Cloud",
+    "question": "Which two options together satisfy these requirements: avoid buying too much or too little hardware by no longer forecasting capacity before launch; and automatically add and remove capacity so you reduce paying for idle servers and avoid running short at peak?",
+    "options": [
+      "Economies of scale",
+      "Go global in minutes",
+      "Stop guessing capacity",
+      "Elasticity",
+      "Pay-as-you-go pricing"
+    ],
+    "correct": [
+      2,
+      3
+    ],
+    "explanation": "Stop guessing capacity is correct: You scale on demand rather than guessing capacity in advance, avoiding waste or shortfalls. Elasticity is correct: Elasticity acquires resources when needed and releases them when not, reducing over-provisioning. Pay-as-you-go pricing bills only for what you consume. Economies of scale lowers prices as aggregated usage grows. Go global in minutes deploys to multiple Regions quickly.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+    "references": [
+      "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+      "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-009",
+    "module": "Well-Architected Pillars",
+    "skill": "Identify the pillars of the AWS Well-Architected Framework",
+    "question": "What should be configured first when the goal is to run and monitor systems to deliver business value and continuously improve supporting processes?",
+    "options": [
+      "Security pillar",
+      "Reliability pillar",
+      "Performance Efficiency pillar",
+      "Operational Excellence pillar"
+    ],
+    "correct": 3,
+    "explanation": "Operational Excellence pillar is correct because The Operational Excellence pillar focuses on running, monitoring, and continuously improving systems and processes. Distractors: Security pillar is the pillar for protecting systems and data. Reliability pillar is the pillar for recovering from failure and meeting demand. Performance Efficiency pillar is the pillar for using resources efficiently.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-010",
+    "module": "Well-Architected Pillars",
+    "skill": "Identify the pillars of the AWS Well-Architected Framework",
+    "question": "Your team needs to protect information and systems through identity, detection, and data protection. Which AWS option should you use?",
+    "options": [
+      "Performance Efficiency pillar",
+      "Cost Optimization pillar",
+      "Security pillar",
+      "Reliability pillar"
+    ],
+    "correct": 2,
+    "explanation": "Security pillar is correct because The Security pillar covers identity and access, detection, infrastructure and data protection, and incident response. Distractors: Performance Efficiency pillar is the pillar for using resources efficiently. Cost Optimization pillar is the pillar for avoiding unnecessary cost. Reliability pillar is the pillar for recovering from failure and meeting demand.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-011",
+    "module": "Well-Architected Pillars",
+    "skill": "Identify the pillars of the AWS Well-Architected Framework",
+    "question": "To ensure a workload performs its intended function correctly and recovers from failures, which AWS capability should you choose?",
+    "options": [
+      "Sustainability pillar",
+      "Reliability pillar",
+      "Performance Efficiency pillar",
+      "Cost Optimization pillar"
+    ],
+    "correct": 1,
+    "explanation": "Reliability pillar is correct because The Reliability pillar focuses on recovering from failures and consistently meeting demand. Distractors: Sustainability pillar is the pillar for minimizing environmental impact. Performance Efficiency pillar is the pillar for using resources efficiently. Cost Optimization pillar is the pillar for avoiding unnecessary cost.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-012",
+    "module": "Well-Architected Pillars",
+    "skill": "Identify the pillars of the AWS Well-Architected Framework",
+    "question": "Choose the two AWS capabilities that meet these needs: use computing resources efficiently and maintain that efficiency as demand changes; and run and monitor systems to deliver business value and continuously improve supporting processes.",
+    "options": [
+      "Security pillar",
+      "Reliability pillar",
+      "Cost Optimization pillar",
+      "Performance Efficiency pillar",
+      "Operational Excellence pillar"
+    ],
+    "correct": [
+      3,
+      4
+    ],
+    "explanation": "Performance Efficiency pillar is correct: The Performance Efficiency pillar focuses on using resources efficiently as requirements evolve. Operational Excellence pillar is correct: The Operational Excellence pillar focuses on running, monitoring, and continuously improving systems and processes. Security pillar is the pillar for protecting systems and data. Reliability pillar is the pillar for recovering from failure and meeting demand. Cost Optimization pillar is the pillar for avoiding unnecessary cost.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html",
+    "references": [
+      "https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html",
+      "https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-013",
+    "module": "Well-Architected Pillars",
+    "skill": "Identify the pillars of the AWS Well-Architected Framework",
+    "question": "A workload requires that you avoid unnecessary cost and understand where money is being spent. What is the correct choice?",
+    "options": [
+      "Sustainability pillar",
+      "Operational Excellence pillar",
+      "Security pillar",
+      "Cost Optimization pillar"
+    ],
+    "correct": 3,
+    "explanation": "Cost Optimization pillar is correct because The Cost Optimization pillar focuses on avoiding unneeded cost and getting the best value for spend. Distractors: Sustainability pillar is the pillar for minimizing environmental impact. Operational Excellence pillar is the pillar for running and improving systems. Security pillar is the pillar for protecting systems and data.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-014",
+    "module": "Well-Architected Pillars",
+    "skill": "Identify the pillars of the AWS Well-Architected Framework",
+    "question": "As the AWS administrator, you are asked to minimize the environmental impact and energy use of running cloud workloads. What do you select?",
+    "options": [
+      "Security pillar",
+      "Reliability pillar",
+      "Sustainability pillar",
+      "Operational Excellence pillar"
+    ],
+    "correct": 2,
+    "explanation": "Sustainability pillar is correct because The Sustainability pillar focuses on reducing energy use and improving efficiency across the workload. Distractors: Security pillar is the pillar for protecting systems and data. Reliability pillar is the pillar for recovering from failure and meeting demand. Operational Excellence pillar is the pillar for running and improving systems.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-015",
+    "module": "Cloud Design Principles",
+    "skill": "Identify AWS cloud design principles",
+    "question": "Which AWS feature lets you assume any component can fail and add redundancy so the system keeps running?",
+    "options": [
+      "Use managed services",
+      "Design for failure and build redundancy",
+      "Loose coupling",
+      "Automation"
+    ],
+    "correct": 1,
+    "explanation": "Design for failure and build redundancy is correct because Designing for failure and adding redundancy removes single points of failure so the system tolerates component loss. Distractors: Use managed services shifts operational work to AWS. Loose coupling is a design principle reducing dependencies between components. Automation is a design principle replacing manual steps with code.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/design-principles.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-016",
+    "module": "Cloud Design Principles",
+    "skill": "Identify AWS cloud design principles",
+    "question": "Which option should you implement to reduce dependencies between components so they can change or fail independently?",
+    "options": [
+      "Loose coupling",
+      "Automation",
+      "Use managed services",
+      "Make data-driven decisions"
+    ],
+    "correct": 0,
+    "explanation": "Loose coupling is correct because Loose coupling reduces interdependencies through defined interfaces so components evolve and fail independently. Distractors: Automation is a design principle replacing manual steps with code. Use managed services shifts operational work to AWS. Make data-driven decisions is a different AWS capability and does not best satisfy this requirement.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_prevent_interaction_failure_loosely_coupled_system.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-017",
+    "module": "Cloud Design Principles",
+    "skill": "Identify AWS cloud design principles",
+    "question": "You need a solution to replace manual, error-prone setup with repeatable code that applies changes consistently. Which option fits best?",
+    "options": [
+      "Use managed services",
+      "Make data-driven decisions",
+      "Design for failure and build redundancy",
+      "Automation"
+    ],
+    "correct": 3,
+    "explanation": "Automation is correct because Automating with code reduces human error and makes changes consistent and repeatable. Distractors: Use managed services shifts operational work to AWS. Make data-driven decisions is a different AWS capability and does not best satisfy this requirement. Design for failure and build redundancy is a design principle for removing single points of failure.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/general-design-principles.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-018",
+    "module": "Cloud Design Principles",
+    "skill": "Identify AWS cloud design principles",
+    "question": "Two requirements must be met: offload undifferentiated operational work by letting AWS run the service infrastructure; and reduce dependencies between components so they can change or fail independently. Select the two correct options.",
+    "options": [
+      "Design for failure and build redundancy",
+      "Automation",
+      "Use managed services",
+      "Loose coupling",
+      "Make data-driven decisions"
+    ],
+    "correct": [
+      2,
+      3
+    ],
+    "explanation": "Use managed services is correct: Using AWS managed services shifts operational and maintenance work to AWS so teams focus on the application. Loose coupling is correct: Loose coupling reduces interdependencies through defined interfaces so components evolve and fail independently. Make data-driven decisions is a different AWS capability and does not best satisfy this requirement. Design for failure and build redundancy is a design principle for removing single points of failure. Automation is a design principle replacing manual steps with code.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/sus_sus_hardware_a4.html",
+    "references": [
+      "https://docs.aws.amazon.com/wellarchitected/latest/framework/sus_sus_hardware_a4.html",
+      "https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_prevent_interaction_failure_loosely_coupled_system.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-019",
+    "module": "Cloud Design Principles",
+    "skill": "Identify AWS cloud design principles",
+    "question": "You are administering an AWS environment and need to collect data about how the architecture performs and use it to choose and improve the design. Which option best meets the requirement?",
+    "options": [
+      "Automation",
+      "Make data-driven decisions",
+      "Design for failure and build redundancy",
+      "Loose coupling"
+    ],
+    "correct": 1,
+    "explanation": "Make data-driven decisions is correct because AWS recommends driving architecture decisions using data collected about how the workload actually performs. Distractors: Automation is a design principle replacing manual steps with code. Design for failure and build redundancy is a design principle for removing single points of failure. Loose coupling is a design principle reducing dependencies between components.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/general-design-principles.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-020",
+    "module": "Cloud Deployment & Service Models",
+    "skill": "Identify cloud deployment and service models",
+    "question": "A design review identifies this requirement: run every part of an application in the cloud with no on-premises infrastructure. What should you configure?",
+    "options": [
+      "Cloud (all-in) deployment model",
+      "Hybrid deployment model",
+      "On-premises (private cloud) deployment model",
+      "Infrastructure as a Service (IaaS)"
+    ],
+    "correct": 0,
+    "explanation": "Cloud (all-in) deployment model is correct because An all-in cloud deployment runs the entire application in the cloud. Distractors: Hybrid deployment model is a different AWS capability and does not best satisfy this requirement. On-premises (private cloud) deployment model is a different AWS capability and does not best satisfy this requirement. Infrastructure as a Service (IaaS) is a different AWS capability and does not best satisfy this requirement.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-021",
+    "module": "Cloud Deployment & Service Models",
+    "skill": "Identify cloud deployment and service models",
+    "question": "Which AWS capability is the best fit when the requirement is to connect on-premises infrastructure with cloud resources so they work together?",
+    "options": [
+      "On-premises (private cloud) deployment model",
+      "Infrastructure as a Service (IaaS)",
+      "Platform as a Service (PaaS)",
+      "Hybrid deployment model"
+    ],
+    "correct": 3,
+    "explanation": "Hybrid deployment model is correct because A hybrid deployment connects on-premises infrastructure with cloud resources, for example using AWS Outposts or VMware Cloud on AWS. Distractors: On-premises (private cloud) deployment model is a different AWS capability and does not best satisfy this requirement. Infrastructure as a Service (IaaS) is a different AWS capability and does not best satisfy this requirement. Platform as a Service (PaaS) is a different AWS capability and does not best satisfy this requirement.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-022",
+    "module": "Cloud Deployment & Service Models",
+    "skill": "Identify cloud deployment and service models",
+    "question": "An operations team wants to keep running applications in your own data center using virtualization and resource management. Which choice is most appropriate?",
+    "options": [
+      "Platform as a Service (PaaS)",
+      "Software as a Service (SaaS)",
+      "On-premises (private cloud) deployment model",
+      "Infrastructure as a Service (IaaS)"
+    ],
+    "correct": 2,
+    "explanation": "On-premises (private cloud) deployment model is correct because An on-premises or private-cloud deployment runs applications in your own data center using virtualization and management tools. Distractors: Platform as a Service (PaaS) is a different AWS capability and does not best satisfy this requirement. Software as a Service (SaaS) is a different AWS capability and does not best satisfy this requirement. Infrastructure as a Service (IaaS) is a different AWS capability and does not best satisfy this requirement.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-023",
+    "module": "Cloud Deployment & Service Models",
+    "skill": "Identify cloud deployment and service models",
+    "question": "Pick the two features that address these requirements: rent virtual servers, storage, and networking while you manage the operating system and applications; and run every part of an application in the cloud with no on-premises infrastructure.",
+    "options": [
+      "On-premises (private cloud) deployment model",
+      "Platform as a Service (PaaS)",
+      "Infrastructure as a Service (IaaS)",
+      "Cloud (all-in) deployment model",
+      "Hybrid deployment model"
+    ],
+    "correct": [
+      2,
+      3
+    ],
+    "explanation": "Infrastructure as a Service (IaaS) is correct: IaaS provides the basic building blocks of compute, storage, and networking while the customer manages the OS and applications. Cloud (all-in) deployment model is correct: An all-in cloud deployment runs the entire application in the cloud. Hybrid deployment model is a different AWS capability and does not best satisfy this requirement. On-premises (private cloud) deployment model is a different AWS capability and does not best satisfy this requirement. Platform as a Service (PaaS) is a different AWS capability and does not best satisfy this requirement.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/gxp-systems-on-aws/infrastructure-description-and-controls.html",
+    "references": [
+      "https://docs.aws.amazon.com/whitepapers/latest/gxp-systems-on-aws/infrastructure-description-and-controls.html",
+      "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-024",
+    "module": "Cloud Deployment & Service Models",
+    "skill": "Identify cloud deployment and service models",
+    "question": "During implementation, you must use a managed platform to build and run applications without managing the underlying OS or servers. Which AWS feature should you choose?",
+    "options": [
+      "Platform as a Service (PaaS)",
+      "Software as a Service (SaaS)",
+      "Cloud (all-in) deployment model",
+      "Hybrid deployment model"
+    ],
+    "correct": 0,
+    "explanation": "Platform as a Service (PaaS) is correct because PaaS removes the need to manage the underlying infrastructure and OS so you focus on deploying and running applications. Distractors: Software as a Service (SaaS) is a different AWS capability and does not best satisfy this requirement. Cloud (all-in) deployment model is a different AWS capability and does not best satisfy this requirement. Hybrid deployment model is a different AWS capability and does not best satisfy this requirement.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/gxp-systems-on-aws/infrastructure-description-and-controls.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-025",
+    "module": "Cloud Deployment & Service Models",
+    "skill": "Identify cloud deployment and service models",
+    "question": "An organization has the following requirement: use a complete application delivered over the internet without managing any infrastructure. What is the least-complex correct option?",
+    "options": [
+      "Cloud (all-in) deployment model",
+      "Hybrid deployment model",
+      "On-premises (private cloud) deployment model",
+      "Software as a Service (SaaS)"
+    ],
+    "correct": 3,
+    "explanation": "Software as a Service (SaaS) is correct because SaaS delivers a complete, provider-managed application over the internet; the customer just uses it. Distractors: Cloud (all-in) deployment model is a different AWS capability and does not best satisfy this requirement. Hybrid deployment model is a different AWS capability and does not best satisfy this requirement. On-premises (private cloud) deployment model is a different AWS capability and does not best satisfy this requirement.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/gxp-systems-on-aws/infrastructure-description-and-controls.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-026",
+    "module": "Cloud Migration & Adoption",
+    "skill": "Understand cloud adoption and migration",
+    "question": "What should be configured first when the goal is to organize a cloud adoption program across business, people, governance, platform, security, and operations?",
+    "options": [
+      "Replatform",
+      "Repurchase",
+      "AWS Cloud Adoption Framework (CAF)",
+      "Rehost"
+    ],
+    "correct": 2,
+    "explanation": "AWS Cloud Adoption Framework (CAF) is correct because The AWS CAF organizes adoption guidance into six perspectives to plan and run cloud adoption. Distractors: Replatform makes small cloud optimizations during migration. Repurchase switches to a different product such as SaaS. Rehost lifts and shifts with minimal change.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/foundational-capabilities.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-027",
+    "module": "Cloud Migration & Adoption",
+    "skill": "Understand cloud adoption and migration",
+    "question": "Your team needs to move an application to AWS with minimal changes by lifting and shifting it. Which AWS option should you use?",
+    "options": [
+      "Refactor",
+      "Rehost",
+      "Replatform",
+      "Repurchase"
+    ],
+    "correct": 1,
+    "explanation": "Rehost is correct because Rehosting (lift and shift) moves an application without changing its architecture, the fastest strategy. Distractors: Refactor re-architects the application to be cloud-native. Replatform makes small cloud optimizations during migration. Repurchase switches to a different product such as SaaS.",
+    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-028",
+    "module": "Cloud Migration & Adoption",
+    "skill": "Understand cloud adoption and migration",
+    "question": "To move to a managed database during migration with a few optimizations but no rewrite, which AWS capability should you choose?",
+    "options": [
+      "Replatform",
+      "Repurchase",
+      "Refactor",
+      "Retire"
+    ],
+    "correct": 0,
+    "explanation": "Replatform is correct because Replatforming makes small cloud optimizations such as a managed database without re-architecting. Distractors: Repurchase switches to a different product such as SaaS. Refactor re-architects the application to be cloud-native. Retire decommissions an unneeded application.",
+    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-029",
+    "module": "Cloud Migration & Adoption",
+    "skill": "Understand cloud adoption and migration",
+    "question": "Select the two configurations that best support these requirements: retire the existing product and switch to a different one, often SaaS; and keep some applications on premises for now and revisit migrating them later.",
+    "options": [
+      "Rehost",
+      "Repurchase",
+      "Retain",
+      "AWS Application Migration Service",
+      "AWS Cloud Adoption Framework (CAF)"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "Repurchase is correct: Repurchasing replaces the current product with a different one, frequently a SaaS offering. Retain is correct: Retaining keeps applications where they are when there is no current business case to migrate. AWS Application Migration Service automates rehosting of servers. AWS Cloud Adoption Framework (CAF) organizes adoption across perspectives, not a single migration. Rehost lifts and shifts with minimal change.",
+    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
+    "references": [
+      "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
+      "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-030",
+    "module": "Cloud Migration & Adoption",
+    "skill": "Understand cloud adoption and migration",
+    "question": "A workload requires that you rework an application to be cloud-native, for example breaking it into microservices. What is the correct choice?",
+    "options": [
+      "Retain",
+      "Relocate",
+      "Refactor",
+      "Retire"
+    ],
+    "correct": 2,
+    "explanation": "Refactor is correct because Refactoring significantly changes the application to take advantage of cloud-native features. Distractors: Retain keeps an application where it is for now. Relocate moves infrastructure without changing the application. Retire decommissions an unneeded application.",
+    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-031",
+    "module": "Cloud Migration & Adoption",
+    "skill": "Understand cloud adoption and migration",
+    "question": "As the AWS administrator, you are asked to decommission applications that are no longer useful instead of migrating them. What do you select?",
+    "options": [
+      "AWS DataSync",
+      "Retire",
+      "Retain",
+      "Relocate"
+    ],
+    "correct": 1,
+    "explanation": "Retire is correct because Retiring shuts down applications that are no longer needed, reducing cost and attack surface. Distractors: AWS DataSync moves large datasets to AWS online. Retain keeps an application where it is for now. Relocate moves infrastructure without changing the application.",
+    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-032",
+    "module": "Shared Responsibility Model",
+    "skill": "Understand the AWS shared responsibility model",
+    "question": "Which AWS feature lets you decide who installs operating system patches on an Amazon EC2 instance?",
+    "options": [
+      "Customer patches the EC2 guest operating system",
+      "AWS maintains the hypervisor and physical hardware",
+      "AWS provides physical data center security",
+      "Customer configures IAM users and permissions"
+    ],
+    "correct": 0,
+    "explanation": "Customer patches the EC2 guest operating system is correct because For EC2 the customer manages the guest operating system and its patches; AWS manages the host and hypervisor. Distractors: AWS maintains the hypervisor and physical hardware is an AWS infrastructure responsibility. AWS provides physical data center security is an AWS responsibility. Customer configures IAM users and permissions is a customer responsibility.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-033",
+    "module": "Shared Responsibility Model",
+    "skill": "Understand the AWS shared responsibility model",
+    "question": "Which option should you implement to decide who maintains the host hypervisor and the physical servers?",
+    "options": [
+      "AWS provides physical data center security",
+      "Customer configures IAM users and permissions",
+      "Customer classifies and encrypts its data",
+      "AWS maintains the hypervisor and physical hardware"
+    ],
+    "correct": 3,
+    "explanation": "AWS maintains the hypervisor and physical hardware is correct because AWS is responsible for the infrastructure that runs services, including the hypervisor and physical hardware. Distractors: AWS provides physical data center security is an AWS responsibility. Customer configures IAM users and permissions is a customer responsibility. Customer classifies and encrypts its data is a customer responsibility.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-034",
+    "module": "Shared Responsibility Model",
+    "skill": "Understand the AWS shared responsibility model",
+    "question": "You need a solution to decide who is responsible for the physical security of AWS data centers. Which option fits best?",
+    "options": [
+      "Customer classifies and encrypts its data",
+      "AWS operates managed-service infrastructure",
+      "AWS provides physical data center security",
+      "Customer configures IAM users and permissions"
+    ],
+    "correct": 2,
+    "explanation": "AWS provides physical data center security is correct because Physical and environmental security of AWS facilities is always an AWS responsibility. Distractors: Customer classifies and encrypts its data is a customer responsibility. AWS operates managed-service infrastructure is AWS-managed for managed services. Customer configures IAM users and permissions is a customer responsibility.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-035",
+    "module": "Shared Responsibility Model",
+    "skill": "Understand the AWS shared responsibility model",
+    "question": "Which two options together satisfy these requirements: decide who configures IAM users, roles, and permissions in the account; and decide who configures security groups and network traffic rules around an EC2 instance?",
+    "options": [
+      "Customer configures IAM users and permissions",
+      "Customer configures security groups and firewall rules",
+      "AWS maintains the hypervisor and physical hardware",
+      "AWS provides physical data center security",
+      "Customer classifies and encrypts its data"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Customer configures IAM users and permissions is correct: Identity and access management configuration is a customer responsibility. Customer configures security groups and firewall rules is correct: Configuring network controls such as security groups around customer resources is a customer responsibility. AWS maintains the hypervisor and physical hardware is an AWS infrastructure responsibility. AWS provides physical data center security is an AWS responsibility. Customer classifies and encrypts its data is a customer responsibility.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html",
+    "references": [
+      "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html",
+      "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-036",
+    "module": "Shared Responsibility Model",
+    "skill": "Understand the AWS shared responsibility model",
+    "question": "You are administering an AWS environment and need to decide who classifies and encrypts the customer's own data. Which option best meets the requirement?",
+    "options": [
+      "Customer classifies and encrypts its data",
+      "AWS operates managed-service infrastructure",
+      "Customer configures security groups and firewall rules",
+      "AWS maintains the global network and Regions"
+    ],
+    "correct": 0,
+    "explanation": "Customer classifies and encrypts its data is correct because Customers own their data and decide how it is classified, encrypted, and who can access it. Distractors: AWS operates managed-service infrastructure is AWS-managed for managed services. Customer configures security groups and firewall rules is a customer responsibility. AWS maintains the global network and Regions is an AWS responsibility.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-037",
+    "module": "Shared Responsibility Model",
+    "skill": "Understand the AWS shared responsibility model",
+    "question": "A design review identifies this requirement: decide who operates the underlying servers and OS of a managed service such as Amazon S3. What should you configure?",
+    "options": [
+      "Customer configures security groups and firewall rules",
+      "AWS maintains the global network and Regions",
+      "Customer manages applications on its instances",
+      "AWS operates managed-service infrastructure"
+    ],
+    "correct": 3,
+    "explanation": "AWS operates managed-service infrastructure is correct because For managed services AWS operates the infrastructure, OS, and platform, so customers focus on data and access. Distractors: Customer configures security groups and firewall rules is a customer responsibility. AWS maintains the global network and Regions is an AWS responsibility. Customer manages applications on its instances is a customer responsibility.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-038",
+    "module": "Shared Responsibility Model",
+    "skill": "Understand the AWS shared responsibility model",
+    "question": "Which AWS capability is the best fit when the requirement is to decide who configures security groups and network traffic rules around an EC2 instance?",
+    "options": [
+      "Customer manages applications on its instances",
+      "Customer patches the EC2 guest operating system",
+      "Customer configures security groups and firewall rules",
+      "AWS maintains the global network and Regions"
+    ],
+    "correct": 2,
+    "explanation": "Customer configures security groups and firewall rules is correct because Configuring network controls such as security groups around customer resources is a customer responsibility. Distractors: Customer manages applications on its instances is a customer responsibility. Customer patches the EC2 guest operating system is a customer task for EC2. AWS maintains the global network and Regions is an AWS responsibility.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-039",
+    "module": "Shared Responsibility Model",
+    "skill": "Understand the AWS shared responsibility model",
+    "question": "Choose the two AWS capabilities that meet these needs: decide who maintains the global network backbone, Regions, and Availability Zones; and decide who maintains the host hypervisor and the physical servers.",
+    "options": [
+      "Customer patches the EC2 guest operating system",
+      "AWS maintains the global network and Regions",
+      "AWS maintains the hypervisor and physical hardware",
+      "Customer configures security groups and firewall rules",
+      "Customer manages applications on its instances"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "AWS maintains the global network and Regions is correct: AWS maintains the global infrastructure, including Regions, Availability Zones, and the network backbone. AWS maintains the hypervisor and physical hardware is correct: AWS is responsible for the infrastructure that runs services, including the hypervisor and physical hardware. Customer configures security groups and firewall rules is a customer responsibility. Customer manages applications on its instances is a customer responsibility. Customer patches the EC2 guest operating system is a customer task for EC2.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html",
+    "references": [
+      "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html",
+      "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-040",
+    "module": "Shared Responsibility Model",
+    "skill": "Understand the AWS shared responsibility model",
+    "question": "An operations team wants to decide who manages the application code and access running on a customer's EC2 instance. Which choice is most appropriate?",
+    "options": [
+      "Customer manages applications on its instances",
+      "Customer patches the EC2 guest operating system",
+      "AWS maintains the hypervisor and physical hardware",
+      "AWS provides physical data center security"
+    ],
+    "correct": 0,
+    "explanation": "Customer manages applications on its instances is correct because The customer manages the applications, code, and access running on its own EC2 instances. Distractors: Customer patches the EC2 guest operating system is a customer task for EC2. AWS maintains the hypervisor and physical hardware is an AWS infrastructure responsibility. AWS provides physical data center security is an AWS responsibility.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-041",
+    "module": "IAM & Access Management",
+    "skill": "Define AWS access management capabilities",
+    "question": "During implementation, you must give a specific person long-term credentials to sign in to the account. Which AWS feature should you choose?",
+    "options": [
+      "IAM role",
+      "IAM group",
+      "Multi-factor authentication (MFA)",
+      "IAM user"
+    ],
+    "correct": 3,
+    "explanation": "IAM user is correct because An IAM user is an identity with long-term credentials for a person or workload that signs in to the account. Distractors: IAM role provides temporary credentials assumed by services or users. IAM group groups users to attach permissions at once. Multi-factor authentication (MFA) adds a second authentication factor.",
+    "reference": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-042",
+    "module": "IAM & Access Management",
+    "skill": "Define AWS access management capabilities",
+    "question": "An organization has the following requirement: let an application on EC2 obtain temporary credentials to call AWS without stored keys. What is the least-complex correct option?",
+    "options": [
+      "Multi-factor authentication (MFA)",
+      "Root user protection",
+      "IAM role",
+      "IAM group"
+    ],
+    "correct": 2,
+    "explanation": "IAM role is correct because An IAM role grants temporary credentials that services or users assume, avoiding long-term keys in code. Distractors: Multi-factor authentication (MFA) adds a second authentication factor. Root user protection secures the account root user. IAM group groups users to attach permissions at once.",
+    "reference": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-043",
+    "module": "IAM & Access Management",
+    "skill": "Define AWS access management capabilities",
+    "question": "What should be configured first when the goal is to attach the same permissions to many users at once by collecting them together?",
+    "options": [
+      "Least privilege",
+      "IAM group",
+      "Multi-factor authentication (MFA)",
+      "Root user protection"
+    ],
+    "correct": 1,
+    "explanation": "IAM group is correct because An IAM group is a collection of users so you attach a permission set to many identities at once. Distractors: Least privilege grants only the permissions required. Multi-factor authentication (MFA) adds a second authentication factor. Root user protection secures the account root user.",
+    "reference": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-044",
+    "module": "IAM & Access Management",
+    "skill": "Define AWS access management capabilities",
+    "question": "Two requirements must be met: require a second authentication factor so a stolen password alone cannot sign in; and centrally manage one workforce sign-in to many AWS accounts and applications. Select the two correct options.",
+    "options": [
+      "Root user protection",
+      "Multi-factor authentication (MFA)",
+      "AWS IAM Identity Center",
+      "IAM role",
+      "IAM group"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "Multi-factor authentication (MFA) is correct: MFA requires an additional factor beyond the password, protecting accounts including the root user. AWS IAM Identity Center is correct: IAM Identity Center centrally manages workforce single sign-on across multiple accounts and applications. IAM role provides temporary credentials assumed by services or users. IAM group groups users to attach permissions at once. Root user protection secures the account root user.",
+    "reference": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html",
+    "references": [
+      "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html",
+      "https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-045",
+    "module": "IAM & Access Management",
+    "skill": "Define AWS access management capabilities",
+    "question": "Your team needs to follow best practice for the AWS account root user. Which AWS option should you use?",
+    "options": [
+      "Least privilege",
+      "AWS IAM Identity Center",
+      "IAM policy",
+      "Root user protection"
+    ],
+    "correct": 3,
+    "explanation": "Root user protection is correct because Best practice is to secure the root user with MFA, avoid daily use, and not create root access keys. Distractors: Least privilege grants only the permissions required. AWS IAM Identity Center centralizes workforce single sign-on across accounts. IAM policy is a JSON document defining permissions.",
+    "reference": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-046",
+    "module": "IAM & Access Management",
+    "skill": "Define AWS access management capabilities",
+    "question": "To grant only the permissions a task needs and nothing more, which AWS capability should you choose?",
+    "options": [
+      "IAM policy",
+      "Amazon Cognito",
+      "Least privilege",
+      "AWS IAM Identity Center"
+    ],
+    "correct": 2,
+    "explanation": "Least privilege is correct because Least privilege grants only the permissions required for a task, reducing risk if credentials are misused. Distractors: IAM policy is a JSON document defining permissions. Amazon Cognito handles sign-in for an app's external end users. AWS IAM Identity Center centralizes workforce single sign-on across accounts.",
+    "reference": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-047",
+    "module": "IAM & Access Management",
+    "skill": "Define AWS access management capabilities",
+    "question": "A workload requires that you centrally manage one workforce sign-in to many AWS accounts and applications. What is the correct choice?",
+    "options": [
+      "IAM user",
+      "AWS IAM Identity Center",
+      "IAM policy",
+      "Amazon Cognito"
+    ],
+    "correct": 1,
+    "explanation": "AWS IAM Identity Center is correct because IAM Identity Center centrally manages workforce single sign-on across multiple accounts and applications. Distractors: IAM user is a long-term identity for a person or workload. IAM policy is a JSON document defining permissions. Amazon Cognito handles sign-in for an app's external end users.",
+    "reference": "https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-048",
+    "module": "IAM & Access Management",
+    "skill": "Define AWS access management capabilities",
+    "question": "Pick the two features that address these requirements: define permissions in a JSON document attached to a user, group, or role; and let an application on EC2 obtain temporary credentials to call AWS without stored keys.",
+    "options": [
+      "Amazon Cognito",
+      "IAM user",
+      "IAM policy",
+      "IAM role",
+      "AWS IAM Identity Center"
+    ],
+    "correct": [
+      2,
+      3
+    ],
+    "explanation": "IAM policy is correct: An IAM policy is a JSON document that defines permissions and is attached to identities or resources. IAM role is correct: An IAM role grants temporary credentials that services or users assume, avoiding long-term keys in code. AWS IAM Identity Center centralizes workforce single sign-on across accounts. Amazon Cognito handles sign-in for an app's external end users. IAM user is a long-term identity for a person or workload.",
+    "reference": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+    "references": [
+      "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+      "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-049",
+    "module": "IAM & Access Management",
+    "skill": "Define AWS access management capabilities",
+    "question": "As the AWS administrator, you are asked to add sign-up and sign-in for the end users of a customer-facing web or mobile app. What do you select?",
+    "options": [
+      "IAM user",
+      "IAM role",
+      "IAM group",
+      "Amazon Cognito"
+    ],
+    "correct": 3,
+    "explanation": "Amazon Cognito is correct because Amazon Cognito provides authentication and user management for an application's external end users. Distractors: IAM user is a long-term identity for a person or workload. IAM role provides temporary credentials assumed by services or users. IAM group groups users to attach permissions at once.",
+    "reference": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-050",
+    "module": "Security Services & Compliance",
+    "skill": "Identify AWS security and compliance services",
+    "question": "Which AWS feature lets you continuously monitor accounts and workloads for malicious activity using threat intelligence?",
+    "options": [
+      "Amazon Macie",
+      "AWS Security Hub",
+      "Amazon GuardDuty",
+      "Amazon Inspector"
+    ],
+    "correct": 2,
+    "explanation": "Amazon GuardDuty is correct because GuardDuty is a threat detection service that continuously monitors for malicious or unauthorized activity. Distractors: Amazon Macie discovers sensitive data in S3. AWS Security Hub aggregates security findings. Amazon Inspector scans for software vulnerabilities.",
+    "reference": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-051",
+    "module": "Security Services & Compliance",
+    "skill": "Identify AWS security and compliance services",
+    "question": "Which option should you implement to automatically scan EC2 instances and container images for software vulnerabilities?",
+    "options": [
+      "AWS WAF",
+      "Amazon Inspector",
+      "Amazon GuardDuty",
+      "Amazon Macie"
+    ],
+    "correct": 1,
+    "explanation": "Amazon Inspector is correct because Amazon Inspector continuously scans workloads such as EC2 and container images for software vulnerabilities. Distractors: AWS WAF filters web requests. Amazon GuardDuty detects threats, it does not scan code. Amazon Macie discovers sensitive data in S3.",
+    "reference": "https://docs.aws.amazon.com/inspector/latest/user/what-is-inspector.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-052",
+    "module": "Security Services & Compliance",
+    "skill": "Identify AWS security and compliance services",
+    "question": "You need a solution to discover and protect sensitive data such as personal information stored in Amazon S3. Which option fits best?",
+    "options": [
+      "Amazon Macie",
+      "Amazon GuardDuty",
+      "Amazon Inspector",
+      "AWS Security Hub"
+    ],
+    "correct": 0,
+    "explanation": "Amazon Macie is correct because Macie uses machine learning to discover and classify sensitive data, such as PII, stored in Amazon S3. Distractors: Amazon GuardDuty detects threats, it does not scan code. Amazon Inspector scans for software vulnerabilities. AWS Security Hub aggregates security findings.",
+    "reference": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-053",
+    "module": "Security Services & Compliance",
+    "skill": "Identify AWS security and compliance services",
+    "question": "Select the two configurations that best support these requirements: see a central, prioritized view of security findings across many AWS accounts; and download AWS compliance reports such as SOC and PCI on demand.",
+    "options": [
+      "Amazon GuardDuty",
+      "Amazon Inspector",
+      "AWS Security Hub",
+      "AWS Artifact",
+      "AWS Firewall Manager"
+    ],
+    "correct": [
+      2,
+      3
+    ],
+    "explanation": "AWS Security Hub is correct: Security Hub aggregates and prioritizes security findings from multiple services into a single view. AWS Artifact is correct: AWS Artifact provides on-demand access to AWS security and compliance reports and agreements. AWS Firewall Manager centrally manages firewall rules across accounts. Amazon GuardDuty detects threats, it does not scan code. Amazon Inspector scans for software vulnerabilities.",
+    "reference": "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html",
+    "references": [
+      "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html",
+      "https://docs.aws.amazon.com/artifact/latest/ug/what-is-aws-artifact.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-054",
+    "module": "Security Services & Compliance",
+    "skill": "Identify AWS security and compliance services",
+    "question": "You are administering an AWS environment and need to filter malicious web requests such as SQL injection before they reach an application. Which option best meets the requirement?",
+    "options": [
+      "AWS Artifact",
+      "AWS CloudTrail",
+      "AWS WAF",
+      "AWS Shield"
+    ],
+    "correct": 2,
+    "explanation": "AWS WAF is correct because AWS WAF is a web application firewall that filters HTTP and HTTPS requests using rules you define. Distractors: AWS Artifact provides compliance reports on demand. AWS CloudTrail records API calls for audit. AWS Shield protects against DDoS attacks.",
+    "reference": "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-055",
+    "module": "Security Services & Compliance",
+    "skill": "Identify AWS security and compliance services",
+    "question": "A design review identifies this requirement: defend an application against distributed denial of service (DDoS) attacks. What should you configure?",
+    "options": [
+      "AWS Trusted Advisor",
+      "AWS Shield",
+      "AWS Artifact",
+      "AWS CloudTrail"
+    ],
+    "correct": 1,
+    "explanation": "AWS Shield is correct because AWS Shield provides managed DDoS protection, with Standard included and Advanced for enhanced protection. Distractors: AWS Trusted Advisor recommends best-practice improvements. AWS Artifact provides compliance reports on demand. AWS CloudTrail records API calls for audit.",
+    "reference": "https://docs.aws.amazon.com/waf/latest/developerguide/ddos-overview.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-056",
+    "module": "Security Services & Compliance",
+    "skill": "Identify AWS security and compliance services",
+    "question": "Which AWS capability is the best fit when the requirement is to download AWS compliance reports such as SOC and PCI on demand?",
+    "options": [
+      "AWS Artifact",
+      "AWS CloudTrail",
+      "AWS Trusted Advisor",
+      "AWS Certificate Manager (ACM)"
+    ],
+    "correct": 0,
+    "explanation": "AWS Artifact is correct because AWS Artifact provides on-demand access to AWS security and compliance reports and agreements. Distractors: AWS CloudTrail records API calls for audit. AWS Trusted Advisor recommends best-practice improvements. AWS Certificate Manager (ACM) issues and manages TLS certificates.",
+    "reference": "https://docs.aws.amazon.com/artifact/latest/ug/what-is-aws-artifact.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-057",
+    "module": "Security Services & Compliance",
+    "skill": "Identify AWS security and compliance services",
+    "question": "Which two options together satisfy these requirements: record account activity and API calls so they can be audited later; and centrally manage firewall rules such as AWS WAF across many accounts in an organization?",
+    "options": [
+      "AWS Security Hub",
+      "AWS WAF",
+      "AWS Shield",
+      "AWS CloudTrail",
+      "AWS Firewall Manager"
+    ],
+    "correct": [
+      3,
+      4
+    ],
+    "explanation": "AWS CloudTrail is correct: CloudTrail records account activity and API calls, providing an audit trail for governance and compliance. AWS Firewall Manager is correct: AWS Firewall Manager centrally configures and manages firewall rules across accounts in AWS Organizations. AWS Security Hub aggregates security findings. AWS WAF filters web requests. AWS Shield protects against DDoS attacks.",
+    "reference": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+    "references": [
+      "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+      "https://docs.aws.amazon.com/waf/latest/developerguide/fms-chapter.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-058",
+    "module": "Security Services & Compliance",
+    "skill": "Identify AWS security and compliance services",
+    "question": "An operations team wants to get recommendations that check an account against security and other best practices. Which choice is most appropriate?",
+    "options": [
+      "AWS Firewall Manager",
+      "Amazon GuardDuty",
+      "AWS Trusted Advisor",
+      "AWS Certificate Manager (ACM)"
+    ],
+    "correct": 2,
+    "explanation": "AWS Trusted Advisor is correct because Trusted Advisor inspects an account and recommends improvements across several categories including security. Distractors: AWS Firewall Manager centrally manages firewall rules across accounts. Amazon GuardDuty detects threats, it does not scan code. AWS Certificate Manager (ACM) issues and manages TLS certificates.",
+    "reference": "https://docs.aws.amazon.com/awssupport/latest/user/trusted-advisor.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-059",
+    "module": "Security Services & Compliance",
+    "skill": "Identify AWS security and compliance services",
+    "question": "During implementation, you must issue and manage the TLS certificates used to secure websites and applications. Which AWS feature should you choose?",
+    "options": [
+      "Amazon Inspector",
+      "AWS Certificate Manager (ACM)",
+      "AWS Firewall Manager",
+      "Amazon GuardDuty"
+    ],
+    "correct": 1,
+    "explanation": "AWS Certificate Manager (ACM) is correct because ACM provisions and manages public and private TLS certificates for use with AWS services. Distractors: Amazon Inspector scans for software vulnerabilities. AWS Firewall Manager centrally manages firewall rules across accounts. Amazon GuardDuty detects threats, it does not scan code.",
+    "reference": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-060",
+    "module": "Security Services & Compliance",
+    "skill": "Identify AWS security and compliance services",
+    "question": "An organization has the following requirement: centrally manage firewall rules such as AWS WAF across many accounts in an organization. What is the least-complex correct option?",
+    "options": [
+      "AWS Firewall Manager",
+      "Amazon GuardDuty",
+      "Amazon Inspector",
+      "Amazon Macie"
+    ],
+    "correct": 0,
+    "explanation": "AWS Firewall Manager is correct because AWS Firewall Manager centrally configures and manages firewall rules across accounts in AWS Organizations. Distractors: Amazon GuardDuty detects threats, it does not scan code. Amazon Inspector scans for software vulnerabilities. Amazon Macie discovers sensitive data in S3.",
+    "reference": "https://docs.aws.amazon.com/waf/latest/developerguide/fms-chapter.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-061",
+    "module": "Data Protection & Encryption",
+    "skill": "Identify components of AWS data protection",
+    "question": "What should be configured first when the goal is to create and control the cryptographic keys used to encrypt data across AWS services?",
+    "options": [
+      "AWS Secrets Manager",
+      "AWS CloudHSM",
+      "AWS Certificate Manager (ACM)",
+      "AWS Key Management Service (KMS)"
+    ],
+    "correct": 3,
+    "explanation": "AWS Key Management Service (KMS) is correct because AWS KMS lets you create and manage encryption keys and control their use across AWS services. Distractors: AWS Secrets Manager stores and rotates secrets. AWS CloudHSM provides dedicated hardware security modules. AWS Certificate Manager (ACM) issues and manages TLS certificates.",
+    "reference": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-062",
+    "module": "Data Protection & Encryption",
+    "skill": "Identify components of AWS data protection",
+    "question": "Your team needs to describe the general concept of protecting data that is stored on disk. Which AWS option should you use?",
+    "options": [
+      "AWS Secrets Manager",
+      "AWS Certificate Manager (ACM)",
+      "Encryption at rest",
+      "Encryption in transit (TLS)"
+    ],
+    "correct": 2,
+    "explanation": "Encryption at rest is correct because Encryption at rest is the general concept of protecting stored data so it is unreadable without the key. Distractors: AWS Secrets Manager stores and rotates secrets. AWS Certificate Manager (ACM) issues and manages TLS certificates. Encryption in transit (TLS) is the general concept of protecting data on the network.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/logical-separation/encrypting-data-at-rest-and-in-transit.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-063",
+    "module": "Data Protection & Encryption",
+    "skill": "Identify components of AWS data protection",
+    "question": "To describe the general concept of protecting data while it moves over the network, which AWS capability should you choose?",
+    "options": [
+      "AWS Key Management Service (KMS)",
+      "Encryption in transit (TLS)",
+      "Encryption at rest",
+      "AWS Secrets Manager"
+    ],
+    "correct": 1,
+    "explanation": "Encryption in transit (TLS) is correct because Encryption in transit is the general concept of using TLS to protect data while it travels across the network. Distractors: AWS Key Management Service (KMS) creates and controls encryption keys. Encryption at rest is the general concept of protecting stored data. AWS Secrets Manager stores and rotates secrets.",
+    "reference": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryptionInTransit.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-064",
+    "module": "Data Protection & Encryption",
+    "skill": "Identify components of AWS data protection",
+    "question": "Choose the two AWS capabilities that meet these needs: store database passwords and API keys securely and rotate them automatically; and manage your own keys in a dedicated, FIPS-validated hardware security module.",
+    "options": [
+      "Encryption in transit (TLS)",
+      "AWS Secrets Manager",
+      "AWS CloudHSM",
+      "AWS Key Management Service (KMS)",
+      "Encryption at rest"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "AWS Secrets Manager is correct: Secrets Manager securely stores and automatically rotates secrets such as database credentials and API keys. AWS CloudHSM is correct: AWS CloudHSM provides dedicated, FIPS-validated hardware security modules for managing your own keys. AWS Key Management Service (KMS) creates and controls encryption keys. Encryption at rest is the general concept of protecting stored data. Encryption in transit (TLS) is the general concept of protecting data on the network.",
+    "reference": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html",
+    "references": [
+      "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html",
+      "https://docs.aws.amazon.com/cloudhsm/latest/userguide/introduction.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-065",
+    "module": "Data Protection & Encryption",
+    "skill": "Identify components of AWS data protection",
+    "question": "A workload requires that you set an Amazon S3 bucket so new objects are encrypted with a KMS key by default. What is the correct choice?",
+    "options": [
+      "Amazon EBS encryption",
+      "AWS Secrets Manager",
+      "AWS CloudHSM",
+      "Amazon S3 default encryption (SSE-KMS)"
+    ],
+    "correct": 3,
+    "explanation": "Amazon S3 default encryption (SSE-KMS) is correct because S3 lets you set a bucket default of SSE-KMS so new objects are encrypted with your chosen KMS key. Distractors: Amazon EBS encryption encrypts an EBS volume with a KMS key. AWS Secrets Manager stores and rotates secrets. AWS CloudHSM provides dedicated hardware security modules.",
+    "reference": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-066",
+    "module": "Data Protection & Encryption",
+    "skill": "Identify components of AWS data protection",
+    "question": "As the AWS administrator, you are asked to turn on encryption for an Amazon EBS volume so the data on it is protected. What do you select?",
+    "options": [
+      "AWS Key Management Service (KMS)",
+      "AWS CloudHSM",
+      "Amazon EBS encryption",
+      "Amazon S3 default encryption (SSE-KMS)"
+    ],
+    "correct": 2,
+    "explanation": "Amazon EBS encryption is correct because Amazon EBS encryption uses KMS keys to encrypt EBS volumes, snapshots, and data moving to and from the volume. Distractors: AWS Key Management Service (KMS) creates and controls encryption keys. AWS CloudHSM provides dedicated hardware security modules. Amazon S3 default encryption (SSE-KMS) encrypts new S3 objects by default with a KMS key.",
+    "reference": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-encryption.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-067",
+    "module": "Data Protection & Encryption",
+    "skill": "Identify components of AWS data protection",
+    "question": "Which AWS feature lets you manage your own keys in a dedicated, FIPS-validated hardware security module?",
+    "options": [
+      "AWS Certificate Manager (ACM)",
+      "AWS CloudHSM",
+      "AWS KMS key rotation",
+      "Customer ownership of data"
+    ],
+    "correct": 1,
+    "explanation": "AWS CloudHSM is correct because AWS CloudHSM provides dedicated, FIPS-validated hardware security modules for managing your own keys. Distractors: AWS Certificate Manager (ACM) issues and manages TLS certificates. AWS KMS key rotation rotates key material on a schedule. Customer ownership of data is a shared-responsibility concept.",
+    "reference": "https://docs.aws.amazon.com/cloudhsm/latest/userguide/introduction.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-068",
+    "module": "Data Protection & Encryption",
+    "skill": "Identify components of AWS data protection",
+    "question": "Two requirements must be met: automatically change the cryptographic material of a key on a managed schedule; and create and control the cryptographic keys used to encrypt data across AWS services. Select the two correct options.",
+    "options": [
+      "AWS CloudHSM",
+      "Customer ownership of data",
+      "AWS KMS key rotation",
+      "AWS Key Management Service (KMS)",
+      "Amazon EBS encryption"
+    ],
+    "correct": [
+      2,
+      3
+    ],
+    "explanation": "AWS KMS key rotation is correct: AWS KMS can automatically rotate the cryptographic material of a KMS key on a managed schedule. AWS Key Management Service (KMS) is correct: AWS KMS lets you create and manage encryption keys and control their use across AWS services. Amazon EBS encryption encrypts an EBS volume with a KMS key. AWS CloudHSM provides dedicated hardware security modules. Customer ownership of data is a shared-responsibility concept.",
+    "reference": "https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html",
+    "references": [
+      "https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html",
+      "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-069",
+    "module": "Data Protection & Encryption",
+    "skill": "Identify components of AWS data protection",
+    "question": "Which option should you implement to keep responsibility for and control of your own content and protection choices?",
+    "options": [
+      "AWS Certificate Manager (ACM)",
+      "AWS Key Management Service (KMS)",
+      "Encryption at rest",
+      "Customer ownership of data"
+    ],
+    "correct": 3,
+    "explanation": "Customer ownership of data is correct because Under the shared responsibility model the customer retains ownership and control of its content and protection choices. Distractors: AWS Certificate Manager (ACM) issues and manages TLS certificates. AWS Key Management Service (KMS) creates and controls encryption keys. Encryption at rest is the general concept of protecting stored data.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/shared-responsibility.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-070",
+    "module": "Data Protection & Encryption",
+    "skill": "Identify components of AWS data protection",
+    "question": "You need a solution to issue the public TLS certificate that enables HTTPS for a website. Which option fits best?",
+    "options": [
+      "Encryption at rest",
+      "Encryption in transit (TLS)",
+      "AWS Certificate Manager (ACM)",
+      "AWS Key Management Service (KMS)"
+    ],
+    "correct": 2,
+    "explanation": "AWS Certificate Manager (ACM) is correct because ACM issues and manages the TLS certificates that enable encryption in transit for applications. Distractors: Encryption at rest is the general concept of protecting stored data. Encryption in transit (TLS) is the general concept of protecting data on the network. AWS Key Management Service (KMS) creates and controls encryption keys.",
+    "reference": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-071",
+    "module": "Compute",
+    "skill": "Identify AWS compute services",
+    "question": "You are administering an AWS environment and need to run virtual servers where you control and manage the operating system. Which option best meets the requirement?",
+    "options": [
+      "Amazon ECS",
+      "Amazon EC2",
+      "AWS Lambda",
+      "AWS Elastic Beanstalk"
+    ],
+    "correct": 1,
+    "explanation": "Amazon EC2 is correct because Amazon EC2 provides resizable virtual machine instances where you control the operating system and software. Distractors: Amazon ECS orchestrates Docker containers. AWS Lambda runs code serverless with no servers to manage. AWS Elastic Beanstalk deploys and manages an app platform for you.",
+    "reference": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-072",
+    "module": "Compute",
+    "skill": "Identify AWS compute services",
+    "question": "A design review identifies this requirement: run code on events with no servers to provision, paying only for execution time. What should you configure?",
+    "options": [
+      "AWS Lambda",
+      "AWS Elastic Beanstalk",
+      "Amazon ECS",
+      "AWS Fargate"
+    ],
+    "correct": 0,
+    "explanation": "AWS Lambda is correct because AWS Lambda is serverless compute that runs code on events and bills only for the compute time consumed. Distractors: AWS Elastic Beanstalk deploys and manages an app platform for you. Amazon ECS orchestrates Docker containers. AWS Fargate runs containers serverless without managing EC2.",
+    "reference": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-073",
+    "module": "Compute",
+    "skill": "Identify AWS compute services",
+    "question": "Which AWS capability is the best fit when the requirement is to deploy a web app and let AWS handle capacity, load balancing, and scaling for you?",
+    "options": [
+      "Amazon ECS",
+      "AWS Fargate",
+      "EC2 Auto Scaling",
+      "AWS Elastic Beanstalk"
+    ],
+    "correct": 3,
+    "explanation": "AWS Elastic Beanstalk is correct because Elastic Beanstalk deploys and manages applications, handling provisioning, load balancing, and scaling. Distractors: Amazon ECS orchestrates Docker containers. AWS Fargate runs containers serverless without managing EC2. EC2 Auto Scaling adds and removes EC2 capacity automatically.",
+    "reference": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-074",
+    "module": "Compute",
+    "skill": "Identify AWS compute services",
+    "question": "Pick the two features that address these requirements: run and orchestrate Docker containers as a managed AWS service; and spread incoming traffic across multiple healthy targets such as EC2 instances.",
+    "options": [
+      "AWS Fargate",
+      "Amazon ECS",
+      "Elastic Load Balancing",
+      "AWS Lambda",
+      "AWS Elastic Beanstalk"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "Amazon ECS is correct: Amazon ECS is a managed container orchestration service for running and scaling Docker containers. Elastic Load Balancing is correct: Elastic Load Balancing distributes incoming traffic across multiple targets for availability and fault tolerance. AWS Lambda runs code serverless with no servers to manage. AWS Elastic Beanstalk deploys and manages an app platform for you. AWS Fargate runs containers serverless without managing EC2.",
+    "reference": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html",
+    "references": [
+      "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html",
+      "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-075",
+    "module": "Compute",
+    "skill": "Identify AWS compute services",
+    "question": "An operations team wants to run containers without managing any EC2 servers using a serverless engine. Which choice is most appropriate?",
+    "options": [
+      "Amazon EKS",
+      "AWS Fargate",
+      "EC2 Auto Scaling",
+      "Elastic Load Balancing"
+    ],
+    "correct": 1,
+    "explanation": "AWS Fargate is correct because AWS Fargate is a serverless compute engine for containers, so you run tasks without managing EC2 instances. Distractors: Amazon EKS runs managed Kubernetes. EC2 Auto Scaling adds and removes EC2 capacity automatically. Elastic Load Balancing distributes traffic across targets.",
+    "reference": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-076",
+    "module": "Compute",
+    "skill": "Identify AWS compute services",
+    "question": "During implementation, you must automatically add or remove EC2 capacity to match demand. Which AWS feature should you choose?",
+    "options": [
+      "EC2 Auto Scaling",
+      "Elastic Load Balancing",
+      "Amazon EKS",
+      "Amazon Lightsail"
+    ],
+    "correct": 0,
+    "explanation": "EC2 Auto Scaling is correct because EC2 Auto Scaling adjusts the number of instances automatically based on demand and scaling policies. Distractors: Elastic Load Balancing distributes traffic across targets. Amazon EKS runs managed Kubernetes. Amazon Lightsail offers simple low-cost virtual private servers.",
+    "reference": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-077",
+    "module": "Compute",
+    "skill": "Identify AWS compute services",
+    "question": "An organization has the following requirement: spread incoming traffic across multiple healthy targets such as EC2 instances. What is the least-complex correct option?",
+    "options": [
+      "Amazon EKS",
+      "Amazon Lightsail",
+      "Amazon EC2",
+      "Elastic Load Balancing"
+    ],
+    "correct": 3,
+    "explanation": "Elastic Load Balancing is correct because Elastic Load Balancing distributes incoming traffic across multiple targets for availability and fault tolerance. Distractors: Amazon EKS runs managed Kubernetes. Amazon Lightsail offers simple low-cost virtual private servers. Amazon EC2 provides virtual servers you manage.",
+    "reference": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-078",
+    "module": "Compute",
+    "skill": "Identify AWS compute services",
+    "question": "Select the two configurations that best support these requirements: run managed Kubernetes for container orchestration on AWS; and run code on events with no servers to provision, paying only for execution time.",
+    "options": [
+      "Amazon Lightsail",
+      "Amazon EC2",
+      "Amazon EKS",
+      "AWS Lambda",
+      "Elastic Load Balancing"
+    ],
+    "correct": [
+      2,
+      3
+    ],
+    "explanation": "Amazon EKS is correct: Amazon EKS is a managed Kubernetes service for running Kubernetes workloads on AWS. AWS Lambda is correct: AWS Lambda is serverless compute that runs code on events and bills only for the compute time consumed. Elastic Load Balancing distributes traffic across targets. Amazon Lightsail offers simple low-cost virtual private servers. Amazon EC2 provides virtual servers you manage.",
+    "reference": "https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html",
+    "references": [
+      "https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html",
+      "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-079",
+    "module": "Compute",
+    "skill": "Identify AWS compute services",
+    "question": "What should be configured first when the goal is to launch a simple virtual private server with a predictable monthly price for a small site?",
+    "options": [
+      "AWS Elastic Beanstalk",
+      "Amazon Lightsail",
+      "Amazon EC2",
+      "AWS Lambda"
+    ],
+    "correct": 1,
+    "explanation": "Amazon Lightsail is correct because Amazon Lightsail offers easy-to-use virtual private servers at a low, predictable monthly price. Distractors: AWS Elastic Beanstalk deploys and manages an app platform for you. Amazon EC2 provides virtual servers you manage. AWS Lambda runs code serverless with no servers to manage.",
+    "reference": "https://docs.aws.amazon.com/lightsail/latest/userguide/what-is-amazon-lightsail.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-080",
+    "module": "Storage",
+    "skill": "Identify AWS storage services",
+    "question": "Your team needs to store and retrieve any amount of general-purpose, frequently accessed object data. Which AWS option should you use?",
+    "options": [
+      "Amazon S3",
+      "Amazon EBS",
+      "Amazon EFS",
+      "AWS Storage Gateway"
+    ],
+    "correct": 0,
+    "explanation": "Amazon S3 is correct because Amazon S3 is object storage for any amount of data; S3 Standard suits frequently accessed objects. Distractors: Amazon EBS is a block volume for an instance. Amazon EFS is a shared file system for many instances. AWS Storage Gateway connects on-premises systems to AWS storage.",
+    "reference": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-081",
+    "module": "Storage",
+    "skill": "Identify AWS storage services",
+    "question": "To attach a persistent block storage volume to an EC2 instance, which AWS capability should you choose?",
+    "options": [
+      "Amazon EFS",
+      "Amazon S3 Glacier Deep Archive",
+      "Amazon S3 Lifecycle policy",
+      "Amazon EBS"
+    ],
+    "correct": 3,
+    "explanation": "Amazon EBS is correct because Amazon EBS provides persistent block storage volumes for EC2 instances (some volume types support Multi-Attach to a few instances). Distractors: Amazon EFS is a shared file system for many instances. Amazon S3 Glacier Deep Archive is lowest-cost archival with hours-long retrieval. Amazon S3 Lifecycle policy moves objects by age or date.",
+    "reference": "https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-082",
+    "module": "Storage",
+    "skill": "Identify AWS storage services",
+    "question": "A workload requires that you provide a shared file system many Linux EC2 instances can mount at the same time. What is the correct choice?",
+    "options": [
+      "Amazon S3 Lifecycle policy",
+      "Amazon S3 Intelligent-Tiering",
+      "Amazon EFS",
+      "Amazon S3 Glacier Deep Archive"
+    ],
+    "correct": 2,
+    "explanation": "Amazon EFS is correct because Amazon EFS is a managed elastic NFS file system that multiple EC2 instances access concurrently. Distractors: Amazon S3 Lifecycle policy moves objects by age or date. Amazon S3 Intelligent-Tiering moves objects automatically based on changing access patterns. Amazon S3 Glacier Deep Archive is lowest-cost archival with hours-long retrieval.",
+    "reference": "https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-083",
+    "module": "Storage",
+    "skill": "Identify AWS storage services",
+    "question": "Which two options together satisfy these requirements: archive data at the lowest storage cost where retrieval can take hours; and connect on-premises applications to AWS storage through a hybrid appliance?",
+    "options": [
+      "Amazon S3 Lifecycle policy",
+      "Amazon S3 Intelligent-Tiering",
+      "Amazon S3 Glacier Deep Archive",
+      "AWS Storage Gateway",
+      "Amazon EFS"
+    ],
+    "correct": [
+      2,
+      3
+    ],
+    "explanation": "Amazon S3 Glacier Deep Archive is correct: S3 Glacier Deep Archive is the lowest-cost class for long-term archive with retrieval measured in hours. AWS Storage Gateway is correct: AWS Storage Gateway connects on-premises environments to AWS storage for hybrid use cases. Amazon EFS is a shared file system for many instances. Amazon S3 Lifecycle policy moves objects by age or date. Amazon S3 Intelligent-Tiering moves objects automatically based on changing access patterns.",
+    "reference": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html",
+    "references": [
+      "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html",
+      "https://docs.aws.amazon.com/storagegateway/latest/userguide/WhatIsStorageGateway.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-084",
+    "module": "Storage",
+    "skill": "Identify AWS storage services",
+    "question": "As the AWS administrator, you are asked to automatically move objects to lower-cost tiers based on a fixed age such as after 90 days. What do you select?",
+    "options": [
+      "Amazon S3 Lifecycle policy",
+      "Amazon EBS",
+      "Amazon EFS",
+      "AWS Storage Gateway"
+    ],
+    "correct": 0,
+    "explanation": "Amazon S3 Lifecycle policy is correct because An S3 Lifecycle policy transitions or expires objects on a schedule based on object age or date. Distractors: Amazon EBS is a block volume for an instance. Amazon EFS is a shared file system for many instances. AWS Storage Gateway connects on-premises systems to AWS storage.",
+    "reference": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-085",
+    "module": "Storage",
+    "skill": "Identify AWS storage services",
+    "question": "Which AWS feature lets you automatically optimize cost when object access patterns are unknown or change over time?",
+    "options": [
+      "Amazon EBS",
+      "Amazon EFS",
+      "AWS Storage Gateway",
+      "Amazon S3 Intelligent-Tiering"
+    ],
+    "correct": 3,
+    "explanation": "Amazon S3 Intelligent-Tiering is correct because S3 Intelligent-Tiering moves objects between tiers automatically when access patterns are unknown or changing. Distractors: Amazon EBS is a block volume for an instance. Amazon EFS is a shared file system for many instances. AWS Storage Gateway connects on-premises systems to AWS storage.",
+    "reference": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/intelligent-tiering.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-086",
+    "module": "Storage",
+    "skill": "Identify AWS storage services",
+    "question": "Which option should you implement to connect on-premises applications to AWS storage through a hybrid appliance?",
+    "options": [
+      "Amazon S3",
+      "Amazon EBS",
+      "AWS Storage Gateway",
+      "Amazon FSx for Lustre"
+    ],
+    "correct": 2,
+    "explanation": "AWS Storage Gateway is correct because AWS Storage Gateway connects on-premises environments to AWS storage for hybrid use cases. Distractors: Amazon S3 is general-purpose object storage. Amazon EBS is a block volume for an instance. Amazon FSx for Lustre is a managed high-performance Lustre file system.",
+    "reference": "https://docs.aws.amazon.com/storagegateway/latest/userguide/WhatIsStorageGateway.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-087",
+    "module": "Storage",
+    "skill": "Identify AWS storage services",
+    "question": "Choose the two AWS capabilities that meet these needs: provide a fully managed high-performance Lustre file system for compute workloads; and provide a shared file system many Linux EC2 instances can mount at the same time.",
+    "options": [
+      "Amazon S3",
+      "Amazon EBS",
+      "Amazon S3 Glacier Deep Archive",
+      "Amazon FSx for Lustre",
+      "Amazon EFS"
+    ],
+    "correct": [
+      3,
+      4
+    ],
+    "explanation": "Amazon FSx for Lustre is correct: Amazon FSx for Lustre is a fully managed high-performance file system for compute-intensive workloads. Amazon EFS is correct: Amazon EFS is a managed elastic NFS file system that multiple EC2 instances access concurrently. Amazon S3 is general-purpose object storage. Amazon EBS is a block volume for an instance. Amazon S3 Glacier Deep Archive is lowest-cost archival with hours-long retrieval.",
+    "reference": "https://docs.aws.amazon.com/fsx/latest/LustreGuide/what-is.html",
+    "references": [
+      "https://docs.aws.amazon.com/fsx/latest/LustreGuide/what-is.html",
+      "https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-088",
+    "module": "Networking & Content Delivery",
+    "skill": "Identify AWS networking services",
+    "question": "You need a solution to create a logically isolated private network with your own IP range and subnets. Which option fits best?",
+    "options": [
+      "Amazon VPC",
+      "Amazon Route 53",
+      "Amazon CloudFront",
+      "AWS Direct Connect"
+    ],
+    "correct": 0,
+    "explanation": "Amazon VPC is correct because Amazon VPC provisions a logically isolated section of AWS with full control over IP addressing and subnets. Distractors: Amazon Route 53 is DNS and routing. Amazon CloudFront is a content delivery network. AWS Direct Connect is a dedicated private link to AWS.",
+    "reference": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-089",
+    "module": "Networking & Content Delivery",
+    "skill": "Identify AWS networking services",
+    "question": "You are administering an AWS environment and need to provide a scalable DNS service that routes users to applications. Which option best meets the requirement?",
+    "options": [
+      "Amazon CloudFront",
+      "AWS Direct Connect",
+      "AWS Site-to-Site VPN",
+      "Amazon Route 53"
+    ],
+    "correct": 3,
+    "explanation": "Amazon Route 53 is correct because Route 53 is a highly available DNS service that routes users to applications and can run health checks. Distractors: Amazon CloudFront is a content delivery network. AWS Direct Connect is a dedicated private link to AWS. AWS Site-to-Site VPN is an encrypted tunnel over the internet.",
+    "reference": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-090",
+    "module": "Networking & Content Delivery",
+    "skill": "Identify AWS networking services",
+    "question": "A design review identifies this requirement: cache and deliver content to users worldwide with low latency from edge locations. What should you configure?",
+    "options": [
+      "AWS Site-to-Site VPN",
+      "Security group",
+      "Amazon CloudFront",
+      "AWS Direct Connect"
+    ],
+    "correct": 2,
+    "explanation": "Amazon CloudFront is correct because CloudFront is a content delivery network that caches content at edge locations for low-latency delivery. Distractors: AWS Site-to-Site VPN is an encrypted tunnel over the internet. Security group is a stateful instance-level firewall. AWS Direct Connect is a dedicated private link to AWS.",
+    "reference": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-091",
+    "module": "Networking & Content Delivery",
+    "skill": "Identify AWS networking services",
+    "question": "Two requirements must be met: establish a dedicated private physical connection from a data center to AWS; and reach an AWS service privately from a VPC without using the public internet. Select the two correct options.",
+    "options": [
+      "VPC endpoint",
+      "Amazon CloudFront",
+      "AWS Site-to-Site VPN",
+      "Security group",
+      "AWS Direct Connect"
+    ],
+    "correct": [
+      0,
+      4
+    ],
+    "explanation": "AWS Direct Connect is correct: Direct Connect provides a dedicated, private physical network connection between on-premises and AWS. VPC endpoint is correct: A VPC endpoint privately connects a VPC to supported AWS services without traversing the public internet. Amazon CloudFront is a content delivery network. AWS Site-to-Site VPN is an encrypted tunnel over the internet. Security group is a stateful instance-level firewall.",
+    "reference": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html",
+    "references": [
+      "https://docs.aws.amazon.com/vpc/latest/privatelink/concepts.html",
+      "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-092",
+    "module": "Networking & Content Delivery",
+    "skill": "Identify AWS networking services",
+    "question": "Which AWS capability is the best fit when the requirement is to create an encrypted tunnel over the internet between on-premises and a VPC?",
+    "options": [
+      "AWS Site-to-Site VPN",
+      "Security group",
+      "VPC endpoint",
+      "Network ACL"
+    ],
+    "correct": 0,
+    "explanation": "AWS Site-to-Site VPN is correct because AWS Site-to-Site VPN creates an encrypted IPsec tunnel over the internet between your network and a VPC. Distractors: Security group is a stateful instance-level firewall. VPC endpoint provides private access to AWS services. Network ACL is a stateless subnet-level control.",
+    "reference": "https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-093",
+    "module": "Networking & Content Delivery",
+    "skill": "Identify AWS networking services",
+    "question": "An operations team wants to act as a stateful virtual firewall controlling traffic to an EC2 instance. Which choice is most appropriate?",
+    "options": [
+      "VPC endpoint",
+      "Network ACL",
+      "Amazon VPC",
+      "Security group"
+    ],
+    "correct": 3,
+    "explanation": "Security group is correct because A security group is a stateful virtual firewall that controls inbound and outbound traffic for an instance. Distractors: VPC endpoint provides private access to AWS services. Network ACL is a stateless subnet-level control. Amazon VPC is an isolated private network.",
+    "reference": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-094",
+    "module": "Networking & Content Delivery",
+    "skill": "Identify AWS networking services",
+    "question": "During implementation, you must reach an AWS service privately from a VPC without using the public internet. Which AWS feature should you choose?",
+    "options": [
+      "Amazon VPC",
+      "Amazon Route 53",
+      "VPC endpoint",
+      "Network ACL"
+    ],
+    "correct": 2,
+    "explanation": "VPC endpoint is correct because A VPC endpoint privately connects a VPC to supported AWS services without traversing the public internet. Distractors: Amazon VPC is an isolated private network. Amazon Route 53 is DNS and routing. Network ACL is a stateless subnet-level control.",
+    "reference": "https://docs.aws.amazon.com/vpc/latest/privatelink/concepts.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-095",
+    "module": "Networking & Content Delivery",
+    "skill": "Identify AWS networking services",
+    "question": "Pick the two features that address these requirements: apply stateless allow and deny rules at the subnet boundary; and cache and deliver content to users worldwide with low latency from edge locations.",
+    "options": [
+      "Network ACL",
+      "Amazon CloudFront",
+      "Amazon VPC",
+      "Amazon Route 53",
+      "AWS Direct Connect"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Network ACL is correct: A network ACL is a stateless, optional layer that allows or denies traffic at the subnet level. Amazon CloudFront is correct: CloudFront is a content delivery network that caches content at edge locations for low-latency delivery. Amazon VPC is an isolated private network. Amazon Route 53 is DNS and routing. AWS Direct Connect is a dedicated private link to AWS.",
+    "reference": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html",
+    "references": [
+      "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html",
+      "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-096",
+    "module": "Databases",
+    "skill": "Identify AWS database services",
+    "question": "An organization has the following requirement: run a managed relational database using a standard engine such as MySQL, PostgreSQL, or SQL Server. What is the least-complex correct option?",
+    "options": [
+      "Amazon RDS",
+      "Amazon DynamoDB",
+      "Amazon Redshift",
+      "Amazon ElastiCache"
+    ],
+    "correct": 0,
+    "explanation": "Amazon RDS is correct because Amazon RDS is a managed relational database service for standard engines, handling provisioning, patching, and backups. Distractors: Amazon DynamoDB is a managed NoSQL key-value database. Amazon Redshift is a data warehouse for analytics. Amazon ElastiCache is an in-memory cache.",
+    "reference": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-097",
+    "module": "Databases",
+    "skill": "Identify AWS database services",
+    "question": "What should be configured first when the goal is to use a fully managed NoSQL key-value database with single-digit millisecond latency at any scale?",
+    "options": [
+      "Amazon Aurora",
+      "Amazon ElastiCache",
+      "Amazon Redshift",
+      "Amazon DynamoDB"
+    ],
+    "correct": 3,
+    "explanation": "Amazon DynamoDB is correct because DynamoDB is a serverless NoSQL database delivering consistent single-digit millisecond performance at any scale. Distractors: Amazon Aurora is a cloud-built MySQL/PostgreSQL-compatible database. Amazon ElastiCache is an in-memory cache. Amazon Redshift is a data warehouse for analytics.",
+    "reference": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-098",
+    "module": "Databases",
+    "skill": "Identify AWS database services",
+    "question": "Your team needs to run a cloud-built database that is MySQL- and PostgreSQL-compatible with higher performance. Which AWS option should you use?",
+    "options": [
+      "Amazon Redshift",
+      "Amazon DocumentDB",
+      "Amazon Aurora",
+      "Amazon DynamoDB"
+    ],
+    "correct": 2,
+    "explanation": "Amazon Aurora is correct because Aurora is a cloud-built, MySQL- and PostgreSQL-compatible relational database with improved performance and availability. Distractors: Amazon Redshift is a data warehouse for analytics. Amazon DocumentDB is a managed MongoDB-compatible document database. Amazon DynamoDB is a managed NoSQL key-value database.",
+    "reference": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-099",
+    "module": "Databases",
+    "skill": "Identify AWS database services",
+    "question": "Select the two configurations that best support these requirements: add an in-memory cache in front of a database to speed up reads; and run a managed MongoDB-compatible document database.",
+    "options": [
+      "Amazon RDS",
+      "Amazon ElastiCache",
+      "Amazon DocumentDB",
+      "Amazon Redshift",
+      "AWS Database Migration Service (DMS)"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "Amazon ElastiCache is correct: ElastiCache provides managed in-memory caching with Redis or Memcached to accelerate read-heavy workloads. Amazon DocumentDB is correct: Amazon DocumentDB is a managed document database compatible with MongoDB workloads. Amazon Redshift is a data warehouse for analytics. AWS Database Migration Service (DMS) migrates databases to AWS. Amazon RDS is a managed relational database for standard engines.",
+    "reference": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html",
+    "references": [
+      "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html",
+      "https://docs.aws.amazon.com/documentdb/latest/developerguide/what-is.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-100",
+    "module": "Databases",
+    "skill": "Identify AWS database services",
+    "question": "To run a petabyte-scale data warehouse for analytics across large datasets, which AWS capability should you choose?",
+    "options": [
+      "Amazon Redshift",
+      "AWS Database Migration Service (DMS)",
+      "Amazon DocumentDB",
+      "Amazon RDS"
+    ],
+    "correct": 0,
+    "explanation": "Amazon Redshift is correct because Amazon Redshift is a managed data warehouse for analytic queries over very large datasets. Distractors: AWS Database Migration Service (DMS) migrates databases to AWS. Amazon DocumentDB is a managed MongoDB-compatible document database. Amazon RDS is a managed relational database for standard engines.",
+    "reference": "https://docs.aws.amazon.com/redshift/latest/mgmt/welcome.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-101",
+    "module": "Databases",
+    "skill": "Identify AWS database services",
+    "question": "A workload requires that you migrate an existing database to AWS while the source keeps running. What is the correct choice?",
+    "options": [
+      "Amazon DocumentDB",
+      "Amazon RDS",
+      "Amazon DynamoDB",
+      "AWS Database Migration Service (DMS)"
+    ],
+    "correct": 3,
+    "explanation": "AWS Database Migration Service (DMS) is correct because AWS DMS migrates databases to AWS with minimal downtime while the source remains operational. Distractors: Amazon DocumentDB is a managed MongoDB-compatible document database. Amazon RDS is a managed relational database for standard engines. Amazon DynamoDB is a managed NoSQL key-value database.",
+    "reference": "https://docs.aws.amazon.com/dms/latest/userguide/Welcome.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-102",
+    "module": "Databases",
+    "skill": "Identify AWS database services",
+    "question": "As the AWS administrator, you are asked to run a managed MongoDB-compatible document database. What do you select?",
+    "options": [
+      "Amazon DynamoDB",
+      "Amazon Aurora",
+      "Amazon DocumentDB",
+      "Amazon RDS"
+    ],
+    "correct": 2,
+    "explanation": "Amazon DocumentDB is correct because Amazon DocumentDB is a managed document database compatible with MongoDB workloads. Distractors: Amazon DynamoDB is a managed NoSQL key-value database. Amazon Aurora is a cloud-built MySQL/PostgreSQL-compatible database. Amazon RDS is a managed relational database for standard engines.",
+    "reference": "https://docs.aws.amazon.com/documentdb/latest/developerguide/what-is.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-103",
+    "module": "Global Infrastructure & Deployment",
+    "skill": "Understand AWS global infrastructure and ways to access AWS",
+    "question": "Which AWS feature lets you choose the separate geographic area that contains multiple isolated Availability Zones?",
+    "options": [
+      "AWS CloudFormation",
+      "AWS Region",
+      "Availability Zone",
+      "Edge location"
+    ],
+    "correct": 1,
+    "explanation": "AWS Region is correct because An AWS Region is a separate geographic area that contains multiple isolated Availability Zones. Distractors: AWS CloudFormation provisions infrastructure as code. Availability Zone is one or more isolated data centers in a Region. Edge location caches content near users.",
+    "reference": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-104",
+    "module": "Global Infrastructure & Deployment",
+    "skill": "Understand AWS global infrastructure and ways to access AWS",
+    "question": "Which option should you implement to spread a workload across isolated locations within one Region for high availability?",
+    "options": [
+      "Availability Zone",
+      "Edge location",
+      "AWS CloudFormation",
+      "AWS Command Line Interface (CLI)"
+    ],
+    "correct": 0,
+    "explanation": "Availability Zone is correct because An Availability Zone is one or more discrete data centers within a Region; spreading across AZs improves availability. Distractors: Edge location caches content near users. AWS CloudFormation provisions infrastructure as code. AWS Command Line Interface (CLI) runs AWS commands in a terminal.",
+    "reference": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-105",
+    "module": "Global Infrastructure & Deployment",
+    "skill": "Understand AWS global infrastructure and ways to access AWS",
+    "question": "You need a solution to cache content close to end users at points of presence for low latency. Which option fits best?",
+    "options": [
+      "AWS CloudFormation",
+      "AWS Command Line Interface (CLI)",
+      "AWS Management Console",
+      "Edge location"
+    ],
+    "correct": 3,
+    "explanation": "Edge location is correct because Edge locations are sites used by CloudFront and other services to cache content closer to users. Distractors: AWS CloudFormation provisions infrastructure as code. AWS Command Line Interface (CLI) runs AWS commands in a terminal. AWS Management Console is the web interface for AWS.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-106",
+    "module": "Global Infrastructure & Deployment",
+    "skill": "Understand AWS global infrastructure and ways to access AWS",
+    "question": "Which two options together satisfy these requirements: define and provision AWS resources from declarative templates as code; and choose the separate geographic area that contains multiple isolated Availability Zones?",
+    "options": [
+      "AWS Region",
+      "Availability Zone",
+      "Edge location",
+      "AWS Command Line Interface (CLI)",
+      "AWS CloudFormation"
+    ],
+    "correct": [
+      0,
+      4
+    ],
+    "explanation": "AWS CloudFormation is correct: CloudFormation provisions AWS resources from declarative templates, treating infrastructure as code. AWS Region is correct: An AWS Region is a separate geographic area that contains multiple isolated Availability Zones. Availability Zone is one or more isolated data centers in a Region. Edge location caches content near users. AWS Command Line Interface (CLI) runs AWS commands in a terminal.",
+    "reference": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html",
+    "references": [
+      "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html",
+      "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-107",
+    "module": "Global Infrastructure & Deployment",
+    "skill": "Understand AWS global infrastructure and ways to access AWS",
+    "question": "You are administering an AWS environment and need to control AWS services by typing commands in a terminal or shell. Which option best meets the requirement?",
+    "options": [
+      "Availability Zone",
+      "AWS Command Line Interface (CLI)",
+      "AWS Management Console",
+      "AWS Region"
+    ],
+    "correct": 1,
+    "explanation": "AWS Command Line Interface (CLI) is correct because The AWS CLI controls AWS services from a command-line shell and can be scripted for automation. Distractors: Availability Zone is one or more isolated data centers in a Region. AWS Management Console is the web interface for AWS. AWS Region is a geographic area of Availability Zones.",
+    "reference": "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-108",
+    "module": "Global Infrastructure & Deployment",
+    "skill": "Understand AWS global infrastructure and ways to access AWS",
+    "question": "A design review identifies this requirement: manage AWS services through a web-based graphical interface in a browser. What should you configure?",
+    "options": [
+      "AWS Management Console",
+      "AWS Region",
+      "Availability Zone",
+      "Edge location"
+    ],
+    "correct": 0,
+    "explanation": "AWS Management Console is correct because The AWS Management Console is the web application for accessing and managing AWS services. Distractors: AWS Region is a geographic area of Availability Zones. Availability Zone is one or more isolated data centers in a Region. Edge location caches content near users.",
+    "reference": "https://docs.aws.amazon.com/awsconsolehelpdocs/latest/gsg/getting-started.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-109",
+    "module": "Management & Monitoring",
+    "skill": "Identify AWS management and monitoring tools",
+    "question": "Which AWS capability is the best fit when the requirement is to collect metrics and logs and trigger alarms on AWS resources?",
+    "options": [
+      "AWS CloudTrail",
+      "AWS Config",
+      "AWS Trusted Advisor",
+      "Amazon CloudWatch"
+    ],
+    "correct": 3,
+    "explanation": "Amazon CloudWatch is correct because CloudWatch monitors resources and applications by collecting metrics and logs and triggering alarms and actions. Distractors: AWS CloudTrail records API calls for audit. AWS Config records and evaluates resource configurations. AWS Trusted Advisor recommends best-practice improvements.",
+    "reference": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-110",
+    "module": "Management & Monitoring",
+    "skill": "Identify AWS management and monitoring tools",
+    "question": "An operations team wants to record API calls and account activity for auditing and governance. Which choice is most appropriate?",
+    "options": [
+      "AWS Trusted Advisor",
+      "AWS Systems Manager",
+      "AWS CloudTrail",
+      "AWS Config"
+    ],
+    "correct": 2,
+    "explanation": "AWS CloudTrail is correct because CloudTrail records API calls and account activity to support auditing and governance. Distractors: AWS Trusted Advisor recommends best-practice improvements. AWS Systems Manager automates operational tasks. AWS Config records and evaluates resource configurations.",
+    "reference": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-111",
+    "module": "Management & Monitoring",
+    "skill": "Identify AWS management and monitoring tools",
+    "question": "During implementation, you must record resource configurations and evaluate them against rules over time. Which AWS feature should you choose?",
+    "options": [
+      "AWS Health Dashboard",
+      "AWS Config",
+      "AWS Trusted Advisor",
+      "AWS Systems Manager"
+    ],
+    "correct": 1,
+    "explanation": "AWS Config is correct because AWS Config records resource configurations and evaluates compliance against rules over time. Distractors: AWS Health Dashboard shows service and account health events. AWS Trusted Advisor recommends best-practice improvements. AWS Systems Manager automates operational tasks.",
+    "reference": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-112",
+    "module": "Management & Monitoring",
+    "skill": "Identify AWS management and monitoring tools",
+    "question": "Choose the two AWS capabilities that meet these needs: get best-practice recommendations across cost, performance, security, and fault tolerance; and collect metrics and logs and trigger alarms on AWS resources.",
+    "options": [
+      "AWS CloudTrail",
+      "AWS Config",
+      "AWS Systems Manager",
+      "AWS Trusted Advisor",
+      "Amazon CloudWatch"
+    ],
+    "correct": [
+      3,
+      4
+    ],
+    "explanation": "AWS Trusted Advisor is correct: Trusted Advisor inspects an environment and recommends improvements across several categories and limits. Amazon CloudWatch is correct: CloudWatch monitors resources and applications by collecting metrics and logs and triggering alarms and actions. AWS CloudTrail records API calls for audit. AWS Config records and evaluates resource configurations. AWS Systems Manager automates operational tasks.",
+    "reference": "https://docs.aws.amazon.com/awssupport/latest/user/trusted-advisor.html",
+    "references": [
+      "https://docs.aws.amazon.com/awssupport/latest/user/trusted-advisor.html",
+      "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-113",
+    "module": "Management & Monitoring",
+    "skill": "Identify AWS management and monitoring tools",
+    "question": "An organization has the following requirement: automate operational tasks and run commands across many EC2 instances. What is the least-complex correct option?",
+    "options": [
+      "AWS Health Dashboard",
+      "Amazon CloudWatch",
+      "AWS CloudTrail",
+      "AWS Systems Manager"
+    ],
+    "correct": 3,
+    "explanation": "AWS Systems Manager is correct because AWS Systems Manager provides operational management and automation across AWS resources. Distractors: AWS Health Dashboard shows service and account health events. Amazon CloudWatch collects metrics, logs, and alarms. AWS CloudTrail records API calls for audit.",
+    "reference": "https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-114",
+    "module": "Management & Monitoring",
+    "skill": "Identify AWS management and monitoring tools",
+    "question": "What should be configured first when the goal is to see the status of AWS services and events that affect your specific account?",
+    "options": [
+      "AWS CloudTrail",
+      "AWS Config",
+      "AWS Health Dashboard",
+      "Amazon CloudWatch"
+    ],
+    "correct": 2,
+    "explanation": "AWS Health Dashboard is correct because The AWS Health Dashboard shows AWS service status and personalized events affecting your resources. Distractors: AWS CloudTrail records API calls for audit. AWS Config records and evaluates resource configurations. Amazon CloudWatch collects metrics, logs, and alarms.",
+    "reference": "https://docs.aws.amazon.com/health/latest/ug/what-is-aws-health.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-115",
+    "module": "Pricing Models",
+    "skill": "Compare AWS pricing models",
+    "question": "Your team needs to pay for EC2 by the second with no commitment and no risk that AWS reclaims the capacity. Which AWS option should you use?",
+    "options": [
+      "Spot Instances",
+      "On-Demand pricing",
+      "Reserved Instances",
+      "Savings Plans"
+    ],
+    "correct": 1,
+    "explanation": "On-Demand pricing is correct because On-Demand bills per second with no commitment and is not interrupted, suiting short-term or unpredictable workloads. Distractors: Spot Instances are cheapest but can be interrupted. Reserved Instances discount a specific instance configuration for a 1- or 3-year term. Savings Plans discount a committed dollars-per-hour spend.",
+    "reference": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-on-demand-instances.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-116",
+    "module": "Pricing Models",
+    "skill": "Compare AWS pricing models",
+    "question": "To commit to a specific instance configuration for one or three years to get a large discount, which AWS capability should you choose?",
+    "options": [
+      "Reserved Instances",
+      "On-Demand pricing",
+      "Savings Plans",
+      "Spot Instances"
+    ],
+    "correct": 0,
+    "explanation": "Reserved Instances is correct because Reserved Instances discount a specific instance configuration in exchange for a one- or three-year commitment. Distractors: On-Demand pricing has no commitment but the highest unit price. Savings Plans discount a committed dollars-per-hour spend. Spot Instances are cheapest but can be interrupted.",
+    "reference": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-reserved-instances.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-117",
+    "module": "Pricing Models",
+    "skill": "Compare AWS pricing models",
+    "question": "A workload requires that you commit to a consistent amount of compute spend per hour for one or three years for a flexible discount. What is the correct choice?",
+    "options": [
+      "On-Demand pricing",
+      "Reserved Instances",
+      "Spot Instances",
+      "Savings Plans"
+    ],
+    "correct": 3,
+    "explanation": "Savings Plans is correct because Savings Plans give lower prices for committing to a consistent dollars-per-hour amount of usage for one or three years. Distractors: On-Demand pricing has no commitment but the highest unit price. Reserved Instances discount a specific instance configuration for a 1- or 3-year term. Spot Instances are cheapest but can be interrupted.",
+    "reference": "https://docs.aws.amazon.com/savingsplans/latest/userguide/what-is-savings-plans.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-118",
+    "module": "Pricing Models",
+    "skill": "Compare AWS pricing models",
+    "question": "Two requirements must be met: use spare EC2 capacity at a steep discount for workloads that tolerate interruption; and pay for EC2 by the second with no commitment and no risk that AWS reclaims the capacity. Select the two correct options.",
+    "options": [
+      "Savings Plans",
+      "Volume-based (tiered) pricing",
+      "Spot Instances",
+      "On-Demand pricing",
+      "Reserved Instances"
+    ],
+    "correct": [
+      2,
+      3
+    ],
+    "explanation": "Spot Instances is correct: Spot Instances use spare capacity at a large discount but can be interrupted, suiting fault-tolerant workloads. On-Demand pricing is correct: On-Demand bills per second with no commitment and is not interrupted, suiting short-term or unpredictable workloads. Reserved Instances discount a specific instance configuration for a 1- or 3-year term. Savings Plans discount a committed dollars-per-hour spend. Volume-based (tiered) pricing lowers per-unit price as usage grows.",
+    "reference": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-instances.html",
+    "references": [
+      "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-instances.html",
+      "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-on-demand-instances.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-119",
+    "module": "Pricing Models",
+    "skill": "Compare AWS pricing models",
+    "question": "As the AWS administrator, you are asked to pay a lower per-unit price as monthly usage of a service such as S3 storage grows. What do you select?",
+    "options": [
+      "Reserved Instances",
+      "Volume-based (tiered) pricing",
+      "AWS Free Tier",
+      "On-Demand pricing"
+    ],
+    "correct": 1,
+    "explanation": "Volume-based (tiered) pricing is correct because Some services apply volume-based tiering where the per-unit price decreases at higher usage levels. Distractors: Reserved Instances discount a specific instance configuration for a 1- or 3-year term. AWS Free Tier offers sign-up credits and free services. On-Demand pricing has no commitment but the highest unit price.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/how-aws-pricing-works/aws-pricing-models.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-120",
+    "module": "Pricing Models",
+    "skill": "Compare AWS pricing models",
+    "question": "Which AWS feature lets you explore AWS at no cost using sign-up credits and always-free services?",
+    "options": [
+      "AWS Free Tier",
+      "On-Demand pricing",
+      "Reserved Instances",
+      "Savings Plans"
+    ],
+    "correct": 0,
+    "explanation": "AWS Free Tier is correct because New AWS accounts receive sign-up credits plus always-free services and can choose a Free or Paid account plan. Distractors: On-Demand pricing has no commitment but the highest unit price. Reserved Instances discount a specific instance configuration for a 1- or 3-year term. Savings Plans discount a committed dollars-per-hour spend.",
+    "reference": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-121",
+    "module": "Billing & Cost Management",
+    "skill": "Use AWS cost management tools",
+    "question": "Which option should you implement to visualize, understand, and forecast AWS spend and usage over time?",
+    "options": [
+      "AWS Budgets",
+      "AWS Cost and Usage Report",
+      "AWS Organizations consolidated billing",
+      "AWS Cost Explorer"
+    ],
+    "correct": 3,
+    "explanation": "AWS Cost Explorer is correct because Cost Explorer lets you visualize, understand, and forecast AWS costs and usage over time. Distractors: AWS Budgets alerts when spend or usage crosses a threshold. AWS Cost and Usage Report gives the most detailed billing data. AWS Organizations consolidated billing combines billing across accounts.",
+    "reference": "https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-122",
+    "module": "Billing & Cost Management",
+    "skill": "Use AWS cost management tools",
+    "question": "You need a solution to set a cost or usage threshold and be alerted when actual or forecast values cross it. Which option fits best?",
+    "options": [
+      "AWS Organizations consolidated billing",
+      "Cost allocation tags",
+      "AWS Budgets",
+      "AWS Cost and Usage Report"
+    ],
+    "correct": 2,
+    "explanation": "AWS Budgets is correct because AWS Budgets sets custom cost and usage budgets and alerts you when thresholds are crossed. Distractors: AWS Organizations consolidated billing combines billing across accounts. Cost allocation tags categorize costs by label. AWS Cost and Usage Report gives the most detailed billing data.",
+    "reference": "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-123",
+    "module": "Billing & Cost Management",
+    "skill": "Use AWS cost management tools",
+    "question": "You are administering an AWS environment and need to get the most detailed, line-item billing data for deep analysis. Which option best meets the requirement?",
+    "options": [
+      "AWS Cost Explorer",
+      "AWS Cost and Usage Report",
+      "AWS Organizations consolidated billing",
+      "Cost allocation tags"
+    ],
+    "correct": 1,
+    "explanation": "AWS Cost and Usage Report is correct because The AWS Cost and Usage Report provides the most comprehensive, line-item billing and usage data. Distractors: AWS Cost Explorer visualizes and forecasts spend. AWS Organizations consolidated billing combines billing across accounts. Cost allocation tags categorize costs by label.",
+    "reference": "https://docs.aws.amazon.com/cur/latest/userguide/what-is-cur.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-124",
+    "module": "Billing & Cost Management",
+    "skill": "Use AWS cost management tools",
+    "question": "Pick the two features that address these requirements: combine billing across many accounts and share volume discounts; and set a cost or usage threshold and be alerted when actual or forecast values cross it.",
+    "options": [
+      "AWS Cost and Usage Report",
+      "AWS Organizations consolidated billing",
+      "AWS Budgets",
+      "Cost allocation tags",
+      "AWS Cost Explorer"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "AWS Organizations consolidated billing is correct: Consolidated billing in AWS Organizations combines account usage into one bill with shared volume pricing. AWS Budgets is correct: AWS Budgets sets custom cost and usage budgets and alerts you when thresholds are crossed. Cost allocation tags categorize costs by label. AWS Cost Explorer visualizes and forecasts spend. AWS Cost and Usage Report gives the most detailed billing data.",
+    "reference": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/consolidated-billing.html",
+    "references": [
+      "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/consolidated-billing.html",
+      "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-125",
+    "module": "Billing & Cost Management",
+    "skill": "Use AWS cost management tools",
+    "question": "A design review identifies this requirement: categorize and track costs by project or team using labels on resources. What should you configure?",
+    "options": [
+      "AWS Cost Explorer",
+      "AWS Budgets",
+      "AWS Cost and Usage Report",
+      "Cost allocation tags"
+    ],
+    "correct": 3,
+    "explanation": "Cost allocation tags is correct because Cost allocation tags let you categorize and track AWS costs by labels such as project, team, or environment. Distractors: AWS Cost Explorer visualizes and forecasts spend. AWS Budgets alerts when spend or usage crosses a threshold. AWS Cost and Usage Report gives the most detailed billing data.",
+    "reference": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-126",
+    "module": "Support & Resources",
+    "skill": "Identify AWS technical resources and support options",
+    "question": "Which AWS capability is the best fit when the requirement is to use the no-cost plan that covers account and billing questions, AWS service health, and documentation?",
+    "options": [
+      "AWS Enterprise Support",
+      "AWS documentation and whitepapers",
+      "AWS Basic Support",
+      "AWS Business Support+"
+    ],
+    "correct": 2,
+    "explanation": "AWS Basic Support is correct because Basic Support is included for every account and covers account and billing questions, AWS service health checks, documentation, and support forums. Distractors: AWS Enterprise Support adds a Technical Account Manager and fastest response. AWS documentation and whitepapers are free self-service resources, not a support plan. AWS Business Support+ adds 24x7 engineers, 500+ checks, and AI help.",
+    "reference": "https://docs.aws.amazon.com/awssupport/latest/user/aws-support-plans.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-127",
+    "module": "Support & Resources",
+    "skill": "Identify AWS technical resources and support options",
+    "question": "An operations team wants to get 24x7 access to Cloud Support Engineers, more than 500 Trusted Advisor checks, and AI-powered help. Which choice is most appropriate?",
+    "options": [
+      "AWS re:Post",
+      "AWS Business Support+",
+      "AWS Basic Support",
+      "AWS Enterprise Support"
+    ],
+    "correct": 1,
+    "explanation": "AWS Business Support+ is correct because Business Support+ adds 24x7 access to Cloud Support Engineers, more than 500 Trusted Advisor checks, the Support API, and AI-powered assistance. Distractors: AWS re:Post is a public community Q and A service. AWS Basic Support is free with selected core checks only. AWS Enterprise Support adds a Technical Account Manager and fastest response.",
+    "reference": "https://docs.aws.amazon.com/awssupport/latest/user/aws-support-plans.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-128",
+    "module": "Support & Resources",
+    "skill": "Identify AWS technical resources and support options",
+    "question": "During implementation, you must get a designated Technical Account Manager and the fastest listed response for business-critical workloads. Which AWS feature should you choose?",
+    "options": [
+      "AWS Enterprise Support",
+      "AWS Basic Support",
+      "AWS Business Support+",
+      "AWS re:Post"
+    ],
+    "correct": 0,
+    "explanation": "AWS Enterprise Support is correct because Enterprise Support adds a designated Technical Account Manager and the fastest listed response times for critical workloads. Distractors: AWS Basic Support is free with selected core checks only. AWS Business Support+ adds 24x7 engineers, 500+ checks, and AI help. AWS re:Post is a public community Q and A service.",
+    "reference": "https://docs.aws.amazon.com/awssupport/latest/user/aws-support-plans.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-129",
+    "module": "Support & Resources",
+    "skill": "Identify AWS technical resources and support options",
+    "question": "Select the two configurations that best support these requirements: find free best-practice guidance, technical papers, and documentation published by AWS; and get 24x7 access to Cloud Support Engineers, more than 500 Trusted Advisor checks, and AI-powered help.",
+    "options": [
+      "AWS Enterprise Support",
+      "AWS documentation and whitepapers",
+      "AWS Business Support+",
+      "AWS re:Post",
+      "AWS Basic Support"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "AWS documentation and whitepapers is correct: AWS publishes free documentation, technical papers, and best-practice guides as self-service resources. AWS Business Support+ is correct: Business Support+ adds 24x7 access to Cloud Support Engineers, more than 500 Trusted Advisor checks, the Support API, and AI-powered assistance. AWS re:Post is a public community Q and A service. AWS Basic Support is free with selected core checks only. AWS Enterprise Support adds a Technical Account Manager and fastest response.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/introduction.html",
+    "references": [
+      "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/introduction.html",
+      "https://docs.aws.amazon.com/awssupport/latest/user/aws-support-plans.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-130",
+    "module": "Support & Resources",
+    "skill": "Identify AWS technical resources and support options",
+    "question": "An organization has the following requirement: ask technical questions and get community and AWS answers in a managed public Q and A service. What is the least-complex correct option?",
+    "options": [
+      "AWS Business Support+",
+      "AWS Enterprise Support",
+      "AWS re:Post",
+      "AWS Basic Support"
+    ],
+    "correct": 2,
+    "explanation": "AWS re:Post is correct because AWS re:Post is a managed public community question-and-answer service for technical guidance. Distractors: AWS Business Support+ adds 24x7 engineers, 500+ checks, and AI help. AWS Enterprise Support adds a Technical Account Manager and fastest response. AWS Basic Support is free with selected core checks only.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/userguide/continue-workflow-review.html",
+    "question_type": "STANDARD"
+  }
+]
