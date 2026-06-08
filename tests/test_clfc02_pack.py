@@ -40,7 +40,7 @@ class ClfC02PackTests(unittest.TestCase):
 
     def test_free_taxonomy(self):
         self.assertEqual(self.meta.get("commercialStatus"), "free")
-        self.assertEqual(self.meta.get("vendor"), "AWS")
+        self.assertEqual(self.meta.get("vendor"), "Amazon Web Services")
         self.assertEqual(self.meta.get("certificationCode"), "CLF-C02")
 
     def test_recommends_saac03(self):

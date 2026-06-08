@@ -11,7 +11,7 @@
   "schemaVersion": "1.1",
   "badge": "Foundational",
   "icon": "fas fa-cloud",
-  "vendor": "AWS",
+  "vendor": "Amazon Web Services",
   "certificationCode": "CLF-C02",
   "domains": [
     "Cloud",
