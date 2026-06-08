@@ -40,6 +40,7 @@
         "Cloud Value & Economics",
         "Well-Architected Pillars",
         "Cloud Design Principles",
+        "Cloud Deployment & Service Models",
         "Cloud Migration & Adoption"
       ]
     },
@@ -96,6 +97,10 @@
     {
       "icon": "fas fa-drafting-compass",
       "name": "Cloud Design Principles"
+    },
+    {
+      "icon": "fas fa-layer-group",
+      "name": "Cloud Deployment & Service Models"
     },
     {
       "icon": "fas fa-truck-moving",

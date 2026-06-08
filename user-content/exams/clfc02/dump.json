@@ -84,7 +84,7 @@
     ],
     "correct": 3,
     "explanation": "Total Cost of Ownership (TCO) is correct because TCO compares relevant direct and indirect costs; AWS avoids physical data-center work, though customers still administer their workloads. Distractors: Stop spending on undifferentiated heavy lifting removes data-center operational work. Increased speed and agility makes new resources available in minutes. Stop guessing capacity removes the need to forecast capacity.",
-    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/migration-tools/business-case.html",
     "question_type": "STANDARD"
   },
   {
@@ -253,13 +253,13 @@
     "skill": "Identify AWS cloud design principles",
     "question": "Which AWS feature lets you assume any component can fail and add redundancy so the system keeps running?",
     "options": [
-      "Horizontal scaling",
+      "Use managed services",
       "Design for failure and build redundancy",
       "Loose coupling",
       "Automation"
     ],
     "correct": 1,
-    "explanation": "Design for failure and build redundancy is correct because Designing for failure and adding redundancy removes single points of failure so the system tolerates component loss. Distractors: Horizontal scaling adds more instances rather than enlarging one. Loose coupling is a design principle reducing dependencies between components. Automation is a design principle replacing manual steps with code.",
+    "explanation": "Design for failure and build redundancy is correct because Designing for failure and adding redundancy removes single points of failure so the system tolerates component loss. Distractors: Use managed services shifts operational work to AWS. Loose coupling is a design principle reducing dependencies between components. Automation is a design principle replacing manual steps with code.",
     "reference": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/design-principles.html",
     "question_type": "STANDARD"
   },
@@ -267,15 +267,15 @@
     "id": "CLFC02-PRO-016",
     "module": "Cloud Design Principles",
     "skill": "Identify AWS cloud design principles",
-    "question": "Which option should you implement to reduce dependencies between components so they can change, scale, or fail independently?",
+    "question": "Which option should you implement to reduce dependencies between components so they can change or fail independently?",
     "options": [
       "Loose coupling",
       "Automation",
-      "Horizontal scaling",
-      "Use managed services"
+      "Use managed services",
+      "Make data-driven decisions"
     ],
     "correct": 0,
-    "explanation": "Loose coupling is correct because Loose coupling reduces interdependencies through defined interfaces so components evolve and fail independently. Distractors: Automation is a design principle replacing manual steps with code. Horizontal scaling adds more instances rather than enlarging one. Use managed services shifts operational work to AWS.",
+    "explanation": "Loose coupling is correct because Loose coupling reduces interdependencies through defined interfaces so components evolve and fail independently. Distractors: Automation is a design principle replacing manual steps with code. Use managed services shifts operational work to AWS. Make data-driven decisions is a different AWS capability and does not best satisfy this requirement.",
     "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_prevent_interaction_failure_loosely_coupled_system.html",
     "question_type": "STANDARD"
   },
@@ -285,13 +285,13 @@
     "skill": "Identify AWS cloud design principles",
     "question": "You need a solution to replace manual, error-prone setup with repeatable code that applies changes consistently. Which option fits best?",
     "options": [
-      "Horizontal scaling",
       "Use managed services",
-      "Treat resources as disposable",
+      "Make data-driven decisions",
+      "Design for failure and build redundancy",
       "Automation"
     ],
     "correct": 3,
-    "explanation": "Automation is correct because Automating with code reduces human error and makes changes consistent and repeatable. Distractors: Horizontal scaling adds more instances rather than enlarging one. Use managed services shifts operational work to AWS. Treat resources as disposable replaces rather than repairs resources.",
+    "explanation": "Automation is correct because Automating with code reduces human error and makes changes consistent and repeatable. Distractors: Use managed services shifts operational work to AWS. Make data-driven decisions is a different AWS capability and does not best satisfy this requirement. Design for failure and build redundancy is a design principle for removing single points of failure.",
     "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/general-design-principles.html",
     "question_type": "STANDARD"
   },
@@ -299,23 +299,23 @@
     "id": "CLFC02-PRO-018",
     "module": "Cloud Design Principles",
     "skill": "Identify AWS cloud design principles",
-    "question": "Two requirements must be met: handle more load by adding more instances rather than enlarging one server; and assume any component can fail and add redundancy so the system keeps running. Select the two correct options.",
+    "question": "Two requirements must be met: offload undifferentiated operational work by letting AWS run the service infrastructure; and reduce dependencies between components so they can change or fail independently. Select the two correct options.",
     "options": [
+      "Design for failure and build redundancy",
       "Automation",
       "Use managed services",
-      "Horizontal scaling",
-      "Design for failure and build redundancy",
-      "Loose coupling"
+      "Loose coupling",
+      "Make data-driven decisions"
     ],
     "correct": [
       2,
       3
     ],
-    "explanation": "Horizontal scaling is correct: Horizontal scaling adds more resources to share load, improving resilience compared with scaling one server up. Design for failure and build redundancy is correct: Designing for failure and adding redundancy removes single points of failure so the system tolerates component loss. Loose coupling is a design principle reducing dependencies between components. Automation is a design principle replacing manual steps with code. Use managed services shifts operational work to AWS.",
-    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/design-principles.html",
+    "explanation": "Use managed services is correct: Using AWS managed services shifts operational and maintenance work to AWS so teams focus on the application. Loose coupling is correct: Loose coupling reduces interdependencies through defined interfaces so components evolve and fail independently. Make data-driven decisions is a different AWS capability and does not best satisfy this requirement. Design for failure and build redundancy is a design principle for removing single points of failure. Automation is a design principle replacing manual steps with code.",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/sus_sus_hardware_a4.html",
     "references": [
-      "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/design-principles.html",
-      "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/design-principles.html"
+      "https://docs.aws.amazon.com/wellarchitected/latest/framework/sus_sus_hardware_a4.html",
+      "https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_prevent_interaction_failure_loosely_coupled_system.html"
     ],
     "question_type": "MULTI"
   },
@@ -323,87 +323,175 @@
     "id": "CLFC02-PRO-019",
     "module": "Cloud Design Principles",
     "skill": "Identify AWS cloud design principles",
-    "question": "You are administering an AWS environment and need to prefer AWS managed services so AWS operates the undifferentiated infrastructure. Which option best meets the requirement?",
+    "question": "You are administering an AWS environment and need to collect data about how the architecture performs and use it to choose and improve the design. Which option best meets the requirement?",
     "options": [
-      "Loose coupling",
-      "Use managed services",
-      "Treat resources as disposable",
-      "Design for failure and build redundancy"
+      "Automation",
+      "Make data-driven decisions",
+      "Design for failure and build redundancy",
+      "Loose coupling"
     ],
     "correct": 1,
-    "explanation": "Use managed services is correct because Using managed services shifts operational heavy lifting to AWS so teams focus on the application. Distractors: Loose coupling is a design principle reducing dependencies between components. Treat resources as disposable replaces rather than repairs resources. Design for failure and build redundancy is a design principle for removing single points of failure.",
+    "explanation": "Make data-driven decisions is correct because AWS recommends driving architecture decisions using data collected about how the workload actually performs. Distractors: Automation is a design principle replacing manual steps with code. Design for failure and build redundancy is a design principle for removing single points of failure. Loose coupling is a design principle reducing dependencies between components.",
     "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/general-design-principles.html",
     "question_type": "STANDARD"
   },
   {
     "id": "CLFC02-PRO-020",
-    "module": "Cloud Design Principles",
-    "skill": "Identify AWS cloud design principles",
-    "question": "A design review identifies this requirement: treat servers as replaceable so you can recreate them from a known definition. What should you configure?",
+    "module": "Cloud Deployment & Service Models",
+    "skill": "Identify cloud deployment and service models",
+    "question": "A design review identifies this requirement: run every part of an application in the cloud with no on-premises infrastructure. What should you configure?",
     "options": [
-      "Treat resources as disposable",
-      "Design for failure and build redundancy",
-      "Loose coupling",
-      "Automation"
+      "Cloud (all-in) deployment model",
+      "Hybrid deployment model",
+      "On-premises (private cloud) deployment model",
+      "Infrastructure as a Service (IaaS)"
     ],
     "correct": 0,
-    "explanation": "Treat resources as disposable is correct because Treating resources as disposable lets you replace rather than repair them, supporting automation and consistency. Distractors: Design for failure and build redundancy is a design principle for removing single points of failure. Loose coupling is a design principle reducing dependencies between components. Automation is a design principle replacing manual steps with code.",
-    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/framework/general-design-principles.html",
+    "explanation": "Cloud (all-in) deployment model is correct because An all-in cloud deployment runs the entire application in the cloud. Distractors: Hybrid deployment model is a different AWS capability and does not best satisfy this requirement. On-premises (private cloud) deployment model is a different AWS capability and does not best satisfy this requirement. Infrastructure as a Service (IaaS) is a different AWS capability and does not best satisfy this requirement.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html",
     "question_type": "STANDARD"
   },
   {
     "id": "CLFC02-PRO-021",
-    "module": "Cloud Migration & Adoption",
-    "skill": "Understand cloud adoption and migration",
-    "question": "Which AWS capability is the best fit when the requirement is to organize a cloud adoption program across business, people, governance, platform, security, and operations?",
+    "module": "Cloud Deployment & Service Models",
+    "skill": "Identify cloud deployment and service models",
+    "question": "Which AWS capability is the best fit when the requirement is to connect on-premises infrastructure with cloud resources so they work together?",
     "options": [
-      "Rehost",
-      "Replatform",
-      "Repurchase",
-      "AWS Cloud Adoption Framework (CAF)"
+      "On-premises (private cloud) deployment model",
+      "Infrastructure as a Service (IaaS)",
+      "Platform as a Service (PaaS)",
+      "Hybrid deployment model"
     ],
     "correct": 3,
-    "explanation": "AWS Cloud Adoption Framework (CAF) is correct because The AWS CAF organizes adoption guidance into six perspectives to plan and run cloud adoption. Distractors: Rehost lifts and shifts with minimal change. Replatform makes small cloud optimizations during migration. Repurchase switches to a different product such as SaaS.",
-    "reference": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/foundational-capabilities.html",
+    "explanation": "Hybrid deployment model is correct because A hybrid deployment connects on-premises infrastructure with cloud resources, for example using AWS Outposts or VMware Cloud on AWS. Distractors: On-premises (private cloud) deployment model is a different AWS capability and does not best satisfy this requirement. Infrastructure as a Service (IaaS) is a different AWS capability and does not best satisfy this requirement. Platform as a Service (PaaS) is a different AWS capability and does not best satisfy this requirement.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html",
     "question_type": "STANDARD"
   },
   {
     "id": "CLFC02-PRO-022",
-    "module": "Cloud Migration & Adoption",
-    "skill": "Understand cloud adoption and migration",
-    "question": "An operations team wants to move an application to AWS with minimal changes by lifting and shifting it. Which choice is most appropriate?",
+    "module": "Cloud Deployment & Service Models",
+    "skill": "Identify cloud deployment and service models",
+    "question": "An operations team wants to keep running applications in your own data center using virtualization and resource management. Which choice is most appropriate?",
     "options": [
-      "Repurchase",
-      "Refactor",
-      "Rehost",
-      "Replatform"
+      "Platform as a Service (PaaS)",
+      "Software as a Service (SaaS)",
+      "On-premises (private cloud) deployment model",
+      "Infrastructure as a Service (IaaS)"
     ],
     "correct": 2,
-    "explanation": "Rehost is correct because Rehosting (lift and shift) moves an application without changing its architecture, the fastest strategy. Distractors: Repurchase switches to a different product such as SaaS. Refactor re-architects the application to be cloud-native. Replatform makes small cloud optimizations during migration.",
-    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
+    "explanation": "On-premises (private cloud) deployment model is correct because An on-premises or private-cloud deployment runs applications in your own data center using virtualization and management tools. Distractors: Platform as a Service (PaaS) is a different AWS capability and does not best satisfy this requirement. Software as a Service (SaaS) is a different AWS capability and does not best satisfy this requirement. Infrastructure as a Service (IaaS) is a different AWS capability and does not best satisfy this requirement.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html",
     "question_type": "STANDARD"
   },
   {
     "id": "CLFC02-PRO-023",
+    "module": "Cloud Deployment & Service Models",
+    "skill": "Identify cloud deployment and service models",
+    "question": "Pick the two features that address these requirements: rent virtual servers, storage, and networking while you manage the operating system and applications; and run every part of an application in the cloud with no on-premises infrastructure.",
+    "options": [
+      "On-premises (private cloud) deployment model",
+      "Platform as a Service (PaaS)",
+      "Infrastructure as a Service (IaaS)",
+      "Cloud (all-in) deployment model",
+      "Hybrid deployment model"
+    ],
+    "correct": [
+      2,
+      3
+    ],
+    "explanation": "Infrastructure as a Service (IaaS) is correct: IaaS provides the basic building blocks of compute, storage, and networking while the customer manages the OS and applications. Cloud (all-in) deployment model is correct: An all-in cloud deployment runs the entire application in the cloud. Hybrid deployment model is a different AWS capability and does not best satisfy this requirement. On-premises (private cloud) deployment model is a different AWS capability and does not best satisfy this requirement. Platform as a Service (PaaS) is a different AWS capability and does not best satisfy this requirement.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html",
+    "references": [
+      "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html",
+      "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html"
+    ],
+    "question_type": "MULTI"
+  },
+  {
+    "id": "CLFC02-PRO-024",
+    "module": "Cloud Deployment & Service Models",
+    "skill": "Identify cloud deployment and service models",
+    "question": "During implementation, you must use a managed platform to build and run applications without managing the underlying OS or servers. Which AWS feature should you choose?",
+    "options": [
+      "Platform as a Service (PaaS)",
+      "Software as a Service (SaaS)",
+      "Cloud (all-in) deployment model",
+      "Hybrid deployment model"
+    ],
+    "correct": 0,
+    "explanation": "Platform as a Service (PaaS) is correct because PaaS removes the need to manage the underlying infrastructure and OS so you focus on deploying and running applications. Distractors: Software as a Service (SaaS) is a different AWS capability and does not best satisfy this requirement. Cloud (all-in) deployment model is a different AWS capability and does not best satisfy this requirement. Hybrid deployment model is a different AWS capability and does not best satisfy this requirement.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-025",
+    "module": "Cloud Deployment & Service Models",
+    "skill": "Identify cloud deployment and service models",
+    "question": "An organization has the following requirement: use a complete application delivered over the internet without managing any infrastructure. What is the least-complex correct option?",
+    "options": [
+      "Cloud (all-in) deployment model",
+      "Hybrid deployment model",
+      "On-premises (private cloud) deployment model",
+      "Software as a Service (SaaS)"
+    ],
+    "correct": 3,
+    "explanation": "Software as a Service (SaaS) is correct because SaaS delivers a complete, provider-managed application over the internet; the customer just uses it. Distractors: Cloud (all-in) deployment model is a different AWS capability and does not best satisfy this requirement. Hybrid deployment model is a different AWS capability and does not best satisfy this requirement. On-premises (private cloud) deployment model is a different AWS capability and does not best satisfy this requirement.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-026",
     "module": "Cloud Migration & Adoption",
     "skill": "Understand cloud adoption and migration",
-    "question": "During implementation, you must move to a managed database during migration with a few optimizations but no rewrite. Which AWS feature should you choose?",
+    "question": "What should be configured first when the goal is to organize a cloud adoption program across business, people, governance, platform, security, and operations?",
     "options": [
-      "Retire",
       "Replatform",
       "Repurchase",
-      "Refactor"
+      "AWS Cloud Adoption Framework (CAF)",
+      "Rehost"
+    ],
+    "correct": 2,
+    "explanation": "AWS Cloud Adoption Framework (CAF) is correct because The AWS CAF organizes adoption guidance into six perspectives to plan and run cloud adoption. Distractors: Replatform makes small cloud optimizations during migration. Repurchase switches to a different product such as SaaS. Rehost lifts and shifts with minimal change.",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/foundational-capabilities.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-027",
+    "module": "Cloud Migration & Adoption",
+    "skill": "Understand cloud adoption and migration",
+    "question": "Your team needs to move an application to AWS with minimal changes by lifting and shifting it. Which AWS option should you use?",
+    "options": [
+      "Refactor",
+      "Rehost",
+      "Replatform",
+      "Repurchase"
     ],
     "correct": 1,
-    "explanation": "Replatform is correct because Replatforming makes small cloud optimizations such as a managed database without re-architecting. Distractors: Retire decommissions an unneeded application. Repurchase switches to a different product such as SaaS. Refactor re-architects the application to be cloud-native.",
+    "explanation": "Rehost is correct because Rehosting (lift and shift) moves an application without changing its architecture, the fastest strategy. Distractors: Refactor re-architects the application to be cloud-native. Replatform makes small cloud optimizations during migration. Repurchase switches to a different product such as SaaS.",
     "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
     "question_type": "STANDARD"
   },
   {
-    "id": "CLFC02-PRO-024",
+    "id": "CLFC02-PRO-028",
     "module": "Cloud Migration & Adoption",
     "skill": "Understand cloud adoption and migration",
-    "question": "Pick the two features that address these requirements: retire the existing product and switch to a different one, often SaaS; and keep some applications on premises for now and revisit migrating them later.",
+    "question": "To move to a managed database during migration with a few optimizations but no rewrite, which AWS capability should you choose?",
+    "options": [
+      "Replatform",
+      "Repurchase",
+      "Refactor",
+      "Retire"
+    ],
+    "correct": 0,
+    "explanation": "Replatform is correct because Replatforming makes small cloud optimizations such as a managed database without re-architecting. Distractors: Repurchase switches to a different product such as SaaS. Refactor re-architects the application to be cloud-native. Retire decommissions an unneeded application.",
+    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
+    "question_type": "STANDARD"
+  },
+  {
+    "id": "CLFC02-PRO-029",
+    "module": "Cloud Migration & Adoption",
+    "skill": "Understand cloud adoption and migration",
+    "question": "Select the two configurations that best support these requirements: retire the existing product and switch to a different one, often SaaS; and keep some applications on premises for now and revisit migrating them later.",
     "options": [
       "Rehost",
       "Repurchase",
@@ -424,123 +512,35 @@
     "question_type": "MULTI"
   },
   {
-    "id": "CLFC02-PRO-025",
-    "module": "Cloud Migration & Adoption",
-    "skill": "Understand cloud adoption and migration",
-    "question": "An organization has the following requirement: rework an application to be cloud-native, for example breaking it into microservices. What is the least-complex correct option?",
-    "options": [
-      "Retire",
-      "Retain",
-      "Relocate",
-      "Refactor"
-    ],
-    "correct": 3,
-    "explanation": "Refactor is correct because Refactoring significantly changes the application to take advantage of cloud-native features. Distractors: Retire decommissions an unneeded application. Retain keeps an application where it is for now. Relocate moves infrastructure without changing the application.",
-    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": "CLFC02-PRO-026",
-    "module": "Cloud Migration & Adoption",
-    "skill": "Understand cloud adoption and migration",
-    "question": "What should be configured first when the goal is to decommission applications that are no longer useful instead of migrating them?",
-    "options": [
-      "Relocate",
-      "AWS DataSync",
-      "Retire",
-      "Retain"
-    ],
-    "correct": 2,
-    "explanation": "Retire is correct because Retiring shuts down applications that are no longer needed, reducing cost and attack surface. Distractors: Relocate moves infrastructure without changing the application. AWS DataSync moves large datasets to AWS online. Retain keeps an application where it is for now.",
-    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": "CLFC02-PRO-027",
-    "module": "Cloud Migration & Adoption",
-    "skill": "Understand cloud adoption and migration",
-    "question": "Your team needs to keep some applications on premises for now and revisit migrating them later. Which AWS option should you use?",
-    "options": [
-      "AWS Migration Hub",
-      "Retain",
-      "Relocate",
-      "AWS DataSync"
-    ],
-    "correct": 1,
-    "explanation": "Retain is correct because Retaining keeps applications where they are when there is no current business case to migrate. Distractors: AWS Migration Hub tracks migration progress across tools. Relocate moves infrastructure without changing the application. AWS DataSync moves large datasets to AWS online.",
-    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": "CLFC02-PRO-028",
-    "module": "Cloud Migration & Adoption",
-    "skill": "Understand cloud adoption and migration",
-    "question": "Select the two configurations that best support these requirements: move an application to the cloud without purchasing new hardware or rewriting it, such as VMware-based relocation; and automate lift-and-shift migration of many servers while they keep running.",
-    "options": [
-      "Refactor",
-      "Retire",
-      "Relocate",
-      "AWS Application Migration Service",
-      "Repurchase"
-    ],
-    "correct": [
-      2,
-      3
-    ],
-    "explanation": "Relocate is correct: Relocating moves infrastructure to the cloud (for example VMware Cloud on AWS) without changing the application. AWS Application Migration Service is correct: AWS Application Migration Service automates rehosting of servers to AWS with minimal downtime. Repurchase switches to a different product such as SaaS. Refactor re-architects the application to be cloud-native. Retire decommissions an unneeded application.",
-    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
-    "references": [
-      "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
-      "https://docs.aws.amazon.com/mgn/latest/ug/what-is-application-migration-service.html"
-    ],
-    "question_type": "MULTI"
-  },
-  {
-    "id": "CLFC02-PRO-029",
-    "module": "Cloud Migration & Adoption",
-    "skill": "Understand cloud adoption and migration",
-    "question": "To transfer large datasets to AWS over the network with a managed high-speed service, which AWS capability should you choose?",
-    "options": [
-      "AWS Migration Hub",
-      "AWS Application Migration Service",
-      "AWS Cloud Adoption Framework (CAF)",
-      "AWS DataSync"
-    ],
-    "correct": 3,
-    "explanation": "AWS DataSync is correct because AWS DataSync moves large amounts of data online between on-premises storage and AWS at high speed. Distractors: AWS Migration Hub tracks migration progress across tools. AWS Application Migration Service automates rehosting of servers. AWS Cloud Adoption Framework (CAF) organizes adoption across perspectives, not a single migration.",
-    "reference": "https://docs.aws.amazon.com/datasync/latest/userguide/what-is-datasync.html",
-    "question_type": "STANDARD"
-  },
-  {
     "id": "CLFC02-PRO-030",
     "module": "Cloud Migration & Adoption",
     "skill": "Understand cloud adoption and migration",
-    "question": "A workload requires that you track the status of servers and applications as they migrate to AWS in one place. What is the correct choice?",
+    "question": "A workload requires that you rework an application to be cloud-native, for example breaking it into microservices. What is the correct choice?",
     "options": [
-      "AWS Cloud Adoption Framework (CAF)",
-      "Rehost",
-      "AWS Migration Hub",
-      "AWS Application Migration Service"
+      "Retain",
+      "Relocate",
+      "Refactor",
+      "Retire"
     ],
     "correct": 2,
-    "explanation": "AWS Migration Hub is correct because AWS Migration Hub gives a single place to track migration progress across AWS and partner tools. Distractors: AWS Cloud Adoption Framework (CAF) organizes adoption across perspectives, not a single migration. Rehost lifts and shifts with minimal change. AWS Application Migration Service automates rehosting of servers.",
-    "reference": "https://docs.aws.amazon.com/migrationhub/latest/ug/whatishub.html",
+    "explanation": "Refactor is correct because Refactoring significantly changes the application to take advantage of cloud-native features. Distractors: Retain keeps an application where it is for now. Relocate moves infrastructure without changing the application. Retire decommissions an unneeded application.",
+    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
     "question_type": "STANDARD"
   },
   {
     "id": "CLFC02-PRO-031",
     "module": "Cloud Migration & Adoption",
     "skill": "Understand cloud adoption and migration",
-    "question": "As the AWS administrator, you are asked to automate lift-and-shift migration of many servers while they keep running. What do you select?",
+    "question": "As the AWS administrator, you are asked to decommission applications that are no longer useful instead of migrating them. What do you select?",
     "options": [
-      "Replatform",
-      "AWS Application Migration Service",
-      "AWS Cloud Adoption Framework (CAF)",
-      "Rehost"
+      "AWS DataSync",
+      "Retire",
+      "Retain",
+      "Relocate"
     ],
     "correct": 1,
-    "explanation": "AWS Application Migration Service is correct because AWS Application Migration Service automates rehosting of servers to AWS with minimal downtime. Distractors: Replatform makes small cloud optimizations during migration. AWS Cloud Adoption Framework (CAF) organizes adoption across perspectives, not a single migration. Rehost lifts and shifts with minimal change.",
-    "reference": "https://docs.aws.amazon.com/mgn/latest/ug/what-is-application-migration-service.html",
+    "explanation": "Retire is correct because Retiring shuts down applications that are no longer needed, reducing cost and attack surface. Distractors: AWS DataSync moves large datasets to AWS online. Retain keeps an application where it is for now. Relocate moves infrastructure without changing the application.",
+    "reference": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
     "question_type": "STANDARD"
   },
   {
@@ -1602,8 +1602,8 @@
     "explanation": "AWS Direct Connect is correct: Direct Connect provides a dedicated, private physical network connection between on-premises and AWS. VPC endpoint is correct: A VPC endpoint privately connects a VPC to supported AWS services without traversing the public internet. Amazon CloudFront is a content delivery network. AWS Site-to-Site VPN is an encrypted tunnel over the internet. Security group is a stateful instance-level firewall.",
     "reference": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html",
     "references": [
-      "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html",
-      "https://docs.aws.amazon.com/vpc/latest/privatelink/concepts.html"
+      "https://docs.aws.amazon.com/vpc/latest/privatelink/concepts.html",
+      "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
     ],
     "question_type": "MULTI"
   },
@@ -1866,8 +1866,8 @@
     "explanation": "AWS CloudFormation is correct: CloudFormation provisions AWS resources from declarative templates, treating infrastructure as code. AWS Region is correct: An AWS Region is a separate geographic area that contains multiple isolated Availability Zones. Availability Zone is one or more isolated data centers in a Region. Edge location caches content near users. AWS Command Line Interface (CLI) runs AWS commands in a terminal.",
     "reference": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html",
     "references": [
-      "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html",
-      "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html"
+      "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html",
+      "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html"
     ],
     "question_type": "MULTI"
   },
@@ -2203,7 +2203,7 @@
     "id": "CLFC02-PRO-126",
     "module": "Support & Resources",
     "skill": "Identify AWS technical resources and support options",
-    "question": "Which AWS capability is the best fit when the requirement is to use the no-cost plan that covers account and billing questions and selected core Trusted Advisor checks?",
+    "question": "Which AWS capability is the best fit when the requirement is to use the no-cost plan that covers account and billing questions, AWS service health, and documentation?",
     "options": [
       "AWS Enterprise Support",
       "AWS documentation and whitepapers",
@@ -2211,7 +2211,7 @@
       "AWS Business Support+"
     ],
     "correct": 2,
-    "explanation": "AWS Basic Support is correct because Basic Support is included for every account and covers account and billing help, service health, and selected core Trusted Advisor checks. Distractors: AWS Enterprise Support adds a Technical Account Manager and fastest response. AWS documentation and whitepapers are free self-service resources, not a support plan. AWS Business Support+ adds 24x7 engineers, 500+ checks, and AI help.",
+    "explanation": "AWS Basic Support is correct because Basic Support is included for every account and covers account and billing questions, AWS service health checks, documentation, and support forums. Distractors: AWS Enterprise Support adds a Technical Account Manager and fastest response. AWS documentation and whitepapers are free self-service resources, not a support plan. AWS Business Support+ adds 24x7 engineers, 500+ checks, and AI help.",
     "reference": "https://docs.aws.amazon.com/awssupport/latest/user/aws-support-plans.html",
     "question_type": "STANDARD"
   },
