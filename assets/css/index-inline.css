@@ -1418,3 +1418,33 @@ pointer-events: none;
 .exam-library-section .section-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
 .exam-library-section .section-header .library-filter-toggle{flex:none;margin:0}
 .library-controls.filters-collapsed .library-control-topline{display:none}
+
+/* ===== Light mode: calm cards (white + colored top accent + dark text). Dark mode keeps the vibrant gradient. ===== */
+body:not(.dark-mode) .exam-card.exam-sc900,
+body:not(.dark-mode) .exam-card.exam-ab730,
+body:not(.dark-mode) .exam-card.exam-ab731,
+body:not(.dark-mode) .exam-card.custom{
+  background:#ffffff;
+  border:1px solid #e6e9f0;
+  border-top-width:4px;
+  box-shadow:0 6px 18px rgba(30,60,114,.08);
+}
+body:not(.dark-mode) .exam-card.exam-sc900{border-top-color:#137c8b}
+body:not(.dark-mode) .exam-card.exam-ab730{border-top-color:#16a34a}
+body:not(.dark-mode) .exam-card.exam-ab731{border-top-color:#be123c}
+body:not(.dark-mode) .exam-card.custom{border-top-color:#e83e8c}
+body:not(.dark-mode) .exam-card .exam-title,
+body:not(.dark-mode) .exam-card .exam-stat-number{color:#1f2733}
+body:not(.dark-mode) .exam-card .exam-subtitle{color:#5b6573}
+body:not(.dark-mode) .exam-card .exam-stat-label,
+body:not(.dark-mode) .exam-card .exam-study-info,
+body:not(.dark-mode) .exam-card .exam-total-info{color:#6b7280}
+body:not(.dark-mode) .exam-card .exam-icon{color:#334155;text-shadow:none}
+body:not(.dark-mode) .exam-card .exam-icon.fa-aws{color:#ff9900}
+body:not(.dark-mode) .exam-card .exam-icon.fa-microsoft{color:#0a7bd0}
+body:not(.dark-mode) .exam-card .exam-taxonomy-chip{background:rgba(30,41,59,.06);border-color:rgba(30,41,59,.12);color:#374151}
+body:not(.dark-mode) .exam-card .exam-taxonomy-chip i{color:#6b7280}
+body:not(.dark-mode) .exam-card:hover .exam-title,
+body:not(.dark-mode) .exam-card.selected .exam-title{color:#1f2733}
+body:not(.dark-mode) .exam-card:hover .exam-subtitle,
+body:not(.dark-mode) .exam-card.selected .exam-subtitle{color:#5b6573}
