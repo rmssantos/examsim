@@ -400,9 +400,9 @@
       3
     ],
     "explanation": "Infrastructure as a Service (IaaS) is correct: IaaS provides the basic building blocks of compute, storage, and networking while the customer manages the OS and applications. Cloud (all-in) deployment model is correct: An all-in cloud deployment runs the entire application in the cloud. Hybrid deployment model is a different AWS capability and does not best satisfy this requirement. On-premises (private cloud) deployment model is a different AWS capability and does not best satisfy this requirement. Platform as a Service (PaaS) is a different AWS capability and does not best satisfy this requirement.",
-    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/gxp-systems-on-aws/infrastructure-description-and-controls.html",
     "references": [
-      "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html",
+      "https://docs.aws.amazon.com/whitepapers/latest/gxp-systems-on-aws/infrastructure-description-and-controls.html",
       "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html"
     ],
     "question_type": "MULTI"
@@ -420,7 +420,7 @@
     ],
     "correct": 0,
     "explanation": "Platform as a Service (PaaS) is correct because PaaS removes the need to manage the underlying infrastructure and OS so you focus on deploying and running applications. Distractors: Software as a Service (SaaS) is a different AWS capability and does not best satisfy this requirement. Cloud (all-in) deployment model is a different AWS capability and does not best satisfy this requirement. Hybrid deployment model is a different AWS capability and does not best satisfy this requirement.",
-    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/gxp-systems-on-aws/infrastructure-description-and-controls.html",
     "question_type": "STANDARD"
   },
   {
@@ -436,7 +436,7 @@
     ],
     "correct": 3,
     "explanation": "Software as a Service (SaaS) is correct because SaaS delivers a complete, provider-managed application over the internet; the customer just uses it. Distractors: Cloud (all-in) deployment model is a different AWS capability and does not best satisfy this requirement. Hybrid deployment model is a different AWS capability and does not best satisfy this requirement. On-premises (private cloud) deployment model is a different AWS capability and does not best satisfy this requirement.",
-    "reference": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/gxp-systems-on-aws/infrastructure-description-and-controls.html",
     "question_type": "STANDARD"
   },
   {
@@ -2284,7 +2284,7 @@
     ],
     "correct": 2,
     "explanation": "AWS re:Post is correct because AWS re:Post is a managed public community question-and-answer service for technical guidance. Distractors: AWS Business Support+ adds 24x7 engineers, 500+ checks, and AI help. AWS Enterprise Support adds a Technical Account Manager and fastest response. AWS Basic Support is free with selected core checks only.",
-    "reference": "https://docs.aws.amazon.com/awssupport/latest/user/getting-started.html",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/latest/userguide/continue-workflow-review.html",
     "question_type": "STANDARD"
   }
 ]
