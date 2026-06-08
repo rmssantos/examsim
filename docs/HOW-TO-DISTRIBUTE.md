@@ -77,8 +77,8 @@ Then start:
 python server.py
 ```
 
-The folder name is the authoritative exam ID. Metadata IDs that do not match the
-folder are normalized by the tooling.
+The folder name is the authoritative exam ID. The metadata ID must match the
+folder name; pack validation fails when they differ.
 
 ## Creating a Pack
 

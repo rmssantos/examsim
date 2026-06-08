@@ -92,12 +92,12 @@ Refresh the homepage after adding the folder.
 
 ## Images
 
-Reference images with safe relative filenames:
+Reference images with safe filenames that do not contain directory separators:
 
 ```json
 {
-  "question_images": [{"filename": "network/diagram.png"}],
-  "explanation_images": [{"filename": "network/answer.png"}]
+  "question_images": [{"filename": "network-diagram.png"}],
+  "explanation_images": [{"filename": "network-answer.png"}]
 }
 ```
 
@@ -107,6 +107,7 @@ them.
 Do not use:
 
 - absolute paths;
+- directory separators or nested paths;
 - parent traversal such as `../`;
 - drive letters;
 - URL schemes inside filenames;

@@ -57,12 +57,33 @@ class PublicRepositoryBoundaryTests(unittest.TestCase):
             ".yml",
             ".yaml",
         }
-        absolute_user_path = re.compile(r"(?i)[a-z]:[\\/]+users[\\/]+[^\\/\s]+[\\/]")
+        absolute_user_path = re.compile(
+            r"(?i)(?:"
+            r"[a-z]:[\\/]+users[\\/]+[^\\/\s]+[\\/]|"
+            r"/users/[^/\s]+/|"
+            r"/home/[^/\s]+/|"
+            r"/mnt/[a-z]/users/[^/\s]+/"
+            r")"
+        )
+        examples = (
+            "C:" + r"\Users\alice\project",
+            "/" + "Users/alice/project",
+            "/" + "home/alice/project",
+            "/" + "mnt/c/Users/alice/project",
+        )
+        for example in examples:
+            with self.subTest(example=example):
+                self.assertRegex(example, absolute_user_path)
+
         matches = []
 
         for relative_path in self.tracked_files:
             absolute_path = ROOT / relative_path
-            if relative_path.suffix.lower() not in text_suffixes or not absolute_path.is_file():
+            if (
+                relative_path == Path("tests/test_public_repository_safety.py")
+                or relative_path.suffix.lower() not in text_suffixes
+                or not absolute_path.is_file()
+            ):
                 continue
             text = absolute_path.read_text(encoding="utf-8")
             if absolute_user_path.search(text):
@@ -76,6 +97,7 @@ class PublicMessagingTests(unittest.TestCase):
         paths = [
             ROOT / "README.md",
             ROOT / "index.html",
+            ROOT / "exams" / "index.html",
             ROOT / "tools" / "generate-exam-pages.py",
             *sorted((ROOT / "exams").glob("*/index.html")),
         ]
@@ -157,6 +179,18 @@ class PublicDocumentationTests(unittest.TestCase):
         ):
             with self.subTest(phrase=phrase):
                 self.assertNotIn(phrase, text)
+
+    def test_public_pack_examples_match_filename_and_metadata_validation(self):
+        import_guide = (ROOT / "user-content" / "README-IMPORT.md").read_text(encoding="utf-8")
+        distribution_guide = (ROOT / "docs" / "HOW-TO-DISTRIBUTE.md").read_text(encoding="utf-8").lower()
+        normalized_distribution_guide = " ".join(distribution_guide.split())
+
+        self.assertIsNone(
+            re.search(r'"filename"\s*:\s*"[^"]*[\\/]', import_guide),
+            "image filename examples must not include directory separators",
+        )
+        self.assertNotIn("normalized by the tooling", normalized_distribution_guide)
+        self.assertIn("metadata id must match the folder name", normalized_distribution_guide)
 
     def test_primary_docs_are_concise_and_current(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
