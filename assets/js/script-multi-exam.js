@@ -2448,9 +2448,10 @@ class MultiExamSimulator {
             recSlot.innerHTML = this.renderRecommendedPro(recMeta);
             const cta = recSlot.querySelector('.recommended-pro-cta');
             if (cta) {
-                const targetExam = (recMeta && recMeta.recommendedPro && recMeta.recommendedPro.examId) || this.currentExam;
+                // Attribute the click to the source exam (the one just completed); the
+                // 'results_recommended_pro' placement already identifies it as the cross-sell.
                 cta.addEventListener('click', () => {
-                    window.ExamApp?.analytics?.trackRecommendedPackClicked?.(targetExam);
+                    window.ExamApp?.analytics?.trackRecommendedPackClicked?.(this.currentExam);
                 });
             }
         }
