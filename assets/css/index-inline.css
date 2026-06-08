@@ -1399,3 +1399,14 @@ pointer-events: none;
 .getting-started-card .gs-points i{color:var(--primary);width:16px;text-align:center}
 .getting-started-card .gs-cta{display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;text-decoration:none;font-weight:700;padding:.7rem 1.2rem;border-radius:12px}
 .getting-started-card .gs-cta:hover{filter:brightness(1.05)}
+
+
+/* dark-mode parity for first-run elements (match real panels, not raw --card-bg) */
+[data-theme="dark"] .home-step,
+.dark-mode .home-step{background:rgba(44,55,72,.98);border-color:rgba(255,255,255,.08)}
+[data-theme="dark"] .getting-started-card,
+.dark-mode .getting-started-card{background:linear-gradient(135deg,rgba(15,23,42,.96),rgba(30,41,59,.96));border-color:rgba(0,188,242,.25)}
+
+/* demoted tools row at the bottom of the home board */
+.home-tools{margin:1.6rem 0 .5rem;padding-top:1.1rem;border-top:1px solid var(--border)}
+.home-tools-label{display:block;color:var(--text-light);font-size:.85rem;margin-bottom:.65rem}
