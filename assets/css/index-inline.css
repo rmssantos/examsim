@@ -1429,4 +1429,4 @@ body:not(.dark-mode) .getting-started-card{background:#eef2f8;border:1px solid r
 /* Bottom: center the library tools row, and match the footer width to the content panel (945px) */
 .home-tools{text-align:center}
 .home-tools .quick-actions{justify-content:center}
-.app-footer{width:min(945px, calc(100% - 32px))}
+.app-footer{width:min(1120px, 100%);max-width:none;margin-left:auto;margin-right:auto}
