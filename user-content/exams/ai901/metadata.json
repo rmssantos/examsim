@@ -1,0 +1,106 @@
+{
+  "id": "ai901",
+  "name": "AI-901",
+  "fullName": "Microsoft Azure AI Fundamentals",
+  "description": "Free Microsoft Azure AI Fundamentals (AI-901) practice exam. Original questions written from official Microsoft Learn documentation, aligned to the AI-901 study guide that replaces AI-900 from June 30, 2026. Not real exam questions.",
+  "duration": 45,
+  "questionCount": 50,
+  "passScore": 70,
+  "language": "en",
+  "schemaVersion": "1.1",
+  "badge": "Fundamentals",
+  "icon": "fas fa-brain",
+  "vendor": "Microsoft",
+  "certificationCode": "AI-901",
+  "domains": [
+    "Azure",
+    "AI",
+    "Fundamentals"
+  ],
+  "level": "Fundamentals",
+  "productFamily": "Azure",
+  "contentType": "practice-exam",
+  "commercialStatus": "free",
+  "contentOrigin": "original",
+  "objectiveDomains": [
+    {
+      "code": "AI901-D1",
+      "name": "Identify AI concepts and responsibilities",
+      "weightRange": "40-45%",
+      "source": "Microsoft AI-901 study guide",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-901",
+      "mappedModules": [
+        "Responsible AI Principles",
+        "Generative AI Models and Configuration",
+        "AI Workloads and Capabilities"
+      ]
+    },
+    {
+      "code": "AI901-D2",
+      "name": "Implement AI solutions by using Microsoft Foundry",
+      "weightRange": "55-60%",
+      "source": "Microsoft AI-901 study guide",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-901",
+      "mappedModules": [
+        "Generative AI Apps and Agents with Foundry",
+        "Text and Speech Solutions with Foundry",
+        "Computer Vision and Image Generation with Foundry",
+        "Information Extraction with Content Understanding"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "icon": "fas fa-scale-balanced",
+      "name": "Responsible AI Principles"
+    },
+    {
+      "icon": "fas fa-robot",
+      "name": "Generative AI Models and Configuration"
+    },
+    {
+      "icon": "fas fa-diagram-project",
+      "name": "AI Workloads and Capabilities"
+    },
+    {
+      "icon": "fas fa-comments",
+      "name": "Generative AI Apps and Agents with Foundry"
+    },
+    {
+      "icon": "fas fa-microphone-lines",
+      "name": "Text and Speech Solutions with Foundry"
+    },
+    {
+      "icon": "fas fa-eye",
+      "name": "Computer Vision and Image Generation with Foundry"
+    },
+    {
+      "icon": "fas fa-file-magnifying-glass",
+      "name": "Information Extraction with Content Understanding"
+    }
+  ],
+  "contentReview": {
+    "lastReviewed": "2026-06-09",
+    "sourceOfTruth": "Microsoft AI-901 study guide (skills measured as of April 15, 2026)",
+    "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-901",
+    "objectiveVersion": "AI-901 skills measured as of April 15, 2026 (beta)"
+  },
+  "resources": [
+    {
+      "icon": "fas fa-book",
+      "name": "Microsoft AI-901 Study Guide",
+      "url": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-901"
+    },
+    {
+      "icon": "fas fa-graduation-cap",
+      "name": "Microsoft Certified: Azure AI Fundamentals",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-fundamentals/"
+    },
+    {
+      "icon": "fas fa-laptop-code",
+      "name": "What is Azure AI Foundry?",
+      "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-azure-ai-foundry"
+    }
+  ],
+  "totalQuestions": 130
+}
