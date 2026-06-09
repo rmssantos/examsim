@@ -11,7 +11,8 @@
     ],
     "correct": 0,
     "explanation": "Copilot responses are grounded in the user's prompt, current app context, and content the user is permitted to access. It does not automatically use every tenant document or rely only on public web data.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
   },
   {
     "id": 2,
@@ -29,7 +30,8 @@
       3
     ],
     "explanation": "Generative AI can create and transform content, and output quality depends heavily on prompt and grounding context. Human review remains important, especially for sensitive or high-impact work.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 3,
@@ -48,7 +50,8 @@
       0
     ],
     "explanation": "Copilot can use app context and relevant accessible content. It respects permissions and may use web grounding when available. Relevant context usually improves response quality.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
   },
   {
     "id": 4,
@@ -62,7 +65,8 @@
     ],
     "correct": 0,
     "explanation": "A chat experience is best for flexible, ad hoc assistance. Agents are better when the organization needs reusable behavior, knowledge, instructions, and sharing for repeatable workflows.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 5,
@@ -81,7 +85,8 @@
       3
     ],
     "explanation": "Start with a clear prompt and relevant constraints, refine through follow-up, verify the result, and then use it in the workflow.",
-    "question_type": "SEQUENCE"
+    "question_type": "SEQUENCE",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 6,
@@ -95,7 +100,8 @@
     ],
     "correct": 0,
     "explanation": "Grounding provides relevant context, such as files, meetings, chats, or web data, so the model can produce an answer tied to the task rather than a generic response.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
   },
   {
     "id": 7,
@@ -109,7 +115,8 @@
     ],
     "correct": 0,
     "explanation": "Copilot can generate a first draft from a prompt. Security, retention, and network features are important, but they do not directly create a document draft.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 8,
@@ -123,7 +130,8 @@
     ],
     "correct": 0,
     "explanation": "Referencing the relevant files or working in the correct app context helps Copilot use the right information and reduces ambiguity.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 9,
@@ -137,7 +145,8 @@
     ],
     "correct": 0,
     "explanation": "A fabrication is an output that sounds confident or plausible but is wrong or unsupported. Users should verify important AI-generated claims.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 10,
@@ -155,7 +164,8 @@
       3
     ],
     "explanation": "Good practice includes minimizing sensitive input, verifying outputs, and using authorized content. Generated summaries should be reviewed before sharing.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-privacy"
   },
   {
     "id": 11,
@@ -169,7 +179,8 @@
     ],
     "correct": 0,
     "explanation": "High-value or sensitive outputs should be verified against source material. Human review remains essential for contracts, compliance, and other consequential content.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 12,
@@ -188,7 +199,8 @@
       0
     ],
     "explanation": "Responsible AI includes human review, awareness of prompt injection, and respecting data protection. AI output is not automatically authoritative legal advice.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-privacy"
   },
   {
     "id": 13,
@@ -202,7 +214,8 @@
     ],
     "correct": 0,
     "explanation": "A safe prompt uses approved, appropriate context and avoids unnecessary sensitive or confidential data.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-privacy"
   },
   {
     "id": 14,
@@ -216,7 +229,8 @@
     ],
     "correct": 0,
     "explanation": "Over-reliance occurs when users depend on AI output without applying expertise, checking sources, or considering risk.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 15,
@@ -230,7 +244,8 @@
     ],
     "correct": 0,
     "explanation": "Effective prompts specify the task, audience, tone, format, constraints, and relevant context.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 16,
@@ -248,7 +263,8 @@
       2
     ],
     "explanation": "Clear goals, context, and output expectations help Copilot produce better responses. Ambiguous prompts are less reliable.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 17,
@@ -262,7 +278,8 @@
     ],
     "correct": 0,
     "explanation": "Scheduling a prompt supports recurring work where a user wants Copilot to run or remind them on a planned cadence.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/scheduled-prompts"
   },
   {
     "id": 18,
@@ -281,7 +298,8 @@
       2
     ],
     "explanation": "First identify gaps, then improve context, ask a focused follow-up, and use the answer only after verification.",
-    "question_type": "SEQUENCE"
+    "question_type": "SEQUENCE",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 19,
@@ -295,7 +313,8 @@
     ],
     "correct": 0,
     "explanation": "Prompts can be shared when they are reusable and safe. Sensitive data should not be embedded in shared prompts.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 20,
@@ -314,7 +333,8 @@
       1
     ],
     "explanation": "Conversation organization features help users manage work. Old chats may become stale when context changes and should be reviewed carefully.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 21,
@@ -328,7 +348,8 @@
     ],
     "correct": 0,
     "explanation": "The best prompt defines format, content priorities, and safety constraints. It does not ask Copilot to invent unsupported information.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 22,
@@ -342,7 +363,8 @@
     ],
     "correct": 0,
     "explanation": "Referencing a file helps Copilot use the right source material. It does not bypass permissions, provide legal approval, or alter content by itself.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
   },
   {
     "id": 23,
@@ -356,7 +378,8 @@
     ],
     "correct": 0,
     "explanation": "A focused follow-up gives specific constraints for length, audience, and format.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 24,
@@ -370,7 +393,8 @@
     ],
     "correct": 0,
     "explanation": "The most useful sources are relevant, authorized, and directly connected to the task.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
   },
   {
     "id": 25,
@@ -384,7 +408,8 @@
     ],
     "correct": 0,
     "explanation": "Agents are useful for repeatable workflows where curated knowledge, instructions, settings, and sharing provide value.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/microsoft-copilot-extend-copilot-extensions"
   },
   {
     "id": 26,
@@ -402,7 +427,8 @@
       2
     ],
     "explanation": "Agents can be configured with instructions, knowledge, capabilities, and suggested prompts. They should not be designed to ignore policy.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
   },
   {
     "id": 27,
@@ -416,7 +442,8 @@
     ],
     "correct": 0,
     "explanation": "The Agent Store is the appropriate place to look for existing agents before creating a new one.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/copilot-agent-store"
   },
   {
     "id": 28,
@@ -435,7 +462,8 @@
       0
     ],
     "explanation": "Agents can use templates, configured knowledge, and instructions. Sharing may be available depending on configuration and policy.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/microsoft-copilot-extend-copilot-extensions"
   },
   {
     "id": 29,
@@ -449,7 +477,8 @@
     ],
     "correct": 0,
     "explanation": "A policy assistant should use approved policy knowledge, clear instructions, and safe handling of restricted information.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
   },
   {
     "id": 30,
@@ -468,7 +497,8 @@
       3
     ],
     "explanation": "A sensible flow is to choose the starting point, configure behavior and knowledge, test with realistic prompts, and share when approved.",
-    "question_type": "SEQUENCE"
+    "question_type": "SEQUENCE",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
   },
   {
     "id": 31,
@@ -482,7 +512,8 @@
     ],
     "correct": 0,
     "explanation": "Agents are most useful when grounded in relevant, approved sources for the task.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
   },
   {
     "id": 32,
@@ -496,7 +527,8 @@
     ],
     "correct": 0,
     "explanation": "Testing and verification reduce the risk of poor answers, unsafe disclosure, or misalignment with the intended workflow.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/agent-essentials/agent-lifecycle/agent-assign-deploy"
   },
   {
     "id": 33,
@@ -510,7 +542,8 @@
     ],
     "correct": 0,
     "explanation": "Business drafts improve when prompts include audience, goal, constraints, tone, and appropriate grounding material.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 34,
@@ -528,7 +561,8 @@
       2
     ],
     "explanation": "Copilot can draft, summarize, and transform content. Final approval for legal or sensitive language still requires human review.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 35,
@@ -542,7 +576,8 @@
     ],
     "correct": 0,
     "explanation": "The best request names the audience, format, and priorities for the summary.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 36,
@@ -561,7 +596,8 @@
       1
     ],
     "explanation": "Copilot supports drafting and transformation, but people still provide expertise and review final content.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 37,
@@ -575,7 +611,8 @@
     ],
     "correct": 0,
     "explanation": "Audience, tone, and purpose are important constraints when adapting content.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 38,
@@ -589,7 +626,8 @@
     ],
     "correct": 0,
     "explanation": "Copilot can help transform information from meetings or documents into content for another Microsoft 365 app, such as a presentation.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 39,
@@ -603,7 +641,8 @@
     ],
     "correct": 0,
     "explanation": "A safe business image prompt describes purpose and style while avoiding sensitive, private, or trademark-infringing material.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 40,
@@ -622,7 +661,8 @@
       0
     ],
     "explanation": "Use approved facts, generate the draft, review carefully, then send only after appropriate approval.",
-    "question_type": "SEQUENCE"
+    "question_type": "SEQUENCE",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-privacy"
   },
   {
     "id": 41,
@@ -636,7 +676,8 @@
     ],
     "correct": 0,
     "explanation": "Prompt refinement and verification help correct omissions before the output is used.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 42,
@@ -650,7 +691,8 @@
     ],
     "correct": 0,
     "explanation": "Meeting summaries are most actionable when they capture decisions, action items, owners, deadlines, and open questions.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 43,
@@ -668,7 +710,8 @@
       2
     ],
     "explanation": "Copilot can help analyze trends, explain drivers, and create summaries or visualizations. It cannot guarantee source data quality.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 44,
@@ -687,7 +730,8 @@
       0
     ],
     "explanation": "Copilot Pages can support collaboration, but they do not replace all communication. Accuracy and sensitivity review remain important.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/microsoft-365-copilot"
   },
   {
     "id": 45,
@@ -701,7 +745,8 @@
     ],
     "correct": 0,
     "explanation": "Data quality matters. Missing values should be identified and considered when interpreting Copilot-assisted analysis.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 46,
@@ -715,7 +760,8 @@
     ],
     "correct": 0,
     "explanation": "Memory and instructions can help personalize assistance, but they should not store secrets, bypass policies, or replace approval.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/copilot-personalization-memory"
   },
   {
     "id": 47,
@@ -729,7 +775,8 @@
     ],
     "correct": 0,
     "explanation": "The best prompt specifies the analysis goal, desired output, audience, and treatment of data quality.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 48,
@@ -748,7 +795,8 @@
       0
     ],
     "explanation": "Generate a summary, refine it to include key meeting outcomes, verify owners and actions, then share the reviewed version.",
-    "question_type": "SEQUENCE"
+    "question_type": "SEQUENCE",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 49,
@@ -762,7 +810,8 @@
     ],
     "correct": 0,
     "explanation": "Referencing the correct documents and asking for examples and uncertainty helps make the analysis more transparent and useful.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
   },
   {
     "id": 50,
@@ -776,7 +825,8 @@
     ],
     "correct": 0,
     "explanation": "Safe collaboration means treating AI output as draft material, reviewing it, and sharing sensitive information only with authorized people.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 51,
@@ -790,7 +840,8 @@
     ],
     "correct": 0,
     "explanation": "Copilot needs relevant context to produce specific and useful answers. Generic prompts often produce generic output.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
   },
   {
     "id": 52,
@@ -808,7 +859,8 @@
       2
     ],
     "explanation": "Grounding uses relevant available context and respects permissions.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
   },
   {
     "id": 53,
@@ -827,7 +879,8 @@
       0
     ],
     "explanation": "Generative AI supports drafting and reasoning, but human review and prompt quality remain important.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 54,
@@ -841,7 +894,8 @@
     ],
     "correct": 0,
     "explanation": "Citations and references help users inspect source material and verify output.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
   },
   {
     "id": 55,
@@ -855,7 +909,8 @@
     ],
     "correct": 0,
     "explanation": "Copilot can support ideation, but business judgment and validation are still required.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 56,
@@ -874,7 +929,8 @@
       3
     ],
     "explanation": "A productive flow is prompt, refine, verify, then use.",
-    "question_type": "SEQUENCE"
+    "question_type": "SEQUENCE",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 57,
@@ -888,7 +944,8 @@
     ],
     "correct": 0,
     "explanation": "Permission-aware experiences use content within the user access scope.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
   },
   {
     "id": 58,
@@ -906,7 +963,8 @@
       2
     ],
     "explanation": "Copilot can summarize, draft, and analyze, but final approvals require accountable human processes.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 59,
@@ -920,7 +978,8 @@
     ],
     "correct": 0,
     "explanation": "Generative AI is sensitive to prompt wording, context, and constraints.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 60,
@@ -934,7 +993,8 @@
     ],
     "correct": 0,
     "explanation": "Copilot Chat helps with flexible knowledge work tasks and can use relevant context where available.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 61,
@@ -948,7 +1008,8 @@
     ],
     "correct": 0,
     "explanation": "External content should be reviewed by accountable people before publishing.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 62,
@@ -966,7 +1027,8 @@
       2
     ],
     "explanation": "Responsible use includes verification, data minimization, and awareness of bias and limitations.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-privacy"
   },
   {
     "id": 63,
@@ -985,7 +1047,8 @@
       0
     ],
     "explanation": "Sensitive data still needs protection when AI is used.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-privacy"
   },
   {
     "id": 64,
@@ -999,7 +1062,8 @@
     ],
     "correct": 0,
     "explanation": "Prompt injection attempts to steer the model away from intended instructions or safe behavior.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 65,
@@ -1013,7 +1077,8 @@
     ],
     "correct": 0,
     "explanation": "Unsupported claims should be verified before use, especially for business decisions.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 66,
@@ -1032,7 +1097,8 @@
       2
     ],
     "explanation": "Generate with approved sources, verify, check sensitivity, then share only with authorized people.",
-    "question_type": "SEQUENCE"
+    "question_type": "SEQUENCE",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-privacy"
   },
   {
     "id": 67,
@@ -1046,7 +1112,8 @@
     ],
     "correct": 0,
     "explanation": "Over-reliance means acting on AI output without appropriate judgment or validation.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 68,
@@ -1064,7 +1131,8 @@
       2
     ],
     "explanation": "AI output may be fabricated, stale, incomplete, or biased. It is not automatic legal approval.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 69,
@@ -1078,7 +1146,8 @@
     ],
     "correct": 0,
     "explanation": "Unexpected exposure should trigger review of permissions, sharing, and governance.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-privacy"
   },
   {
     "id": 70,
@@ -1092,7 +1161,8 @@
     ],
     "correct": 0,
     "explanation": "Prompts should use appropriate approved data and avoid unnecessary personal or secret information.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-privacy"
   },
   {
     "id": 71,
@@ -1106,7 +1176,8 @@
     ],
     "correct": 0,
     "explanation": "The best prompt defines goal, audience, format, constraints, and context.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 72,
@@ -1124,7 +1195,8 @@
       2
     ],
     "explanation": "Audience, format, and context improve response quality.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 73,
@@ -1138,7 +1210,8 @@
     ],
     "correct": 0,
     "explanation": "Prompts can specify the desired format, such as a table, bullets, or an email.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 74,
@@ -1157,7 +1230,8 @@
       1
     ],
     "explanation": "Prompt and chat management helps reuse and organize work, but stale context should be treated carefully.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 75,
@@ -1176,7 +1250,8 @@
       3
     ],
     "explanation": "Improve prompts by diagnosing gaps, adding context and constraints, then regenerating.",
-    "question_type": "SEQUENCE"
+    "question_type": "SEQUENCE",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 76,
@@ -1190,7 +1265,8 @@
     ],
     "correct": 0,
     "explanation": "A strong follow-up adds source context, audience, format, and constraints.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 77,
@@ -1204,7 +1280,8 @@
     ],
     "correct": 0,
     "explanation": "Renaming chats helps organize prior work.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/paths/explore-microsoft-365-copilot-business-chat/"
   },
   {
     "id": 78,
@@ -1222,7 +1299,8 @@
       2
     ],
     "explanation": "Recurring knowledge tasks can benefit from reusable or scheduled prompts. Secrets should not be shared.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/scheduled-prompts"
   },
   {
     "id": 79,
@@ -1236,7 +1314,8 @@
     ],
     "correct": 0,
     "explanation": "Specific constraints on length, audience, and style help Copilot revise effectively.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 80,
@@ -1250,7 +1329,8 @@
     ],
     "correct": 0,
     "explanation": "Comparison prompts should name sources, dimensions, and output expectations.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 81,
@@ -1269,7 +1349,8 @@
       0
     ],
     "explanation": "References help grounding but do not bypass access control.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
   },
   {
     "id": 82,
@@ -1283,7 +1364,8 @@
     ],
     "correct": 0,
     "explanation": "A good meeting-prep prompt specifies sources, objectives, and expected output.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 83,
@@ -1301,7 +1383,8 @@
       2
     ],
     "explanation": "Conversation management helps organize work, while old context may become outdated.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/training/paths/explore-microsoft-365-copilot-business-chat/"
   },
   {
     "id": 84,
@@ -1315,7 +1398,8 @@
     ],
     "correct": 0,
     "explanation": "Reusable prompts should be safe and adaptable.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 85,
@@ -1329,7 +1413,8 @@
     ],
     "correct": 0,
     "explanation": "Balanced analysis prompts ask for multiple dimensions and assumptions.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 86,
@@ -1343,7 +1428,8 @@
     ],
     "correct": 0,
     "explanation": "Repeatable workflows are good candidates for agents with curated knowledge and instructions.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/microsoft-copilot-extend-copilot-extensions"
   },
   {
     "id": 87,
@@ -1361,7 +1447,8 @@
       2
     ],
     "explanation": "Agent setup should define scope, knowledge, and prompts while respecting policy.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
   },
   {
     "id": 88,
@@ -1375,7 +1462,8 @@
     ],
     "correct": 0,
     "explanation": "Testing helps detect poor answers, unsafe scope, and missing knowledge before rollout.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
   },
   {
     "id": 89,
@@ -1394,7 +1482,8 @@
       0
     ],
     "explanation": "Agents can use templates, instructions, and sharing controls, but must respect data access.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/microsoft-copilot-extend-copilot-extensions"
   },
   {
     "id": 90,
@@ -1413,7 +1502,8 @@
       0
     ],
     "explanation": "Review failures, narrow scope, improve knowledge, then retest.",
-    "question_type": "SEQUENCE"
+    "question_type": "SEQUENCE",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
   },
   {
     "id": 91,
@@ -1427,7 +1517,8 @@
     ],
     "correct": 0,
     "explanation": "A sales agent should use approved business sources and avoid unsupported claims.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
   },
   {
     "id": 92,
@@ -1445,7 +1536,8 @@
       2
     ],
     "explanation": "Existing agents can save time for common needs, but private data availability depends on configuration.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/copilot-agent-store"
   },
   {
     "id": 93,
@@ -1459,7 +1551,8 @@
     ],
     "correct": 0,
     "explanation": "Suggested prompts should guide users safely toward supported tasks.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
   },
   {
     "id": 94,
@@ -1473,7 +1566,8 @@
     ],
     "correct": 0,
     "explanation": "One-time tasks often do not require an agent.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/microsoft-copilot-extend-copilot-extensions"
   },
   {
     "id": 95,
@@ -1492,7 +1586,8 @@
       0
     ],
     "explanation": "Relevant approved knowledge improves agents; testing should include boundary cases.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
   },
   {
     "id": 96,
@@ -1506,7 +1601,8 @@
     ],
     "correct": 0,
     "explanation": "Scope and instructions shape agent behavior.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
   },
   {
     "id": 97,
@@ -1520,7 +1616,8 @@
     ],
     "correct": 0,
     "explanation": "Limited pilots help validate quality and risk before broader sharing.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/agent-essentials/agent-lifecycle/agent-assign-deploy"
   },
   {
     "id": 98,
@@ -1534,7 +1631,8 @@
     ],
     "correct": 0,
     "explanation": "Good business drafting prompts include source facts, tone, and desired structure.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 99,
@@ -1552,7 +1650,8 @@
       2
     ],
     "explanation": "Copilot can draft, rewrite, and summarize, but final approvals need accountable review.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 100,
@@ -1571,7 +1670,8 @@
       0
     ],
     "explanation": "Copilot supports drafts and transformations, but unsupported invented content is risky.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 101,
@@ -1585,7 +1685,8 @@
     ],
     "correct": 0,
     "explanation": "Audience adaptation needs explicit audience, purpose, and content priorities.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 102,
@@ -1604,7 +1705,8 @@
       3
     ],
     "explanation": "Use approved inputs, generate a draft, review, then publish after approval.",
-    "question_type": "SEQUENCE"
+    "question_type": "SEQUENCE",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 103,
@@ -1618,7 +1720,8 @@
     ],
     "correct": 0,
     "explanation": "Unsupported claims should be removed or verified.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 104,
@@ -1632,7 +1735,8 @@
     ],
     "correct": 0,
     "explanation": "Clear rewrite prompts preserve meaning while defining audience and style.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 105,
@@ -1650,7 +1754,8 @@
       2
     ],
     "explanation": "External communication should be checked for facts, sensitivity, tone, and policy alignment.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 106,
@@ -1664,7 +1769,8 @@
     ],
     "correct": 0,
     "explanation": "Copilot can transform approved content into another format such as slides.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 107,
@@ -1683,7 +1789,8 @@
       0
     ],
     "explanation": "Business creative content should be appropriate, authorized, and reviewed.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 108,
@@ -1697,7 +1804,8 @@
     ],
     "correct": 0,
     "explanation": "A useful brief prompt defines audience, structure, length, and sources.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
   {
     "id": 109,
@@ -1711,7 +1819,8 @@
     ],
     "correct": 0,
     "explanation": "Copilot drafts are useful starting points but should be reviewed.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
   {
     "id": 110,
@@ -1725,7 +1834,8 @@
     ],
     "correct": 0,
     "explanation": "Meeting summaries are most useful when they identify decisions and follow-up work.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 111,
@@ -1743,7 +1853,8 @@
       2
     ],
     "explanation": "Copilot can assist analysis and visualization, but data quality still needs review.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 112,
@@ -1757,7 +1868,8 @@
     ],
     "correct": 0,
     "explanation": "Data quality issues can affect analysis and should be handled transparently.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 113,
@@ -1776,7 +1888,8 @@
       0
     ],
     "explanation": "Collaborative AI work benefits from review, appropriate sharing, and source context.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/microsoft-365-copilot"
   },
   {
     "id": 114,
@@ -1795,7 +1908,8 @@
       3
     ],
     "explanation": "Reference the workbook, check data quality, ask for analysis, then create a reviewed summary.",
-    "question_type": "SEQUENCE"
+    "question_type": "SEQUENCE",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 115,
@@ -1809,7 +1923,8 @@
     ],
     "correct": 0,
     "explanation": "Good data prompts specify the source, metric, purpose, and desired reasoning.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 116,
@@ -1827,7 +1942,8 @@
       2
     ],
     "explanation": "Follow-ups should include actionable meeting outcomes and avoid unrelated sensitive content.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 117,
@@ -1841,7 +1957,8 @@
     ],
     "correct": 0,
     "explanation": "Memory and instructions can personalize work style but should not store secrets or bypass policy.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/copilot-personalization-memory"
   },
   {
     "id": 118,
@@ -1860,7 +1977,8 @@
       0
     ],
     "explanation": "Meeting summaries are useful but require verification and appropriate sharing.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   },
   {
     "id": 119,
@@ -1874,7 +1992,8 @@
     ],
     "correct": 0,
     "explanation": "Combining collaborative content requires relevance, currency, permissions, and review.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
   },
   {
     "id": 120,
@@ -1888,6 +2007,7 @@
     ],
     "correct": 0,
     "explanation": "Decision memos should include analysis, assumptions, and reviewed context.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
   }
 ]
