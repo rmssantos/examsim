@@ -11,7 +11,8 @@
     ],
     "correct": 2,
     "explanation": "Physical host security is always the responsibility of the cloud provider in all cloud deployment models (IaaS, PaaS, SaaS). The cloud provider manages the physical data centers, networking hardware, and host infrastructure. Responsibilities like identity management, applications, and OS patching shift between customer and provider depending on the service model.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility"
   },
   {
     "id": 2,
@@ -30,7 +31,8 @@
       3
     ],
     "explanation": "In a SaaS model, the customer is always responsible for their information and data, accounts and identities, and devices. The cloud provider takes responsibility for network controls, operating systems, the application itself, and all underlying infrastructure.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility"
   },
   {
     "id": 3,
@@ -49,7 +51,8 @@
       0
     ],
     "explanation": "In IaaS, the customer manages the OS including patching (Yes). The cloud provider always manages physical network infrastructure across all models including PaaS (Yes). In SaaS, the provider manages the application code, not the customer (No). Regardless of cloud model, the customer is always responsible for securing their own data (Yes).",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility"
   },
   {
     "id": 4,
@@ -63,7 +66,8 @@
     ],
     "correct": 2,
     "explanation": "The compute layer in the defense in depth model focuses on securing access to virtual machines. This includes closing ports, applying system patches, and ensuring endpoint protection. The perimeter layer handles DDoS protection, the network layer handles segmentation and access controls, and the application layer addresses application-level vulnerabilities.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/describe-security-concepts-methodologies/"
   },
   {
     "id": 5,
@@ -78,13 +82,14 @@
     ],
     "correct": [
       1,
+      4,
       3,
       0,
-      4,
       2
     ],
-    "explanation": "The defense in depth layers from outermost to innermost are: Physical security (outermost, protecting the data center), Perimeter (DDoS protection, firewalls), Network (segmentation, access controls), Identity & access (authentication, authorization controls), and Data (innermost, the core asset being protected). Note: Compute and Application layers exist between Identity & access and Data but were not listed in the options.",
-    "question_type": "SEQUENCE"
+    "explanation": "In the Microsoft defense in depth model, identity and access is the layer immediately inside physical security. For these layers the order from outermost to innermost is: Physical security, Identity & access, Perimeter, Network, Data (innermost). Each layer adds protection so a weakness in one layer is mitigated by the others.",
+    "question_type": "SEQUENCE",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/describe-security-concepts-methodologies/"
   },
   {
     "id": 6,
@@ -98,7 +103,8 @@
     ],
     "correct": 1,
     "explanation": "Layered security (also known as defense in depth) is the principle that uses multiple layers of protection so that if one layer is compromised, additional layers continue to provide security. This approach slows down attackers and provides more opportunities for detection. Least privilege, SSO, and RBAC are individual security mechanisms, not the overarching layered approach.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/describe-security-concepts-methodologies/"
   },
   {
     "id": 7,
@@ -112,7 +118,8 @@
     ],
     "correct": 1,
     "explanation": "The Zero Trust model is based on three principles: verify explicitly, use least privilege access, and assume breach. 'Verify explicitly' means always authenticate and authorize based on all available data points. Zero Trust does NOT trust internal traffic by default, does NOT grant maximum access, and does NOT assume the network perimeter is secure.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/security/zero-trust/zero-trust-overview"
   },
   {
     "id": 8,
@@ -131,7 +138,8 @@
       3
     ],
     "explanation": "The three guiding principles of the Zero Trust model are: (1) Verify explicitly - always authenticate and authorize based on all available data points, (2) Use least privilege access - limit user access with just-in-time and just-enough-access, and (3) Assume breach - minimize blast radius, segment access, verify end-to-end encryption. 'Trust but verify' and 'implicit trust for internal users' contradict the Zero Trust philosophy.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/security/zero-trust/zero-trust-overview"
   },
   {
     "id": 9,
@@ -145,7 +153,8 @@
     ],
     "correct": 2,
     "explanation": "This scenario best represents the 'verify explicitly' principle. By requiring re-authentication and device compliance checks for every access attempt, even from the internal network, the organization is ensuring that every request is fully authenticated and authorized based on all available signals. This removes implicit trust for internal network users.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/security/zero-trust/zero-trust-overview"
   },
   {
     "id": 10,
@@ -159,7 +168,8 @@
     ],
     "correct": 2,
     "explanation": "Symmetric encryption uses a single shared key for both encryption and decryption. It is fast and efficient for encrypting large amounts of data. Asymmetric encryption uses a key pair (public and private). Hashing is a one-way function that does not use keys for decryption. Digital signing uses asymmetric keys to verify integrity and authenticity.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/security/fundamentals/encryption-overview"
   },
   {
     "id": 11,
@@ -178,7 +188,8 @@
       0
     ],
     "explanation": "Asymmetric encryption uses a public/private key pair (Yes). Hashing is NOT reversible - it is a one-way function that converts data into a fixed-length value; it is not encryption (No). Encryption at rest protects data that is stored on disks, databases, or other storage media (Yes). TLS (Transport Layer Security) is indeed used to protect data as it moves between locations, i.e., in transit (Yes).",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/azure/security/fundamentals/encryption-overview"
   },
   {
     "id": 12,
@@ -192,7 +203,8 @@
     ],
     "correct": 2,
     "explanation": "Hashing is used to verify data integrity. By comparing the hash value of the downloaded file with the original published hash, the company can confirm the file has not been altered. Hashing produces a unique fixed-length output for any given input, so any change to the file produces a different hash. Encryption protects confidentiality, not integrity verification.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/security/fundamentals/encryption-overview"
   },
   {
     "id": 13,
@@ -206,7 +218,8 @@
     ],
     "correct": 2,
     "explanation": "Risk management is the process of identifying, assessing, and responding to threats or events that can impact an organization. Governance sets the rules and policies that guide the organization. Compliance is about meeting regulatory and legal requirements. Data residency refers to where data is physically stored.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/compliance/assurance/assurance-governance"
   },
   {
     "id": 14,
@@ -225,7 +238,8 @@
       3
     ],
     "explanation": "A GRC framework includes: Governance (setting policies and procedures to guide the organization), Risk management (identifying, assessing, and mitigating threats), and Compliance (ensuring the organization meets regulatory and legal requirements). Deploying virtual machines and configuring load balancers are operational IT tasks, not GRC components.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/compliance/assurance/assurance-governance"
   },
   {
     "id": 15,
@@ -239,7 +253,8 @@
     ],
     "correct": 0,
     "explanation": "Data sovereignty refers to the concept that data is subject to the laws and regulations of the country or region where it is physically stored or collected. The requirement to keep EU citizen data within the EU relates directly to data sovereignty. Data classification categorizes data by sensitivity, data governance manages data availability and integrity, and data loss prevention prevents unauthorized data sharing.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/training/modules/describe-security-concepts-methodologies/"
   },
   {
     "id": 16,
@@ -253,7 +268,8 @@
     ],
     "correct": 1,
     "explanation": "Authentication (AuthN) is the process of verifying the identity of a user or service (proving who you are). Authorization (AuthZ) determines what level of access an authenticated user has (what you can do). Authentication always happens before authorization. They are distinct but related processes that apply to both internal and external users.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity-platform/authentication-vs-authorization"
   },
   {
     "id": 17,
@@ -267,7 +283,8 @@
     ],
     "correct": 1,
     "explanation": "With the rise of cloud computing, remote work, and BYOD policies, the traditional network perimeter is no longer sufficient as the primary security boundary. 'Identity as the new security perimeter' is the concept that identity verification and management have become the primary line of defense. Users and devices must prove their identity before accessing resources, regardless of their network location.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/fundamentals/introduction-identity-access-management"
   },
   {
     "id": 18,
@@ -281,7 +298,8 @@
     ],
     "correct": 1,
     "explanation": "Federation establishes a trust relationship between two or more domains or identity providers, allowing users to authenticate with their home identity provider and then access resources in other federated domains without needing separate credentials. This enables single sign-on experiences across organizational boundaries.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/fundamentals/introduction-identity-access-management"
   },
   {
     "id": 19,
@@ -300,7 +318,8 @@
       0
     ],
     "explanation": "Authentication always occurs before authorization, because you must first verify who a user is before determining what they can access (Yes). Federation enables users to use their existing credentials across multiple organizations through trust relationships (Yes). Authorization is NOT about proving identity - that is authentication. Authorization determines what a verified user can do (No). SSO allows users to authenticate once and then access multiple applications without needing to sign in again (Yes).",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/entra/fundamentals/introduction-identity-access-management"
   },
   {
     "id": 20,
@@ -314,7 +333,8 @@
     ],
     "correct": 1,
     "explanation": "Microsoft Entra ID (formerly Azure Active Directory) is Microsoft's cloud-based identity and access management (IAM) service. It helps employees, guests, and partners sign in and access resources. It is not a firewall, not an on-premises directory (that is Active Directory Domain Services), and not a network management tool.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/fundamentals/whatis"
   },
   {
     "id": 21,
@@ -333,7 +353,8 @@
       4
     ],
     "explanation": "Microsoft Entra ID P2 includes all P1 features plus: Microsoft Entra ID Protection (risk-based conditional access), Privileged Identity Management (PIM) for just-in-time privileged access, and Access reviews. Conditional Access and self-service password reset are available in P1. These P2 features provide advanced identity protection and governance capabilities.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/entra/fundamentals/licensing"
   },
   {
     "id": 22,
@@ -347,7 +368,8 @@
     ],
     "correct": 1,
     "explanation": "Microsoft Entra ID P1 is included with Microsoft 365 E3 subscriptions. It includes Conditional Access, self-service password reset with on-premises writeback, dynamic groups, and group-based access management. The Free edition has limited features, P2 is included with E5, and Entra ID Governance is an add-on for advanced governance features.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/fundamentals/licensing"
   },
   {
     "id": 23,
@@ -363,10 +385,11 @@
       0,
       0,
       1,
-      0
+      1
     ],
-    "explanation": "The Free edition supports MFA through security defaults, which enable basic MFA for all users (Yes). Conditional Access requires P1 or higher; it is not available in the Free edition (Yes). PIM requires P2, not P1 (No). The Free edition supports up to 500,000 directory objects (Yes).",
-    "question_type": "YES_NO_MATRIX"
+    "explanation": "Microsoft Entra ID Free is included with Microsoft 365 and Azure subscriptions and supports core identity features. Its default directory object quota is 50,000 objects (extended to 300,000 with at least one verified domain); 500,000 objects is a paid pricing-tier limit, not a Free-edition capability. Premium features such as Conditional Access require P1 or P2.",
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/users/directory-service-limits-restrictions"
   },
   {
     "id": 24,
@@ -380,7 +403,8 @@
     ],
     "correct": 2,
     "explanation": "A managed identity is an identity type in Microsoft Entra ID that provides Azure services with an automatically managed identity. This eliminates the need for developers to manage credentials in code. Managed identities can authenticate to any service that supports Microsoft Entra authentication, such as Azure Key Vault. A service principal requires credential management, and guest/external identities are for external users.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview"
   },
   {
     "id": 25,
@@ -400,7 +424,8 @@
       4
     ],
     "explanation": "Microsoft Entra ID supports multiple identity types: User identities (internal members and guests), Workload identities (applications and service principals), Managed identities (system-assigned and user-assigned for Azure resources), and Device identities (registered, joined, or hybrid joined devices). 'Network identity' is not a recognized identity type in Microsoft Entra ID.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/entra/fundamentals/whatis"
   },
   {
     "id": 26,
@@ -414,7 +439,8 @@
     ],
     "correct": 1,
     "explanation": "A system-assigned managed identity is tied directly to a single Azure resource and shares its lifecycle - when the resource is deleted, the identity is also deleted. A user-assigned managed identity is created as a standalone Azure resource and can be assigned to one or more Azure resources, making it reusable and independently managed.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview"
   },
   {
     "id": 27,
@@ -428,7 +454,8 @@
     ],
     "correct": 1,
     "explanation": "When an application is registered in Microsoft Entra ID, two objects are created: an application object (the global definition in the home tenant) and a service principal (the local representation in each tenant where the app is used). The service principal defines what the app can do in that specific tenant, while the application object serves as the template.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity-platform/app-objects-and-service-principals"
   },
   {
     "id": 28,
@@ -442,7 +469,8 @@
     ],
     "correct": 1,
     "explanation": "Microsoft Entra Connect (formerly Azure AD Connect) is the tool used to synchronize on-premises Active Directory identities with Microsoft Entra ID, enabling hybrid identity scenarios. Application Proxy provides remote access to on-premises apps, Permissions Management handles multi-cloud permissions, and Verified ID is for decentralized identity credentials.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/hybrid/whatis-hybrid-identity"
   },
   {
     "id": 29,
@@ -461,12 +489,13 @@
       2
     ],
     "explanation": "Microsoft Entra Connect supports three authentication methods for hybrid identity: Password hash synchronization (PHS) synchronizes a hash of the on-premises password hash to Microsoft Entra ID; Pass-through authentication (PTA) validates passwords directly against on-premises AD; Federation with AD FS delegates authentication to on-premises Active Directory Federation Services. Certificate-based and RADIUS are not hybrid identity authentication methods for Entra Connect.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/hybrid/connect/choose-ad-authn"
   },
   {
     "id": 30,
     "module": "Microsoft Entra",
-    "question": "An organization requires that all authentication requests are validated against on-premises Active Directory in real time, without storing any form of password in the cloud. Which hybrid identity authentication method should they use?",
+    "question": "An organization requires that all authentication requests are validated against on-premises Active Directory in real time, without storing any form of password in the cloud and without deploying and maintaining additional federation server infrastructure. Which hybrid identity authentication method should they use?",
     "options": [
       "Password hash synchronization (PHS)",
       "Pass-through authentication (PTA)",
@@ -474,8 +503,9 @@
       "Microsoft Entra passwordless"
     ],
     "correct": 1,
-    "explanation": "Pass-through authentication (PTA) validates user passwords directly against on-premises Active Directory without storing any form of the password in the cloud. Authentication agents installed on-premises handle the validation. PHS stores a hash of the password hash in the cloud. Federation delegates to AD FS but involves additional infrastructure. PTA meets the requirement of real-time on-premises validation with no cloud password storage.",
-    "question_type": "STANDARD"
+    "explanation": "Pass-through authentication (PTA) validates passwords directly against on-premises Active Directory in real time using a lightweight agent, without storing any password form in the cloud and without the extra infrastructure of an AD FS federation farm. PHS stores a hash in the cloud; Federation with AD FS also validates on-premises but requires additional federation servers.",
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/hybrid/connect/choose-ad-authn"
   },
   {
     "id": 31,
@@ -489,7 +519,8 @@
     ],
     "correct": 1,
     "explanation": "Microsoft Entra B2B (Business-to-Business) collaboration allows organizations to invite guest users from partner organizations to access their resources. Guest users can use their own credentials from their home organization. B2C is for consumer-facing applications, Entra Connect is for hybrid identity synchronization, and Domain Services provides managed domain services.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/external-id/what-is-b2b"
   },
   {
     "id": 32,
@@ -497,13 +528,14 @@
     "question": "A retail company wants to allow its customers to sign up and sign in to its mobile app using their personal Google or Facebook accounts. Which Microsoft service should they use?",
     "options": [
       "Microsoft Entra B2B collaboration",
-      "Microsoft Entra External ID (B2C)",
+      "Microsoft Entra External ID (customer identity and access management)",
       "Microsoft Entra Connect",
       "Microsoft Entra Conditional Access"
     ],
     "correct": 1,
     "explanation": "Microsoft Entra External ID with B2C (Business-to-Consumer) capabilities is designed for consumer-facing applications. It allows customers to sign up and sign in using social identity providers like Google, Facebook, or local accounts. B2B is for partner collaboration, Entra Connect is for hybrid identity, and Conditional Access is a policy engine for access control.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/external-id/external-identities-overview"
   },
   {
     "id": 33,
@@ -522,7 +554,8 @@
       0
     ],
     "explanation": "B2B collaboration enables guest users to sign in with their own organization's credentials or social identities (Yes). B2C is designed for consumer and customer identity management, not employees (No). External ID supports social identity providers like Google, Facebook, Apple, and others (Yes). B2B guest users appear as user objects (with UserType = Guest) in the host tenant's Microsoft Entra directory (Yes).",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/entra/external-id/external-identities-overview"
   },
   {
     "id": 34,
@@ -541,7 +574,8 @@
       2
     ],
     "explanation": "Microsoft Entra ID supports three primary passwordless authentication methods: Windows Hello for Business (biometric or PIN tied to a device), FIDO2 security keys (hardware-based authentication using open standards), and the Microsoft Authenticator app (phone sign-in with biometric or PIN). SMS OTP still involves a code entry and is considered MFA, not passwordless. Complex passwords are traditional password-based authentication.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-passwordless"
   },
   {
     "id": 35,
@@ -555,7 +589,8 @@
     ],
     "correct": 2,
     "explanation": "FIDO2 (Fast Identity Online 2) security keys use an open authentication standard and allow users to sign in using a physical hardware key, such as a USB, Bluetooth, or NFC device. No password is required. Windows Hello uses biometrics/PIN tied to a device, the Authenticator app is a phone-based solution, and OATH tokens generate time-based codes but still work alongside passwords.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-passwordless"
   },
   {
     "id": 36,
@@ -569,7 +604,8 @@
     ],
     "correct": 2,
     "explanation": "Windows Hello for Business replaces passwords with strong two-factor authentication by combining a device-bound credential with a biometric (fingerprint, facial recognition) or PIN. The credential never leaves the device. FIDO2 uses a physical security key, OATH tokens generate time-based codes, and certificate-based authentication uses X.509 certificates.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-passwordless"
   },
   {
     "id": 37,
@@ -589,7 +625,8 @@
       4
     ],
     "explanation": "The three passwordless authentication methods in Microsoft Entra ID are: Windows Hello for Business (device-bound biometric or PIN), FIDO2 security keys (hardware-based open standard), and Microsoft Authenticator app with phone sign-in (push notification with biometric verification). SMS, email OTP, and password with MFA all still rely on traditional credential mechanisms.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-passwordless"
   },
   {
     "id": 38,
@@ -603,7 +640,8 @@
     ],
     "correct": 0,
     "explanation": "Multi-factor authentication (MFA) requires a user to provide two or more verification methods from different categories: something you know (password, PIN), something you have (phone, security key), or something you are (biometric like fingerprint or face). Simply using a complex password, rotating passwords, or allowing unrestricted access do not constitute MFA.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-mfa-howitworks"
   },
   {
     "id": 39,
@@ -617,7 +655,8 @@
     ],
     "correct": 1,
     "explanation": "Security defaults is a set of basic security settings that Microsoft recommends for all organizations. It enables MFA for all users and can be activated with a single toggle in the Azure portal. It is available in all editions of Microsoft Entra ID, including the Free edition. Conditional Access, PIM, and Identity Protection require P1 or P2 licenses.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/fundamentals/security-defaults"
   },
   {
     "id": 40,
@@ -637,7 +676,8 @@
       4
     ],
     "explanation": "Valid MFA verification methods in Microsoft Entra ID include: Microsoft Authenticator push notifications, SMS text messages, voice calls, and OATH hardware/software tokens. Security questions alone are NOT an MFA method - they can be used for self-service password reset but do not qualify as a standalone MFA factor.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods"
   },
   {
     "id": 41,
@@ -651,7 +691,8 @@
     ],
     "correct": 1,
     "explanation": "Self-service password reset (SSPR) allows users to change or reset their own passwords without needing to contact an administrator or help desk. Users verify their identity using methods they have previously registered (such as phone, email, or security questions). This reduces help desk calls and improves productivity.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-sspr-howitworks"
   },
   {
     "id": 42,
@@ -671,7 +712,8 @@
       4
     ],
     "explanation": "SSPR supports the following authentication methods: mobile app notification (Microsoft Authenticator), email (alternate email), mobile phone (SMS), office phone, and security questions. FIDO2 security keys are used for passwordless sign-in, not for SSPR. Administrators can configure which methods are available and how many are required.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-sspr-howitworks"
   },
   {
     "id": 43,
@@ -685,7 +727,8 @@
     ],
     "correct": 2,
     "explanation": "SSPR can be configured as Disabled (off for everyone), Selected (enabled for a specific group of users), or All (enabled for all users in the tenant). The 'Selected' option allows administrators to target a specific security group for piloting before a broader rollout.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/authentication/tutorial-enable-sspr"
   },
   {
     "id": 44,
@@ -699,7 +742,8 @@
     ],
     "correct": 1,
     "explanation": "Microsoft Entra Password Protection detects and blocks known weak passwords and their variants. It includes a global banned password list maintained by Microsoft and allows organizations to create custom banned password lists. This prevents users from choosing commonly attacked or easily guessable passwords.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-password-ban-bad"
   },
   {
     "id": 45,
@@ -718,7 +762,8 @@
       0
     ],
     "explanation": "The global banned password list is automatically enforced for all users in every Microsoft Entra tenant (Yes). Custom banned password lists are a feature that requires P1 or P2 licensing (Yes). Smart lockout does NOT lock accounts permanently; it uses temporary lockouts with increasing duration and can distinguish between familiar and unfamiliar sign-in patterns (No). Smart lockout uses intelligence to differentiate between likely legitimate users and attackers, reducing false lockouts (Yes).",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-password-ban-bad"
   },
   {
     "id": 46,
@@ -732,7 +777,8 @@
     ],
     "correct": 3,
     "explanation": "Conditional Access policies use signals such as user/group membership, IP location, device state, device platform, application being accessed, real-time risk detection, and client app type. A user's preferred language setting is not used as a Conditional Access signal. These signals are evaluated to make access decisions.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/conditional-access/overview"
   },
   {
     "id": 47,
@@ -746,7 +792,8 @@
     ],
     "correct": 1,
     "explanation": "Conditional Access evaluation starts when a user attempts to sign in to an application. Then signals are collected (user, location, device, application, risk), policy conditions are evaluated, and finally access is granted, blocked, or requires additional verification such as MFA.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-policies"
   },
   {
     "id": 48,
@@ -766,7 +813,8 @@
       4
     ],
     "explanation": "Valid Conditional Access grant controls include: require MFA, require compliant device, require Microsoft Entra hybrid joined device, require approved client app, require app protection policy, require password change (for risky users), and block access. Requiring a password change every 7 days is a password policy setting, not a Conditional Access grant control.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-grant"
   },
   {
     "id": 49,
@@ -780,7 +828,8 @@
     ],
     "correct": 1,
     "explanation": "A Conditional Access policy with named locations allows administrators to define trusted IP ranges (such as the corporate network) and apply different access requirements based on the user's location. By configuring a named location for the office network and setting a Conditional Access policy, MFA can be required only when users are outside the trusted network.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-assignment-network"
   },
   {
     "id": 50,
@@ -794,7 +843,8 @@
     ],
     "correct": 2,
     "explanation": "The Global Administrator role has the highest level of access and can manage all aspects of Microsoft Entra ID and Microsoft services. Global Administrators can manage all administrative features, assign other admin roles, and reset passwords for all users. Security Administrator manages security features, User Administrator manages users and groups, and Privileged Role Administrator manages role assignments in PIM.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference"
   },
   {
     "id": 51,
@@ -814,7 +864,8 @@
       4
     ],
     "explanation": "Global Administrator, User Administrator, and Security Administrator are built-in Microsoft Entra roles. Database Administrator, Network Operator, and Storage Manager are not standard Microsoft Entra built-in roles. Microsoft Entra ID has many built-in roles, each with specific permissions for managing identity and access resources.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference"
   },
   {
     "id": 52,
@@ -828,7 +879,8 @@
     ],
     "correct": 1,
     "explanation": "Microsoft Entra roles control access to Microsoft Entra resources such as users, groups, and applications. Azure RBAC (Role-Based Access Control) roles control access to Azure resources like virtual machines, storage accounts, and networks. They are separate role systems that serve different scopes, although some roles like Global Administrator can affect both.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/concept-understand-roles"
   },
   {
     "id": 53,
@@ -842,7 +894,8 @@
     ],
     "correct": 1,
     "explanation": "Microsoft Entra Privileged Identity Management (PIM) provides just-in-time (JIT) privileged access, making role assignments time-bound rather than permanent. This reduces the risk of excessive, unnecessary, or misused access permissions. PIM requires justification and approval for activation, provides audit trails, and requires a P2 license.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-configure"
   },
   {
     "id": 54,
@@ -862,7 +915,8 @@
       3
     ],
     "explanation": "Microsoft Entra Identity Governance includes: Access reviews (periodic certification of user access), Entitlement management (managing access packages for internal and external users), Terms of Use (requiring users to accept terms before accessing resources), and PIM (just-in-time privileged access management). Firewall rule management is not an identity governance capability.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/entra/id-governance/identity-governance-overview"
   },
   {
     "id": 55,
@@ -876,7 +930,8 @@
     ],
     "correct": 1,
     "explanation": "The entitlement management lifecycle begins when an administrator creates an access package containing resources and policies. Then a user requests access, the request is approved, and when the assignment expires, access is automatically removed.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-overview"
   },
   {
     "id": 56,
@@ -890,7 +945,8 @@
     ],
     "correct": 1,
     "explanation": "Access reviews in Microsoft Entra ID allow organizations to periodically review and certify user access to resources. Reviewers can validate whether guest users still require access, and access can be automatically removed if not confirmed. This ensures that access rights remain appropriate over time. Conditional Access controls access conditions, entitlement management handles access packages, and Password Protection manages password policies.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/id-governance/access-reviews-overview"
   },
   {
     "id": 57,
@@ -904,7 +960,8 @@
     ],
     "correct": 1,
     "explanation": "Sign-in risk represents the probability that a given sign-in was not performed by the legitimate account owner. Microsoft Entra ID Protection evaluates each sign-in for risk signals such as anonymous IP addresses, impossible travel, malware-linked IPs, and unfamiliar sign-in properties. User risk represents the probability that a user's identity has been compromised.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/id-protection/overview-identity-protection"
   },
   {
     "id": 58,
@@ -922,21 +979,23 @@
       3
     ],
     "explanation": "Microsoft Entra ID Protection evaluates two types of risk: Sign-in risk (the probability that a sign-in attempt is not performed by the legitimate identity owner) and User risk (the probability that a user's identity or account has been compromised). Network risk, application risk, and storage risk are not risk categories in Microsoft Entra ID Protection.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks"
   },
   {
     "id": 59,
     "module": "Microsoft Entra",
-    "question": "What is Microsoft Entra Permissions Management?",
+    "question": "What is cloud infrastructure entitlement management (CIEM), as provided by Microsoft Defender for Cloud?",
     "options": [
       "A tool for managing file system permissions on Windows servers",
-      "A cloud infrastructure entitlement management (CIEM) solution that provides visibility and control over permissions across multi-cloud environments",
+      "A capability that provides visibility into and right-sizes permissions for identities across multicloud environments such as Azure, AWS, and GCP",
       "A feature for setting up role-based access control in Microsoft Entra ID only",
       "A service for managing on-premises Active Directory group policies"
     ],
     "correct": 1,
-    "explanation": "Microsoft Entra Permissions Management is a cloud infrastructure entitlement management (CIEM) solution that provides comprehensive visibility into permissions assigned to all identities across multi-cloud environments (Azure, AWS, and GCP). It helps organizations right-size permissions, detect anomalous activity, and enforce the principle of least privilege across cloud infrastructure.",
-    "question_type": "STANDARD"
+    "explanation": "Cloud infrastructure entitlement management (CIEM) gives comprehensive visibility into permissions assigned to identities across multicloud infrastructures (Azure, AWS, GCP) and helps enforce least privilege. These CIEM capabilities are provided through the Defender Cloud Security Posture Management plan in Microsoft Defender for Cloud.",
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/permissions-management"
   },
   {
     "id": 60,
@@ -950,7 +1009,8 @@
     ],
     "correct": 2,
     "explanation": "Microsoft Entra Verified ID is a decentralized identity service based on open standards (such as W3C Verifiable Credentials and Decentralized Identifiers). It allows organizations to issue verifiable credentials to users and verify credentials presented by others, enabling privacy-respecting identity verification scenarios such as employment verification, education credentials, and onboarding.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/verified-id/decentralized-identifier-overview"
   },
   {
     "id": 61,
@@ -964,7 +1024,8 @@
     ],
     "correct": 2,
     "explanation": "Azure DDoS Network Protection (formerly DDoS Protection Standard) provides enhanced DDoS mitigation features including attack telemetry, alerting, adaptive tuning, and DDoS rapid response support. DDoS Infrastructure Protection (formerly Basic) is automatically enabled and provides only basic protection without telemetry or alerting.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/ddos-protection/ddos-protection-overview"
   },
   {
     "id": 62,
@@ -981,7 +1042,8 @@
       1
     ],
     "explanation": "Azure DDoS Infrastructure Protection (Basic) is automatically enabled at no cost for all Azure resources. DDoS Network Protection does include cost protection through service credits during attacks. Access to the DDoS Rapid Response (DRR) team is a feature of DDoS Network Protection, not Infrastructure Protection.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/azure/ddos-protection/ddos-protection-overview"
   },
   {
     "id": 63,
@@ -1000,7 +1062,8 @@
       3
     ],
     "explanation": "Azure Firewall provides threat intelligence-based filtering, built-in high availability with unrestricted cloud scalability, and NAT rules for inbound traffic. Azure Firewall does not manage encryption of Azure Storage accounts or patch virtual machine operating systems.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/azure/firewall/overview"
   },
   {
     "id": 64,
@@ -1014,7 +1077,8 @@
     ],
     "correct": 2,
     "explanation": "Azure Firewall application rules allow you to filter outbound traffic based on fully qualified domain names (FQDNs), including wildcards. Network rules filter traffic based on IP addresses, ports, and protocols. NAT rules are used for inbound connectivity. Security rules are not a valid Azure Firewall rule type.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/firewall/overview"
   },
   {
     "id": 65,
@@ -1033,7 +1097,8 @@
       0
     ],
     "explanation": "Azure Firewall integrates with Microsoft Threat Intelligence for filtering. Azure Firewall is a stateful firewall, not stateless, meaning it tracks active connections. It supports forced tunneling for routing internet-bound traffic. Azure Firewall Premium adds TLS inspection and IDPS capabilities.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/azure/firewall/overview"
   },
   {
     "id": 66,
@@ -1047,7 +1112,8 @@
     ],
     "correct": 1,
     "explanation": "Azure Web Application Firewall (WAF) provides centralized protection against common web exploits and vulnerabilities such as SQL injection and cross-site scripting. WAF can be deployed on Azure Application Gateway, Azure Front Door, and Azure CDN. NSGs filter network traffic but do not inspect HTTP/HTTPS payloads.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/web-application-firewall/overview"
   },
   {
     "id": 67,
@@ -1064,8 +1130,9 @@
       1,
       2
     ],
-    "explanation": "Azure WAF can be deployed on Azure Application Gateway and Azure Front Door (as well as Azure CDN). Azure Virtual Network, Azure Bastion, and Azure Key Vault are not hosts for WAF policies.",
-    "question_type": "MULTI"
+    "explanation": "Azure WAF can be deployed on Azure Application Gateway and Azure Front Door. Azure Virtual Network, Azure Bastion, and Azure Key Vault are not hosts for WAF policies.",
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/azure/web-application-firewall/overview"
   },
   {
     "id": 68,
@@ -1079,7 +1146,8 @@
     ],
     "correct": 0,
     "explanation": "NSG rules are processed in priority order, from lowest number (highest priority) to highest number. Rule A has priority 100 and matches traffic from 10.0.0.5 (within 10.0.0.0/24) on TCP port 443, so the traffic is allowed. Rule B and C are never evaluated because Rule A already matched.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview"
   },
   {
     "id": 69,
@@ -1098,7 +1166,8 @@
       3
     ],
     "explanation": "Every NSG includes three default inbound rules: AllowVNetInBound (allows traffic within the VNet), AllowAzureLoadBalancerInBound (allows health probes from the Azure load balancer), and DenyAllInBound (denies all other inbound traffic). There is no default AllowInternetInBound or AllowAllInBound rule.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview"
   },
   {
     "id": 70,
@@ -1112,7 +1181,8 @@
     ],
     "correct": 2,
     "explanation": "For inbound traffic, Azure first evaluates the NSG associated with the subnet, and then evaluates the NSG associated with the network interface. Traffic must be allowed by both NSGs to reach the VM. For outbound traffic, the order is reversed: network interface NSG first, then subnet NSG.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview"
   },
   {
     "id": 71,
@@ -1126,7 +1196,8 @@
     ],
     "correct": 3,
     "explanation": "Azure Bastion provides secure and seamless RDP/SSH connectivity to virtual machines directly through the Azure portal over TLS, without the need to expose public IP addresses on the VMs. Azure VPN Gateway provides site-to-site or point-to-site VPN but still requires RDP/SSH to be configured on VMs.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/bastion/bastion-overview"
   },
   {
     "id": 72,
@@ -1143,7 +1214,8 @@
       0
     ],
     "explanation": "Azure Bastion does NOT require a public IP address on the target VM; that is a key benefit. It provides RDP/SSH through the Azure portal using an HTML5-based web client over TLS. Azure Bastion is deployed in a virtual network and can connect to VMs in peered virtual networks.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/azure/bastion/vnet-peering"
   },
   {
     "id": 73,
@@ -1157,7 +1229,8 @@
     ],
     "correct": 1,
     "explanation": "Azure Key Vault is designed to securely store and manage secrets (such as connection strings and API keys), encryption keys, and certificates. It provides centralized secret management with access policies, logging, and hardware security module (HSM) backing for keys.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/key-vault/general/overview"
   },
   {
     "id": 74,
@@ -1176,7 +1249,8 @@
       3
     ],
     "explanation": "Azure Key Vault can store three types of objects: secrets (passwords, connection strings, API keys), cryptographic keys (for encryption operations), and certificates (X.509 certificates for TLS/SSL). It does not store VM disk images or resource group configurations.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/azure/key-vault/general/overview"
   },
   {
     "id": 75,
@@ -1190,7 +1264,8 @@
     ],
     "correct": 2,
     "explanation": "VNet peering connects two Azure virtual networks and allows traffic between them using private IP addresses over the Microsoft backbone network. It provides low-latency, high-bandwidth connectivity. Azure VPN Gateway can also connect VNets but uses encrypted tunnels and has higher latency compared to peering.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-peering-overview"
   },
   {
     "id": 76,
@@ -1207,7 +1282,8 @@
       0
     ],
     "explanation": "Azure ExpressRoute establishes a private connection through a connectivity provider, bypassing the public internet. VNet peering traffic stays on the Microsoft backbone network and does NOT traverse the public internet. An Azure VNet provides logical isolation, enabling Azure resources to communicate securely within a private IP address space.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview"
   },
   {
     "id": 77,
@@ -1221,7 +1297,8 @@
     ],
     "correct": 2,
     "explanation": "Microsoft Entra Private Access provides Zero Trust Network Access (ZTNA) for private applications, whether hosted in Azure or on-premises. It replaces traditional VPNs by providing identity-centric secure access to private resources. Microsoft Entra Internet Access secures access to internet and SaaS applications.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/global-secure-access/concept-private-access"
   },
   {
     "id": 78,
@@ -1235,7 +1312,8 @@
     ],
     "correct": 1,
     "explanation": "Microsoft Entra Internet Access is an identity-centric Secure Web Gateway (SWG) that secures access to internet and SaaS applications. It provides web content filtering, threat protection, and integrates with Conditional Access policies. Microsoft Entra Private Access is for accessing private applications.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/global-secure-access/concept-internet-access"
   },
   {
     "id": 79,
@@ -1249,7 +1327,8 @@
     ],
     "correct": 0,
     "explanation": "Cloud Security Posture Management (CSPM) is a pillar of Microsoft Defender for Cloud that continuously assesses your resources, tracks your security posture, and provides hardening recommendations. CWPP (Cloud Workload Protection) focuses on threat protection for specific workloads like servers, databases, and containers.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/concept-cloud-security-posture-management"
   },
   {
     "id": 80,
@@ -1267,7 +1346,8 @@
       2
     ],
     "explanation": "The foundational (free) CSPM in Defender for Cloud includes security recommendations based on the Microsoft Cloud Security Benchmark (MCSB) and Secure Score. Attack path analysis, agentless vulnerability scanning, and cloud security explorer are part of Defender CSPM (paid plan).",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/concept-cloud-security-posture-management"
   },
   {
     "id": 81,
@@ -1280,7 +1360,8 @@
     ],
     "correct": 1,
     "explanation": "Microsoft Defender for Cloud's three pillars work in order: (1) Assess - continuously evaluate your security posture and identify vulnerabilities, (2) Secure - harden resources and services with recommendations from the Microsoft Cloud Security Benchmark, and (3) Defend - detect and resolve threats to resources, workloads, and services.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction"
   },
   {
     "id": 82,
@@ -1299,7 +1380,8 @@
       1
     ],
     "explanation": "Defender for Cloud supports multi-cloud environments (Azure, AWS, GCP), not just Azure. It provides a Secure Score for measuring security posture. It generates security alerts for detected threats. Secure Score is available with the free foundational CSPM and does not require paid Defender plans.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction"
   },
   {
     "id": 83,
@@ -1312,8 +1394,9 @@
       "The number of compliance standards your organization meets"
     ],
     "correct": 0,
-    "explanation": "The Secure Score in Microsoft Defender for Cloud is a percentage that represents how many of the recommended security actions (controls) have been completed. A higher score indicates a better security posture. Each recommendation contributes points, and implementing them increases the overall score.",
-    "question_type": "STANDARD"
+    "explanation": "The Secure Score in Microsoft Defender for Cloud is a weighted measure of how many of the recommended security controls you have implemented, expressed as a percentage of the maximum. Addressing higher-weighted recommendations raises the score more. A higher score indicates a stronger security posture.",
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/secure-score-security-controls"
   },
   {
     "id": 84,
@@ -1327,7 +1410,8 @@
     ],
     "correct": 0,
     "explanation": "When you implement a security recommendation in Defender for Cloud, your Secure Score increases. Each recommendation has a point value, and fulfilling it adds those points to your score. The Secure Score is updated continuously, not just monthly.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/secure-score-security-controls"
   },
   {
     "id": 85,
@@ -1346,12 +1430,13 @@
       3
     ],
     "explanation": "Microsoft Defender for Cloud offers enhanced workload protection plans including Defender for Servers, Defender for Storage, and Defender for Key Vault, among others (Databases, App Service, Containers, etc.). There is no Defender for Azure Active Directory plan or Defender for Azure Monitor plan within Defender for Cloud.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction"
   },
   {
     "id": 86,
     "module": "Microsoft Defender for Cloud",
-    "question": "Your organization wants to enable just-in-time (JIT) VM access and adaptive application controls for Azure virtual machines. Which capability of Microsoft Defender for Cloud provides these features?",
+    "question": "Your organization wants to enable just-in-time (JIT) VM access and file integrity monitoring for Azure virtual machines. Which capability of Microsoft Defender for Cloud provides these features?",
     "options": [
       "Foundational CSPM (free tier)",
       "Azure Policy",
@@ -1359,8 +1444,9 @@
       "Enhanced security features (Defender for Servers plan)"
     ],
     "correct": 3,
-    "explanation": "Just-in-time (JIT) VM access and adaptive application controls are enhanced security features available when you enable the Defender for Servers plan. These are not included in the free foundational CSPM tier. They help reduce the attack surface by controlling network access and application execution on VMs.",
-    "question_type": "STANDARD"
+    "explanation": "Just-in-time (JIT) VM access and file integrity monitoring (FIM) are enhanced security features available when you enable the Defender for Servers plan. They are not included in the free foundational CSPM tier; they reduce the attack surface and detect changes to critical files.",
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/just-in-time-access-overview"
   },
   {
     "id": 87,
@@ -1374,7 +1460,8 @@
     ],
     "correct": 3,
     "explanation": "Microsoft Defender for Cloud provides multi-cloud support, including native connectors for AWS and Google Cloud Platform (GCP). This allows organizations to view security recommendations, Secure Score, and regulatory compliance status across Azure, AWS, and GCP from a single dashboard.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/multicloud"
   },
   {
     "id": 88,
@@ -1388,7 +1475,8 @@
     ],
     "correct": 1,
     "explanation": "Microsoft Defender for Cloud first automatically discovers the new resource and assesses its configuration. Then it generates security recommendations, the administrator remediates them to improve the Secure Score, and if a threat is detected, Defender for Cloud generates a security alert.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction"
   },
   {
     "id": 89,
@@ -1402,7 +1490,8 @@
     ],
     "correct": 3,
     "explanation": "Microsoft Sentinel is a cloud-native SIEM (Security Information and Event Management) and SOAR (Security Orchestration, Automation, and Response) solution. It collects data across the enterprise, detects threats, investigates incidents, and responds automatically using playbooks.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/sentinel/overview"
   },
   {
     "id": 90,
@@ -1421,12 +1510,13 @@
       1
     ],
     "explanation": "SIEM (Security Information and Event Management) capabilities include collecting/aggregating log data and using analytics to correlate events and generate alerts. SOAR (Security Orchestration, Automation, and Response) capabilities include automatically executing playbooks and orchestrating workflows across security tools for incident response.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/azure/sentinel/overview"
   },
   {
     "id": 91,
     "module": "Microsoft Sentinel",
-    "question": "Which Microsoft Sentinel component is used to ingest data from sources such as Microsoft 365, Azure Active Directory, and third-party security solutions?",
+    "question": "Which Microsoft Sentinel component is used to ingest data from sources such as Microsoft 365, Microsoft Entra ID, and third-party security solutions?",
     "options": [
       "Analytics rules",
       "Data connectors",
@@ -1435,7 +1525,8 @@
     ],
     "correct": 1,
     "explanation": "Data connectors in Microsoft Sentinel are used to ingest data from various sources, including Microsoft services (Microsoft 365, Microsoft Entra ID), Azure services, and third-party solutions (firewalls, threat intelligence feeds). Analytics rules detect threats, workbooks visualize data, and playbooks automate responses.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/sentinel/connect-data-sources"
   },
   {
     "id": 92,
@@ -1454,7 +1545,8 @@
       3
     ],
     "explanation": "The core features of Microsoft Sentinel include data connectors (for ingesting data from multiple sources), analytics rules (for detecting threats using correlation and machine learning), and workbooks (for visualizing and monitoring security data using Azure Monitor Workbooks). EDR agent deployment is a Defender for Endpoint capability, and VM provisioning is not a Sentinel feature.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/azure/sentinel/overview"
   },
   {
     "id": 93,
@@ -1468,7 +1560,8 @@
     ],
     "correct": 0,
     "explanation": "Microsoft Sentinel playbooks are built on Azure Logic Apps. They allow you to create automated workflows that are triggered by Sentinel alerts or incidents, enabling automated threat response such as blocking IPs, isolating devices, or sending notifications.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/sentinel/automate-responses-with-playbooks"
   },
   {
     "id": 94,
@@ -1482,7 +1575,8 @@
     ],
     "correct": 3,
     "explanation": "Microsoft Sentinel hunting allows security analysts to proactively search for security threats across data sources before alerts are triggered, using built-in or custom KQL (Kusto Query Language) queries. Analytics rules trigger alerts reactively, data connectors ingest data, and workbooks visualize data.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/sentinel/hunting"
   },
   {
     "id": 95,
@@ -1496,7 +1590,8 @@
     ],
     "correct": 1,
     "explanation": "The Microsoft Sentinel workflow begins with data being ingested through data connectors into the Log Analytics workspace. Then analytics rules correlate events and generate incidents, analysts investigate using the investigation graph, and playbooks can automatically execute to contain threats.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/sentinel/overview"
   },
   {
     "id": 96,
@@ -1510,7 +1605,8 @@
     ],
     "correct": 0,
     "explanation": "Microsoft Sentinel uses KQL (Kusto Query Language) for writing analytics rules, hunting queries, and searching through log data stored in the Log Analytics workspace. KQL is a read-only query language used across many Microsoft services including Azure Monitor and Microsoft Defender.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/sentinel/kusto-overview"
   },
   {
     "id": 97,
@@ -1524,7 +1620,8 @@
     ],
     "correct": 1,
     "explanation": "When a security analyst discovers interesting findings during a hunting session, they can create a bookmark to preserve the query results and relevant data for later investigation. Bookmarks can also be promoted to incidents. Data connectors are for data ingestion, workbooks for visualization, and automation rules for automated actions.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/sentinel/bookmarks"
   },
   {
     "id": 98,
@@ -1538,7 +1635,8 @@
     ],
     "correct": 1,
     "explanation": "The investigation graph in Microsoft Sentinel provides a visual representation of the relationships between entities (users, IP addresses, hosts, etc.) involved in a security incident. This helps analysts understand the full scope and timeline of an attack. Workbooks are for general data visualization, not entity relationship mapping.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/sentinel/investigate-cases"
   },
   {
     "id": 99,
@@ -1552,7 +1650,8 @@
     ],
     "correct": 3,
     "explanation": "The Microsoft Defender portal provides a unified security operations center experience, bringing together threat protection across identities (Defender for Identity), endpoints (Defender for Endpoint), email and collaboration (Defender for Office 365), and cloud apps (Defender for Cloud Apps) in a single portal.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/defender-xdr/microsoft-365-defender"
   },
   {
     "id": 100,
@@ -1566,7 +1665,8 @@
     ],
     "correct": 1,
     "explanation": "Microsoft Secure Score is a measurement of an organization's security posture across Microsoft 365 services. It provides a numerical score along with prioritized recommendations for improvement actions. A higher score indicates more recommended actions have been taken to protect the organization.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/defender-xdr/microsoft-secure-score"
   },
   {
     "id": 101,
@@ -1583,7 +1683,8 @@
       0
     ],
     "explanation": "Microsoft Secure Score provides improvement actions with specific recommendations to increase your score. It measures security posture across Microsoft 365 services (identity, devices, apps), not just Azure infrastructure. It includes a comparison feature to benchmark your score against organizations of similar size and industry.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/defender-xdr/microsoft-secure-score"
   },
   {
     "id": 102,
@@ -1597,7 +1698,8 @@
     ],
     "correct": 0,
     "explanation": "Safe Attachments in Microsoft Defender for Office 365 checks email attachments for malicious content by opening them in a virtual environment (sandbox/detonation chamber) before delivering them to the recipient. Safe Links protects against malicious URLs, DLP prevents data leakage, and message encryption protects message confidentiality.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/defender-office-365/safe-attachments-about"
   },
   {
     "id": 103,
@@ -1611,7 +1713,8 @@
     ],
     "correct": 2,
     "explanation": "Safe Links in Microsoft Defender for Office 365 provides time-of-click URL verification, scanning URLs when a user clicks them to check if they lead to malicious content. This protects even if the URL was safe at delivery time but became malicious later. Safe Attachments scans attachments, not URLs.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/defender-office-365/safe-links-about"
   },
   {
     "id": 104,
@@ -1625,7 +1728,8 @@
     ],
     "correct": 1,
     "explanation": "Attack simulation training is a feature of Microsoft Defender for Office 365 Plan 2 that allows organizations to run simulated phishing campaigns to test employee security awareness. Plan 1 includes Safe Attachments and Safe Links but does not include attack simulation training or Threat Explorer.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/defender-office-365/attack-simulation-training-get-started"
   },
   {
     "id": 105,
@@ -1639,7 +1743,8 @@
     ],
     "correct": 3,
     "explanation": "Endpoint detection and response (EDR) in Microsoft Defender for Endpoint provides continuous monitoring, behavioral detection, and response capabilities for advanced threats on endpoints. ASR reduces the attack surface, threat and vulnerability management identifies vulnerabilities, and AIR automates investigation and remediation.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/defender-endpoint/overview-endpoint-detection-response"
   },
   {
     "id": 106,
@@ -1658,7 +1763,8 @@
       3
     ],
     "explanation": "Microsoft Defender for Endpoint includes attack surface reduction (ASR) rules to minimize the attack surface, threat and vulnerability management to identify and remediate vulnerabilities, and endpoint detection and response (EDR) for advanced threat monitoring. Email Safe Attachments is part of Defender for Office 365, and cloud app discovery is part of Defender for Cloud Apps.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-endpoint"
   },
   {
     "id": 107,
@@ -1672,7 +1778,8 @@
     ],
     "correct": 2,
     "explanation": "Automated investigation and response (AIR) in Microsoft Defender for Endpoint uses automated processes to investigate alerts and take remediation actions (like quarantining files or isolating devices) without requiring manual security analyst intervention. EDR detects threats but requires manual response, while ASR prevents attacks proactively.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/defender-endpoint/automated-investigations"
   },
   {
     "id": 108,
@@ -1686,7 +1793,8 @@
     ],
     "correct": 0,
     "explanation": "Microsoft Defender for Cloud Apps is a Cloud Access Security Broker (CASB) that provides visibility into cloud app usage, sophisticated analytics for threat detection, and control over data travel across cloud services. It helps organizations discover Shadow IT, assess risk, enforce policies, and protect sensitive information.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/defender-cloud-apps/what-is-defender-for-cloud-apps"
   },
   {
     "id": 109,
@@ -1705,7 +1813,8 @@
       3
     ],
     "explanation": "Microsoft Defender for Cloud Apps provides Shadow IT discovery (identifying unsanctioned apps), app governance (monitoring OAuth apps and their permissions/behaviors), and Conditional Access App Control (real-time session monitoring and control). Server patching and VM backup are not CASB capabilities.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/defender-cloud-apps/what-is-defender-for-cloud-apps"
   },
   {
     "id": 110,
@@ -1719,7 +1828,8 @@
     ],
     "correct": 0,
     "explanation": "Shadow IT discovery in Microsoft Defender for Cloud Apps analyzes traffic logs to discover cloud applications being used across the organization, including unapproved or unsanctioned apps. It provides a risk assessment of each discovered app, helping organizations understand and manage their cloud app landscape.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/defender-cloud-apps/what-is-defender-for-cloud-apps"
   },
   {
     "id": 111,
@@ -1733,7 +1843,8 @@
     ],
     "correct": 2,
     "explanation": "Microsoft Defender for Identity monitors Active Directory Domain Services (AD DS) signals to identify, detect, and investigate advanced threats, compromised identities, and malicious insider actions. It uses sensors installed on domain controllers to analyze AD traffic and detect suspicious activities.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/defender-for-identity/what-is"
   },
   {
     "id": 112,
@@ -1751,7 +1862,8 @@
       3
     ],
     "explanation": "Microsoft Defender for Identity detects identity-based threats including lateral movement paths (where attackers move between systems using compromised credentials) and credential-based attacks like pass-the-hash, pass-the-ticket, and brute force. SQL injection and DDoS are detected by WAF and DDoS Protection respectively, and mobile device malware is handled by Defender for Endpoint.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/defender-for-identity/what-is"
   },
   {
     "id": 113,
@@ -1765,7 +1877,8 @@
     ],
     "correct": 2,
     "explanation": "Microsoft Defender Vulnerability Management provides a unified view of software vulnerabilities and misconfigurations across endpoints, with prioritized remediation recommendations based on business context, threat landscape, and risk. Microsoft Secure Score focuses on configuration security across Microsoft 365, while Defender for Cloud focuses on cloud resource security posture.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/defender-vulnerability-management/defender-vulnerability-management"
   },
   {
     "id": 114,
@@ -1779,12 +1892,13 @@
     ],
     "correct": 1,
     "explanation": "Microsoft Defender Threat Intelligence (Defender TI) provides detailed threat intelligence including profiles of threat actors, their infrastructure, tools, tactics, and techniques (TTPs). It helps security analysts understand the threat landscape and investigate indicators of compromise (IoCs). Sentinel Threat Intelligence is a data source, not a dedicated TI platform.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/defender/threat-intelligence/what-is-microsoft-defender-threat-intelligence-defender-ti"
   },
   {
     "id": 115,
     "module": "Microsoft Defender XDR",
-    "question": "What is Microsoft Copilot for Security?",
+    "question": "What is Microsoft Security Copilot?",
     "options": [
       "An automated patch management tool for Microsoft 365",
       "A vulnerability scanner for Azure virtual machines",
@@ -1792,8 +1906,9 @@
       "A generative AI-powered security tool that helps security professionals with incident response, threat hunting, and security posture management"
     ],
     "correct": 3,
-    "explanation": "Microsoft Copilot for Security (formerly Security Copilot) is a generative AI-powered security tool that combines large language models with Microsoft's security-specific models and threat intelligence. It assists security professionals with tasks like incident summarization, threat hunting, script analysis, and security posture management using natural language prompts.",
-    "question_type": "STANDARD"
+    "explanation": "Microsoft Security Copilot (formerly Microsoft Copilot for Security) is a generative AI-powered security solution that combines large language models with Microsoft security-specific models and threat intelligence to help security professionals investigate and respond to threats at machine speed.",
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/copilot/security/microsoft-security-copilot"
   },
   {
     "id": 116,
@@ -1812,7 +1927,8 @@
       3
     ],
     "explanation": "Defender for Identity monitors on-premises Active Directory Domain Services for identity-based threats. Defender for Endpoint provides protection for devices (workstations, servers, mobile devices). Defender for Cloud Apps is a CASB that protects and governs SaaS application usage. Defender for Office 365 (not Identity) protects email and collaboration tools.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/defender-xdr/microsoft-365-defender"
   },
   {
     "id": 117,
@@ -1826,7 +1942,8 @@
     ],
     "correct": 1,
     "explanation": "The Microsoft Service Trust Portal provides access to audit reports, compliance guides, and trust documents for Microsoft cloud services. It contains SOC reports, ISO certifications, FedRAMP documentation, and other third-party audit reports that demonstrate Microsoft's compliance posture.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/azure/compliance/offerings/"
   },
   {
     "id": 118,
@@ -1841,11 +1958,13 @@
     ],
     "correct": [
       0,
+      1,
       2,
       4
     ],
-    "explanation": "The Service Trust Portal provides SOC audit reports, ISO certification documents, and industry-specific compliance guides. Real-time service health dashboards are found in the Microsoft 365 admin center, and while Microsoft performs penetration testing, those detailed results are not published on the Service Trust Portal.",
-    "question_type": "MULTI"
+    "explanation": "The Service Trust Portal provides SOC audit reports, ISO certification documents, industry-specific compliance guides, and Azure penetration test reports (in the FedRAMP folder). Real-time service health dashboards are not on the Service Trust Portal; service health is shown in the Microsoft 365 admin center and Azure Service Health.",
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/azure/compliance/offerings/"
   },
   {
     "id": 119,
@@ -1864,7 +1983,8 @@
       0
     ],
     "explanation": "Microsoft's privacy principles include: no content-based targeting (Microsoft does NOT use customer content for advertising), control (users can access and manage their data), transparency (clear communication about data practices), and strong legal protections (Microsoft challenges government data requests that are inappropriate). The six principles are: control, transparency, security, strong legal protections, no content-based targeting, and benefits to the user.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/compliance/assurance/assurance-privacy"
   },
   {
     "id": 120,
@@ -1878,7 +1998,8 @@
     ],
     "correct": 1,
     "explanation": "Microsoft Priva provides two key capabilities: Privacy Risk Management, which helps identify and remediate privacy risks in your Microsoft 365 data, and Priva Subject Rights Requests, which automates and manages data subject access requests (DSARs) to help meet regulatory obligations such as GDPR.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/privacy/priva/priva-overview"
   },
   {
     "id": 121,
@@ -1891,7 +2012,8 @@
     ],
     "correct": 2,
     "explanation": "Customer-managed controls are implemented and managed entirely by the customer organization. Microsoft-managed controls are handled by Microsoft, and shared controls are jointly managed by both Microsoft and the customer. Compliance Manager tracks all three types but only customer-managed and shared controls contribute to the organization's compliance score.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/compliance-manager"
   },
   {
     "id": 122,
@@ -1910,7 +2032,8 @@
       1
     ],
     "explanation": "The compliance score is indeed a percentage measuring completion progress of improvement actions. Compliance Manager does NOT automatically implement controls; it provides recommendations and tracks progress, but the organization must implement controls. Assessments do map controls to regulatory frameworks such as GDPR, HIPAA, or ISO 27001. Microsoft-managed controls do NOT contribute to the organization's score; only customer-managed and shared controls do.",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/purview/compliance-manager"
   },
   {
     "id": 123,
@@ -1931,7 +2054,8 @@
       4
     ],
     "explanation": "Compliance Manager categorizes improvement actions by both their mandatory/discretionary nature and their functional type. Mandatory actions are required by regulation, while discretionary actions are recommended best practices. Functional categories include preventive (proactively handling tasks like setting permissions), detective (monitoring for compliance issues), and corrective (addressing issues after they are found).",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/purview/compliance-manager-improvement-actions"
   },
   {
     "id": 124,
@@ -1945,7 +2069,8 @@
     ],
     "correct": 2,
     "explanation": "Sensitive information types (SITs) use predefined patterns, regular expressions, keywords, and confidence levels to identify sensitive data such as credit card numbers and Social Security numbers. Microsoft provides over 300 built-in SITs. Trainable classifiers use machine learning, EDM matches against specific data values, and Content Explorer is a viewing tool, not a classification method.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/sensitive-information-type-learn-about"
   },
   {
     "id": 125,
@@ -1959,7 +2084,8 @@
     ],
     "correct": 2,
     "explanation": "Trainable classifiers use machine learning to classify content based on what the item is (such as a contract, invoice, or resume), rather than by matching specific patterns. You can use built-in pre-trained classifiers or create custom trainable classifiers by providing sample content. Sensitive information types and EDM are pattern/value-based approaches.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/trainable-classifiers-learn-about"
   },
   {
     "id": 126,
@@ -1973,7 +2099,8 @@
     ],
     "correct": 2,
     "explanation": "Exact Data Match (EDM) classification compares content against a table of exact, specific sensitive data values. For example, you can upload a database of employee Social Security numbers and names, and EDM will match content that contains those exact values. This provides higher accuracy than generic pattern matching with fewer false positives.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/sit-learn-about-exact-data-match-based-sits"
   },
   {
     "id": 127,
@@ -1987,7 +2114,8 @@
     ],
     "correct": 2,
     "explanation": "Content Explorer allows administrators to browse and view the actual content of items that have been classified. It shows sensitive information types and sensitivity labels applied to content across Exchange, SharePoint, and OneDrive. Activity Explorer, by contrast, shows what activities have been performed on labeled or classified content.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/data-classification-content-explorer"
   },
   {
     "id": 128,
@@ -2007,7 +2135,8 @@
       4
     ],
     "explanation": "Activity Explorer tracks labeling activities such as sensitivity label changes, DLP policy matches, and endpoint activities like files copied to removable media or printed. It does NOT track simple file read operations by label. Activity Explorer provides visibility into what actions are being taken on classified content across the organization.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/purview/data-classification-activity-explorer"
   },
   {
     "id": 129,
@@ -2026,7 +2155,8 @@
       3
     ],
     "explanation": "The correct order for deploying sensitivity labels is: (1) Create the sensitivity labels with appropriate names and descriptions, (2) Define the scope and protection settings such as encryption and content markings like headers, footers, and watermarks, (3) Publish the labels to users and groups through a label policy, and (4) Users apply labels manually or auto-labeling policies apply labels automatically based on conditions.",
-    "question_type": "SEQUENCE"
+    "question_type": "SEQUENCE",
+    "reference": "https://learn.microsoft.com/en-us/purview/sensitivity-labels"
   },
   {
     "id": 130,
@@ -2046,7 +2176,8 @@
       4
     ],
     "explanation": "Sensitivity labels can encrypt content, apply visual markings (watermarks, headers, footers), auto-apply based on conditions (such as detecting sensitive information types), and restrict access to specific users or groups. Automatic deletion after a retention period is a capability of retention labels, not sensitivity labels.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/purview/sensitivity-labels"
   },
   {
     "id": 131,
@@ -2060,7 +2191,8 @@
     ],
     "correct": 2,
     "explanation": "When a sensitivity label applies encryption with access restrictions limited to the Legal department, users outside that group (such as Sales employees) will be denied access entirely. The encryption persists with the document regardless of where it travels, ensuring that only authorized users can access the content.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/encryption-sensitivity-labels"
   },
   {
     "id": 132,
@@ -2074,7 +2206,8 @@
     ],
     "correct": 1,
     "explanation": "A DLP rule defines the conditions (what sensitive information to look for, such as sensitive information types, sensitivity labels, or data volume thresholds) and the actions to take when those conditions are met (such as blocking sharing, showing policy tips, or generating alerts). DLP policies contain one or more rules.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/dlp-learn-about-dlp"
   },
   {
     "id": 133,
@@ -2094,7 +2227,8 @@
       3
     ],
     "explanation": "DLP policies can be applied to Exchange Online, SharePoint Online, OneDrive for Business, Microsoft Teams chat and channel messages, and Windows 10/11 endpoints (via Endpoint DLP). DLP policies are not natively applied to Azure Linux virtual machines. DLP can also extend to on-premises repositories, Power BI, and third-party cloud apps through Defender for Cloud Apps.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/purview/dlp-learn-about-dlp"
   },
   {
     "id": 134,
@@ -2108,7 +2242,8 @@
     ],
     "correct": 1,
     "explanation": "When a DLP policy is configured to block external sharing of content containing credit card numbers, the email is blocked and the user receives a policy tip explaining the violation. Policy tips educate users about why their action was blocked and can optionally allow them to override the block with a business justification.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/dlp-learn-about-dlp"
   },
   {
     "id": 135,
@@ -2122,7 +2257,8 @@
     ],
     "correct": 1,
     "explanation": "Retention policies are applied broadly at the container level (entire mailboxes, SharePoint sites, OneDrive accounts), while retention labels are applied at the item level (individual documents, emails, or folders). Retention labels can be applied both manually by users and automatically through auto-apply label policies. Disposition review is a capability of retention labels, not retention policies.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/retention"
   },
   {
     "id": 136,
@@ -2137,11 +2273,12 @@
     "correct": [
       0,
       0,
-      0,
+      1,
       1
     ],
-    "explanation": "A retention policy can indeed be applied to multiple locations simultaneously. Retention labels can mark items as regulatory records, which cannot be deleted or modified even by administrators. When both a policy and a label apply, the label's settings take precedence (retention wins principle, and labels prevail over policies). Disposition review is a feature of retention labels, NOT retention policies.",
-    "question_type": "YES_NO_MATRIX"
+    "explanation": "Under the principles of retention, retention always wins over deletion and the longest retention period wins, whether it comes from a policy or a label. Retention labels do not universally take precedence over policies; a label takes precedence only for the delete action. So a blanket claim that the label settings always take precedence is incorrect.",
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/purview/retention"
   },
   {
     "id": 137,
@@ -2160,7 +2297,8 @@
       3
     ],
     "explanation": "At the end of the retention period, a retention label can permanently delete the item, trigger a disposition review (requiring a reviewer to approve deletion), or start a different retention period (relabeling). Retention labels cannot automatically apply sensitivity labels or move items to an archive mailbox at the end of the retention period.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/purview/retention"
   },
   {
     "id": 138,
@@ -2174,7 +2312,8 @@
     ],
     "correct": 1,
     "explanation": "A retention label with a regulatory record designation ensures that content cannot be modified, deleted, or relabeled during the retention period, even by administrators. This meets the strictest compliance requirements such as SEC Rule 17a-4. Unlike a standard record, a regulatory record has even more restrictions and the label itself cannot be removed.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/records-management"
   },
   {
     "id": 139,
@@ -2195,7 +2334,8 @@
       4
     ],
     "explanation": "The records management lifecycle follows this order: (1) Create a file plan that defines retention labels with file plan descriptors such as business department and category, (2) Apply the retention labels to content either manually or through auto-apply policies, (3) Content is retained and protected during the defined retention period, (4) A disposition review is triggered when the retention period ends, and (5) Designated reviewers approve the final disposition (delete) or extend the retention.",
-    "question_type": "SEQUENCE"
+    "question_type": "SEQUENCE",
+    "reference": "https://learn.microsoft.com/en-us/purview/records-management"
   },
   {
     "id": 140,
@@ -2209,7 +2349,8 @@
     ],
     "correct": 1,
     "explanation": "Disposition review allows designated reviewers to examine content at the end of its retention period before it is permanently deleted. Reviewers can approve deletion, extend the retention period, or apply a different retention label. This provides an additional layer of oversight for important business records.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/disposition"
   },
   {
     "id": 141,
@@ -2228,7 +2369,8 @@
       3
     ],
     "explanation": "Insider Risk Management uses signals from multiple Microsoft 365 services including file activity (downloads from SharePoint/OneDrive), communication patterns (emails indicating disgruntlement), and HR connector signals (resignation or termination dates). It does not track GPS location on personal devices or monitor employee social media activity.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/purview/insider-risk-management"
   },
   {
     "id": 142,
@@ -2242,7 +2384,8 @@
     ],
     "correct": 1,
     "explanation": "The triage process in Insider Risk Management involves reviewing alerts generated by policies and deciding whether to confirm them as cases for further investigation or dismiss them. Analysts review the alert details, user activity timeline, and risk indicators to make informed decisions about which alerts warrant deeper investigation.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/insider-risk-management"
   },
   {
     "id": 143,
@@ -2262,7 +2405,8 @@
       4
     ],
     "explanation": "Built-in policy templates in Insider Risk Management include data theft by departing users, general data leaks, security policy violations, and patient data misuse (for healthcare organizations). Phishing email detection is a capability of Microsoft Defender for Office 365, not Insider Risk Management, which focuses on internal threats rather than external attack vectors.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/purview/insider-risk-management-policies"
   },
   {
     "id": 144,
@@ -2276,7 +2420,8 @@
     ],
     "correct": 1,
     "explanation": "Communication Compliance monitors communications across Exchange Online, Microsoft Teams, and Viva Engage (formerly Yammer) to detect policy violations including harassment, threats, discrimination, regulatory compliance issues, and sharing of sensitive information. It uses both built-in classifiers and custom policies to flag content for review.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/communication-compliance"
   },
   {
     "id": 145,
@@ -2296,7 +2441,8 @@
       4
     ],
     "explanation": "Communication Compliance can detect offensive language, harassment, threats, discrimination, sharing of sensitive information, and regulatory compliance violations in communications. Unauthorized file downloads from endpoints are monitored by Insider Risk Management and Endpoint DLP, not Communication Compliance, which focuses specifically on the content of communications.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/purview/communication-compliance"
   },
   {
     "id": 146,
@@ -2310,7 +2456,8 @@
     ],
     "correct": 2,
     "explanation": "Information Barriers in Microsoft Purview allow organizations to restrict communication and collaboration between specific groups of users. This is commonly used in financial services to create 'ethical walls' or 'Chinese walls' between departments such as investment banking and equity trading, as required by regulatory compliance. Information Barriers work across Microsoft Teams, SharePoint, and OneDrive.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/information-barriers"
   },
   {
     "id": 147,
@@ -2328,7 +2475,8 @@
       2
     ],
     "explanation": "Custodian management (including legal hold notifications and custodian communications) and review sets with advanced analytics (near-duplicate detection, email threading, themes, and predictive coding) are exclusive to eDiscovery (Premium). Content search, exporting results, and searching Teams messages are available in eDiscovery (Standard) or basic Content Search.",
-    "question_type": "MULTI"
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/purview/ediscovery-overview"
   },
   {
     "id": 148,
@@ -2342,7 +2490,8 @@
     ],
     "correct": 1,
     "explanation": "A review set in eDiscovery (Premium) is a static collection of content where legal teams can review, tag, annotate, and analyze documents relevant to a case. Review sets support advanced analytics including near-duplicate detection, email threading, themes analysis, and predictive coding to help legal teams efficiently review large volumes of content.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/ediscovery-overview"
   },
   {
     "id": 149,
@@ -2361,7 +2510,8 @@
       1
     ],
     "explanation": "Audit (Standard) retains logs for 180 days (upgraded from the previous 90 days for E3 licenses). Audit (Premium) supports retention for up to one year by default with an option to extend to 10 years using 10-year audit log retention add-on policies. Audit (Premium) provides access to crucial events like MailItemsAccessed and Send, which are vital for forensic investigations. Audit (Standard) does NOT provide these crucial high-value events or intelligent insights; those are exclusive to Audit (Premium).",
-    "question_type": "YES_NO_MATRIX"
+    "question_type": "YES_NO_MATRIX",
+    "reference": "https://learn.microsoft.com/en-us/purview/audit-solutions-overview"
   },
   {
     "id": 150,
@@ -2375,6 +2525,7 @@
     ],
     "correct": 1,
     "explanation": "The MailItemsAccessed crucial event, available exclusively in Audit (Premium), records when mail items are accessed via mail protocols. This is critical for forensic investigations of compromised accounts because it allows investigators to determine exactly which email messages were accessed by an attacker, helping to scope the breach and assess its impact.",
-    "question_type": "STANDARD"
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/purview/audit-premium"
   }
 ]
