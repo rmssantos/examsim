@@ -5,11 +5,11 @@
     "question": "Microsoft's framework for building AI systems responsibly is grounded in a defined set of core principles. How many principles make up Microsoft's responsible AI framework?",
     "options": [
       "Four",
+      "Eight",
       "Five",
-      "Six",
-      "Eight"
+      "Six"
     ],
-    "correct": 2,
+    "correct": 3,
     "explanation": "Microsoft's Responsible AI Standard is a framework built on six principles: fairness, reliability and safety, privacy and security, inclusiveness, transparency, and accountability. Four, five, and eight do not match the documented framework.",
     "reference": "https://learn.microsoft.com/azure/machine-learning/concept-responsible-ai?view=azureml-api-2",
     "id": 1
@@ -19,12 +19,12 @@
     "module": "Responsible AI Principles",
     "question": "A bank trains a loan-approval model on historical data. Reviewers find the model approves applicants from one demographic group at a much higher rate than equally qualified applicants from another group. Which responsible AI principle is most directly violated?",
     "options": [
-      "Fairness",
-      "Transparency",
       "Reliability and safety",
-      "Privacy and security"
+      "Privacy and security",
+      "Fairness",
+      "Transparency"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Fairness requires that AI systems treat people equitably and make the same recommendations for people in similar circumstances, avoiding affecting similarly situated groups differently. Transparency is about understandability, reliability and safety is about consistent and safe operation, and privacy and security is about protecting data, so none of those describes a biased outcome.",
     "reference": "https://learn.microsoft.com/azure/machine-learning/concept-responsible-ai?view=azureml-api-2",
     "id": 2
@@ -34,12 +34,12 @@
     "module": "Responsible AI Principles",
     "question": "Which responsible AI principle is concerned with ensuring an AI system operates as it was originally designed, responds safely to unanticipated conditions, and resists harmful manipulation?",
     "options": [
-      "Inclusiveness",
       "Reliability and safety",
       "Accountability",
-      "Transparency"
+      "Transparency",
+      "Inclusiveness"
     ],
-    "correct": 1,
+    "correct": 0,
     "explanation": "Reliability and safety means AI systems should operate as they were originally designed, respond safely to unanticipated conditions, and resist harmful manipulation. Inclusiveness addresses empowering diverse users, accountability addresses oversight and governance, and transparency addresses understandability.",
     "reference": "https://learn.microsoft.com/azure/machine-learning/concept-responsible-ai?view=azureml-api-2",
     "id": 3
@@ -49,12 +49,12 @@
     "module": "Responsible AI Principles",
     "question": "A team building a customer-facing chatbot wants to make sure people who are blind or who have motor disabilities can use it as effectively as everyone else, for example through screen readers and alternative input methods. Which responsible AI principle does this goal align with?",
     "options": [
-      "Inclusiveness",
-      "Privacy and security",
       "Accountability",
-      "Reliability and safety"
+      "Inclusiveness",
+      "Reliability and safety",
+      "Privacy and security"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Inclusiveness focuses on empowering everyone and accommodating diverse needs, including accessibility for people across the full range of abilities. Privacy and security protects data, accountability provides oversight, and reliability and safety addresses consistent and safe behavior.",
     "reference": "https://learn.microsoft.com/agents/design-guidelines/responsible-ai",
     "id": 4
@@ -64,12 +64,12 @@
     "module": "Responsible AI Principles",
     "question": "An AI system helps decide whether job applicants advance to an interview. Stakeholders ask for human-understandable explanations of why the model rejected specific candidates, including the capability of interpretability. Which responsible AI principle does this request reflect?",
     "options": [
-      "Transparency",
+      "Privacy and security",
       "Fairness",
       "Inclusiveness",
-      "Privacy and security"
+      "Transparency"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Transparency is about making AI systems understandable. A crucial part of transparency is interpretability, which provides useful explanations of AI system behavior, including global and local explanations of how and why a model reaches its decisions. Fairness concerns equitable treatment, inclusiveness concerns accessibility, and privacy and security concerns data protection.",
     "reference": "https://learn.microsoft.com/azure/machine-learning/concept-responsible-ai?view=azureml-api-2#transparency",
     "id": 5
@@ -79,12 +79,12 @@
     "module": "Responsible AI Principles",
     "question": "Which responsible AI principle states that the people who design and deploy AI systems must remain answerable for how those systems operate, and that humans should keep meaningful control over highly autonomous systems?",
     "options": [
-      "Accountability",
-      "Transparency",
       "Reliability and safety",
-      "Inclusiveness"
+      "Inclusiveness",
+      "Accountability",
+      "Transparency"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Accountability means the people who design and deploy AI systems must be accountable for how those systems operate, ensuring AI systems are not the final authority on decisions that affect people's lives and that humans maintain meaningful control over highly autonomous systems. Transparency is about understandability, reliability and safety is about consistent operation, and inclusiveness is about empowering diverse users.",
     "reference": "https://learn.microsoft.com/azure/machine-learning/concept-responsible-ai?view=azureml-api-2#accountability",
     "id": 6
@@ -94,12 +94,12 @@
     "module": "Responsible AI Principles",
     "question": "An organization is concerned that the personal data used to train an AI system, and the predictions it produces, could be exposed or misused. Which responsible AI principle most directly addresses protecting this data?",
     "options": [
+      "Transparency",
       "Privacy and security",
       "Fairness",
-      "Transparency",
       "Inclusiveness"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Privacy and security ensures the data and models an AI system uses and produces are protected and that individuals' right to privacy is preserved. Fairness concerns equitable outcomes, transparency concerns understandability, and inclusiveness concerns accessibility.",
     "reference": "https://learn.microsoft.com/azure/machine-learning/concept-responsible-ai?view=azureml-api-2",
     "id": 7
@@ -124,12 +124,12 @@
     "module": "Responsible AI Principles",
     "question": "A company wants users to clearly know they are interacting with an AI system rather than a human, and to disclose the system's capabilities and known limitations. Which responsible AI principle does this practice best demonstrate?",
     "options": [
+      "Privacy and security",
       "Transparency",
       "Accountability",
-      "Privacy and security",
       "Reliability and safety"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Transparency means being open about how and why AI is used, making clear that users are interacting with an AI system and communicating its capabilities and limitations so users can make informed decisions. Accountability is about oversight, privacy and security is about data protection, and reliability and safety is about safe and consistent operation.",
     "reference": "https://learn.microsoft.com/agents/design-guidelines/responsible-ai",
     "id": 9
@@ -164,8 +164,8 @@
     "question": "A hospital deploys an AI system that recommends treatment plans. Leadership decides a qualified clinician must review and approve every recommendation before it is acted on, and that the AI is never the final decision-maker. Which responsible AI principle does this human-oversight requirement reflect?",
     "options": [
       "Accountability",
-      "Inclusiveness",
       "Transparency",
+      "Inclusiveness",
       "Fairness"
     ],
     "correct": 0,
@@ -291,12 +291,12 @@
     "module": "Responsible AI Principles",
     "question": "A weather-prediction AI service occasionally receives sensor inputs far outside the range it was trained on. The design goal is for the system to handle these unexpected inputs gracefully and continue to behave predictably rather than failing in dangerous ways. Which responsible AI principle does this goal address?",
     "options": [
-      "Reliability and safety",
       "Privacy and security",
-      "Transparency",
-      "Accountability"
+      "Accountability",
+      "Reliability and safety",
+      "Transparency"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Handling variability, edge cases, and unexpected inputs in ways that support safe and predictable behavior is the essence of reliability and safety. Privacy and security protects data, transparency makes behavior understandable, and accountability provides governance and human oversight, none of which is the focus here.",
     "reference": "https://learn.microsoft.com/agents/design-guidelines/responsible-ai",
     "id": 18
@@ -306,12 +306,12 @@
     "module": "Generative AI Models and Configuration",
     "question": "A developer is learning how generative language models process text. Before a large language model can work with a sentence such as a user's question, what does the model first break the input text into?",
     "options": [
-      "Tokens, which can be whole words, fractions of words, or single characters",
       "Embeddings stored in a vector database",
       "Pixels that represent the characters visually",
-      "Separate API calls, one per word"
+      "Separate API calls, one per word",
+      "Tokens, which can be whole words, fractions of words, or single characters"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Large language models do not operate on raw words or characters. A tokenizer first breaks input text into tokens, where a token can be a single character, a fraction of a word, or an entire word, and the model processes those tokens. Embeddings are a downstream numeric representation, not the unit text is split into; pixels and per-word API calls are unrelated to tokenization.",
     "reference": "https://learn.microsoft.com/training/modules/introduction-large-language-models/3-large-language-model-core-concepts",
     "id": 19
@@ -321,12 +321,12 @@
     "module": "Generative AI Models and Configuration",
     "question": "In a chat interaction with a generative AI model, an analyst types the instruction \"Summarize this report in three bullet points\" and the model returns the summarized text. Using the standard terminology for how these models work, what is the model's generated output text called?",
     "options": [
-      "A completion",
-      "A prompt",
       "A token limit",
+      "A prompt",
+      "A completion",
       "An embedding"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "A prompt is the input instruction the user provides; the text the model generates in response is called the completion, which the model produces one token at a time. A token limit is a constraint on length, and an embedding is a numeric vector representation of text, not the generated response.",
     "reference": "https://learn.microsoft.com/training/modules/introduction-large-language-models/3-large-language-model-core-concepts",
     "id": 20
@@ -336,12 +336,12 @@
     "module": "Generative AI Models and Configuration",
     "question": "A team wants to build a retrieval system that finds documents whose meaning is similar to a user's search phrase, even when the exact words differ. Which type of model should they use to convert the text into numerical vectors that capture semantic meaning?",
     "options": [
+      "A speech-to-text model",
       "An embeddings model",
-      "An image generation model",
       "A chat completion model",
-      "A speech-to-text model"
+      "An image generation model"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "An embeddings model converts text into a vector of floating-point numbers that represents the semantic meaning of the text, so that semantically similar text produces similar vectors. This powers vector similarity search. Image generation models create images, chat completion models generate conversational text, and speech-to-text models transcribe audio; none produce the semantic vectors needed for similarity search.",
     "reference": "https://learn.microsoft.com/azure/ai-foundry/openai/concepts/understand-embeddings",
     "id": 21
@@ -351,12 +351,12 @@
     "module": "Generative AI Models and Configuration",
     "question": "A solution must analyze complex legal contracts to identify subtle differences between clauses and work through multi-step logical comparisons with high accuracy. Which category of model is specifically designed for this kind of advanced problem-solving and reasoning?",
     "options": [
-      "A reasoning model, such as the Azure OpenAI o-series",
-      "An embeddings model",
+      "A text-to-speech model",
       "An image generation model",
-      "A text-to-speech model"
+      "An embeddings model",
+      "A reasoning model, such as the Azure OpenAI o-series"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "The Azure OpenAI o-series are reasoning models designed to tackle reasoning and problem-solving tasks, spending more time processing the request; Microsoft lists complex document comparison such as analyzing contracts and case files to identify subtle differences as a key capability. Embeddings models only produce vectors, image generation models create images, and text-to-speech models synthesize audio, none of which perform multi-step reasoning over contracts.",
     "reference": "https://learn.microsoft.com/azure/foundry/openai/how-to/reasoning",
     "id": 22
@@ -367,9 +367,9 @@
     "question": "An application needs a single model that can accept both text and image inputs, for example reading a photo of a receipt and answering questions about it. Which Microsoft Foundry model capability matches this requirement?",
     "options": [
       "A multimodal model such as GPT-4o",
-      "A text-only embeddings model",
+      "A model deployed only to managed compute",
       "A standalone speech recognition model",
-      "A model deployed only to managed compute"
+      "A text-only embeddings model"
     ],
     "correct": 0,
     "explanation": "Multimodal models such as GPT-4o integrate text and images in a single model and can accept both text and images as input, which fits reading a receipt photo and answering questions about it. A text-only embeddings model cannot interpret images, a speech recognition model handles audio not images, and the deployment target (managed compute) is unrelated to whether a model can accept image input.",
@@ -381,12 +381,12 @@
     "module": "Generative AI Models and Configuration",
     "question": "A product team wants a marketing tool that produces original images from a text description that a user types in, such as \"a red bicycle on a sunny beach.\" Which model capability should they select in Microsoft Foundry?",
     "options": [
-      "An image generation model",
-      "An embeddings model",
       "A chat completion model",
-      "A reasoning model"
+      "An image generation model",
+      "A reasoning model",
+      "An embeddings model"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Image generation models create original images from user-provided text prompts, which is exactly what the marketing tool needs. Embeddings models output numeric vectors, chat completion models generate text responses, and reasoning models focus on multi-step problem solving; none of these produce images from a description.",
     "reference": "https://learn.microsoft.com/azure/foundry/openai/how-to/dall-e",
     "id": 24
@@ -396,12 +396,12 @@
     "module": "Generative AI Models and Configuration",
     "question": "Within the Foundry portal, which feature serves as the central hub to discover, search, and filter across hundreds of models from providers such as Azure OpenAI, Meta, Mistral, and Hugging Face before choosing one to deploy?",
     "options": [
-      "The model catalog",
+      "The temperature parameter",
       "The Content Understanding service",
       "The system message",
-      "The temperature parameter"
+      "The model catalog"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "The model catalog in the Foundry portal is the hub for discovering and using a wide range of models across many providers, with keyword search and filters. Content Understanding is a separate Foundry tool for extracting information from content, the system message guides a model's behavior, and temperature is a generation parameter, none of which is the model discovery hub.",
     "reference": "https://learn.microsoft.com/azure/foundry/concepts/foundry-models-overview",
     "id": 25
@@ -411,12 +411,12 @@
     "module": "Generative AI Models and Configuration",
     "question": "An architect wants to consume a generative model purely through an API, paying based on the number of input and output tokens, without provisioning or managing any dedicated virtual machines. Which deployment option in the Microsoft Foundry model catalog matches this requirement?",
     "options": [
-      "Serverless API deployment (pay per token)",
-      "Managed compute on dedicated virtual machines",
+      "Downloading model weights to a local laptop",
       "Deploying the model on an on-premises server",
-      "Downloading model weights to a local laptop"
+      "Serverless API deployment (pay per token)",
+      "Managed compute on dedicated virtual machines"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "With a serverless deployment, the model is hosted in Microsoft-managed infrastructure and accessed through an API, and billing is for inputs and outputs to the API, typically in tokens, with no virtual machines to manage. Managed compute deploys model weights to dedicated virtual machines billed by core hours. On-premises servers and downloading weights to a laptop are not catalog deployment options.",
     "reference": "https://learn.microsoft.com/azure/foundry/concepts/foundry-models-overview",
     "id": 26
@@ -427,9 +427,9 @@
     "question": "A data scientist needs to deploy an open model's weights onto dedicated virtual machines that they control, and they accept being billed for the virtual machine core hours that the deployment uses. Which deployment option should they choose in the model catalog?",
     "options": [
       "Managed compute",
+      "A system prompt",
       "Serverless API deployment",
-      "An embeddings index",
-      "A system prompt"
+      "An embeddings index"
     ],
     "correct": 0,
     "explanation": "Managed compute deploys model weights to dedicated virtual machines and bills for the virtual machine core hours the deployment uses, matching the requirement for dedicated, controlled compute. Serverless API deployment is token-billed and Microsoft-hosted with no virtual machines to manage. An embeddings index and a system prompt are not deployment options for hosting a model.",
@@ -441,12 +441,12 @@
     "module": "Generative AI Models and Configuration",
     "question": "When calling a chat completion model, a developer sets the temperature parameter to a low value such as 0.2. What is the most likely effect on the model's responses?",
     "options": [
-      "The output becomes more focused and deterministic",
-      "The output becomes more random and creative",
       "The model is allowed to generate more total tokens",
-      "The model switches to accepting image input"
+      "The output becomes more focused and deterministic",
+      "The model switches to accepting image input",
+      "The output becomes more random and creative"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Temperature is a sampling control between 0 and 2. Lower values like 0.2 make the output more focused and deterministic, while higher values like 0.8 make it more random. Increasing the token allowance is controlled by max tokens, not temperature, and temperature has nothing to do with enabling image input.",
     "reference": "https://learn.microsoft.com/azure/foundry/openai/reference",
     "id": 28
@@ -456,12 +456,12 @@
     "module": "Generative AI Models and Configuration",
     "question": "A developer wants to cap how long each model response can be, so that a single completion cannot exceed a set number of tokens. Which configuration parameter should they set?",
     "options": [
-      "Max tokens (maximum response length)",
       "Temperature",
-      "Top-p (nucleus sampling)",
-      "The system message"
+      "The system message",
+      "Max tokens (maximum response length)",
+      "Top-p (nucleus sampling)"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "The max tokens parameter sets a limit on the number of tokens generated in a model response, directly capping response length. Temperature and top-p both influence the randomness of token selection, not the length cap, and the system message guides behavior and tone rather than enforcing a token limit.",
     "reference": "https://learn.microsoft.com/azure/foundry/openai/reference",
     "id": 29
@@ -471,12 +471,12 @@
     "module": "Generative AI Models and Configuration",
     "question": "A team is configuring a customer-support chatbot and wants to define its role, tone, and the rule \"only answer questions about our products.\" Which part of the request should they use to provide these initial instructions that steer the model's overall behavior?",
     "options": [
-      "The system message",
       "The temperature value",
+      "The max tokens setting",
       "The embeddings vector",
-      "The max tokens setting"
+      "The system message"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "The system message (system role) is included at the start of the conversation and provides the initial instructions, such as the assistant's role, tone, and rules to follow, steering overall behavior. Temperature only adjusts randomness, an embeddings vector is a numeric text representation, and max tokens limits length, none of which define the assistant's role or rules.",
     "reference": "https://learn.microsoft.com/azure/foundry/openai/concepts/advanced-prompt-engineering",
     "id": 30
@@ -595,12 +595,12 @@
     "module": "AI Workloads and Capabilities",
     "question": "A retailer wants to automatically read scanned printed receipts and pull out the text so it can be stored and searched. Which computer vision capability best matches this scenario?",
     "options": [
+      "Image generation",
       "Optical character recognition (OCR)",
-      "Image classification",
       "Object detection",
-      "Image generation"
+      "Image classification"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "OCR (the Read capability in Azure AI Vision) extracts printed and handwritten text from images and documents such as receipts, signs, and forms, converting it into a machine-readable character stream. Image classification only assigns a category label to the whole image, object detection locates objects with bounding boxes rather than transcribing text, and image generation produces new images rather than reading existing ones.",
     "reference": "https://learn.microsoft.com/azure/ai-services/computer-vision/overview-ocr",
     "id": 37
@@ -611,9 +611,9 @@
     "question": "An app needs to assign a single category label, such as \"pizza\" or \"salad,\" to an entire food photo, without indicating where in the image the food appears. Which computer vision task is this?",
     "options": [
       "Image classification",
-      "Object detection",
       "Optical character recognition (OCR)",
-      "Text to speech"
+      "Text to speech",
+      "Object detection"
     ],
     "correct": 0,
     "explanation": "Image classification applies one or more labels to the whole image and returns class-accuracy (class probability) results that are image-level properties, with no location in the image. Object detection would also return bounding-box coordinates indicating where each object is, OCR extracts text, and text to speech is a speech (not vision) capability.",
@@ -625,12 +625,12 @@
     "module": "AI Workloads and Capabilities",
     "question": "A warehouse safety system must locate every forklift in a photo and report the exact position of each one with bounding-box coordinates. Which computer vision capability is required?",
     "options": [
-      "Object detection",
-      "Image classification",
       "Optical character recognition (OCR)",
+      "Image classification",
+      "Object detection",
       "Sentiment analysis"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Object detection returns both a label and the bounding-box coordinates for each detected object, so it can pinpoint where every forklift is. Image classification labels the whole image but does not provide locations, OCR extracts text, and sentiment analysis is a text-analysis capability.",
     "reference": "https://learn.microsoft.com/azure/ai-services/computer-vision/concept-object-detection",
     "id": 39
@@ -640,12 +640,12 @@
     "module": "AI Workloads and Capabilities",
     "question": "A call center wants to convert recorded customer phone calls into written transcripts. Which Azure AI Speech capability should be used?",
     "options": [
-      "Speech to text",
+      "Image generation",
       "Text to speech",
       "Key phrase extraction",
-      "Image generation"
+      "Speech to text"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Speech to text converts audio into text, which is exactly what transcription requires. Text to speech does the reverse (it converts input text into synthesized speech), key phrase extraction works on existing text, and image generation produces images.",
     "reference": "https://learn.microsoft.com/azure/ai-services/speech-service/overview",
     "id": 40
@@ -655,12 +655,12 @@
     "module": "AI Workloads and Capabilities",
     "question": "An accessibility feature needs to read articles aloud to users in a natural-sounding, human-like voice. Which Azure AI Speech capability provides this?",
     "options": [
-      "Text to speech",
-      "Speech to text",
       "Language detection",
-      "Object detection"
+      "Text to speech",
+      "Object detection",
+      "Speech to text"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Text to speech converts input text into human-like synthesized speech using neural voices, so written articles can be read aloud. Speech to text transcribes audio into text (the opposite direction), language detection identifies which language text is written in, and object detection is a vision capability.",
     "reference": "https://learn.microsoft.com/azure/ai-services/speech-service/text-to-speech",
     "id": 41
@@ -670,12 +670,12 @@
     "module": "AI Workloads and Capabilities",
     "question": "A product team submits thousands of customer reviews and wants each one scored as positive, negative, or neutral. Which Azure AI Language technique provides this?",
     "options": [
-      "Sentiment analysis",
+      "Summarization",
       "Key phrase extraction",
       "Language detection",
-      "Summarization"
+      "Sentiment analysis"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Sentiment analysis in Azure AI Language evaluates text and identifies whether the expressed opinion is positive, negative, or neutral. Key phrase extraction returns the main concepts, language detection identifies the language of the text, and summarization condenses long text, none of which produces a sentiment label.",
     "reference": "https://learn.microsoft.com/azure/ai-services/language-service/sentiment-opinion-mining/overview",
     "id": 42
@@ -685,12 +685,12 @@
     "module": "AI Workloads and Capabilities",
     "question": "From a large batch of support emails, an analyst needs a quick list of the main topics and important phrases in each message, without rephrasing the content. Which Azure AI Language technique fits best?",
     "options": [
-      "Key phrase extraction",
       "Sentiment analysis",
-      "Named entity recognition (NER)",
-      "Speech synthesis"
+      "Speech synthesis",
+      "Key phrase extraction",
+      "Named entity recognition (NER)"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Key phrase extraction evaluates unstructured text and returns a list of the main concepts and key phrases, which is ideal for quickly surfacing the main topics. Sentiment analysis returns positive/negative/neutral, named entity recognition categorizes entities like people and places (not general topics), and speech synthesis is a speech capability.",
     "reference": "https://learn.microsoft.com/azure/ai-services/language-service/key-phrase-extraction/overview",
     "id": 43
@@ -701,8 +701,8 @@
     "question": "Before sharing transcribed chat logs with an analytics team, a company must automatically find and redact items such as phone numbers, email addresses, and national ID numbers. Which Azure AI Language capability is designed for this?",
     "options": [
       "Personally identifiable information (PII) detection",
-      "Key phrase extraction",
       "Sentiment analysis",
+      "Key phrase extraction",
       "Language detection"
     ],
     "correct": 0,
@@ -715,12 +715,12 @@
     "module": "AI Workloads and Capabilities",
     "question": "An incoming message could be written in any of dozens of languages, and the system needs to know which language it is before routing it. Which text analysis technique should run first?",
     "options": [
-      "Language detection",
-      "Summarization",
+      "Image generation",
       "Object detection",
-      "Image generation"
+      "Language detection",
+      "Summarization"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Language detection determines the language a document is written in across a wide range of languages and dialects, which is exactly what is needed to route messages. Summarization condenses text, object detection is a vision task, and image generation creates images.",
     "reference": "https://learn.microsoft.com/azure/ai-services/language-service/language-detection/overview",
     "id": 45
@@ -731,9 +731,9 @@
     "question": "A marketing team types the prompt \"a watercolor painting of a fox reading a book in a sunlit library\" and wants the system to produce a brand-new picture matching that description. Which type of AI workload is this?",
     "options": [
       "Image generation, a generative AI workload",
-      "Image classification",
+      "Optical character recognition (OCR)",
       "Object detection",
-      "Optical character recognition (OCR)"
+      "Image classification"
     ],
     "correct": 0,
     "explanation": "Creating a brand-new image from a text prompt is image generation, a generative AI workload, because the model produces original content rather than analyzing an existing image. Image classification, object detection, and OCR all analyze an input image; they do not create new images.",
@@ -745,12 +745,12 @@
     "module": "AI Workloads and Capabilities",
     "question": "An organization wants a system that can reason about a high-level goal, call tools and APIs, and take multiple steps to complete a task on a user's behalf, rather than just answering a single prompt. Which AI workload type best describes this?",
     "options": [
-      "Agentic AI",
-      "Image classification",
+      "Optical character recognition (OCR)",
       "Speech recognition",
-      "Optical character recognition (OCR)"
+      "Image classification",
+      "Agentic AI"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "An agentic AI workload uses a model to reason about a goal and take autonomous, multi-step actions, calling tools and external data to fulfill a request. Image classification, speech recognition, and OCR are single-purpose analysis capabilities that do not plan or act autonomously across steps.",
     "reference": "https://learn.microsoft.com/azure/foundry/agents/overview",
     "id": 47
@@ -760,12 +760,12 @@
     "module": "AI Workloads and Capabilities",
     "question": "A finance team must process many scanned invoices and automatically pull out structured fields such as invoice ID, vendor, due date, and total amount. Which kind of AI workload best fits this scenario?",
     "options": [
-      "Information extraction from documents",
-      "Image generation",
       "Text-to-speech synthesis",
-      "Sentiment analysis"
+      "Information extraction from documents",
+      "Sentiment analysis",
+      "Image generation"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Pulling structured fields and key-value data out of forms and invoices is an information-extraction (document processing) workload, handled by services such as the Azure AI Document Intelligence invoice model and Azure AI Content Understanding. Image generation creates images, text-to-speech produces audio, and sentiment analysis scores opinion, none of which extracts invoice fields.",
     "reference": "https://learn.microsoft.com/azure/ai-services/document-intelligence/prebuilt/invoice",
     "id": 48
@@ -775,12 +775,12 @@
     "module": "AI Workloads and Capabilities",
     "question": "A team needs one service that can ingest documents, images, audio, and video and turn that unstructured content into structured, machine-readable output for downstream workflows. Which Azure capability is designed for this multimodal information extraction?",
     "options": [
-      "Azure AI Content Understanding",
       "Azure AI Speech text to speech",
       "Azure AI Vision image classification",
+      "Azure AI Content Understanding",
       "Azure AI Language sentiment analysis"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Azure AI Content Understanding is a multimodal service that extracts structured content from documents, images, audio, and video, producing machine-readable output for automation and RAG workflows. Text to speech generates audio, image classification only labels images, and sentiment analysis only scores text, so none of them covers all four modalities.",
     "reference": "https://learn.microsoft.com/azure/ai-services/content-understanding/overview",
     "id": 49
@@ -790,12 +790,12 @@
     "module": "AI Workloads and Capabilities",
     "question": "Which statement best captures the difference between an analysis (discriminative) workload and a generative workload?",
     "options": [
-      "Analysis understands, classifies, or extracts information from an input that already exists, while generation produces new original content.",
       "Analysis always works on images, while generation always works on text.",
+      "Analysis and generation both create new content and are interchangeable terms.",
       "Analysis produces new content, while generation only classifies existing content.",
-      "Analysis and generation both create new content and are interchangeable terms."
+      "Analysis understands, classifies, or extracts information from an input that already exists, while generation produces new original content."
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Analysis (discriminative) workloads, such as classification, OCR, sentiment analysis, and entity detection, classify or extract information from data that already exists. Generative workloads, such as image generation or text generation, create new original content. The other options reverse this relationship or wrongly tie the distinction to a specific data type.",
     "reference": "https://learn.microsoft.com/azure/well-architected/ai/get-started",
     "id": 50
@@ -900,12 +900,12 @@
     "module": "Generative AI Apps and Agents with Foundry",
     "question": "A developer is building a single agent in Microsoft Foundry Agent Service for an outdoor-gear retailer. The agent must answer customer questions using the company's own product manuals and warranty PDFs, which the developer uploads directly and indexes in a vector store. Which built-in tool should the developer add to the agent so it can retrieve answers from these uploaded private documents?",
     "options": [
-      "File Search",
-      "Web search (Grounding with Bing Search)",
       "Code Interpreter",
-      "Image Generation"
+      "File Search",
+      "Image Generation",
+      "Web search (Grounding with Bing Search)"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "File Search is the built-in knowledge tool that augments an agent with information from files you upload directly, such as proprietary product information or user-provided documents; the uploaded files are stored in a vector store, and the agent retrieves relevant chunks to ground its answers. That matches the scenario exactly. Web search (Grounding with Bing Search) retrieves real-time information from the public web, not from privately uploaded documents. Code Interpreter writes and runs Python in a sandbox for tasks like data analysis or charts; it is an action tool, not a way to ground answers in uploaded documents. Image Generation creates or edits images and provides no document retrieval. Note that the separate Azure AI Search tool grounds an agent in an existing Azure AI Search index, whereas File Search is the tool for documents you upload directly and index in a vector store.",
     "reference": "https://learn.microsoft.com/azure/foundry/agents/how-to/tools/file-search",
     "id": 56
@@ -930,12 +930,12 @@
     "module": "Generative AI Apps and Agents with Foundry",
     "question": "After deploying a chat model in the Foundry portal, which built-in, no-code experience lets you immediately test the model by typing prompts and viewing its responses before writing any application code?",
     "options": [
+      "The management center connections page",
       "The model playground",
       "The model catalog leaderboard",
-      "The management center connections page",
       "The Azure portal cost analysis blade"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "When you deploy a model in the Foundry portal you land on its playground, an interactive web-based experience for testing and experimenting with the model before writing code. The model catalog leaderboard compares models, the connections page manages external resources, and cost analysis tracks billing, so none of those are for interactively testing prompts.",
     "reference": "https://learn.microsoft.com/azure/foundry/concepts/concept-playgrounds",
     "id": 58
@@ -960,12 +960,12 @@
     "module": "Generative AI Apps and Agents with Foundry",
     "question": "In the Foundry resource hierarchy, what role does a Foundry project play for a development team?",
     "options": [
-      "It is a development boundary inside the Foundry resource where teams build and evaluate use cases, reusing model deployments and connections",
       "It is the top-level Azure resource where networking and security governance are managed",
       "It is an external Azure Storage account used to hold uploaded files",
+      "It is a development boundary inside the Foundry resource where teams build and evaluate use cases, reusing model deployments and connections",
       "It is the deployed model endpoint that receives inference requests"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "A project is the development boundary inside a Foundry resource where teams prototype and evaluate use cases, reusing the resource's model deployments and connections without repeated IT setup. The top-level Foundry resource is where governance such as networking and security is managed, Azure Storage is a separate connected resource, and a model endpoint is a deployment, so the other options describe different parts of the hierarchy.",
     "reference": "https://learn.microsoft.com/azure/foundry/concepts/architecture",
     "id": 60
@@ -975,12 +975,12 @@
     "module": "Generative AI Apps and Agents with Foundry",
     "question": "A Foundry project needs to use an existing Azure AI Search index and an Azure Storage account that live as separate Azure resources. What does the project use to authenticate to and consume those external resources?",
     "options": [
-      "A connection (connected resource)",
+      "A vector store embedding",
       "A model deployment",
       "A system message",
-      "A vector store embedding"
+      "A connection (connected resource)"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Connections define how a Foundry resource or project authenticates to and uses external resources such as Azure AI Search and Azure Storage, which remain separate Azure resources with their own governance. A model deployment makes a model callable, a system message guides model behavior, and a vector store indexes file content, so none of those connect external resources.",
     "reference": "https://learn.microsoft.com/azure/foundry/how-to/connections-add",
     "id": 61
@@ -990,12 +990,12 @@
     "module": "Generative AI Apps and Agents with Foundry",
     "question": "A developer wants to build a lightweight Python client that connects to a Foundry project and then sends prompts to a deployed model. Which client from the Foundry SDK is the appropriate starting point for connecting to the project?",
     "options": [
+      "VectorStore",
       "AIProjectClient",
       "DefaultAzureCredential",
-      "ChatHistory",
-      "VectorStore"
+      "ChatHistory"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "AIProjectClient is the Foundry SDK client you create with your project endpoint to connect to a Foundry project; from it you call get_openai_client() to send prompts. DefaultAzureCredential only supplies authentication that you pass to the client, ChatHistory is a Semantic Kernel concept, and VectorStore stores indexed files, so they are not the project connection client.",
     "reference": "https://learn.microsoft.com/azure/foundry/quickstarts/get-started-code",
     "id": 62
@@ -1006,12 +1006,12 @@
     "question": "A team creates a prompt agent in Microsoft Foundry Agent Service by defining its instructions, model, and tools in the Foundry portal. They want to understand what running the agent involves operationally. Which statement best describes how the prompt agent's runtime is handled?",
     "options": [
       "Foundry hosts and operates the agent runtime as a managed service, so the team does not provision, patch, or scale the runtime infrastructure (though model inference and tool calls still incur cost)",
+      "The agent only runs inside the Foundry portal playground and cannot be called from a separate client application",
       "The team must deploy and patch a virtual machine or container of their own to host the agent's runtime",
-      "The agent runs entirely free of charge once created, because managed prompt agents incur no inference or tool usage costs",
-      "The agent only runs inside the Foundry portal playground and cannot be called from a separate client application"
+      "The agent runs entirely free of charge once created, because managed prompt agents incur no inference or tool usage costs"
     ],
     "correct": 0,
-    "explanation": "For a prompt agent, you define behavior through configuration (instructions, model, and tools) and the Foundry Agent Runtime hosts, scales, and operates the agent for you. The compare-agent-types guidance lists prompt agents as having no runtime code to maintain and compute that is 'None - fully managed,' with Foundry-managed autoscaling, so the team does not provision, patch, or scale the runtime infrastructure. Option 0 is correct but precisely scoped: it notes that model inference and tool calls still incur cost, matching the documented prompt-agent cost model of 'Per-call inference + tool usage.' Option 1 is wrong because self-hosting a VM or container describes a Hosted agent or running code yourself, not a managed prompt agent. Option 2 is wrong because the prompt agent is not free; the managed runtime removes infrastructure management, but inference and tool usage are billed. Option 3 is wrong because, after testing in the playground, a prompt agent is invoked from your own client application code through its endpoint.",
+    "explanation": "For a prompt agent, you define behavior through configuration (instructions, model, and tools) and the Foundry Agent Runtime hosts, scales, and operates the agent for you. The compare-agent-types guidance lists prompt agents as having no runtime code to maintain and compute that is 'None - fully managed,' with Foundry-managed autoscaling, so the team does not provision, patch, or scale the runtime infrastructure. The managed-runtime answer is correct and precisely scoped: it notes that model inference and tool calls still incur cost, matching the documented prompt-agent cost model of 'Per-call inference + tool usage.' The self-hosted VM or container option is wrong because it describes a Hosted agent or running code yourself, not a managed prompt agent. The free-of-charge option is wrong because the prompt agent is not free; the managed runtime removes infrastructure management, but inference and tool usage are billed. The playground-only option is wrong because, after testing in the playground, a prompt agent is invoked from your own client application code through its endpoint.",
     "reference": "https://learn.microsoft.com/azure/foundry/agents/overview#agent-types",
     "id": 63
   },
@@ -1020,12 +1020,12 @@
     "module": "Generative AI Apps and Agents with Foundry",
     "question": "You are creating an agent in the Foundry portal to act as a friendly geography tutor that explains answers simply. Which element of the agent definition do you use to give it this behavior?",
     "options": [
-      "The agent's instructions",
+      "The project's resource group name",
       "A connected Azure Storage account",
       "The temperature slider in the model catalog",
-      "The project's resource group name"
+      "The agent's instructions"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "An agent's instructions define its core behavior, such as acting as a friendly geography tutor, and ensure consistent responses without repeating guidance each turn. A storage account is a connected resource for data, the resource group is an Azure organizational container, and the model catalog has no temperature slider, so none of those set agent behavior.",
     "reference": "https://learn.microsoft.com/azure/foundry/quickstarts/get-started-code",
     "id": 64
@@ -1035,12 +1035,12 @@
     "module": "Generative AI Apps and Agents with Foundry",
     "question": "An agent needs to answer questions using up-to-date, real-time public web information that is beyond the model's training cutoff. Which capability should you add to the agent?",
     "options": [
-      "A web grounding tool such as Grounding with Bing Search",
       "A higher temperature setting",
       "A longer system message",
+      "A web grounding tool such as Grounding with Bing Search",
       "A second model deployment"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Foundry models have a knowledge cutoff, so adding a web grounding tool such as Grounding with Bing Search lets the agent retrieve real-time public web data and cite sources. Raising temperature only increases randomness, a longer system message cannot supply current facts, and adding another deployment does not provide live web access.",
     "reference": "https://learn.microsoft.com/azure/foundry/agents/how-to/tools/bing-tools",
     "id": 65
@@ -1050,12 +1050,12 @@
     "module": "Generative AI Apps and Agents with Foundry",
     "question": "A retailer's data team has already built and populated an Azure AI Search index, with vector search configured, that lives as its own separate Azure resource and contains the company's product knowledge base. They now want a single agent in Microsoft Foundry Agent Service to ground its answers in that existing index, without re-uploading the source files into the agent. Which knowledge tool should they add to the agent for this data source?",
     "options": [
-      "The Azure AI Search tool, using a project connection to the existing index",
-      "The File Search tool, after uploading the source files so the agent builds its own vector store",
       "The Code Interpreter tool, to run queries against the index in Python",
-      "The web search tool, to retrieve the content from the public web"
+      "The web search tool, to retrieve the content from the public web",
+      "The File Search tool, after uploading the source files so the agent builds its own vector store",
+      "The Azure AI Search tool, using a project connection to the existing index"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "The Azure AI Search tool connects an agent to a new or existing Azure AI Search index through a project connection, so the agent can retrieve and cite documents from an index that already exists as a separate resource. That is exactly this scenario: the index is already built and populated, so the team should connect to it rather than re-ingesting the data. The File Search tool is the wrong choice here because it is meant for documents you upload directly to the agent, where it builds and manages its own vector store; that would mean re-uploading and duplicating the data instead of reusing the existing index. Code Interpreter runs Python for data analysis and is not a knowledge-retrieval tool, and the web search tool retrieves current public web information, neither of which grounds the agent in this private existing index.",
     "reference": "https://learn.microsoft.com/azure/foundry/agents/how-to/tools/ai-search",
     "id": 66
@@ -1067,8 +1067,8 @@
     "options": [
       "Stop sequences",
       "Max response (tokens)",
-      "Top P",
-      "Frequency penalty"
+      "Frequency penalty",
+      "Top P"
     ],
     "correct": 0,
     "explanation": "A stop sequence tells the model to end its response at a chosen point: generation halts when the specified sequence is encountered, and because the response ends before that sequence, the returned text does not contain the stop sequence itself. You can specify up to four such sequences. Max response (tokens) caps the response by a number of tokens, not at a chosen marker. Top P controls randomness through nucleus sampling, narrowing or widening the set of candidate tokens. Frequency penalty discourages repeating the same tokens. None of those end the response at a specific marker or exclude that marker from the output.",
@@ -1080,12 +1080,12 @@
     "module": "Generative AI Apps and Agents with Foundry",
     "question": "After building and configuring an agent in the Foundry portal, which is the fastest way to interactively verify the agent gives the expected responses before integrating it into an application?",
     "options": [
-      "Chat with it in the agents playground in the portal",
+      "Open a support ticket in the Azure portal",
       "Delete and recreate the Foundry resource",
-      "Write and deploy a full production web app first",
-      "Open a support ticket in the Azure portal"
+      "Chat with it in the agents playground in the portal",
+      "Write and deploy a full production web app first"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "The agents playground in the Foundry portal lets you explore, prototype, and test an agent in a live multi-turn conversation without running any code, so you can verify behavior before writing client code. Recreating the resource, building a full production app first, or filing a support ticket are not quick ways to test an agent's responses.",
     "reference": "https://learn.microsoft.com/azure/foundry/concepts/concept-playgrounds",
     "id": 68
@@ -1095,12 +1095,12 @@
     "module": "Generative AI Apps and Agents with Foundry",
     "question": "A lightweight client application needs to call an existing agent created in a Foundry project and hold a multi-turn conversation that remembers earlier messages. Which approach matches how the Foundry SDK supports this?",
     "options": [
-      "Create a conversation and send responses that reference the agent, reusing the same conversation across turns to maintain history",
-      "Send each turn to a brand-new agent so context never persists",
       "Embed the full instructions in every user message because agents are stateless",
-      "Call the model catalog API to retrieve conversation history"
+      "Create a conversation and send responses that reference the agent, reusing the same conversation across turns to maintain history",
+      "Call the model catalog API to retrieve conversation history",
+      "Send each turn to a brand-new agent so context never persists"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "With the Foundry SDK you create a conversation and call the agent (by agent reference) within that same conversation, which maintains history across turns for multi-turn chat. Creating a new agent each turn or re-sending instructions every time is unnecessary because the conversation preserves context, and the model catalog API does not manage conversations.",
     "reference": "https://learn.microsoft.com/azure/foundry/quickstarts/get-started-code",
     "id": 69
@@ -1110,12 +1110,12 @@
     "module": "Generative AI Apps and Agents with Foundry",
     "question": "A developer wants an agent to decide intelligently, based on the conversation context, when to call a knowledge tool rather than forcing it on every request. Which part of the agent configuration best provides this flexible, non-deterministic guidance?",
     "options": [
-      "The agent's instructions describing when and how to use each tool",
       "Setting tool_choice to force a specific tool on every request",
-      "Lowering the model's max token limit",
-      "Renaming the model deployment"
+      "Renaming the model deployment",
+      "The agent's instructions describing when and how to use each tool",
+      "Lowering the model's max token limit"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Instructions provide non-deterministic, flexible guidance: the Foundry model powering the agent decides whether to call a tool based on the agent's instructions and the available tool definitions. Setting tool_choice to a specific tool is deterministic (it forces the tool, the opposite of letting the model decide), and changing token limits or deployment names does not influence tool-selection logic.",
     "reference": "https://learn.microsoft.com/azure/foundry/agents/concepts/tool-catalog",
     "id": 70
@@ -1236,12 +1236,12 @@
     "module": "Generative AI Apps and Agents with Foundry",
     "question": "A developer signs in to the Microsoft Foundry portal and wants to use the model playground to interactively test a chat model with different prompts before writing any application code. Which action must be completed first so that a model is available to test in the playground?",
     "options": [
-      "Deploy the model from the model catalog into a Foundry project",
       "Publish the chat app to an Azure App Service web app",
+      "Add a guardrail (content filter) to the Foundry resource",
       "Install the Foundry SDK and create a project connection string locally",
-      "Add a guardrail (content filter) to the Foundry resource"
+      "Deploy the model from the model catalog into a Foundry project"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "The model playground only lets you interact with models that are already deployed. Microsoft Learn lists 'at least one deployed model' as a prerequisite for the playground, and the deployment workflow states that after you deploy a model you land on its playground to test it with prompts. So the developer must first deploy a model from the catalog into a Foundry project. The other options are wrong: publishing to an Azure App Service web app is a later production-hosting step that itself requires an already-deployed model; installing the Foundry SDK and using a connection string is the code path, not the portal playground, and still depends on a deployed model; adding a guardrail/content filter is optional governance configuration and is not required for a model to appear in the playground.",
     "reference": "https://learn.microsoft.com/azure/foundry/concepts/concept-playgrounds",
     "id": 77
@@ -1251,10 +1251,10 @@
     "module": "Text and Speech Solutions with Foundry",
     "question": "A retailer wants a lightweight app that reads incoming product reviews and labels each one as positive, negative, neutral, or mixed, along with a confidence score. Which Azure AI Language capability should the team use?",
     "options": [
-      "Key phrase extraction",
+      "Named entity recognition",
       "Sentiment analysis",
       "Language detection",
-      "Named entity recognition"
+      "Key phrase extraction"
     ],
     "correct": 1,
     "explanation": "Sentiment analysis applies the labels positive, negative, and neutral at the sentence and document level, and at the document level it can also return mixed when both positive and negative sentences are present, each with a confidence score between 0 and 1. Key phrase extraction returns main topics but no sentiment label. Language detection identifies the written language. Named entity recognition extracts categorized entities such as people and places, not sentiment.",
@@ -1266,12 +1266,12 @@
     "module": "Text and Speech Solutions with Foundry",
     "question": "A content team collects free-text feedback in an unknown variety of languages and wants to route each message to the correct localization queue. Before any other processing, which Azure AI Language feature identifies the predominant language of each message and returns its ISO 639-1 code?",
     "options": [
+      "Language detection",
       "Sentiment analysis",
       "Key phrase extraction",
-      "Language detection",
       "Entity linking"
     ],
-    "correct": 2,
+    "correct": 0,
     "explanation": "Language detection returns one predominant language for each document along with its ISO 639-1 name, a human-readable name, and a confidence score, which is what routing requires. Sentiment analysis classifies tone, key phrase extraction returns main topics, and entity linking connects entities to a knowledge base. None of those identify the language of the text.",
     "reference": "https://learn.microsoft.com/azure/ai-services/language-service/language-detection/how-to/call-api",
     "id": 79
@@ -1281,12 +1281,12 @@
     "module": "Text and Speech Solutions with Foundry",
     "question": "A travel help desk receives phone calls from customers speaking Spanish, but its agents read English only. The team wants each caller's spoken Spanish to appear on the agent's screen as English text, in real time as the customer talks. Which Azure AI capability should they use?",
     "options": [
+      "Azure AI Language key phrase extraction",
       "Azure AI Speech speech translation (speech to text translation)",
       "Azure AI Speech text to speech",
-      "Azure AI Language key phrase extraction",
       "Azure AI Vision optical character recognition (OCR)"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Azure AI Speech speech translation takes an input audio stream in a source language (Spanish) and returns translated text in a chosen target language (English), with interim results returned in real time as speech is detected, which is exactly what the agents need on screen. Text to speech does the opposite, turning written text into spoken audio, so it neither transcribes nor translates the caller. Key phrase extraction is an Azure AI Language feature that works on text that already exists and only lists main concepts; it cannot take audio or translate languages. Azure AI Vision OCR reads printed or handwritten text from images and documents, not spoken audio.",
     "reference": "https://learn.microsoft.com/azure/ai-services/speech-service/speech-translation",
     "id": 80
@@ -1296,12 +1296,12 @@
     "module": "Text and Speech Solutions with Foundry",
     "question": "Where can a developer experiment with Azure AI Language text-analysis features such as sentiment analysis and key phrase extraction using a no-code web interface before writing any application code?",
     "options": [
-      "The Language playground in the Microsoft Foundry portal",
       "The Azure Machine Learning designer canvas",
+      "The Microsoft Purview compliance portal",
       "The Azure Monitor metrics explorer",
-      "The Microsoft Purview compliance portal"
+      "The Language playground in the Microsoft Foundry portal"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "The Microsoft Foundry portal includes a Language playground where you select a feature tile such as Analyze sentiment or Extract key phrases (or Detect language), enter or paste sample text, select Run, and view results, all without writing code. The Azure Machine Learning designer builds ML pipelines, Azure Monitor metrics explorer shows telemetry, and Microsoft Purview handles governance and compliance, none of which is the text-analysis playground.",
     "reference": "https://learn.microsoft.com/azure/ai-services/language-service/key-phrase-extraction/quickstart#use-key-phrase-extraction-in-the-foundry-playground",
     "id": 81
@@ -1312,9 +1312,9 @@
     "question": "An accessibility app must display live captions on screen as a presenter speaks into a microphone during a webinar. Which Azure AI Speech capability is the correct choice for this scenario?",
     "options": [
       "Real-time speech to text",
-      "Batch transcription",
       "Text to speech",
-      "Speech translation to a synthesized voice"
+      "Speech translation to a synthesized voice",
+      "Batch transcription"
     ],
     "correct": 0,
     "explanation": "Real-time speech to text transcribes streaming audio from a microphone as it is spoken, which is what real-time captioning requires. Batch transcription processes prerecorded files asynchronously and is not live. Text to speech generates audio from text rather than transcribing speech, and speech translation with synthesized output produces spoken audio in another language, not on-screen captions.",
@@ -1326,12 +1326,12 @@
     "module": "Text and Speech Solutions with Foundry",
     "question": "A media company stores thousands of prerecorded interview files in Azure Blob Storage and needs transcripts generated overnight, with no requirement to return results in real time. Which Azure AI Speech approach is the best fit?",
     "options": [
+      "Text to speech with a neural voice",
       "Real-time speech to text from a microphone",
       "Batch transcription",
-      "Text to speech with a neural voice",
       "The Voice Live API"
     ],
-    "correct": 1,
+    "correct": 2,
     "explanation": "Batch transcription is designed to transcribe large volumes of prerecorded audio asynchronously by pointing the service at an Azure Blob Storage container, which matches the overnight, non-real-time requirement. Real-time speech to text is for live streaming audio, text to speech generates audio from text, and the Voice Live API is for low-latency interactive voice conversations, none of which fit bulk file transcription.",
     "reference": "https://learn.microsoft.com/azure/ai-services/speech-service/batch-transcription",
     "id": 83
@@ -1341,12 +1341,12 @@
     "module": "Text and Speech Solutions with Foundry",
     "question": "An e-book company wants to convert chapters of written text into natural-sounding spoken audio using high-quality voices that are available out of the box, with no custom training. Which Azure AI Speech capability and voice type should they use?",
     "options": [
-      "Speech to text with diarization",
       "Text to speech with prebuilt neural voices",
-      "Text to speech with a custom neural voice trained on a brand actor",
-      "Real-time speech to text with a phrase list"
+      "Real-time speech to text with a phrase list",
+      "Speech to text with diarization",
+      "Text to speech with a custom neural voice trained on a brand actor"
     ],
-    "correct": 1,
+    "correct": 0,
     "explanation": "Text to speech with prebuilt neural voices provides high-quality, human-like voices available out of the box in many languages with no training, which fits the audiobook need. A custom neural voice requires your own audio training data and the Limited Access process, so it is unnecessary here. Speech to text and real-time transcription convert audio into text, the opposite of what is required.",
     "reference": "https://learn.microsoft.com/azure/ai-services/speech-service/text-to-speech",
     "id": 84
@@ -1356,12 +1356,12 @@
     "module": "Text and Speech Solutions with Foundry",
     "question": "A team is building a hands-free in-car assistant that listens to a spoken question and immediately replies with spoken audio in a single, low-latency back-and-forth conversation. Which option best supports this speech-in, speech-out experience?",
     "options": [
-      "A deployed real-time audio model accessed through the GPT Realtime API",
       "Key phrase extraction on the transcript",
-      "Batch transcription of recorded calls",
-      "A standalone language detection request"
+      "A standalone language detection request",
+      "A deployed real-time audio model accessed through the GPT Realtime API",
+      "Batch transcription of recorded calls"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "The GPT Realtime API supports low-latency, speech-in, speech-out conversational interactions and is well suited to voice assistants such as an in-car assistant. Key phrase extraction and language detection only analyze text, and batch transcription processes prerecorded files asynchronously, so none deliver an interactive spoken reply.",
     "reference": "https://learn.microsoft.com/azure/foundry/openai/how-to/realtime-audio",
     "id": 85
@@ -1371,12 +1371,12 @@
     "module": "Text and Speech Solutions with Foundry",
     "question": "A developer wants to respond to spoken prompts by deploying a generative model in Microsoft Foundry that can both understand audio input and produce a spoken audio response. From which Foundry surface do they discover and deploy such a model?",
     "options": [
-      "The Foundry model catalog",
-      "An Azure Storage account blob container",
       "The Azure Key Vault secrets list",
-      "An Azure DevOps artifact feed"
+      "The Foundry model catalog",
+      "An Azure DevOps artifact feed",
+      "An Azure Storage account blob container"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "In Microsoft Foundry you discover, evaluate, and deploy models, including multimodal audio models, from the model catalog, then call the resulting deployment from your app. An Azure Storage blob container holds data, Azure Key Vault stores secrets, and an Azure DevOps artifact feed hosts packages, none of which is where you select and deploy a Foundry model.",
     "reference": "https://learn.microsoft.com/azure/foundry/concepts/foundry-models-overview",
     "id": 86
@@ -1386,12 +1386,12 @@
     "module": "Text and Speech Solutions with Foundry",
     "question": "A subtitling team needs a transcript of a single prerecorded video file returned synchronously and as quickly as possible, with predictable latency, rather than waiting for an asynchronous job. Which Azure AI Speech option is designed for this?",
     "options": [
-      "Fast transcription",
       "Real-time speech to text from a live microphone stream",
+      "Speaker recognition enrollment",
       "Custom neural voice training",
-      "Speaker recognition enrollment"
+      "Fast transcription"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "The fast transcription API transcribes prerecorded audio files synchronously and faster than real time with predictable latency, which suits quick subtitle generation from a file. Real-time speech to text is meant for live streaming audio rather than a stored file, custom neural voice trains a text-to-speech voice, and speaker recognition identifies who is speaking, so none match this need.",
     "reference": "https://learn.microsoft.com/azure/ai-services/speech-service/fast-transcription-create",
     "id": 87
@@ -1401,12 +1401,12 @@
     "module": "Text and Speech Solutions with Foundry",
     "question": "A product analytics tool needs to pull out and categorize entities such as people, organizations, locations, and dates from unstructured news text, using a prebuilt model with no training. Which Azure AI Language feature is the right choice?",
     "options": [
-      "Named entity recognition (NER)",
-      "Key phrase extraction",
       "Sentiment analysis",
-      "Language detection"
+      "Key phrase extraction",
+      "Language detection",
+      "Named entity recognition (NER)"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Named entity recognition identifies and categorizes entities in unstructured text into predefined categories such as person, organization, location, and date using a prebuilt model. Key phrase extraction returns topics without categorizing them as entities, sentiment analysis returns tone, and language detection identifies the written language, so none of those categorize entities.",
     "reference": "https://learn.microsoft.com/azure/ai-services/language-service/named-entity-recognition/overview",
     "id": 88
@@ -1546,12 +1546,12 @@
     "module": "Computer Vision and Image Generation with Foundry",
     "question": "A retail company wants an app where a customer can upload a photo of a product and ask written questions about what is shown. Which kind of model deployed in Microsoft Foundry directly supports a single prompt that combines the image and the text question?",
     "options": [
-      "A text-to-image generation model",
-      "A multimodal (vision-enabled) generative model",
       "A text-only large language model",
-      "A speech-to-text model"
+      "A speech-to-text model",
+      "A multimodal (vision-enabled) generative model",
+      "A text-to-image generation model"
     ],
-    "correct": 1,
+    "correct": 2,
     "explanation": "A multimodal, vision-enabled model (such as gpt-4.1 or Phi-4-multimodal-instruct) accepts a prompt that contains both a text part and an image part and returns a text response about the image. A text-to-image model produces images from text rather than interpreting an uploaded image. A text-only LLM cannot accept image input, and a speech-to-text model transcribes audio, not images.",
     "reference": "https://learn.microsoft.com/training/modules/develop-generative-ai-vision-apps/2-deploy-multimodal-model",
     "id": 96
@@ -1562,9 +1562,9 @@
     "question": "A field-service app lets a technician photograph a machine and then type an open-ended question such as \"Which valve in this photo is leaking, and what should I check next?\" The answer requires reasoning about what is happening in the scene, not just reading any printed characters that appear on the equipment. Which option in Microsoft Foundry is the right fit, and why?",
     "options": [
       "A deployed vision-enabled (multimodal) chat model, because it combines visual understanding with natural language to answer questions about what is shown in the image",
-      "The Azure AI Vision optical character recognition (Read) feature, because it returns the answer to any question asked about an image",
+      "An image-generation (text-to-image) model, because it can produce a new diagram that answers the technician's question",
       "The Azure AI Vision optical character recognition (Read) feature, because reading the text printed on the machine is the same as understanding the scene",
-      "An image-generation (text-to-image) model, because it can produce a new diagram that answers the technician's question"
+      "The Azure AI Vision optical character recognition (Read) feature, because it returns the answer to any question asked about an image"
     ],
     "correct": 0,
     "explanation": "Vision-enabled (multimodal) chat models are large multimodal models that analyze images and provide textual responses to questions about them, combining natural language processing with visual understanding to answer general questions about what is present in an uploaded image. That is exactly what this open-ended, interpretive task needs. Optical character recognition (the Read feature) only extracts the verbatim printed or handwritten characters that appear in an image; it returns text, not an interpretation of the scene, so it cannot reason about which valve is leaking or what to check next, and reading the text on the machine is not the same as understanding the scene. An image-generation (text-to-image) model creates brand-new pictures from a text prompt and does not answer questions about an existing photo.",
@@ -1576,12 +1576,12 @@
     "module": "Computer Vision and Image Generation with Foundry",
     "question": "You want to experiment with generating images from text prompts in the Microsoft Foundry portal without writing any code first. After deploying an image-generation model, which playground does Foundry open for this task?",
     "options": [
-      "The Images playground",
       "The Speech playground",
+      "The Images playground",
       "The Video playground",
       "The Agents playground for code execution"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "When you experiment with an image-generation model such as gpt-image-1, Foundry presents the Images playground, a no-code environment where you enter a text prompt and select Generate to produce an image. A video model such as Sora-2 opens the Video playground, there is no separate Speech surface for image generation, and the Agents playground is for prototyping agents, not the image-generation experience.",
     "reference": "https://learn.microsoft.com/azure/foundry/concepts/concept-playgrounds#images-playground",
     "id": 98
@@ -1592,11 +1592,11 @@
     "question": "When building a client app that sends an image-based prompt to a deployed multimodal model, how is the user message structured?",
     "options": [
       "As a single plain-text string that names the image file path",
-      "As a multi-part message containing both a text content item and an image content item",
+      "As a separate request that must be sent before any text prompt",
       "As an audio content item only",
-      "As a separate request that must be sent before any text prompt"
+      "As a multi-part message containing both a text content item and an image content item"
     ],
-    "correct": 1,
+    "correct": 3,
     "explanation": "A vision-based prompt uses a multi-part user message that includes a text content item and an image content item together in the same message. Naming a local file path in plain text does not transmit the image, an audio item is for speech, and the image and text are submitted together rather than in separate sequential requests.",
     "reference": "https://learn.microsoft.com/training/modules/develop-generative-ai-vision-apps/3-develop-visual-chat-app",
     "id": 99
@@ -1607,11 +1607,11 @@
     "question": "A developer wants to include a local image file in a prompt to a vision-enabled model, but the image is not hosted at a public web address. Which approach lets the image be passed in the prompt?",
     "options": [
       "Reference the file by its Windows drive letter and folder path",
-      "Encode the image as Base64 and submit it as a data URL",
       "Convert the image to an audio file first",
+      "Encode the image as Base64 and submit it as a data URL",
       "Paste the raw binary bytes directly into the text field"
     ],
-    "correct": 1,
+    "correct": 2,
     "explanation": "For a local image, you encode the file data in Base64 and pass it as a data URL in the form data:image/jpeg;base64,{image_data}. A multimodal prompt accepts either a public image URL or Base64-encoded image data. A local drive path is not accessible to the cloud service, audio conversion is unrelated, and pasting raw binary bytes into a text field is not a supported format.",
     "reference": "https://learn.microsoft.com/azure/foundry/openai/how-to/gpt-with-vision#api-details",
     "id": 100
@@ -1621,12 +1621,12 @@
     "module": "Computer Vision and Image Generation with Foundry",
     "question": "An insurance app lets adjusters upload a photo of a damaged vehicle and asks the model to write a short description of the visible damage. Which best describes what the multimodal model does with the input?",
     "options": [
-      "It generates a brand-new image of an undamaged vehicle",
       "It interprets the uploaded image and returns a text response describing it",
       "It converts the photo into speech audio",
+      "It generates a brand-new image of an undamaged vehicle",
       "It encrypts the image and stores it for later retrieval"
     ],
-    "correct": 1,
+    "correct": 0,
     "explanation": "Vision-enabled models analyze the image you upload and provide a textual response to questions about it, so describing visible damage returns text. The model is interpreting an existing image, not generating a new one, not synthesizing speech, and not an encryption or storage service.",
     "reference": "https://learn.microsoft.com/azure/foundry/openai/how-to/gpt-with-vision",
     "id": 101
@@ -1636,12 +1636,12 @@
     "module": "Computer Vision and Image Generation with Foundry",
     "question": "A logistics company photographs each warehouse shelf and needs an automated way to find every package in a photo and report exactly where each one sits, returning the bounding-box coordinates of each item so a downstream app can count items and flag empty spots. Which Azure AI Vision image analysis capability best fits this requirement?",
     "options": [
-      "Object detection",
-      "Image tagging",
       "Image generation from a text prompt",
-      "Optical character recognition (OCR)"
+      "Object detection",
+      "Optical character recognition (OCR)",
+      "Image tagging"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Object detection is the right fit because it not only identifies the items in an image but also returns the bounding-box coordinates (x, y, width, height) for each one, which is exactly what is needed to know where every package sits and to count multiple instances. Image tagging is wrong because it only returns content labels for what appears in the image without any location or bounding boxes. Image generation (for example with a gpt-image model in the Foundry portal) is wrong because it creates a new image from a text prompt rather than analyzing an existing one. OCR is wrong because it extracts printed or handwritten text from an image, but the scenario is about locating physical objects, not reading text.",
     "reference": "https://learn.microsoft.com/azure/ai-services/computer-vision/concept-object-detection",
     "id": 102
@@ -1671,12 +1671,12 @@
     "module": "Computer Vision and Image Generation with Foundry",
     "question": "A publishing site wants to automatically generate a one-sentence, human-readable description of each uploaded photo to use as accessibility alt text. Which Azure AI Vision capability is designed for this?",
     "options": [
-      "Image captioning in Image Analysis",
-      "A text-to-image generation model",
       "Optical character recognition (OCR)",
-      "Text-to-speech synthesis"
+      "Text-to-speech synthesis",
+      "A text-to-image generation model",
+      "Image captioning in Image Analysis"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Image Analysis captioning generates a one-sentence, human-readable description of an image's content, which is exactly what is recommended for auto-generating accessibility alt text. A text-to-image model creates new pictures from text, OCR only extracts text shown inside an image, and text-to-speech produces audio rather than a written caption.",
     "reference": "https://learn.microsoft.com/azure/ai-services/computer-vision/use-case-alt-text",
     "id": 104
@@ -1705,9 +1705,9 @@
     "question": "A solution must read text printed on photographs of street signs and storefronts taken in the field, where the images are not formal documents. Which capability is purpose-built for this lightweight, in-the-wild text extraction?",
     "options": [
       "Azure AI Vision Image Analysis Read (OCR)",
+      "Sentiment analysis in Azure AI Language",
       "A text-to-image generation model",
-      "A text-to-speech voice",
-      "Sentiment analysis in Azure AI Language"
+      "A text-to-speech voice"
     ],
     "correct": 0,
     "explanation": "The Azure AI Vision Image Analysis Read (OCR) feature is designed to extract text from in-the-wild, non-document images such as street signs, posters, and storefronts using a fast synchronous API. Image generation creates new images, text-to-speech produces audio, and sentiment analysis evaluates text tone, none of which extract text from images.",
@@ -1719,12 +1719,12 @@
     "module": "Computer Vision and Image Generation with Foundry",
     "question": "An online catalog already stores millions of product photos. The team wants to extract printed text and detect objects within those existing photos, and they specifically do not need to create any new images. Which Azure AI service is the right fit?",
     "options": [
-      "Azure AI Vision (image analysis and OCR)",
       "An image-generation model such as gpt-image-1",
+      "Azure AI Vision (image analysis and OCR)",
       "Azure AI Speech",
       "Azure AI Language sentiment analysis"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Azure AI Vision provides image analysis and OCR to extract text and detect objects in existing images, which matches a workload that processes photos the team already has. An image-generation model creates new images rather than analyzing existing ones, Azure AI Speech handles audio, and Azure AI Language analyzes text, not images.",
     "reference": "https://learn.microsoft.com/azure/ai-services/computer-vision/overview-image-analysis",
     "id": 107
@@ -1754,12 +1754,12 @@
     "module": "Computer Vision and Image Generation with Foundry",
     "question": "A product manager asks whether the standard image-generation API used in Foundry can also crop or retouch a customer's existing photo when called with only a text prompt and no input image. What is the accurate response?",
     "options": [
-      "The image-generation API creates an image from a text prompt; it does not edit existing images in that basic call",
       "The image-generation API only edits existing images and cannot create new ones",
-      "The image-generation API transcribes audio into images",
-      "The image-generation API requires an uploaded document to function"
+      "The image-generation API requires an uploaded document to function",
+      "The image-generation API creates an image from a text prompt; it does not edit existing images in that basic call",
+      "The image-generation API transcribes audio into images"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "The image-generation API creates an image from a text prompt and, in that basic form, does not edit or create variations of an existing image. It is not limited to editing only, it does not transcribe audio, and it does not require an uploaded document.",
     "reference": "https://learn.microsoft.com/azure/ai-foundry/openai/dall-e-quickstart",
     "id": 109
@@ -1787,12 +1787,12 @@
     "module": "Computer Vision and Image Generation with Foundry",
     "question": "A team has deployed an image-generation model in Microsoft Foundry and is generating product visuals from text prompts. For a time-sensitive batch where they need each picture back as fast as possible and can accept a less detailed result, which image-generation output setting should they adjust to reduce how long each generation takes?",
     "options": [
-      "Set the quality setting to a lower value, such as low",
-      "Set the size to the largest available dimensions, such as 1536x1024",
       "Set the background setting to transparent",
+      "Set the size to the largest available dimensions, such as 1536x1024",
+      "Set the quality setting to a lower value, such as low",
       "Set the output format to PNG instead of JPEG"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Image-generation models in Microsoft Foundry expose a quality setting (for example low, medium, high, or auto), and generation time varies based on the quality setting and prompt complexity. For time-sensitive applications, the documentation recommends using a lower quality value such as low (or enabling partial images for streaming) so each image comes back faster, at the cost of less detail. The other settings do not reduce generation time for this goal: choosing the largest size generally adds work rather than speeding things up; the background setting (transparent, opaque, or auto) controls whether the image has a transparent background, not speed; and the output format (png, webp, or jpeg) controls the encoding of the returned file, not how long the model takes to generate the picture.",
     "reference": "https://learn.microsoft.com/azure/foundry/agents/how-to/tools/image-generation#optional-parameters",
     "id": 111
@@ -1817,12 +1817,12 @@
     "module": "Information Extraction with Content Understanding",
     "question": "A broadcast media company has a large library of recorded TV shows and wants to make each video searchable by an AI chat assistant. For every video, they need Content Understanding to automatically split it into logical scenes and produce, for each scene, an inline transcript, representative key-frame thumbnails, and a natural-language description of what is happening, packaged as RAG-ready output that can drop straight into a vector store. Which Content Understanding modality and analyzer fits this requirement?",
     "options": [
-      "A video analyzer, which segments the video into scenes and outputs transcripts, key frames, and natural-language scene descriptions as RAG-ready content",
-      "A document analyzer, which extracts key-value fields from each frame treated as a scanned page",
       "An audio analyzer, which produces a speaker-diarized transcript and call summary but no visual key frames or scene descriptions",
-      "An image analyzer, which classifies a single still photo against a custom defect schema"
+      "A document analyzer, which extracts key-value fields from each frame treated as a scanned page",
+      "An image analyzer, which classifies a single still photo against a custom defect schema",
+      "A video analyzer, which segments the video into scenes and outputs transcripts, key frames, and natural-language scene descriptions as RAG-ready content"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Content Understanding's video modality is built for exactly this scenario. The prebuilt video analyzer automatically performs scene segmentation and, for each segment, emits an inline WebVTT transcript, ordered key-frame thumbnails, and natural-language descriptions, packaged as RAG-ready Markdown and JSON that can be loaded directly into a vector store with no post-processing. A document analyzer targets key-value field extraction from documents like invoices, not video scenes. An audio analyzer handles transcription, diarization, and summaries but has no key frames or visual scene descriptions because there is no visual track. An image analyzer works on a single still image against a schema and does not segment time-based content or produce transcripts.",
     "reference": "https://learn.microsoft.com/azure/ai-services/content-understanding/video/overview",
     "id": 113
@@ -1832,12 +1832,12 @@
     "module": "Information Extraction with Content Understanding",
     "question": "When you build a custom analyzer in Content Understanding, what is the primary purpose of the field schema you define?",
     "options": [
-      "It specifies the structured fields to extract, including each field's value type and how its value is generated",
-      "It selects which Azure region the analyzer is deployed to",
       "It sets the pricing tier and request quota for the analyzer",
-      "It chooses the human reviewers who will validate every result"
+      "It specifies the structured fields to extract, including each field's value type and how its value is generated",
+      "It chooses the human reviewers who will validate every result",
+      "It selects which Azure region the analyzer is deployed to"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "The field schema is a formal description of the fields to extract; for each field it specifies the name, an optional description, the value type (string, number, date, object, array, and so on), and the generation method. It acts as the contract for the structured output. It does not control region selection, pricing tier, or human-reviewer assignment.",
     "reference": "https://learn.microsoft.com/azure/ai-services/content-understanding/glossary",
     "id": 114
@@ -1847,12 +1847,12 @@
     "module": "Information Extraction with Content Understanding",
     "question": "A team wants Content Understanding to pull the transaction date and line-item amounts directly off receipts exactly as they appear on the document. Which field generation method best fits this requirement?",
     "options": [
-      "Extract",
-      "Generate",
       "Classify",
-      "Translate"
+      "Generate",
+      "Translate",
+      "Extract"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "The Extract method directly captures values as they appear in the input content, such as dates and line-item amounts on receipts and invoices, and it is supported for document analyzers. Generate produces new free-form values (for example, a summary), Classify assigns content to predefined categories, and Translate is not a Content Understanding field generation method.",
     "reference": "https://learn.microsoft.com/azure/ai-services/content-understanding/overview",
     "id": 115
@@ -1863,8 +1863,8 @@
     "question": "A media company uses Azure AI Content Understanding to process customer testimonial videos. For each video they want one field that holds a one-paragraph plot summary. This summary is not copied verbatim from the file; the model must reason over the content and compose new text. Which field generation method should they configure for this field?",
     "options": [
       "Generate",
-      "Extract",
       "Classify",
+      "Extract",
       "Diarize"
     ],
     "correct": 0,
@@ -1877,12 +1877,12 @@
     "module": "Information Extraction with Content Understanding",
     "question": "A developer reads that one Content Understanding field generation method is supported only for document analyzers and is not available for image, audio, or video. Which method is described?",
     "options": [
-      "Extract",
-      "Generate",
       "Classify",
-      "Segment"
+      "Extract",
+      "Segment",
+      "Generate"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "The Extract method, which captures values directly as they appear in the input content, is supported only for document analyzers. Generate and Classify are available across modalities, and Segment is a processing capability (dividing content into logical sections) rather than a field generation method.",
     "reference": "https://learn.microsoft.com/azure/ai-services/content-understanding/concepts/best-practices",
     "id": 117
@@ -1892,12 +1892,12 @@
     "module": "Information Extraction with Content Understanding",
     "question": "A quality-control team on a manufacturing line wants to automatically flag product photos that show scratches, cracks, or misalignments, and record a structured defect label for each image. Which Content Understanding capability supports this?",
     "options": [
-      "Defining an image analyzer with a field schema to extract structured fields from images",
-      "Using an audio analyzer to transcribe the images into text",
       "Using document layout analysis to read tables out of the photos",
-      "Running a video analyzer to segment the photos into camera shots"
+      "Running a video analyzer to segment the photos into camera shots",
+      "Defining an image analyzer with a field schema to extract structured fields from images",
+      "Using an audio analyzer to transcribe the images into text"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Content Understanding image solutions let you define a schema that specifies the fields to extract from images, including manufacturing quality-control scenarios such as detecting defects and anomalies like scratches, cracks, or misalignments. Audio transcription, document table extraction, and video camera-shot segmentation target other modalities and do not apply to still-image defect detection.",
     "reference": "https://learn.microsoft.com/azure/ai-services/content-understanding/image/overview",
     "id": 118
@@ -1907,12 +1907,12 @@
     "module": "Information Extraction with Content Understanding",
     "question": "A contact center wants to process recorded calls so each call yields a transcript that distinguishes who is speaking, plus a summary and sentiment. Which Content Understanding modality and capabilities apply?",
     "options": [
-      "Audio analysis with transcription and speaker diarization, plus field extraction for summary and sentiment",
       "Document analysis with OCR and table extraction",
-      "Image analysis with figure description and chart extraction",
-      "Translator with key-value pair extraction"
+      "Translator with key-value pair extraction",
+      "Audio analysis with transcription and speaker diarization, plus field extraction for summary and sentiment",
+      "Image analysis with figure description and chart extraction"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Content Understanding audio analyzers transcribe conversational audio and use diarization to distinguish speakers, and field extraction can produce structured outputs such as call summaries and sentiment. OCR and tables belong to document analysis, figure description and charts belong to image and document analysis, and Translator is a separate service that does not transcribe calls.",
     "reference": "https://learn.microsoft.com/azure/ai-services/content-understanding/audio/overview",
     "id": 119
@@ -1922,12 +1922,12 @@
     "module": "Information Extraction with Content Understanding",
     "question": "A bank wants to start extracting fields from US tax forms without designing a schema from scratch, because Content Understanding ships preconfigured analyzers tuned for common document categories. What are these preconfigured analyzers called?",
     "options": [
+      "Base analyzers",
       "Domain-specific (prebuilt) analyzers",
       "Custom labeled analyzers",
-      "Base analyzers",
       "Knowledge-store analyzers"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Domain-specific (prebuilt) analyzers are preconfigured for common document categories in industries such as finance and tax, identity verification, and mortgage and lending, providing tuned field schemas out of the box. Custom analyzers require you to define or label a schema, base analyzers are the generic parents you derive custom analyzers from, and 'knowledge-store analyzer' is not a Content Understanding term.",
     "reference": "https://learn.microsoft.com/azure/ai-services/content-understanding/concepts/prebuilt-analyzers",
     "id": 120
@@ -1938,9 +1938,9 @@
     "question": "An intelligent document processing workflow needs to know, for each extracted invoice field, both how reliable the value is and where in the source document it came from, so low-confidence values can be routed to human review. Which pair of Content Understanding features provides this?",
     "options": [
       "Confidence scores and grounding",
-      "Diarization and segmentation",
+      "Translation and redaction",
       "Content filtering and guardrails",
-      "Translation and redaction"
+      "Diarization and segmentation"
     ],
     "correct": 0,
     "explanation": "Confidence scores give a 0-to-1 reliability estimate per field, and grounding identifies the source region where a value was extracted or generated; together they support straight-through processing with human review of low-confidence values. Diarization and segmentation, content filtering and guardrails, and translation and redaction address other needs and do not provide per-field reliability plus source location.",
@@ -1952,12 +1952,12 @@
     "module": "Information Extraction with Content Understanding",
     "question": "A startup needs an application that reads purchase orders and returns the same named fields every time so the data can be inserted into a database. A teammate suggests instead sending each file to a general chat model and asking it to 'describe the order in your own words.' Which approach better fits the requirement, and why?",
     "options": [
-      "Content Understanding, because a defined field schema yields consistent, schema-aligned structured output for automation",
-      "The chat model, because free-form prose is easier to insert into a relational database",
       "Either one, because both always return identical structured fields",
-      "The chat model, because Content Understanding cannot output structured data"
+      "The chat model, because free-form prose is easier to insert into a relational database",
+      "The chat model, because Content Understanding cannot output structured data",
+      "Content Understanding, because a defined field schema yields consistent, schema-aligned structured output for automation"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Content Understanding is built for structured extraction: a defined field schema produces predictable, schema-aligned key-value output suited to automation and database insertion. A general model asked for free-form prose returns variable text that is harder to map to fixed columns, the two approaches do not produce identical output, and Content Understanding does output structured key-value data.",
     "reference": "https://learn.microsoft.com/azure/ai-services/content-understanding/overview",
     "id": 122
@@ -1969,11 +1969,11 @@
     "options": [
       "A reusable analyzer, identified by an analyzer ID, that the application invokes by calling the Content Understanding resource endpoint and passing that analyzer ID",
       "A separately deployed generative model that the team must publish to its own dedicated endpoint before any extraction can run",
-      "A one-time spreadsheet export of the fields found in the uploaded sample invoice",
-      "A new Azure subscription provisioned specifically to host and bill the analyzer"
+      "A new Azure subscription provisioned specifically to host and bill the analyzer",
+      "A one-time spreadsheet export of the fields found in the uploaded sample invoice"
     ],
     "correct": 0,
-    "explanation": "Building an analyzer in the Foundry portal creates a reusable analyzer that is identified by an analyzer ID. To run extraction on new files, the application calls the Content Understanding resource endpoint and specifies that analyzer ID in the request path (for example, .../contentunderstanding/analyzers/{analyzerId}). The analyzer ID is the identifier used to reference the analyzer in API calls; it is not itself a separate standalone endpoint. The first option is correct because it captures both parts: build produces an analyzer (with an analyzer ID) and the app invokes it through the resource's Content Understanding API. The other options are wrong: building an analyzer does not create a separately deployed model that you must publish to its own endpoint (the analyzer runs against your existing Content Understanding resource); it is not a one-time spreadsheet export (it is a reusable configuration you call repeatedly on new files); and it does not provision a new Azure subscription (the analyzer lives within your existing Foundry/Content Understanding resource).",
+    "explanation": "Building an analyzer in the Foundry portal creates a reusable analyzer that is identified by an analyzer ID. To run extraction on new files, the application calls the Content Understanding resource endpoint and specifies that analyzer ID in the request path (for example, .../contentunderstanding/analyzers/{analyzerId}). The analyzer ID is the identifier used to reference the analyzer in API calls; it is not itself a separate standalone endpoint. The keyed answer is correct because it captures both parts: build produces an analyzer (with an analyzer ID) and the app invokes it through the resource's Content Understanding API. The other options are wrong: building an analyzer does not create a separately deployed model that you must publish to its own endpoint (the analyzer runs against your existing Content Understanding resource); it is not a one-time spreadsheet export (it is a reusable configuration you call repeatedly on new files); and it does not provision a new Azure subscription (the analyzer lives within your existing Foundry/Content Understanding resource).",
     "reference": "https://learn.microsoft.com/azure/ai-services/content-understanding/concepts/analyzer-reference",
     "id": 123
   },
@@ -1982,12 +1982,12 @@
     "module": "Information Extraction with Content Understanding",
     "question": "A finance team builds a custom analyzer in Azure AI Content Understanding to process invoices. Most invoices have a different number of line items, and each line item has the same fixed set of subfields: description, quantity, unit price, and amount. In the field schema, which field structure should they use to capture this variable number of repeated rows, where every row shares the same subfields?",
     "options": [
-      "A table field, represented as an array of objects in the API",
-      "A list field, represented as an array of single basic values in the API",
+      "A classify field with one category defined for each possible line item",
       "A group field, represented as a single object of basic values in the API",
-      "A classify field with one category defined for each possible line item"
+      "A list field, represented as an array of single basic values in the API",
+      "A table field, represented as an array of objects in the API"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Content Understanding's field schema supports nested structures. A table field models a variable number of items that each have the same fixed set of subfields, and it is represented as an array of objects of basic fields in the API. That exactly matches invoice line items, where the row count varies but every row has description, quantity, unit price, and amount. The other options do not fit: a list field is an array of single basic values of the same type (one value per item, not a set of subfields per row); a group field is a single object of related basic fields, so it captures one fixed set of values, not a variable number of repeated rows; and the classify method assigns a value from a predefined set of categories, which is not a way to represent repeating multi-field rows.",
     "reference": "https://learn.microsoft.com/azure/ai-services/content-understanding/service-limits#field-schema-limits",
     "id": 124

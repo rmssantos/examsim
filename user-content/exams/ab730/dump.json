@@ -4,12 +4,12 @@
     "module": "Generative AI Fundamentals",
     "question": "A finance analyst asks Microsoft 365 Copilot to summarize a quarterly report and compare it with last quarter. Which factor most directly shapes the answer Copilot can produce?",
     "options": [
-      "The user's accessible work content and the current app context",
       "All documents stored anywhere in the tenant",
       "Only public web data indexed by search engines",
+      "The user's accessible work content and the current app context",
       "The operating system installed on the user's device"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Copilot responses are grounded in the user's prompt, current app context, and content the user is permitted to access. It does not automatically use every tenant document or rely only on public web data.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
@@ -58,12 +58,12 @@
     "module": "Generative AI Fundamentals",
     "question": "Which scenario best fits a Copilot Chat experience rather than an agent experience?",
     "options": [
-      "A user asks a one-time question to summarize a policy and draft an email response.",
+      "A business unit needs configured instructions and knowledge sources for ongoing use.",
       "A department needs a reusable assistant with curated knowledge and suggested prompts.",
       "A team wants a role-specific tool shared with members for a repeatable process.",
-      "A business unit needs configured instructions and knowledge sources for ongoing use."
+      "A user asks a one-time question to summarize a policy and draft an email response."
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "A chat experience is best for flexible, ad hoc assistance. Agents are better when the organization needs reusable behavior, knowledge, instructions, and sharing for repeatable workflows.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
@@ -95,8 +95,8 @@
     "options": [
       "Connecting the prompt to relevant data or context so the response is more specific and useful",
       "Disabling all organizational data access before generating a response",
-      "Training a new model for every prompt",
-      "Converting every answer into a spreadsheet"
+      "Converting every answer into a spreadsheet",
+      "Training a new model for every prompt"
     ],
     "correct": 0,
     "explanation": "Grounding provides relevant context, such as files, meetings, chats, or web data, so the model can produce an answer tied to the task rather than a generic response.",
@@ -108,12 +108,12 @@
     "module": "Generative AI Fundamentals",
     "question": "Which Copilot capability is most useful when a user needs help turning a rough idea into a first version of a document?",
     "options": [
+      "Network packet inspection",
       "Draft generation from a prompt",
-      "Device encryption",
       "Mailbox retention policy creation",
-      "Network packet inspection"
+      "Device encryption"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Copilot can generate a first draft from a prompt. Security, retention, and network features are important, but they do not directly create a document draft.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
@@ -124,9 +124,9 @@
     "question": "A user wants Copilot to compare content across a Word file and a PowerPoint deck. What should the user do first?",
     "options": [
       "Reference or open the relevant files so Copilot has the right context",
-      "Ask Copilot to use every file in the organization",
       "Remove all file names from the prompt",
-      "Disable citations to simplify the answer"
+      "Disable citations to simplify the answer",
+      "Ask Copilot to use every file in the organization"
     ],
     "correct": 0,
     "explanation": "Referencing the relevant files or working in the correct app context helps Copilot use the right information and reduces ambiguity.",
@@ -138,12 +138,12 @@
     "module": "Responsible AI and Data Protection",
     "question": "Which risk is best described as a plausible-sounding but incorrect AI-generated answer?",
     "options": [
-      "Fabrication",
       "Single sign-on",
-      "Data residency",
-      "Version history"
+      "Fabrication",
+      "Version history",
+      "Data residency"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "A fabrication is an output that sounds confident or plausible but is wrong or unsupported. Users should verify important AI-generated claims.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
@@ -172,12 +172,12 @@
     "module": "Responsible AI and Data Protection",
     "question": "A user suspects Copilot summarized a contract incorrectly. What is the best next step?",
     "options": [
-      "Check citations or source content and perform human review before acting",
       "Assume the output is correct because it was generated by AI",
+      "Forward the summary to the customer immediately",
       "Delete the source document",
-      "Forward the summary to the customer immediately"
+      "Check citations or source content and perform human review before acting"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "High-value or sensitive outputs should be verified against source material. Human review remains essential for contracts, compliance, and other consequential content.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
@@ -207,12 +207,12 @@
     "module": "Responsible AI and Data Protection",
     "question": "Which prompt is safest when asking Copilot to draft a public announcement?",
     "options": [
-      "Use approved public product details and avoid unpublished financial figures.",
-      "Include confidential acquisition plans so the draft is more specific.",
       "Ask Copilot to invent customer quotes.",
+      "Include confidential acquisition plans so the draft is more specific.",
+      "Use approved public product details and avoid unpublished financial figures.",
       "Paste a private HR record to personalize the announcement."
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "A safe prompt uses approved, appropriate context and avoids unnecessary sensitive or confidential data.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-privacy"
@@ -224,8 +224,8 @@
     "options": [
       "Accepting AI output without appropriate judgment, verification, or accountability",
       "Using AI to create a first draft",
-      "Requesting citations from Copilot",
-      "Refining a prompt after the first answer"
+      "Refining a prompt after the first answer",
+      "Requesting citations from Copilot"
     ],
     "correct": 0,
     "explanation": "Over-reliance occurs when users depend on AI output without applying expertise, checking sources, or considering risk.",
@@ -237,12 +237,12 @@
     "module": "Prompting and Conversation Management",
     "question": "Which prompt is most likely to produce a useful Copilot response?",
     "options": [
-      "Draft a 200-word customer email explaining the delivery delay, use an empathetic tone, and include the three mitigation steps in this file.",
+      "Do my work.",
       "Write something about the delay.",
-      "Make it good.",
-      "Do my work."
+      "Draft a 200-word customer email explaining the delivery delay, use an empathetic tone, and include the three mitigation steps in this file.",
+      "Make it good."
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Effective prompts specify the task, audience, tone, format, constraints, and relevant context.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
@@ -271,12 +271,12 @@
     "module": "Prompting and Conversation Management",
     "question": "A manager wants a weekly reminder to ask Copilot for a summary of project risks. Which prompt-management capability best fits this need?",
     "options": [
-      "Schedule a prompt",
       "Delete a chat",
+      "Schedule a prompt",
       "Rename a conversation",
       "Disable prompt history"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Scheduling a prompt supports recurring work where a user wants Copilot to run or remind them on a planned cadence.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/scheduled-prompts"
@@ -306,12 +306,12 @@
     "module": "Prompting and Conversation Management",
     "question": "A user needs to reuse a strong prompt with teammates. Which action is most appropriate?",
     "options": [
-      "Share the prompt if it contains no sensitive information and is useful to the team",
-      "Paste confidential customer data into the prompt before sharing it",
+      "Delete the prompt after each use so no one can learn from it",
       "Rename the prompt to hide its purpose",
-      "Delete the prompt after each use so no one can learn from it"
+      "Paste confidential customer data into the prompt before sharing it",
+      "Share the prompt if it contains no sensitive information and is useful to the team"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Prompts can be shared when they are reusable and safe. Sensitive data should not be embedded in shared prompts.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
@@ -341,12 +341,12 @@
     "module": "Prompting and Conversation Management",
     "question": "Which prompt should a sales user choose to get an executive-ready summary from meeting notes?",
     "options": [
-      "Summarize these notes into five executive bullets, include decisions, risks, and owners, and keep confidential pricing out of the summary.",
       "Summarize this.",
+      "Summarize these notes into five executive bullets, include decisions, risks, and owners, and keep confidential pricing out of the summary.",
       "Make a report but do not use any context.",
       "Invent missing decisions if the notes are unclear."
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "The best prompt defines format, content priorities, and safety constraints. It does not ask Copilot to invent unsupported information.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
@@ -357,9 +357,9 @@
     "question": "What is the main benefit of referencing a specific file in a Copilot prompt?",
     "options": [
       "It grounds the answer in the intended source material.",
-      "It lets Copilot ignore access permissions.",
       "It guarantees the answer is legally approved.",
-      "It permanently changes the file."
+      "It permanently changes the file.",
+      "It lets Copilot ignore access permissions."
     ],
     "correct": 0,
     "explanation": "Referencing a file helps Copilot use the right source material. It does not bypass permissions, provide legal approval, or alter content by itself.",
@@ -371,12 +371,12 @@
     "module": "Prompting and Conversation Management",
     "question": "Which follow-up is best when Copilot gives a summary that is too long?",
     "options": [
-      "Rewrite the summary in three bullets for a VP audience and keep each bullet under 20 words.",
-      "Wrong answer.",
       "Make it shorter somehow.",
-      "Ignore the source and create a new version from memory."
+      "Wrong answer.",
+      "Ignore the source and create a new version from memory.",
+      "Rewrite the summary in three bullets for a VP audience and keep each bullet under 20 words."
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "A focused follow-up gives specific constraints for length, audience, and format.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
@@ -386,12 +386,12 @@
     "module": "Prompting and Conversation Management",
     "question": "Which resource is most appropriate to reference when asking Copilot to draft a project status update?",
     "options": [
-      "The current project plan, recent meeting notes, and risk register",
       "An unrelated marketing brochure",
       "A random public blog post",
+      "The current project plan, recent meeting notes, and risk register",
       "A private HR complaint file"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "The most useful sources are relevant, authorized, and directly connected to the task.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
@@ -435,12 +435,12 @@
     "module": "Copilot Agents and Extensibility",
     "question": "A user needs a prebuilt assistant for a common task and does not need custom knowledge. What should they check first?",
     "options": [
-      "Agent Store",
       "Device Manager",
-      "DNS settings",
-      "Printer queue"
+      "Printer queue",
+      "Agent Store",
+      "DNS settings"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "The Agent Store is the appropriate place to look for existing agents before creating a new one.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/copilot-agent-store"
@@ -470,12 +470,12 @@
     "module": "Copilot Agents and Extensibility",
     "question": "Which agent configuration best supports a HR policy assistant?",
     "options": [
-      "Connect approved HR policy documents as knowledge and provide instructions to cite relevant policy sections.",
       "Ask the agent to answer from memory without source material.",
+      "Connect approved HR policy documents as knowledge and provide instructions to cite relevant policy sections.",
       "Give the agent unrelated sales scripts as knowledge.",
       "Configure the agent to reveal restricted employee records."
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "A policy assistant should use approved policy knowledge, clear instructions, and safe handling of restricted information.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
@@ -505,12 +505,12 @@
     "module": "Copilot Agents and Extensibility",
     "question": "A team wants an agent to help answer questions about a product launch plan. What is the most important knowledge source to include?",
     "options": [
-      "The approved launch plan and related FAQs",
       "A generic article about project management",
       "A private document from another team with no relevance",
-      "An empty knowledge source"
+      "An empty knowledge source",
+      "The approved launch plan and related FAQs"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Agents are most useful when grounded in relevant, approved sources for the task.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
@@ -520,12 +520,12 @@
     "module": "Copilot Agents and Extensibility",
     "question": "What should a user do before sharing a newly created agent with teammates?",
     "options": [
-      "Test it with common prompts and verify it uses approved sources safely",
-      "Share it immediately without reviewing the output",
       "Remove all instructions so behavior is unpredictable",
-      "Add sensitive data to suggested prompts"
+      "Add sensitive data to suggested prompts",
+      "Test it with common prompts and verify it uses approved sources safely",
+      "Share it immediately without reviewing the output"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Testing and verification reduce the risk of poor answers, unsafe disclosure, or misalignment with the intended workflow.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/agent-essentials/agent-lifecycle/agent-assign-deploy"
@@ -535,12 +535,12 @@
     "module": "Business Content Creation",
     "question": "A marketing specialist wants Copilot to create a first draft of a campaign brief. What should the prompt include?",
     "options": [
-      "Audience, objective, key messages, tone, length, and approved source material",
       "Only the word campaign",
-      "A request to invent customer testimonials",
-      "Private employee records for personalization"
+      "Audience, objective, key messages, tone, length, and approved source material",
+      "Private employee records for personalization",
+      "A request to invent customer testimonials"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Business drafts improve when prompts include audience, goal, constraints, tone, and appropriate grounding material.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
@@ -569,12 +569,12 @@
     "module": "Business Content Creation",
     "question": "A user has a long strategy document and needs a concise management summary. Which Copilot request is best?",
     "options": [
-      "Summarize this document for executives in six bullets, focusing on goals, risks, decisions, and next steps.",
-      "Make this shorter.",
+      "Translate it into a spreadsheet without preserving meaning.",
       "Rewrite it with no source references and add new claims.",
-      "Translate it into a spreadsheet without preserving meaning."
+      "Make this shorter.",
+      "Summarize this document for executives in six bullets, focusing on goals, risks, decisions, and next steps."
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "The best request names the audience, format, and priorities for the summary.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
@@ -605,8 +605,8 @@
     "question": "Which instruction helps Copilot adapt a document for a different audience?",
     "options": [
       "Rewrite this for a nontechnical executive audience and keep the tone concise and business-focused.",
-      "Rewrite this somehow.",
       "Ignore the audience and add more jargon.",
+      "Rewrite this somehow.",
       "Remove all business context."
     ],
     "correct": 0,
@@ -634,12 +634,12 @@
     "module": "Business Content Creation",
     "question": "Which prompt best requests image generation for a business presentation?",
     "options": [
-      "Create a professional image concept for a slide about secure AI adoption, using a clean corporate style and no real customer logos.",
-      "Make any image using confidential customer screenshots.",
+      "Use private employee photos without permission.",
       "Generate a trademarked logo for a partner company.",
-      "Use private employee photos without permission."
+      "Create a professional image concept for a slide about secure AI adoption, using a clean corporate style and no real customer logos.",
+      "Make any image using confidential customer screenshots."
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "A safe business image prompt describes purpose and style while avoiding sensitive, private, or trademark-infringing material.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
@@ -669,12 +669,12 @@
     "module": "Business Content Creation",
     "question": "What should a user do if Copilot creates a summary that omits an important risk?",
     "options": [
-      "Ask a follow-up that explicitly requests risks and verify against the source material",
       "Assume the risk is not important",
+      "Ask a follow-up that explicitly requests risks and verify against the source material",
       "Delete the source material",
       "Publish the summary unchanged"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Prompt refinement and verification help correct omissions before the output is used.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
@@ -684,12 +684,12 @@
     "module": "Data, Meetings, and Collaboration",
     "question": "A team wants Copilot to summarize a Teams meeting. Which information is most useful to include in the requested output?",
     "options": [
-      "Decisions, action items, owners, due dates, and unresolved questions",
       "Only the meeting title",
       "Unrelated emails from another project",
-      "A fictional list of decisions"
+      "A fictional list of decisions",
+      "Decisions, action items, owners, due dates, and unresolved questions"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Meeting summaries are most actionable when they capture decisions, action items, owners, deadlines, and open questions.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
@@ -738,12 +738,12 @@
     "module": "Data, Meetings, and Collaboration",
     "question": "A user asks Copilot to analyze sales data. What should they do if the spreadsheet contains missing values?",
     "options": [
-      "Acknowledge the data quality issue and ask Copilot to identify how it affects the analysis",
       "Hide the missing values from reviewers",
       "Ask Copilot to invent missing sales figures",
-      "Assume missing values never affect analysis"
+      "Assume missing values never affect analysis",
+      "Acknowledge the data quality issue and ask Copilot to identify how it affects the analysis"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Data quality matters. Missing values should be identified and considered when interpreting Copilot-assisted analysis.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
@@ -755,8 +755,8 @@
     "options": [
       "Help tailor future assistance to stable preferences and working style where supported",
       "Store passwords for future prompts",
-      "Bypass organizational data policies",
-      "Automatically approve all generated content"
+      "Automatically approve all generated content",
+      "Bypass organizational data policies"
     ],
     "correct": 0,
     "explanation": "Memory and instructions can help personalize assistance, but they should not store secrets, bypass policies, or replace approval.",
@@ -768,12 +768,12 @@
     "module": "Data, Meetings, and Collaboration",
     "question": "Which prompt best asks Copilot to analyze a spreadsheet for a leadership update?",
     "options": [
-      "Identify the top three revenue trends, show possible causes, and create a concise summary for leadership with a chart suggestion.",
       "Look at this data.",
       "Find something interesting and invent numbers if needed.",
+      "Identify the top three revenue trends, show possible causes, and create a concise summary for leadership with a chart suggestion.",
       "Ignore the data quality issues."
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "The best prompt specifies the analysis goal, desired output, audience, and treatment of data quality.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
@@ -803,12 +803,12 @@
     "module": "Data, Meetings, and Collaboration",
     "question": "A user wants to compare customer feedback themes from several documents. Which approach is best?",
     "options": [
+      "Use unrelated financial forecasts as context.",
       "Reference the relevant documents and ask Copilot to group themes, cite examples, and flag uncertainty.",
       "Ask Copilot to guess themes without documents.",
-      "Use unrelated financial forecasts as context.",
       "Remove examples so no one can verify the themes."
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Referencing the correct documents and asking for examples and uncertainty helps make the analysis more transparent and useful.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
@@ -818,12 +818,12 @@
     "module": "Data, Meetings, and Collaboration",
     "question": "Which collaboration practice best supports safe use of Copilot-generated content?",
     "options": [
-      "Clearly label drafts, invite review, and keep sensitive details limited to authorized collaborators",
       "Treat every draft as final",
+      "Remove source context so reviewers cannot check it",
       "Share all generated content publicly by default",
-      "Remove source context so reviewers cannot check it"
+      "Clearly label drafts, invite review, and keep sensitive details limited to authorized collaborators"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Safe collaboration means treating AI output as draft material, reviewing it, and sharing sensitive information only with authorized people.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
@@ -833,12 +833,12 @@
     "module": "Generative AI Fundamentals",
     "question": "A user asks Copilot for a project risk summary but gives no project context. What is the most likely result?",
     "options": [
-      "A generic or incomplete answer that may require follow-up context",
+      "A legally approved risk decision",
       "A guaranteed complete risk register",
-      "Automatic access to every project document",
-      "A legally approved risk decision"
+      "A generic or incomplete answer that may require follow-up context",
+      "Automatic access to every project document"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Copilot needs relevant context to produce specific and useful answers. Generic prompts often produce generic output.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
@@ -888,9 +888,9 @@
     "question": "Which feature best helps a user understand where a Copilot answer came from?",
     "options": [
       "Citations or references to source content",
-      "A longer answer with no sources",
       "A hidden prompt",
-      "A disabled review process"
+      "A disabled review process",
+      "A longer answer with no sources"
     ],
     "correct": 0,
     "explanation": "Citations and references help users inspect source material and verify output.",
@@ -902,12 +902,12 @@
     "module": "Generative AI Fundamentals",
     "question": "A user wants help brainstorming campaign ideas. What is the best expectation?",
     "options": [
-      "Copilot can generate options that the user should evaluate and refine",
-      "Copilot will guarantee the winning campaign",
       "Copilot can replace market validation",
-      "Copilot must use confidential data by default"
+      "Copilot can generate options that the user should evaluate and refine",
+      "Copilot must use confidential data by default",
+      "Copilot will guarantee the winning campaign"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Copilot can support ideation, but business judgment and validation are still required.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
@@ -938,9 +938,9 @@
     "question": "What does it mean that Copilot is permission-aware?",
     "options": [
       "It can only use work content available to the signed-in user",
+      "It removes labels from protected files",
       "It ignores all Microsoft 365 access controls",
-      "It gives every user admin access",
-      "It removes labels from protected files"
+      "It gives every user admin access"
     ],
     "correct": 0,
     "explanation": "Permission-aware experiences use content within the user access scope.",
@@ -971,12 +971,12 @@
     "module": "Generative AI Fundamentals",
     "question": "A user receives two different Copilot answers after changing the prompt wording. Why can this happen?",
     "options": [
-      "Prompt wording and context can influence generative AI output",
-      "Copilot is broken whenever wording changes",
       "The source files were deleted automatically",
-      "The user lost all permissions"
+      "Prompt wording and context can influence generative AI output",
+      "The user lost all permissions",
+      "Copilot is broken whenever wording changes"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Generative AI is sensitive to prompt wording, context, and constraints.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
@@ -986,12 +986,12 @@
     "module": "Generative AI Fundamentals",
     "question": "Which statement best describes Copilot Chat for business users?",
     "options": [
-      "A conversational assistant for flexible work tasks using available context",
       "A database backup service",
-      "A replacement for access governance",
-      "A tool only for writing application code"
+      "A tool only for writing application code",
+      "A conversational assistant for flexible work tasks using available context",
+      "A replacement for access governance"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Copilot Chat helps with flexible knowledge work tasks and can use relevant context where available.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
@@ -1001,12 +1001,12 @@
     "module": "Responsible AI and Data Protection",
     "question": "A team uses Copilot to draft a customer-facing policy explanation. What should happen before publishing?",
     "options": [
-      "Review for accuracy, completeness, tone, and policy alignment",
-      "Publish immediately because AI wrote it",
       "Remove all source references",
-      "Ask Copilot to invent missing policy rules"
+      "Ask Copilot to invent missing policy rules",
+      "Publish immediately because AI wrote it",
+      "Review for accuracy, completeness, tone, and policy alignment"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "External content should be reviewed by accountable people before publishing.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
@@ -1055,12 +1055,12 @@
     "module": "Responsible AI and Data Protection",
     "question": "What is prompt injection?",
     "options": [
-      "An attempt to manipulate the AI system with instructions that conflict with the intended task",
-      "A password reset flow",
       "A method for compressing images",
+      "A password reset flow",
+      "An attempt to manipulate the AI system with instructions that conflict with the intended task",
       "A way to increase monitor brightness"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Prompt injection attempts to steer the model away from intended instructions or safe behavior.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
@@ -1070,12 +1070,12 @@
     "module": "Responsible AI and Data Protection",
     "question": "A Copilot answer includes a confident claim with no citation. What is the safest response?",
     "options": [
-      "Verify the claim before using it",
       "Assume confidence means correctness",
+      "Verify the claim before using it",
       "Delete the original source",
       "Forward it as approved guidance"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Unsupported claims should be verified before use, especially for business decisions.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
@@ -1105,12 +1105,12 @@
     "module": "Responsible AI and Data Protection",
     "question": "Which situation is an example of over-reliance on AI?",
     "options": [
-      "Using a draft without checking facts, sources, or business impact",
-      "Asking Copilot for a first draft",
       "Requesting a shorter summary",
-      "Using citations to review sources"
+      "Using citations to review sources",
+      "Asking Copilot for a first draft",
+      "Using a draft without checking facts, sources, or business impact"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Over-reliance means acting on AI output without appropriate judgment or validation.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
@@ -1140,9 +1140,9 @@
     "question": "What should a user do if Copilot exposes information they think should be restricted?",
     "options": [
       "Report the concern and review permissions or source sharing settings",
-      "Share the output more broadly",
+      "Disable all collaboration tools",
       "Ignore the issue",
-      "Disable all collaboration tools"
+      "Share the output more broadly"
     ],
     "correct": 0,
     "explanation": "Unexpected exposure should trigger review of permissions, sharing, and governance.",
@@ -1154,12 +1154,12 @@
     "module": "Responsible AI and Data Protection",
     "question": "Which prompt best protects privacy when drafting a training announcement?",
     "options": [
-      "Use approved public course details and do not include personal employee data",
-      "Include a private medical record for personalization",
       "Ask Copilot to reveal hidden HR notes",
+      "Include a private medical record for personalization",
+      "Use approved public course details and do not include personal employee data",
       "Paste passwords so attendees can register"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Prompts should use appropriate approved data and avoid unnecessary personal or secret information.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-privacy"
@@ -1170,9 +1170,9 @@
     "question": "Which prompt best asks Copilot to create a concise plan?",
     "options": [
       "Create a five-step rollout plan for the sales team, include owners, risks, and a one-week timeline.",
-      "Plan.",
+      "Do the whole project without context.",
       "Make it nice.",
-      "Do the whole project without context."
+      "Plan."
     ],
     "correct": 0,
     "explanation": "The best prompt defines goal, audience, format, constraints, and context.",
@@ -1203,12 +1203,12 @@
     "module": "Prompting and Conversation Management",
     "question": "A user wants Copilot to produce a table instead of prose. What should they add to the prompt?",
     "options": [
-      "A clear output format requirement",
       "A request to ignore sources",
+      "A clear output format requirement",
       "A secret password",
       "A vague compliment"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Prompts can specify the desired format, such as a table, bullets, or an email.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
@@ -1258,12 +1258,12 @@
     "module": "Prompting and Conversation Management",
     "question": "Which follow-up best improves a generic answer?",
     "options": [
-      "Use the attached project brief and rewrite for a finance executive in three bullets.",
-      "Try again.",
       "Wrong.",
-      "Ignore the file and guess."
+      "Ignore the file and guess.",
+      "Try again.",
+      "Use the attached project brief and rewrite for a finance executive in three bullets."
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "A strong follow-up adds source context, audience, format, and constraints.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
@@ -1273,12 +1273,12 @@
     "module": "Prompting and Conversation Management",
     "question": "What is a good reason to rename a Copilot chat?",
     "options": [
+      "To remove all citations",
       "To make a useful conversation easier to find later",
-      "To change source permissions",
       "To make the answer legally binding",
-      "To remove all citations"
+      "To change source permissions"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Renaming chats helps organize prior work.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/paths/explore-microsoft-365-copilot-business-chat/"
@@ -1308,9 +1308,9 @@
     "question": "A prompt produces too much detail for an executive update. What is the best follow-up?",
     "options": [
       "Condense this into four executive bullets and keep each bullet under 18 words.",
+      "Add unrelated technical jargon.",
       "Make it different.",
-      "Delete all business context.",
-      "Add unrelated technical jargon."
+      "Delete all business context."
     ],
     "correct": 0,
     "explanation": "Specific constraints on length, audience, and style help Copilot revise effectively.",
@@ -1322,12 +1322,12 @@
     "module": "Prompting and Conversation Management",
     "question": "Which prompt is best for comparing two documents?",
     "options": [
-      "Compare Document A and Document B, list differences in scope, risks, and deadlines, and cite source sections.",
       "Compare stuff.",
       "Pick a winner without reading them.",
+      "Compare Document A and Document B, list differences in scope, risks, and deadlines, and cite source sections.",
       "Invent differences if none exist."
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Comparison prompts should name sources, dimensions, and output expectations.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
@@ -1357,12 +1357,12 @@
     "module": "Prompting and Conversation Management",
     "question": "Which prompt best requests a meeting-prep brief?",
     "options": [
-      "Summarize the last project update, open risks, and likely customer questions for a 30-minute meeting.",
-      "Meeting prep.",
       "Make me ready without context.",
-      "Guess what the customer wants."
+      "Meeting prep.",
+      "Guess what the customer wants.",
+      "Summarize the last project update, open risks, and likely customer questions for a 30-minute meeting."
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "A good meeting-prep prompt specifies sources, objectives, and expected output.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
@@ -1391,12 +1391,12 @@
     "module": "Prompting and Conversation Management",
     "question": "A user wants the same prompt to be useful for several teams. What should they do?",
     "options": [
-      "Remove team-specific secrets and document placeholders for variable inputs",
-      "Embed customer passwords",
+      "Make it dependent on one private file",
       "Hide the purpose of the prompt",
-      "Make it dependent on one private file"
+      "Embed customer passwords",
+      "Remove team-specific secrets and document placeholders for variable inputs"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Reusable prompts should be safe and adaptable.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
@@ -1406,12 +1406,12 @@
     "module": "Prompting and Conversation Management",
     "question": "Which prompt best asks for a balanced analysis?",
     "options": [
-      "List pros, cons, assumptions, and open questions for this proposal using the attached brief.",
-      "Tell me if this is good.",
       "Only list positives.",
-      "Ignore assumptions."
+      "Ignore assumptions.",
+      "List pros, cons, assumptions, and open questions for this proposal using the attached brief.",
+      "Tell me if this is good."
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Balanced analysis prompts ask for multiple dimensions and assumptions.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
@@ -1421,12 +1421,12 @@
     "module": "Copilot Agents and Extensibility",
     "question": "A department answers the same policy questions every week. What Copilot approach is most appropriate?",
     "options": [
-      "Create an agent with approved policy knowledge and clear instructions",
-      "Use unrelated public web pages as the only source",
       "Ask each employee to guess",
-      "Disable review of answers"
+      "Create an agent with approved policy knowledge and clear instructions",
+      "Disable review of answers",
+      "Use unrelated public web pages as the only source"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Repeatable workflows are good candidates for agents with curated knowledge and instructions.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/microsoft-copilot-extend-copilot-extensions"
@@ -1456,9 +1456,9 @@
     "question": "Why should a team test an agent before sharing it?",
     "options": [
       "To verify accuracy, source use, and safe behavior for common prompts",
-      "To make it slower",
+      "To avoid user feedback",
       "To remove all instructions",
-      "To avoid user feedback"
+      "To make it slower"
     ],
     "correct": 0,
     "explanation": "Testing helps detect poor answers, unsafe scope, and missing knowledge before rollout.",
@@ -1511,9 +1511,9 @@
     "question": "Which agent design best supports sales proposal guidance?",
     "options": [
       "Use approved proposal templates, product guidance, and instructions to flag uncertain answers",
-      "Use private HR files",
+      "Invent pricing rules",
       "Answer without any source material",
-      "Invent pricing rules"
+      "Use private HR files"
     ],
     "correct": 0,
     "explanation": "A sales agent should use approved business sources and avoid unsupported claims.",
@@ -1544,12 +1544,12 @@
     "module": "Copilot Agents and Extensibility",
     "question": "What should be included in suggested prompts for an agent?",
     "options": [
-      "Clear examples of supported tasks and expected inputs",
       "Sensitive customer secrets",
       "Ambiguous commands with no context",
-      "Instructions to bypass permissions"
+      "Instructions to bypass permissions",
+      "Clear examples of supported tasks and expected inputs"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Suggested prompts should guide users safely toward supported tasks.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
@@ -1559,12 +1559,12 @@
     "module": "Copilot Agents and Extensibility",
     "question": "When is a custom agent unnecessary?",
     "options": [
-      "When a one-time chat prompt fully meets the user need",
-      "When the process is recurring",
       "When curated knowledge is required",
+      "When the process is recurring",
+      "When a one-time chat prompt fully meets the user need",
       "When many users need the same workflow"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "One-time tasks often do not require an agent.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/microsoft-copilot-extend-copilot-extensions"
@@ -1594,12 +1594,12 @@
     "module": "Copilot Agents and Extensibility",
     "question": "A user reports that an agent answers questions outside its purpose. What should the owner adjust first?",
     "options": [
-      "Agent instructions, scope, and suggested prompts",
       "The monitor brightness",
-      "The browser zoom level",
-      "The color of the agent icon"
+      "Agent instructions, scope, and suggested prompts",
+      "The color of the agent icon",
+      "The browser zoom level"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Scope and instructions shape agent behavior.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
@@ -1609,12 +1609,12 @@
     "module": "Copilot Agents and Extensibility",
     "question": "Which agent sharing choice is safest for a pilot?",
     "options": [
-      "Share with a limited audience that can test and provide feedback",
+      "Avoid collecting feedback",
       "Publish to everyone immediately",
-      "Share only with unauthorized users",
-      "Avoid collecting feedback"
+      "Share with a limited audience that can test and provide feedback",
+      "Share only with unauthorized users"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Limited pilots help validate quality and risk before broader sharing.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/agent-essentials/agent-lifecycle/agent-assign-deploy"
@@ -1625,8 +1625,8 @@
     "question": "A user wants to draft a customer apology email. Which prompt is best?",
     "options": [
       "Draft a concise apology email using the approved incident summary, empathetic tone, and three next steps.",
-      "Say sorry.",
       "Invent an outage cause.",
+      "Say sorry.",
       "Include confidential internal blame notes."
     ],
     "correct": 0,
@@ -1678,12 +1678,12 @@
     "module": "Business Content Creation",
     "question": "Which prompt best adapts technical notes for executives?",
     "options": [
-      "Rewrite these notes as an executive summary with business impact, risks, and decisions needed.",
-      "Make technical notes executive.",
       "Add more acronyms.",
-      "Remove all business impact."
+      "Remove all business impact.",
+      "Make technical notes executive.",
+      "Rewrite these notes as an executive summary with business impact, risks, and decisions needed."
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Audience adaptation needs explicit audience, purpose, and content priorities.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
@@ -1713,12 +1713,12 @@
     "module": "Business Content Creation",
     "question": "A generated slide outline includes a claim not found in source material. What should the user do?",
     "options": [
-      "Remove or verify the claim before using it",
       "Keep it because it sounds persuasive",
+      "Remove or verify the claim before using it",
       "Hide source material from reviewers",
       "Publish immediately"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Unsupported claims should be removed or verified.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
@@ -1728,12 +1728,12 @@
     "module": "Business Content Creation",
     "question": "Which request best asks Copilot to improve clarity?",
     "options": [
-      "Rewrite this section in plain language for new customers and keep the original meaning.",
       "Make it different.",
+      "Rewrite this section in plain language for new customers and keep the original meaning.",
       "Make it longer with jargon.",
       "Change the facts."
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Clear rewrite prompts preserve meaning while defining audience and style.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
@@ -1762,12 +1762,12 @@
     "module": "Business Content Creation",
     "question": "Which Copilot use case helps turn a Word strategy note into presentation content?",
     "options": [
-      "Creating slide structure and speaker notes from approved source material",
-      "Changing file permissions for all users",
       "Deleting the source note",
-      "Inventing unsupported financial results"
+      "Inventing unsupported financial results",
+      "Creating slide structure and speaker notes from approved source material",
+      "Changing file permissions for all users"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Copilot can transform approved content into another format such as slides.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
@@ -1797,12 +1797,12 @@
     "module": "Business Content Creation",
     "question": "A user wants a one-page brief from several notes. What should the prompt include?",
     "options": [
-      "Target audience, key sections, length, and referenced notes",
-      "Only the word brief",
       "A request to ignore all notes",
-      "A requirement to add unsupported claims"
+      "A requirement to add unsupported claims",
+      "Only the word brief",
+      "Target audience, key sections, length, and referenced notes"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "A useful brief prompt defines audience, structure, length, and sources.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
@@ -1813,8 +1813,8 @@
     "question": "Which output is most appropriate for an early Copilot draft?",
     "options": [
       "A starting point that a subject-matter expert reviews and improves",
-      "A final approved contract",
       "A replacement for all stakeholder review",
+      "A final approved contract",
       "A guaranteed fact base"
     ],
     "correct": 0,
@@ -1827,12 +1827,12 @@
     "module": "Data, Meetings, and Collaboration",
     "question": "A manager asks Copilot to summarize a meeting transcript. Which output is most actionable?",
     "options": [
-      "Decisions, action items, owners, due dates, and open questions",
-      "Only a paragraph of general impressions",
       "A fictional attendance list",
-      "Unrelated project details"
+      "Decisions, action items, owners, due dates, and open questions",
+      "Unrelated project details",
+      "Only a paragraph of general impressions"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Meeting summaries are most useful when they identify decisions and follow-up work.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
@@ -1861,12 +1861,12 @@
     "module": "Data, Meetings, and Collaboration",
     "question": "A spreadsheet has inconsistent region names. What should the user do before relying on Copilot analysis?",
     "options": [
-      "Identify and clean or account for the data quality issue",
-      "Ask Copilot to ignore the inconsistency",
       "Hide the issue from reviewers",
-      "Publish the analysis unchanged"
+      "Ask Copilot to ignore the inconsistency",
+      "Publish the analysis unchanged",
+      "Identify and clean or account for the data quality issue"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Data quality issues can affect analysis and should be handled transparently.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
@@ -1917,9 +1917,9 @@
     "question": "Which prompt best requests a chart recommendation?",
     "options": [
       "Based on this workbook, suggest the best chart for monthly churn trends and explain why.",
+      "Ignore the workbook.",
       "Make a chart.",
-      "Use any numbers you want.",
-      "Ignore the workbook."
+      "Use any numbers you want."
     ],
     "correct": 0,
     "explanation": "Good data prompts specify the source, metric, purpose, and desired reasoning.",
@@ -1950,12 +1950,12 @@
     "module": "Data, Meetings, and Collaboration",
     "question": "What is a good use of Copilot memory or instructions?",
     "options": [
-      "Remembering stable preferences such as preferred summary style where supported",
-      "Storing account passwords",
       "Bypassing retention policy",
+      "Storing account passwords",
+      "Remembering stable preferences such as preferred summary style where supported",
       "Approving outputs automatically"
     ],
-    "correct": 0,
+    "correct": 2,
     "explanation": "Memory and instructions can personalize work style but should not store secrets or bypass policy.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/copilot-personalization-memory"
@@ -1985,12 +1985,12 @@
     "module": "Data, Meetings, and Collaboration",
     "question": "A team uses Copilot to combine notes from several channels. What should they check?",
     "options": [
+      "That source context is removed",
       "That the sources are relevant, current, and authorized for the audience",
       "That every possible file was included",
-      "That source context is removed",
       "That private data is shared broadly"
     ],
-    "correct": 0,
+    "correct": 1,
     "explanation": "Combining collaborative content requires relevance, currency, permissions, and review.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
@@ -2000,12 +2000,12 @@
     "module": "Data, Meetings, and Collaboration",
     "question": "Which request best supports a data-driven decision memo?",
     "options": [
-      "Analyze the attached workbook, list top drivers, note assumptions, and draft a one-page decision memo.",
-      "Tell me what to decide.",
       "Ignore assumptions.",
-      "Invent missing metrics."
+      "Tell me what to decide.",
+      "Invent missing metrics.",
+      "Analyze the attached workbook, list top drivers, note assumptions, and draft a one-page decision memo."
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "Decision memos should include analysis, assumptions, and reviewed context.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview"
