@@ -1,0 +1,182 @@
+{
+  "id": "az305",
+  "name": "AZ-305",
+  "fullName": "Microsoft Azure Solutions Architect Expert",
+  "description": "Free 25-question preview of the AZ-305 pack. Original design-scenario questions written from public Microsoft Learn docs; not real exam questions. Unlock the full pack for the complete set, detailed explanations, and study mode.",
+  "duration": 50,
+  "questionCount": 25,
+  "totalQuestions": 25,
+  "passScore": 70,
+  "language": "en",
+  "schemaVersion": "1.1",
+  "badge": "Expert",
+  "icon": "fas fa-drafting-compass",
+  "vendor": "Microsoft",
+  "certificationCode": "AZ-305",
+  "domains": [
+    "Azure architecture design",
+    "Identity and governance",
+    "Monitoring and logging",
+    "Data storage design",
+    "Business continuity and disaster recovery",
+    "High availability",
+    "Compute and containers",
+    "Application architecture",
+    "Migration",
+    "Networking",
+    "Well-Architected Framework",
+    "Cloud Adoption Framework"
+  ],
+  "level": "Expert",
+  "productFamily": "Azure",
+  "contentType": "preview",
+  "commercialStatus": "pro-preview",
+  "preview": true,
+  "contentOrigin": "original",
+  "contentReview": {
+    "lastReviewed": "2026-06-10",
+    "sourceOfTruth": "Microsoft Learn AZ-305 study guide and certification page",
+    "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-305",
+    "objectiveVersion": "Skills measured as of April 17, 2026"
+  },
+  "objectiveDomains": [
+    {
+      "code": "AZ305-1",
+      "name": "Design identity, governance, and monitoring solutions",
+      "weightRange": "25-30%",
+      "source": "AZ-305 skills measured (as of April 17, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-305",
+      "mappedModules": [
+        "Design Logging and Monitoring Solutions",
+        "Design Authentication and Authorization Solutions",
+        "Design Secrets, Keys, and Identity Governance",
+        "Design Governance and Resource Organization"
+      ]
+    },
+    {
+      "code": "AZ305-2",
+      "name": "Design data storage solutions",
+      "weightRange": "20-25%",
+      "source": "AZ-305 skills measured (as of April 17, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-305",
+      "mappedModules": [
+        "Design Relational Data Storage Solutions",
+        "Design Semi-Structured and Unstructured Data Storage",
+        "Design Data Integration and Analytics"
+      ]
+    },
+    {
+      "code": "AZ305-3",
+      "name": "Design business continuity solutions",
+      "weightRange": "15-20%",
+      "source": "AZ-305 skills measured (as of April 17, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-305",
+      "mappedModules": [
+        "Design Backup and Disaster Recovery Solutions",
+        "Design for High Availability"
+      ]
+    },
+    {
+      "code": "AZ305-4",
+      "name": "Design infrastructure solutions",
+      "weightRange": "30-35%",
+      "source": "AZ-305 skills measured (as of April 17, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-305",
+      "mappedModules": [
+        "Design Compute Solutions",
+        "Design Application Architecture",
+        "Design Migration Solutions",
+        "Design Network Connectivity Solutions",
+        "Design Load Balancing and Network Performance"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "icon": "fas fa-chart-line",
+      "name": "Design Logging and Monitoring Solutions"
+    },
+    {
+      "icon": "fas fa-key",
+      "name": "Design Authentication and Authorization Solutions"
+    },
+    {
+      "icon": "fas fa-user-shield",
+      "name": "Design Secrets, Keys, and Identity Governance"
+    },
+    {
+      "icon": "fas fa-sitemap",
+      "name": "Design Governance and Resource Organization"
+    },
+    {
+      "icon": "fas fa-database",
+      "name": "Design Relational Data Storage Solutions"
+    },
+    {
+      "icon": "fas fa-cubes",
+      "name": "Design Semi-Structured and Unstructured Data Storage"
+    },
+    {
+      "icon": "fas fa-diagram-project",
+      "name": "Design Data Integration and Analytics"
+    },
+    {
+      "icon": "fas fa-life-ring",
+      "name": "Design Backup and Disaster Recovery Solutions"
+    },
+    {
+      "icon": "fas fa-server",
+      "name": "Design for High Availability"
+    },
+    {
+      "icon": "fas fa-microchip",
+      "name": "Design Compute Solutions"
+    },
+    {
+      "icon": "fas fa-network-wired",
+      "name": "Design Application Architecture"
+    },
+    {
+      "icon": "fas fa-truck-moving",
+      "name": "Design Migration Solutions"
+    },
+    {
+      "icon": "fas fa-globe",
+      "name": "Design Network Connectivity Solutions"
+    },
+    {
+      "icon": "fas fa-scale-balanced",
+      "name": "Design Load Balancing and Network Performance"
+    }
+  ],
+  "resources": [
+    {
+      "icon": "fas fa-book",
+      "name": "Microsoft Learn AZ-305 Study Guide",
+      "url": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-305"
+    },
+    {
+      "icon": "fas fa-graduation-cap",
+      "name": "Microsoft Certified: Azure Solutions Architect Expert",
+      "url": "https://learn.microsoft.com/credentials/certifications/azure-solutions-architect/"
+    },
+    {
+      "icon": "fas fa-file-lines",
+      "name": "Azure documentation",
+      "url": "https://learn.microsoft.com/azure/"
+    }
+  ],
+  "pro": {
+    "title": "AZ-305 Complete",
+    "questions": 279,
+    "price": "19 EUR",
+    "url": "https://examplar.gumroad.com/l/az305-complete",
+    "highlights": [
+      "279 original design-scenario questions across every exam objective",
+      "Detailed explanation for the correct answer and every distractor",
+      "Study mode with spaced repetition and weak-area focus",
+      "Coverage map so you see nothing is missing",
+      "Free updates when the exam changes"
+    ]
+  }
+}
