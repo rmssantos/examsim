@@ -1588,10 +1588,13 @@
       const code = ($('#customExamCode').value||'').trim();
       if (!code) { notify('Enter an exam code'); return; }
       if (!window.ExamApp.isSafeExamId(code)) { notify('Invalid exam code'); return; }
+      // Each location is tried independently so a thrown fetch (e.g. offline with only the
+      // legacy file in the service-worker cache) still reaches the fallback.
+      const tryFetch = async (url) => { try { return await fetch(url); } catch (_) { return null; } };
       try {
-        let resp = await fetch(`./custom-packs/${encodeURIComponent(code)}.json`);
-        if (!resp.ok) resp = await fetch(`./exam-dumps/${encodeURIComponent(code)}.json`);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        let resp = await tryFetch(`./custom-packs/${encodeURIComponent(code)}.json`);
+        if (!resp || !resp.ok) resp = await tryFetch(`./exam-dumps/${encodeURIComponent(code)}.json`);
+        if (!resp || !resp.ok) throw new Error(resp ? `HTTP ${resp.status}` : 'network error');
         const json = await resp.json();
         state.exam = 'custom';
         state.customCode = code;
