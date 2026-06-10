@@ -177,7 +177,7 @@ body:not(.dark-mode) .home-board { border-color: transparent; }
 .cr-topnav {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 0.85rem 1.5rem;
+  padding: 0.6rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -251,26 +251,26 @@ body:not(.dark-mode) .home-board { border-color: transparent; }
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
-  gap: 2.5rem;
+  gap: 2rem;
   align-items: center;
-  padding: 2.4rem 1.5rem 2.9rem;
+  padding: 1.6rem 1.5rem 2rem;
 }
 .hero-headline {
   color: var(--rail-text-strong);
-  font-size: 2.15rem;
+  font-size: 1.85rem;
   line-height: 1.18;
   font-weight: 700;
   letter-spacing: -0.015em;
-  margin: 0 0 0.9rem;
+  margin: 0 0 0.6rem;
   text-wrap: balance;
 }
 .hero-headline-accent { color: var(--accent-bright); }
 .hero-subtitle {
   color: var(--rail-text);
-  font-size: 1rem;
-  line-height: 1.55;
-  max-width: 56ch;
-  margin-bottom: 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  max-width: 58ch;
+  margin-bottom: 0.8rem;
 }
 .hero-subtitle strong { color: var(--rail-text-strong); }
 .hero-trust {
@@ -278,7 +278,7 @@ body:not(.dark-mode) .home-board { border-color: transparent; }
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
-  margin: 0 0 1.25rem;
+  margin: 0 0 1rem;
   padding: 0;
 }
 .trust-chip {
@@ -320,12 +320,12 @@ body:not(.dark-mode) .home-board { border-color: transparent; }
   background: var(--rail-bg-soft);
   border: 1px solid var(--rail-line);
   border-radius: 10px;
-  padding: 0.85rem 1rem;
+  padding: 0.65rem 0.9rem;
 }
 .stat-card .stat-value {
   display: block;
   font-family: var(--h-font-num);
-  font-size: 1.45rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: var(--rail-text-strong);
   font-variant-numeric: tabular-nums;
@@ -1069,6 +1069,15 @@ body.dragging-file .exam-library-section::after {
 .btn-import:hover { background: var(--h-accent-deep); }
 
 /* ===== Sidebar cards (stacked below the library) ===== */
+/* One quick Start on the card + one configured Start in the details panel
+   is enough; these sidebar blocks duplicate the details panel (preview
+   stats, exam info, module coverage, extra Start buttons). Hidden with
+   !important because legacy JS still writes inline display on them. */
+#hero-preview,
+#current-exam-info,
+.start-exam-cta,
+#modules-section { display: none !important; }
+
 .sidebar {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
