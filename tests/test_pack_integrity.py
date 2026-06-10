@@ -62,14 +62,25 @@ class PackIntegrityTests(unittest.TestCase):
     def test_validator_fails_when_disk_pack_missing_from_index(self):
         # A pack folder absent from index.json is invisible on the static host; the
         # validator must fail loudly on that drift instead of silently skipping it.
+        # The listed pack is fully VALID so the nonzero exit is attributable to the
+        # drift issue alone, not to an unrelated validation failure.
         import tempfile
 
+        valid_question = [{
+            "id": 1,
+            "module": "Core",
+            "question": "Which option is keyed as correct in this fixture?",
+            "options": ["The keyed option", "A distractor", "Another distractor", "A third distractor"],
+            "correct": 0,
+            "explanation": "The keyed option is correct by construction of this validation fixture.",
+            "question_type": "STANDARD",
+        }]
         with tempfile.TemporaryDirectory() as tmp:
             tmp_root = Path(tmp)
             for exam_id in ("listed", "ghostpack"):
                 pack = tmp_root / exam_id
                 pack.mkdir()
-                (pack / "dump.json").write_text("[]", encoding="utf-8")
+                (pack / "dump.json").write_text(json.dumps(valid_question), encoding="utf-8")
                 (pack / "metadata.json").write_text(
                     json.dumps({"id": exam_id, "name": exam_id.upper()}), encoding="utf-8"
                 )
@@ -86,6 +97,8 @@ class PackIntegrityTests(unittest.TestCase):
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("not listed in index.json: ghostpack", result.stdout)
+            self.assertIn("Found 1 validation issue(s)", result.stdout,
+                          "the drift issue must be the ONLY failure in this fixture")
 
 
 class PackRegistrySyncTests(unittest.TestCase):

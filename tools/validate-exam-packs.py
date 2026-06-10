@@ -571,7 +571,7 @@ def answer_position_issue_count(questions: list[Any]) -> int:
     standard = [
         q for q in questions
         if isinstance(q, dict) and normalize_question_type(q) == "STANDARD"
-        and isinstance(q.get("correct"), int)
+        and is_plain_int(q.get("correct"))
     ]
     n = len(standard)
     if n < ANSWER_BALANCE_MIN_QUESTIONS:
