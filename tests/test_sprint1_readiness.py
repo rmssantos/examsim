@@ -278,7 +278,7 @@ class Sprint1ReadinessTests(unittest.TestCase):
         self.assertIn("invalid image filename 'foo\\\\bar.png'", result.stdout)
 
     def test_docs_describe_current_yes_no_matrix_schema_and_study_mode_status(self):
-        data_docs = (ROOT / "docs/Data-and-Dumps.md").read_text(encoding="utf-8")
+        data_docs = (ROOT / "docs/Pack-Format.md").read_text(encoding="utf-8")
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         privacy = (ROOT / "PRIVACY-AND-STORAGE.md").read_text(encoding="utf-8")
 

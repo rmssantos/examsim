@@ -161,6 +161,6 @@ moving to another device.
 
 ## Related Documentation
 
-- [Question and metadata schema](../docs/Data-and-Dumps.md)
+- [Question and metadata schema](../docs/Pack-Format.md)
 - [Pack distribution](../docs/HOW-TO-DISTRIBUTE.md)
 - [Privacy and storage](../PRIVACY-AND-STORAGE.md)

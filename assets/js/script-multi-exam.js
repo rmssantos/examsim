@@ -546,9 +546,10 @@ class MultiExamSimulator {
                     }
                 }
             } catch (_) {}
-            // Fallback to exam-dumps
+            // Fallback to the custom-packs drop-in folder (exam-dumps/ is the legacy name)
             try {
-                const resp = await fetch(`./exam-dumps/${encodeURIComponent(code)}.json`);
+                let resp = await fetch(`./custom-packs/${encodeURIComponent(code)}.json`);
+                if (!resp.ok) resp = await fetch(`./exam-dumps/${encodeURIComponent(code)}.json`);
                 if (resp.ok) {
                     const data = await resp.json();
                     if (Array.isArray(data) && data.length && window.ExamApp.validateExamData(data).valid) {

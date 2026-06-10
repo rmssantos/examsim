@@ -103,7 +103,7 @@
 
   let state = {
     exam: '',
-    customCode: null, // when exam === 'custom', holds code for exam-dumps/<code>.json and localStorage keys
+    customCode: null, // when exam === 'custom', holds code for custom-packs/<code>.json and localStorage keys
     items: [],
     filtered: [],
     currentIndex: -1,
@@ -1583,13 +1583,14 @@
     $('#qImgUpload').addEventListener('click', ()=> uploadFiles($('#qImgFiles'), $('#qImages')));
     $('#eImgUpload').addEventListener('click', ()=> uploadFiles($('#eImgFiles'), $('#eImages')));
 
-    // Load custom exam from exam-dumps/<code>.json
+    // Load custom exam from custom-packs/<code>.json (exam-dumps/ is the legacy folder name)
     $('#loadCustomExam')?.addEventListener('click', async()=>{
       const code = ($('#customExamCode').value||'').trim();
       if (!code) { notify('Enter an exam code'); return; }
       if (!window.ExamApp.isSafeExamId(code)) { notify('Invalid exam code'); return; }
       try {
-        const resp = await fetch(`./exam-dumps/${encodeURIComponent(code)}.json`);
+        let resp = await fetch(`./custom-packs/${encodeURIComponent(code)}.json`);
+        if (!resp.ok) resp = await fetch(`./exam-dumps/${encodeURIComponent(code)}.json`);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const json = await resp.json();
         state.exam = 'custom';
@@ -1603,7 +1604,7 @@
         renderForm();
         notify(`Loaded custom exam: ${code}`);
       } catch (e) {
-        notify(`Failed to load exam-dumps/${code}.json`);
+        notify(`Failed to load custom-packs/${code}.json`);
       }
     });
 

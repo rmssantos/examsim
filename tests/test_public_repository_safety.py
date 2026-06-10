@@ -157,7 +157,7 @@ class PublicDocumentationTests(unittest.TestCase):
             ROOT / "README.md",
             ROOT / "CONTRIBUTING.md",
             ROOT / "docs" / "HOW-TO-DISTRIBUTE.md",
-            ROOT / "docs" / "Data-and-Dumps.md",
+            ROOT / "docs" / "Pack-Format.md",
             ROOT / "user-content" / "README-IMPORT.md",
         ]
         forbidden = ("portable/", "portable\\", "ai102", "ai-102")
