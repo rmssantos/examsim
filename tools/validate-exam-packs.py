@@ -8,6 +8,7 @@ import hashlib
 import json
 import re
 import sys
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -83,6 +84,24 @@ class PackValidator:
             return False
 
         exam_ids = self.discover_exam_ids()
+
+        # Drift guard: on a static host, a pack folder absent from index.json is silently
+        # invisible (no discovery, no validation, no health report). Fail loudly instead.
+        # The opposite direction (listed but missing on disk) is caught by validate_pack.
+        index_path = self.root / "index.json"
+        if index_path.exists():
+            on_disk = sorted(
+                child.name
+                for child in self.root.iterdir()
+                if child.is_dir() and (child / "dump.json").is_file()
+            )
+            for name in on_disk:
+                if name not in exam_ids:
+                    self.add_issue(
+                        index_path,
+                        f"pack folder exists on disk but is not listed in index.json: {name}",
+                    )
+
         seen = set()
         for exam_id in exam_ids:
             if exam_id in seen:
@@ -529,6 +548,74 @@ def schema_issue_count(root: Path, exam_id: str) -> int:
     return len(validator.issues)
 
 
+# --- Content-quality signals (non-blocking; surfaced by the health report) ---
+
+# The app shuffles STANDARD/MULTI options on every attempt, so text that points at option
+# POSITIONS ("the first option", "option B") or order-dependent options ("all of the above")
+# renders wrong on screen. Source-order answer balance is an authoring lint (the shuffle hides
+# it from users) but flags pipeline bias worth fixing at the source.
+POSITIONAL_LANGUAGE_RE = re.compile(
+    r"\b(first|second|third|fourth|last)\s+option\b|\boption\s*[0-9]\b|\boption\s+[A-D]\b", re.IGNORECASE
+)
+ORDER_DEPENDENT_OPTION_RE = re.compile(
+    r"\b(all|none|both|neither)\s+of\s+the\s+(above|listed|following)\b", re.IGNORECASE
+)
+ANSWER_BALANCE_MIN_QUESTIONS = 20
+ANSWER_BALANCE_MAX_SHARE = 0.5
+ANSWER_BALANCE_DEAD_SHARE = 0.02
+SHORT_EXPLANATION_CHARS = 60
+
+
+def answer_position_issue_count(questions: list[Any]) -> int:
+    """Count exploit-looking patterns in the SOURCE answer-position distribution."""
+    standard = [
+        q for q in questions
+        if isinstance(q, dict) and normalize_question_type(q) == "STANDARD"
+        and isinstance(q.get("correct"), int)
+    ]
+    n = len(standard)
+    if n < ANSWER_BALANCE_MIN_QUESTIONS:
+        return 0
+    issues = 0
+    counts = Counter(q["correct"] for q in standard)
+    if counts.most_common(1)[0][1] / n > ANSWER_BALANCE_MAX_SHARE:
+        issues += 1
+    four_plus = [q for q in standard if isinstance(q.get("options"), list) and len(q["options"]) >= 4]
+    if len(four_plus) >= ANSWER_BALANCE_MIN_QUESTIONS:
+        c4 = Counter(q["correct"] for q in four_plus)
+        issues += sum(1 for pos in range(4) if c4.get(pos, 0) / len(four_plus) < ANSWER_BALANCE_DEAD_SHARE)
+    return issues
+
+
+def positional_language_issue_count(questions: list[Any]) -> int:
+    """Count shuffled-type questions whose text references option positions (user-facing)."""
+    issues = 0
+    for question in questions:
+        if not isinstance(question, dict):
+            continue
+        if normalize_question_type(question) not in ("STANDARD", "MULTI"):
+            continue
+        blob = f"{question.get('question') or ''} {question.get('explanation') or ''}"
+        if POSITIONAL_LANGUAGE_RE.search(blob):
+            issues += 1
+            continue
+        options = question.get("options")
+        if isinstance(options, list) and any(
+            ORDER_DEPENDENT_OPTION_RE.search(str(option)) for option in options
+        ):
+            issues += 1
+    return issues
+
+
+def short_explanation_count(questions: list[Any]) -> int:
+    """Count questions whose explanation is missing or thinner than the floor."""
+    return sum(
+        1 for question in questions
+        if isinstance(question, dict)
+        and len(str(question.get("explanation") or "").strip()) < SHORT_EXPLANATION_CHARS
+    )
+
+
 def bounded_component_score(max_score: int, issue_count: int, penalty: int) -> int:
     return max(0, max_score - (issue_count * penalty))
 
@@ -563,21 +650,36 @@ def print_health_report(root: Path, exam_ids: list[str]) -> int:
         manifest_issues = manifest_issue_count(exam_dir)
         image_issues = image_reference_issue_count(root, exam_id, questions)
         schema_issues = schema_issue_count(root, exam_id)
+        balance_issues = answer_position_issue_count(questions)
+        wording_issues = positional_language_issue_count(questions)
+        thin_explanations = short_explanation_count(questions)
         score = (
-            round((present / total) * 30) if total else 0
+            round((present / total) * 25) if total else 0
         ) + bounded_component_score(25, schema_issues, 5) \
-            + bounded_component_score(20, manifest_issues, 5) \
-            + bounded_component_score(15, image_issues, 5) \
-            + bounded_component_score(10, duplicate_texts, 5)
+            + bounded_component_score(15, manifest_issues, 5) \
+            + bounded_component_score(10, image_issues, 5) \
+            + bounded_component_score(10, duplicate_texts, 5) \
+            + bounded_component_score(5, balance_issues, 5) \
+            + bounded_component_score(5, wording_issues, 5) \
+            + bounded_component_score(5, thin_explanations, 1)
         manifest_status = "ok" if manifest_issues == 0 else f"{manifest_issues} issue(s)"
         image_status = "ok" if image_issues == 0 else f"{image_issues} issue(s)"
         schema_status = "ok" if schema_issues == 0 else f"{schema_issues} issue(s)"
+        quality_bits = []
+        if balance_issues:
+            quality_bits.append(f"answer-balance:{balance_issues}")
+        if wording_issues:
+            quality_bits.append(f"positional-wording:{wording_issues}")
+        if thin_explanations:
+            quality_bits.append(f"thin-explanations:{thin_explanations}")
+        quality_status = " ".join(quality_bits) if quality_bits else "ok"
         image_count = len([rel for rel in pack_file_paths(exam_dir) if rel.startswith("images/")])
         print(
             f"- {exam_id}: score:{score}/100 {health_label(score)}, "
             f"metadata:{percentage}% ({present}/{total}), schema:{schema_status}, "
             f"manifest:{manifest_status}, images:{image_status} ({image_count}), "
-            f"duplicates:{duplicate_texts}, questions:{len(questions)}, types:{question_type_summary(questions)}"
+            f"duplicates:{duplicate_texts}, quality:{quality_status}, "
+            f"questions:{len(questions)}, types:{question_type_summary(questions)}"
         )
     return 0
 
