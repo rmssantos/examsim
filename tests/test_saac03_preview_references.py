@@ -7,7 +7,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class Saac03PreviewReferenceTests(unittest.TestCase):
-    def test_preview_questions_cite_official_aws_docs(self):
+    def test_preview_questions_cite_official_aws_domains(self):
+        # Allowlist mirrors the official-documentation set used across packs:
+        # docs.aws.amazon.com (service guides) plus aws.amazon.com (whitepapers, FAQs).
         dump = json.loads(
             (ROOT / "user-content" / "exams" / "saac03" / "dump.json").read_text(encoding="utf-8")
         )
