@@ -117,13 +117,21 @@ class PackRegistrySyncTests(unittest.TestCase):
         self.assertEqual(ids, self.index, "analytics.js publicExamIds drifted from index.json")
 
     def test_gitignore_allowlists_every_indexed_pack(self):
+        # user-content/exams/* ignores everything; each pack needs BOTH re-include lines:
+        # the directory itself AND its contents (/**). Without the second, files inside
+        # the pack stay ignored and would silently never be committed.
         gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
         for exam_id in sorted(self.index):
-            self.assertIn(
+            for pattern in (
                 f"!user-content/exams/{exam_id}/",
-                gitignore,
-                f"{exam_id} is indexed but not allowlisted in .gitignore (would not be committed)",
-            )
+                f"!user-content/exams/{exam_id}/**",
+            ):
+                self.assertIn(
+                    pattern,
+                    gitignore,
+                    f"{exam_id} is indexed but missing {pattern!r} in .gitignore "
+                    "(pack files would not be committed)",
+                )
 
 
 if __name__ == "__main__":
