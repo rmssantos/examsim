@@ -113,7 +113,7 @@ Check that:
 - metadata counts and exam IDs are correct;
 - referenced content is licensed for distribution.
 
-See [Data-and-Dumps.md](Data-and-Dumps.md) for the complete schema.
+See [Pack-Format.md](Pack-Format.md) for the complete schema.
 
 ## Security
 

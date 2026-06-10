@@ -546,10 +546,14 @@ class MultiExamSimulator {
                     }
                 }
             } catch (_) {}
-            // Fallback to exam-dumps
+            // Fallback to the custom-packs drop-in folder (exam-dumps/ is the legacy name).
+            // Each location is tried independently so a thrown fetch (e.g. offline with only
+            // the legacy file in the service-worker cache) still reaches the fallback.
+            const tryFetch = async (url) => { try { return await fetch(url); } catch (_) { return null; } };
             try {
-                const resp = await fetch(`./exam-dumps/${encodeURIComponent(code)}.json`);
-                if (resp.ok) {
+                let resp = await tryFetch(`./custom-packs/${encodeURIComponent(code)}.json`);
+                if (!resp || !resp.ok) resp = await tryFetch(`./exam-dumps/${encodeURIComponent(code)}.json`);
+                if (resp && resp.ok) {
                     const data = await resp.json();
                     if (Array.isArray(data) && data.length && window.ExamApp.validateExamData(data).valid) {
                         const meta = getMeta(data);

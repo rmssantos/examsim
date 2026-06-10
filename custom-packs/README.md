@@ -1,6 +1,6 @@
-# Custom Exam Dumps Folder
+# Custom Packs Folder
 
-This folder is for storing custom exam question files that can be loaded into the editor.
+This folder is for storing your own question packs that can be loaded into the editor.
 
 ## Usage
 
@@ -10,12 +10,15 @@ This folder is for storing custom exam question files that can be loaded into th
 2. In the editor:
    - Set the exam selector to **Custom**
    - Enter your exam code (e.g., `myexam`)
-   - Click **Load** to import the questions from `exam-dumps/myexam.json`
+   - Click **Load** to import the questions from `custom-packs/myexam.json`
 
 3. The simulator stores questions locally in browser storage. Current versions use IndexedDB for imported content and may keep this legacy localStorage key for compatibility:
    ```
    custom_<exam-code>_questions
    ```
+
+> Older setups used a folder named `exam-dumps/` for the same purpose; the app still reads
+> that location as a fallback, but `custom-packs/` is the supported name going forward.
 
 ## File Format
 
@@ -35,11 +38,12 @@ Your JSON file should contain an array of question objects:
 ]
 ```
 
-See [docs/Data-and-Dumps.md](../docs/Data-and-Dumps.md) for complete schema documentation.
+See [docs/Pack-Format.md](../docs/Pack-Format.md) for complete schema documentation.
 
 ## Notes
 
-- **Custom exams are NOT automatically loaded** - you must explicitly load them via the editor
+- **Custom packs are NOT automatically loaded** - you must explicitly load them via the editor
 - After loading and editing in the editor, click **Save** to persist to browser storage
 - Questions persist in your browser even after closing the tab
-- To share your custom exam, export it as JSON from the editor
+- To share your custom pack, export it as JSON from the editor
+- Only publish content that you created or are authorized to redistribute

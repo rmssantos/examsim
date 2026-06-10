@@ -87,7 +87,7 @@ not uploaded to the public repository or server.
 Detailed formats:
 
 - [Exam import guide](user-content/README-IMPORT.md)
-- [Question and metadata schema](docs/Data-and-Dumps.md)
+- [Question and metadata schema](docs/Pack-Format.md)
 - [Pack distribution guide](docs/HOW-TO-DISTRIBUTE.md)
 
 ## Built-In Editor
