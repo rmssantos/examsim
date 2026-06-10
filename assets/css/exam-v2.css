@@ -1230,6 +1230,34 @@ button { font-family: inherit; }
   opacity: 0.7;
 }
 
+/* custom alert (utils.js showCustomAlert) */
+.custom-alert-content {
+  max-width: 400px;
+  text-align: center;
+  padding: 30px;
+}
+.custom-alert-icon { font-size: 2.6rem; margin-bottom: 16px; }
+.custom-alert-icon.info { color: var(--accent); }
+.custom-alert-icon.success { color: var(--good); }
+.custom-alert-icon.warning { color: var(--flag); }
+.custom-alert-icon.error { color: var(--bad); }
+.custom-alert-title { margin: 0 0 8px; font-size: 1.15rem; font-weight: 700; color: var(--text); }
+.custom-alert-desc { margin: 0 0 20px; font-size: 0.9rem; line-height: 1.5; color: var(--text-soft); }
+.custom-alert-btn {
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.55rem 1.5rem;
+  background: var(--accent);
+  color: var(--btn-primary-text);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.custom-alert-btn:hover { background: var(--accent-deep); }
+.custom-alert-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 /* ===== Results screen ===== */
 #results-screen {
   max-width: 920px;
