@@ -11,7 +11,8 @@
       "Increase the number of processing servers and leave them running at peak count permanently"
     ],
     "correct": 2,
-    "explanation": "An SQS queue decouples producers from consumers. The queue durably absorbs bursts and the processing tier pulls messages at its own pace, so spikes no longer cause lost orders and you can scale consumers on queue depth. Vertical scaling has a ceiling and still fails at a higher spike, and it is not elastic. An Application Load Balancer distributes requests but does not buffer work, so an overwhelmed backend still drops requests. Permanently running peak capacity wastes money during normal load and still has no buffer if demand exceeds that fixed capacity.\n\nSources: [Amazon SQS](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html)"
+    "explanation": "An SQS queue decouples producers from consumers. The queue durably absorbs bursts and the processing tier pulls messages at its own pace, so spikes no longer cause lost orders and you can scale consumers on queue depth. Vertical scaling has a ceiling and still fails at a higher spike, and it is not elastic. An Application Load Balancer distributes requests but does not buffer work, so an overwhelmed backend still drops requests. Permanently running peak capacity wastes money during normal load and still has no buffer if demand exceeds that fixed capacity.\n\nSources: [Amazon SQS](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html)",
+    "reference": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
   },
   {
     "id": "q2",
@@ -25,7 +26,8 @@
       "Write each event to a single Amazon SQS queue shared by all three systems"
     ],
     "correct": 0,
-    "explanation": "SNS fan-out publishes one message to a topic and delivers a copy to every subscriber, so all three systems receive every event independently. Subscribing each system through its own SQS queue adds durability and lets each process at its own pace. A single shared standard SQS queue is wrong because each message is delivered to only one consumer, so the systems would compete for messages instead of all receiving them. Synchronous HTTP couples the uploader to every downstream system and fails if any one is down. Polling DynamoDB with periodic scans adds latency and cost and is inefficient.\n\nSources: [Amazon SNS](https://docs.aws.amazon.com/sns/latest/dg/welcome.html), [Common SNS scenarios (fan-out)](https://docs.aws.amazon.com/sns/latest/dg/sns-common-scenarios.html)"
+    "explanation": "SNS fan-out publishes one message to a topic and delivers a copy to every subscriber, so all three systems receive every event independently. Subscribing each system through its own SQS queue adds durability and lets each process at its own pace. A single shared standard SQS queue is wrong because each message is delivered to only one consumer, so the systems would compete for messages instead of all receiving them. Synchronous HTTP couples the uploader to every downstream system and fails if any one is down. Polling DynamoDB with periodic scans adds latency and cost and is inefficient.\n\nSources: [Amazon SNS](https://docs.aws.amazon.com/sns/latest/dg/welcome.html), [Common SNS scenarios (fan-out)](https://docs.aws.amazon.com/sns/latest/dg/sns-common-scenarios.html)",
+    "reference": "https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html"
   },
   {
     "id": "q3",
@@ -39,7 +41,8 @@
       "An Amazon SNS standard topic with multiple subscribers"
     ],
     "correct": 1,
-    "explanation": "SQS FIFO queues guarantee ordering and exactly-once processing within a message group. Using the customer ID as the message group ID preserves order per customer while letting different customers be processed in parallel. A standard queue gives best-effort ordering and at-least-once delivery, so duplicates and reordering are possible. An SNS standard topic does not guarantee ordering. A single-shard Kinesis stream does order records, but it serializes everything through one shard, removing the per-customer parallelism and adding more operational weight than FIFO message groups.\n\nSources: [Amazon SQS FIFO queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html)"
+    "explanation": "SQS FIFO queues guarantee ordering and exactly-once processing within a message group. Using the customer ID as the message group ID preserves order per customer while letting different customers be processed in parallel. A standard queue gives best-effort ordering and at-least-once delivery, so duplicates and reordering are possible. An SNS standard topic does not guarantee ordering. A single-shard Kinesis stream does order records, but it serializes everything through one shard, removing the per-customer parallelism and adding more operational weight than FIFO message groups.\n\nSources: [Amazon SQS FIFO queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html)",
+    "reference": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html"
   },
   {
     "id": "q4",
@@ -57,7 +60,8 @@
       1,
       2
     ],
-    "explanation": "An Auto Scaling group across two or more Availability Zones replaces failed instances automatically and adds or removes capacity with demand, providing both fault tolerance and elasticity. An Application Load Balancer that spans multiple Availability Zones spreads traffic across healthy targets and stops routing to unhealthy ones, so losing an instance or an Availability Zone does not take the tier down. A larger single instance is still a single point of failure in one Availability Zone. Storing an AMI helps rebuild but is manual and provides no automatic availability. Termination protection only prevents accidental termination and does nothing for Availability Zone failure or scaling.\n\nSources: [Amazon EC2 Auto Scaling](https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html), [Elastic Load Balancing](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html)"
+    "explanation": "An Auto Scaling group across two or more Availability Zones replaces failed instances automatically and adds or removes capacity with demand, providing both fault tolerance and elasticity. An Application Load Balancer that spans multiple Availability Zones spreads traffic across healthy targets and stops routing to unhealthy ones, so losing an instance or an Availability Zone does not take the tier down. A larger single instance is still a single point of failure in one Availability Zone. Storing an AMI helps rebuild but is manual and provides no automatic availability. Termination protection only prevents accidental termination and does nothing for Availability Zone failure or scaling.\n\nSources: [Amazon EC2 Auto Scaling](https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html), [Elastic Load Balancing](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html)",
+    "reference": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/auto-scaling-benefits.html"
   },
   {
     "id": "q5",
@@ -71,7 +75,8 @@
       "Take automated snapshots every hour"
     ],
     "correct": 0,
-    "explanation": "RDS Multi-AZ keeps a synchronous standby replica in a different Availability Zone and fails over automatically, which is purpose built for high availability with minimal downtime and no manual replication. A read replica is for scaling reads and uses asynchronous replication; promoting it on failure is manual and can lose data, and a same-Availability-Zone replica does not protect against an Availability Zone failure. Hourly snapshots imply data loss of up to an hour and a slow restore, not minimal downtime. A larger instance improves performance, not availability.\n\nSources: [RDS Multi-AZ](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html), [RDS read replicas](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html)"
+    "explanation": "RDS Multi-AZ keeps a synchronous standby replica in a different Availability Zone and fails over automatically, which is purpose built for high availability with minimal downtime and no manual replication. A read replica is for scaling reads and uses asynchronous replication; promoting it on failure is manual and can lose data, and a same-Availability-Zone replica does not protect against an Availability Zone failure. Hourly snapshots imply data loss of up to an hour and a slow restore, not minimal downtime. A larger instance improves performance, not availability.\n\nSources: [RDS Multi-AZ](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html), [RDS read replicas](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html)",
+    "reference": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZSingleStandby.html"
   },
   {
     "id": "q6",
@@ -85,7 +90,8 @@
       "Warm standby: run a scaled down but always running copy in the second Region and scale it up on failover"
     ],
     "correct": 3,
-    "explanation": "Warm standby keeps a smaller, always running copy of the workload in the recovery Region with continuous data replication, so it can take traffic almost immediately and then scale to full capacity. That meets a recovery time objective of minutes and a recovery point objective of seconds without paying for two full environments. Backup and restore has recovery times measured in hours and a larger recovery point. Pilot light keeps data replicating but application servers are off, so it needs time to start and scale and usually misses a few-minute recovery time objective. Multi-site active/active meets the lowest objectives but runs full capacity in both Regions, which is the cost the business wants to avoid.\n\nSources: [Disaster recovery options in the cloud (AWS whitepaper)](https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html)"
+    "explanation": "Warm standby keeps a smaller, always running copy of the workload in the recovery Region with continuous data replication, so it can take traffic almost immediately and then scale to full capacity. That meets a recovery time objective of minutes and a recovery point objective of seconds without paying for two full environments. Backup and restore has recovery times measured in hours and a larger recovery point. Pilot light keeps data replicating but application servers are off, so it needs time to start and scale and usually misses a few-minute recovery time objective. Multi-site active/active meets the lowest objectives but runs full capacity in both Regions, which is the cost the business wants to avoid.\n\nSources: [Disaster recovery options in the cloud (AWS whitepaper)](https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html)",
+    "reference": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html"
   },
   {
     "id": "q7",
@@ -99,7 +105,8 @@
       "Write session data to the local disk of each instance"
     ],
     "correct": 1,
-    "explanation": "Externalizing session state to a shared store such as ElastiCache for Redis or DynamoDB makes the instances stateless, so any instance can serve any user and scaling in or out never loses sessions. Sticky sessions pin a user to one instance, but when Auto Scaling terminates that instance the session is still lost, and disabling Auto Scaling sacrifices elasticity. A larger instance does not change the fact that in-memory state disappears when the instance is removed. Local disk has the same problem as memory because it is tied to a single instance.\n\nSources: [Amazon ElastiCache](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html), [Caching strategies](https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/Strategies.html)"
+    "explanation": "Externalizing session state to a shared store such as ElastiCache for Redis or DynamoDB makes the instances stateless, so any instance can serve any user and scaling in or out never loses sessions. Sticky sessions pin a user to one instance, but when Auto Scaling terminates that instance the session is still lost, and disabling Auto Scaling sacrifices elasticity. A larger instance does not change the fact that in-memory state disappears when the instance is removed. Local disk has the same problem as memory because it is tied to a single instance.\n\nSources: [Amazon ElastiCache](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html), [Caching strategies](https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/Strategies.html)",
+    "reference": "https://docs.aws.amazon.com/wellarchitected/2023-10-03/framework/rel_mitigate_interaction_failure_stateless.html"
   },
   {
     "id": "q8",
@@ -113,7 +120,8 @@
       "Enable S3 Cross-Region Replication to a bucket on every continent and route users manually"
     ],
     "correct": 1,
-    "explanation": "CloudFront is a content delivery network that caches static assets at edge locations close to users, reducing latency and offloading the origin, with very little operational overhead and lower data transfer cost from the origin. Replicating to buckets on every continent and routing users manually is operationally heavy and expensive compared with a managed CDN. Running EC2 fleets to serve static files rebuilds a CDN at higher cost and complexity. Changing the storage class to Standard-IA affects cost and adds retrieval fees for frequently accessed content; it does not address global latency.\n\nSources: [Amazon CloudFront](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html), [S3 storage classes](https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html)"
+    "explanation": "CloudFront is a content delivery network that caches static assets at edge locations close to users, reducing latency and offloading the origin, with very little operational overhead and lower data transfer cost from the origin. Replicating to buckets on every continent and routing users manually is operationally heavy and expensive compared with a managed CDN. Running EC2 fleets to serve static files rebuilds a CDN at higher cost and complexity. Changing the storage class to Standard-IA affects cost and adds retrieval fees for frequently accessed content; it does not address global latency.\n\nSources: [Amazon CloudFront](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html), [S3 storage classes](https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html)",
+    "reference": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html"
   },
   {
     "id": "q9",
@@ -127,7 +135,8 @@
       "Amazon Route 53 latency based routing on its own"
     ],
     "correct": 0,
-    "explanation": "Global Accelerator routes traffic over the AWS global network from the nearest edge to the application, improving performance for non-cacheable TCP and UDP traffic, and it provides static anycast IP addresses, which suits gaming and other dynamic workloads. CloudFront is optimized for cacheable HTTP and HTTPS content and does not serve arbitrary UDP, so it does not fit a non-cacheable TCP/UDP protocol. Route 53 latency routing only influences DNS resolution; it does not move packets onto the AWS backbone or provide static anycast IPs. API Gateway is for HTTP, REST, and WebSocket APIs, not arbitrary TCP/UDP game traffic.\n\nSources: [AWS Global Accelerator](https://docs.aws.amazon.com/global-accelerator/latest/dg/what-is-global-accelerator.html), [Amazon CloudFront](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html)"
+    "explanation": "Global Accelerator routes traffic over the AWS global network from the nearest edge to the application, improving performance for non-cacheable TCP and UDP traffic, and it provides static anycast IP addresses, which suits gaming and other dynamic workloads. CloudFront is optimized for cacheable HTTP and HTTPS content and does not serve arbitrary UDP, so it does not fit a non-cacheable TCP/UDP protocol. Route 53 latency routing only influences DNS resolution; it does not move packets onto the AWS backbone or provide static anycast IPs. API Gateway is for HTTP, REST, and WebSocket APIs, not arbitrary TCP/UDP game traffic.\n\nSources: [AWS Global Accelerator](https://docs.aws.amazon.com/global-accelerator/latest/dg/what-is-global-accelerator.html), [Amazon CloudFront](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html)",
+    "reference": "https://docs.aws.amazon.com/global-accelerator/latest/dg/what-is-global-accelerator.html"
   },
   {
     "id": "q10",
@@ -141,7 +150,8 @@
       "AWS Global Accelerator in front of the database"
     ],
     "correct": 2,
-    "explanation": "ElastiCache stores the results of frequent, expensive queries in memory, so repeated reads are served with sub-millisecond latency and never reach the database, directly reducing database CPU. A Multi-AZ standby is for failover and does not serve read traffic, so it cannot offload reads. More IOPS helps disk bound workloads but does not stop the repeated identical query execution that is saturating CPU. Global Accelerator improves the network path to internet facing endpoints and is not a database caching layer.\n\nSources: [Amazon ElastiCache](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html), [Caching strategies](https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/Strategies.html)"
+    "explanation": "ElastiCache stores the results of frequent, expensive queries in memory, so repeated reads are served with sub-millisecond latency and never reach the database, directly reducing database CPU. A Multi-AZ standby is for failover and does not serve read traffic, so it cannot offload reads. More IOPS helps disk bound workloads but does not stop the repeated identical query execution that is saturating CPU. Global Accelerator improves the network path to internet facing endpoints and is not a database caching layer.\n\nSources: [Amazon ElastiCache](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html), [Caching strategies](https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/Strategies.html)",
+    "reference": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/elasticache-use-cases.html"
   },
   {
     "id": "q11",
@@ -155,7 +165,8 @@
       "Convert the database to a single larger instance and route all traffic to it"
     ],
     "correct": 0,
-    "explanation": "RDS read replicas provide additional read only endpoints that asynchronously replicate from the primary. Pointing the dashboard at replicas offloads read traffic and keeps the primary free for writes and latency sensitive reads. Multi-AZ standby instances do not serve read traffic; they exist only for failover. Vertical scaling has a ceiling and still funnels all reads and writes through one instance. An Application Load Balancer balances HTTP application traffic, not SQL database connections, and adds no read capacity.\n\nSources: [RDS read replicas](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html), [RDS Multi-AZ](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html)"
+    "explanation": "RDS read replicas provide additional read only endpoints that asynchronously replicate from the primary. Pointing the dashboard at replicas offloads read traffic and keeps the primary free for writes and latency sensitive reads. Multi-AZ standby instances do not serve read traffic; they exist only for failover. Vertical scaling has a ceiling and still funnels all reads and writes through one instance. An Application Load Balancer balances HTTP application traffic, not SQL database connections, and adds no read capacity.\n\nSources: [RDS read replicas](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html), [RDS Multi-AZ](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html)",
+    "reference": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html"
   },
   {
     "id": "q12",
@@ -169,7 +180,8 @@
       "Cold HDD (sc1)"
     ],
     "correct": 2,
-    "explanation": "Provisioned IOPS SSD volumes (io2 or io2 Block Express) let you specify a consistent, high IOPS level with low latency, which is exactly what a latency sensitive transactional database needs, and EBS volumes persist independently of the instance lifecycle. st1 is a throughput optimized HDD for large sequential workloads such as big data and log processing, not high random IOPS. sc1 is the lowest cost HDD for infrequently accessed data and has the lowest performance. Instance store is physically attached and ephemeral, so data is lost when the instance stops or fails, which fails the persistence requirement.\n\nSources: [Amazon EBS volume types](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html)"
+    "explanation": "Provisioned IOPS SSD volumes (io2 or io2 Block Express) let you specify a consistent, high IOPS level with low latency, which is exactly what a latency sensitive transactional database needs, and EBS volumes persist independently of the instance lifecycle. st1 is a throughput optimized HDD for large sequential workloads such as big data and log processing, not high random IOPS. sc1 is the lowest cost HDD for infrequently accessed data and has the lowest performance. Instance store is physically attached and ephemeral, so data is lost when the instance stops or fails, which fails the persistence requirement.\n\nSources: [Amazon EBS volume types](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html)",
+    "reference": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html"
   },
   {
     "id": "q13",
@@ -183,7 +195,8 @@
       "An Amazon SNS topic"
     ],
     "correct": 0,
-    "explanation": "Kinesis Data Streams retains records for a configurable period (24 hours by default and extendable), supports multiple independent consumers reading the same stream, and allows replay by re-reading from an earlier position, which fits real time analytics with several consumers. Data Firehose is a fully managed delivery stream that buffers and loads data into destinations such as S3 or Redshift, but it does not retain data for arbitrary replay or support multiple independent stream consumers in the same way. An SQS standard queue deletes each message after one consumer processes it and supports neither replay nor multiple independent readers of the same message. SNS pushes messages to subscribers without retention or replay.\n\nSources: [Amazon Kinesis Data Streams](https://docs.aws.amazon.com/streams/latest/dev/introduction.html), [Amazon Data Firehose](https://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html)"
+    "explanation": "Kinesis Data Streams retains records for a configurable period (24 hours by default and extendable), supports multiple independent consumers reading the same stream, and allows replay by re-reading from an earlier position, which fits real time analytics with several consumers. Data Firehose is a fully managed delivery stream that buffers and loads data into destinations such as S3 or Redshift, but it does not retain data for arbitrary replay or support multiple independent stream consumers in the same way. An SQS standard queue deletes each message after one consumer processes it and supports neither replay nor multiple independent readers of the same message. SNS pushes messages to subscribers without retention or replay.\n\nSources: [Amazon Kinesis Data Streams](https://docs.aws.amazon.com/streams/latest/dev/introduction.html), [Amazon Data Firehose](https://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html)",
+    "reference": "https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html"
   },
   {
     "id": "q14",
@@ -197,7 +210,8 @@
       "Store an IAM user access key and secret key in the application configuration file"
     ],
     "correct": 1,
-    "explanation": "An IAM role attached to the instance supplies temporary, automatically rotated credentials through the instance metadata service, so no long lived secrets are stored on the instance. This is the AWS best practice. Storing access keys in a configuration file or embedding them in code creates long lived static credentials that can leak and must be rotated manually. Making the bucket public exposes the data to everyone and still does not scope access to just the application.\n\nSources: [IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html), [Using an IAM role with EC2](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html)"
+    "explanation": "An IAM role attached to the instance supplies temporary, automatically rotated credentials through the instance metadata service, so no long lived secrets are stored on the instance. This is the AWS best practice. Storing access keys in a configuration file or embedding them in code creates long lived static credentials that can leak and must be rotated manually. Making the bucket public exposes the data to everyone and still does not scope access to just the application.\n\nSources: [IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html), [Using an IAM role with EC2](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html)",
+    "reference": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html"
   },
   {
     "id": "q15",
@@ -211,7 +225,8 @@
       "Create an IAM user in Account A and share its access keys with Account B"
     ],
     "correct": 2,
-    "explanation": "A cross-account IAM role in Account A with a trust policy for Account B lets Account B call AWS STS AssumeRole to obtain temporary credentials, giving scoped, auditable access with no shared long lived secrets. Sharing access keys creates static credentials that are hard to rotate and audit. Making resources public removes access control entirely. Duplicating Account B's users inside Account A is unmanageable and defeats the purpose of cross-account roles.\n\nSources: [Cross-account access with IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html), [IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html)"
+    "explanation": "A cross-account IAM role in Account A with a trust policy for Account B lets Account B call AWS STS AssumeRole to obtain temporary credentials, giving scoped, auditable access with no shared long lived secrets. Sharing access keys creates static credentials that are hard to rotate and audit. Making resources public removes access control entirely. Duplicating Account B's users inside Account A is unmanageable and defeats the purpose of cross-account roles.\n\nSources: [Cross-account access with IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html), [IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html)",
+    "reference": "https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html"
   },
   {
     "id": "q16",
@@ -225,7 +240,8 @@
       "A security group attached to the instances, allowing inbound TCP 443"
     ],
     "correct": 3,
-    "explanation": "Security groups operate at the instance level and are stateful, so when inbound HTTPS is allowed, the return traffic is automatically permitted regardless of outbound rules. A network ACL is stateless and operates at the subnet level, so you must add matching inbound and outbound rules for ephemeral ports, and it applies to the entire subnet rather than specific instances. An IAM policy controls API permissions, not network traffic. An S3 bucket policy controls access to S3 objects and is unrelated to EC2 network filtering.\n\nSources: [Security groups](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html), [Network ACLs](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html)"
+    "explanation": "Security groups operate at the instance level and are stateful, so when inbound HTTPS is allowed, the return traffic is automatically permitted regardless of outbound rules. A network ACL is stateless and operates at the subnet level, so you must add matching inbound and outbound rules for ephemeral ports, and it applies to the entire subnet rather than specific instances. An IAM policy controls API permissions, not network traffic. An S3 bucket policy controls access to S3 objects and is unrelated to EC2 network filtering.\n\nSources: [Security groups](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html), [Network ACLs](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html)",
+    "reference": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html"
   },
   {
     "id": "q17",
@@ -239,7 +255,8 @@
       "An environment variable on each server"
     ],
     "correct": 1,
-    "explanation": "Secrets Manager is built to store secrets and provides built in automatic rotation, including managed rotation for supported databases, with minimal custom code, plus fine grained access control and auditing. Parameter Store standard parameters can store secrets with KMS encryption but do not provide native scheduled rotation without you building it yourself with Lambda, so it needs more effort here. An encrypted S3 object can hold the value but offers no rotation or secret lifecycle features. Environment variables are static, visible to anyone who can inspect the process, and are not rotated.\n\nSources: [Rotating secrets in AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html), [SSM Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html)"
+    "explanation": "Secrets Manager is built to store secrets and provides built in automatic rotation, including managed rotation for supported databases, with minimal custom code, plus fine grained access control and auditing. Parameter Store standard parameters can store secrets with KMS encryption but do not provide native scheduled rotation without you building it yourself with Lambda, so it needs more effort here. An encrypted S3 object can hold the value but offers no rotation or secret lifecycle features. Environment variables are static, visible to anyone who can inspect the process, and are not rotated.\n\nSources: [Rotating secrets in AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html), [SSM Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html)",
+    "reference": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html"
   },
   {
     "id": "q18",
@@ -253,7 +270,8 @@
       "A network ACL blocking the attacker IP ranges"
     ],
     "correct": 1,
-    "explanation": "AWS WAF inspects HTTP and HTTPS requests at the application layer and can block common exploits such as SQL injection and cross-site scripting, including through AWS managed rule groups, and it attaches to an Application Load Balancer, CloudFront, or API Gateway. Shield Standard protects against common network and transport layer DDoS attacks but does not inspect application layer request content. A network ACL filters by IP and port and cannot understand HTTP payloads, so it cannot reliably stop injection patterns. GuardDuty detects and alerts on suspicious activity but does not inline block web requests.\n\nSources: [AWS WAF](https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html)"
+    "explanation": "AWS WAF inspects HTTP and HTTPS requests at the application layer and can block common exploits such as SQL injection and cross-site scripting, including through AWS managed rule groups, and it attaches to an Application Load Balancer, CloudFront, or API Gateway. Shield Standard protects against common network and transport layer DDoS attacks but does not inspect application layer request content. A network ACL filters by IP and port and cannot understand HTTP payloads, so it cannot reliably stop injection patterns. GuardDuty detects and alerts on suspicious activity but does not inline block web requests.\n\nSources: [AWS WAF](https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html)",
+    "reference": "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html"
   },
   {
     "id": "q19",
@@ -271,7 +289,8 @@
       1,
       4
     ],
-    "explanation": "SSE-KMS encrypts objects at rest with KMS keys and logs every key use in AWS CloudTrail, satisfying both encryption at rest and the audit trail requirement. Serving the application over HTTPS with an ACM certificate encrypts data in transit. SSE-S3 also encrypts at rest, but its keys are fully managed by S3 and it does not provide the per request key usage audit trail that KMS gives, so it does not meet the auditing requirement. Relying on VPC isolation does not encrypt data in transit. Restricting the bucket with an IAM policy controls access but leaves the data unencrypted, failing the at rest requirement.\n\nSources: [SSE-KMS](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html), [SSE-S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingServerSideEncryption.html), [AWS Certificate Manager](https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html)"
+    "explanation": "SSE-KMS encrypts objects at rest with KMS keys and logs every key use in AWS CloudTrail, satisfying both encryption at rest and the audit trail requirement. Serving the application over HTTPS with an ACM certificate encrypts data in transit. SSE-S3 also encrypts at rest, but its keys are fully managed by S3 and it does not provide the per request key usage audit trail that KMS gives, so it does not meet the auditing requirement. Relying on VPC isolation does not encrypt data in transit. Restricting the bucket with an IAM policy controls access but leaves the data unencrypted, failing the at rest requirement.\n\nSources: [SSE-KMS](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html), [SSE-S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingServerSideEncryption.html), [AWS Certificate Manager](https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html)",
+    "reference": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html"
   },
   {
     "id": "q20",
@@ -285,7 +304,8 @@
       "Manually copy older logs to a cheaper bucket each month"
     ],
     "correct": 0,
-    "explanation": "An S3 Lifecycle policy automatically transitions objects to colder, cheaper storage classes as they age, for example Standard to Standard-IA after 30 days and then to a Glacier class, and can expire them after seven years, matching the access pattern with no ongoing manual work. Manually copying logs every month is error prone operational overhead. Keeping everything in S3 Standard ignores the falling access frequency and is the most expensive option. Moving logs straight to Deep Archive on upload breaks the need for frequent access in the first 30 days, because Deep Archive retrieval takes hours and has a long minimum storage duration.\n\nSources: [S3 Lifecycle management](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html), [S3 storage classes](https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html)"
+    "explanation": "An S3 Lifecycle policy automatically transitions objects to colder, cheaper storage classes as they age, for example Standard to Standard-IA after 30 days and then to a Glacier class, and can expire them after seven years, matching the access pattern with no ongoing manual work. Manually copying logs every month is error prone operational overhead. Keeping everything in S3 Standard ignores the falling access frequency and is the most expensive option. Moving logs straight to Deep Archive on upload breaks the need for frequent access in the first 30 days, because Deep Archive retrieval takes hours and has a long minimum storage duration.\n\nSources: [S3 Lifecycle management](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html), [S3 storage classes](https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html)",
+    "reference": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html"
   },
   {
     "id": "q21",
@@ -299,7 +319,8 @@
       "S3 Standard-IA"
     ],
     "correct": 0,
-    "explanation": "S3 Intelligent-Tiering automatically moves each object between access tiers based on its changing usage for a small monitoring fee and charges no retrieval fees, which is ideal when access patterns are unknown or unpredictable. Standard-IA assumes infrequent access and charges per GB retrieval fees, so unexpected reads become expensive. One Zone-IA is cheaper but stores data in a single Availability Zone, reducing resilience, and still has retrieval fees. Glacier Flexible Retrieval is for archive data with retrieval times of minutes to hours, not for data that might be read at any moment.\n\nSources: [S3 Intelligent-Tiering](https://docs.aws.amazon.com/AmazonS3/latest/userguide/intelligent-tiering.html), [S3 storage classes](https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html)"
+    "explanation": "S3 Intelligent-Tiering automatically moves each object between access tiers based on its changing usage for a small monitoring fee and charges no retrieval fees, which is ideal when access patterns are unknown or unpredictable. Standard-IA assumes infrequent access and charges per GB retrieval fees, so unexpected reads become expensive. One Zone-IA is cheaper but stores data in a single Availability Zone, reducing resilience, and still has retrieval fees. Glacier Flexible Retrieval is for archive data with retrieval times of minutes to hours, not for data that might be read at any moment.\n\nSources: [S3 Intelligent-Tiering](https://docs.aws.amazon.com/AmazonS3/latest/userguide/intelligent-tiering.html), [S3 storage classes](https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html)",
+    "reference": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/intelligent-tiering.html"
   },
   {
     "id": "q22",
@@ -317,7 +338,8 @@
       0,
       2
     ],
-    "explanation": "Spot Instances offer steep discounts compared with On-Demand and suit fault tolerant, retryable work that can tolerate occasional interruption, which is exactly this batch job. Scaling the Auto Scaling group in to zero when the queue is empty means you pay only while there is work to do. Reserved Instances sized for peak that run all day would pay for capacity that is idle outside the nightly window. Keeping the largest On-Demand instances running at all times is the most expensive option. Switching to SNS does not fit a worker pull model and does not reduce the compute cost, which dominates here.\n\nSources: [Amazon EC2 Spot Instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-instances.html), [Amazon EC2 Auto Scaling](https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html)"
+    "explanation": "Spot Instances offer steep discounts compared with On-Demand and suit fault tolerant, retryable work that can tolerate occasional interruption, which is exactly this batch job. Scaling the Auto Scaling group in to zero when the queue is empty means you pay only while there is work to do. Reserved Instances sized for peak that run all day would pay for capacity that is idle outside the nightly window. Keeping the largest On-Demand instances running at all times is the most expensive option. Switching to SNS does not fit a worker pull model and does not reduce the compute cost, which dominates here.\n\nSources: [Amazon EC2 Spot Instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-instances.html), [Amazon EC2 Auto Scaling](https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html)",
+    "reference": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-instances.html"
   },
   {
     "id": "q23",
@@ -331,7 +353,8 @@
       "On-Demand Instances"
     ],
     "correct": 1,
-    "explanation": "Compute Savings Plans give a significant discount for a one or three year commitment to a steady amount of compute spend and apply automatically across instance families, sizes, and Regions, and to Lambda and Fargate, which suits a predictable always on baseline that still wants flexibility. On-Demand has no commitment and the highest per hour price, so it does not minimize cost for steady usage. Spot is cheapest but can be interrupted, which is unsuitable for an always on baseline. A Standard Reserved Instance locked to one type and Region gives a discount but less flexibility than a Compute Savings Plan.\n\nSources: [AWS Savings Plans](https://docs.aws.amazon.com/savingsplans/latest/userguide/what-is-savings-plans.html)"
+    "explanation": "Compute Savings Plans give a significant discount for a one or three year commitment to a steady amount of compute spend and apply automatically across instance families, sizes, and Regions, and to Lambda and Fargate, which suits a predictable always on baseline that still wants flexibility. On-Demand has no commitment and the highest per hour price, so it does not minimize cost for steady usage. Spot is cheapest but can be interrupted, which is unsuitable for an always on baseline. A Standard Reserved Instance locked to one type and Region gives a discount but less flexibility than a Compute Savings Plan.\n\nSources: [AWS Savings Plans](https://docs.aws.amazon.com/savingsplans/latest/userguide/what-is-savings-plans.html)",
+    "reference": "https://docs.aws.amazon.com/savingsplans/latest/userguide/what-is-savings-plans.html"
   },
   {
     "id": "q24",
@@ -345,7 +368,8 @@
       "An internet gateway attached to the private subnet"
     ],
     "correct": 2,
-    "explanation": "A gateway VPC endpoint for S3 routes traffic to S3 privately over the AWS network with no NAT gateway in the path and no charge for the endpoint itself, removing the NAT data processing and transfer costs for S3 traffic. A larger NAT gateway still incurs per GB processing charges and does not address the cost driver. Attaching an internet gateway to the private subnet would make it public, a security change, and still would not give the private low cost path that a gateway endpoint provides. Interface endpoints are billed per hour and per GB and are used to reach individual services privately; for S3 and DynamoDB the gateway endpoint is the free and appropriate choice and is not a general internet gateway.\n\nSources: [Gateway VPC endpoints](https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html), [VPC endpoints](https://docs.aws.amazon.com/vpc/latest/privatelink/concepts.html)"
+    "explanation": "A gateway VPC endpoint for S3 routes traffic to S3 privately over the AWS network with no NAT gateway in the path and no charge for the endpoint itself, removing the NAT data processing and transfer costs for S3 traffic. A larger NAT gateway still incurs per GB processing charges and does not address the cost driver. Attaching an internet gateway to the private subnet would make it public, a security change, and still would not give the private low cost path that a gateway endpoint provides. Interface endpoints are billed per hour and per GB and are used to reach individual services privately; for S3 and DynamoDB the gateway endpoint is the free and appropriate choice and is not a general internet gateway.\n\nSources: [Gateway VPC endpoints](https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html), [VPC endpoints](https://docs.aws.amazon.com/vpc/latest/privatelink/concepts.html)",
+    "reference": "https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html"
   },
   {
     "id": "q25",
@@ -359,6 +383,7 @@
       "Amazon Aurora Serverless v2, which scales capacity up and down automatically with load"
     ],
     "correct": 3,
-    "explanation": "Aurora Serverless v2 automatically scales database capacity up and down based on demand, so you pay for capacity in fine grained increments and far less during idle nights and weekends, with no manual instance sizing. A large always on provisioned Aurora instance pays for peak capacity around the clock and wastes money while idle. A provisioned RDS instance sized for peak has the same idle waste problem. Running a self managed database on EC2 adds operational burden and still pays for running instances when idle.\n\nSources: [Aurora Serverless v2](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html), [DynamoDB capacity modes](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadWriteCapacityMode.html)"
+    "explanation": "Aurora Serverless v2 automatically scales database capacity up and down based on demand, so you pay for capacity in fine grained increments and far less during idle nights and weekends, with no manual instance sizing. A large always on provisioned Aurora instance pays for peak capacity around the clock and wastes money while idle. A provisioned RDS instance sized for peak has the same idle waste problem. Running a self managed database on EC2 adds operational burden and still pays for running instances when idle.\n\nSources: [Aurora Serverless v2](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html), [DynamoDB capacity modes](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadWriteCapacityMode.html)",
+    "reference": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html"
   }
 ]
