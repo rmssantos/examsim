@@ -83,13 +83,22 @@ class PackValidator:
             self.add_issue(self.root, "exam root does not exist or is not a directory")
             return False
 
+        index_path = self.root / "index.json"
+        issues_before_index = len(self.issues)
         exam_ids = self.discover_exam_ids()
+        # "Clean" means no NEW issue was recorded against index.json itself - checked by
+        # path rather than by issue count, so unrelated future issues cannot disable the guard.
+        index_is_clean = not any(
+            issue.path == index_path for issue in self.issues[issues_before_index:]
+        )
 
         # Drift guard: on a static host, a pack folder absent from index.json is silently
         # invisible (no discovery, no validation, no health report). Fail loudly instead.
         # The opposite direction (listed but missing on disk) is caught by validate_pack.
-        index_path = self.root / "index.json"
-        if index_path.exists():
+        # Skipped when index.json itself was flagged (invalid JSON / not an array / bad ids):
+        # exam_ids is empty or partial then, and drift noise for every disk pack would bury
+        # the root cause.
+        if index_path.exists() and index_is_clean:
             on_disk = sorted(
                 child.name
                 for child in self.root.iterdir()

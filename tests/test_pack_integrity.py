@@ -100,6 +100,32 @@ class PackIntegrityTests(unittest.TestCase):
             self.assertIn("Found 1 validation issue(s)", result.stdout,
                           "the drift issue must be the ONLY failure in this fixture")
 
+    def test_drift_guard_stays_quiet_when_index_itself_is_broken(self):
+        # When index.json is invalid, exam_ids is empty/partial; emitting a drift issue
+        # for every pack on disk would bury the root cause. Only the index error surfaces.
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            pack = tmp_root / "somepack"
+            pack.mkdir()
+            (pack / "dump.json").write_text("[]", encoding="utf-8")
+            (tmp_root / "index.json").write_text("{not valid json", encoding="utf-8")
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "tools" / "validate-exam-packs.py"),
+                    "--root",
+                    str(tmp_root),
+                ],
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("invalid JSON", result.stdout)
+            self.assertNotIn("not listed in index.json", result.stdout,
+                             "drift noise must not bury the broken-index root cause")
+
 
 class PackRegistrySyncTests(unittest.TestCase):
     """The pack id is registered in several hand-maintained lists; they must agree."""
