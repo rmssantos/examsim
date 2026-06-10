@@ -77,24 +77,32 @@
 	<main id="main-content" class="container" tabindex="-1">
 		<!-- Welcome Screen -->
 		<div id="welcome-screen" class="screen active">
-			<div class="theme-controls">
-				<a class="theme-public-link local-only-public-link" href="https://examplar.app/" target="_blank" rel="noopener noreferrer" title="Open public Examplar site" aria-label="Open public Examplar site" hidden aria-hidden="true">
-					<i aria-hidden="true" class="fas fa-globe"></i>
-					<span>examplar.app</span>
-				</a>
-				<button id="theme-toggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
-					<i aria-hidden="true" class="fas fa-moon"></i>
-				</button>
-			</div>
-			<section class="home-board">
+			<!-- Dark control-room band: top nav + hero, edge to edge -->
+			<div class="cr-hero-zone">
+				<div class="cr-topnav">
+					<div class="logo cr-topnav-brand">
+						<img class="logo-img" src="assets/media/examplar-mark.png" alt="Examplar logo" width="67" height="60" decoding="async">
+						<h1>Exampl<span class="logo-accent">a</span>r</h1>
+					</div>
+					<nav class="cr-topnav-links" aria-label="Site links">
+						<a href="editor.html" data-route="editor">Editor</a>
+						<a href="https://github.com/rmssantos/examsim" target="_blank" rel="noopener noreferrer">GitHub</a>
+						<div class="theme-controls">
+							<a class="theme-public-link local-only-public-link" href="https://examplar.app/" target="_blank" rel="noopener noreferrer" title="Open public Examplar site" aria-label="Open public Examplar site" hidden aria-hidden="true">
+								<i aria-hidden="true" class="fas fa-globe"></i>
+								<span>examplar.app</span>
+							</a>
+							<button id="theme-toggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+								<i aria-hidden="true" class="fas fa-moon"></i>
+							</button>
+						</div>
+					</nav>
+				</div>
 				<!-- Hero Header -->
 				<header class="hero-header hero-banner">
 					<div class="hero-banner__inner">
 						<div class="hero-branding">
-							<div class="logo">
-								<img class="logo-img" src="assets/media/examplar-mark.png" alt="Examplar logo" width="67" height="60" decoding="async">
-								<h1>Exampl<span class="logo-accent">a</span>r</h1>
-							</div>
+							<p class="hero-headline">Certification practice, <span class="hero-headline-accent">built like a cockpit</span>.</p>
 							<p class="hero-subtitle"><strong>Free, local-first, and offline-capable</strong> practice for certification exams. Questions, answers, imports, and progress remain in your browser.</p>
 							<ul class="hero-trust" aria-label="Why Examplar">
 								<li class="trust-chip"><i aria-hidden="true" class="fas fa-wifi"></i> Works offline after first load</li>
@@ -136,6 +144,8 @@
 						</aside>
 					</div>
 				</header>
+			</div>
+			<section class="home-board">
 					<!-- How it works -->
 					<ol class="home-steps" aria-label="How Examplar works">
 						<li class="home-step"><span class="home-step-n">1</span><div><h3>Pick an exam</h3><p>Choose from the free library below. No setup.</p></div></li>
