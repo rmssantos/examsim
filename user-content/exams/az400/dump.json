@@ -1,0 +1,400 @@
+[
+  {
+    "question_type": "STANDARD",
+    "module": "Traceability and flow of work",
+    "question": "A 12-person product team develops a customer-facing web app in a single GitHub repository. They want every change to start from a short-lived branch off the default branch, go through a pull request review, and ship to production as soon as the pull request is merged. The team has no need to maintain multiple long-lived release branches. Which flow of work best fits these requirements?",
+    "options": [
+      "A fork-per-developer model where each developer maintains a personal fork and never branches within the shared repository",
+      "A long-lived release-branch model that maintains separate development, testing, and production branches",
+      "A code-promotion model that promotes changes between dedicated development, test, and production branches in sequence",
+      "GitHub Flow, where each change uses a feature branch off the default branch and merges back through a pull request"
+    ],
+    "correct": 3,
+    "explanation": "GitHub Flow is a lightweight, branch-based workflow: every feature, fix, or experiment begins on a short-lived branch created from the default branch, changes are reviewed and discussed in a pull request, and the change merges back into the default branch from which the team deploys frequently. That matches a team wanting fast iteration with a single deployable default branch and no long-lived release branches. A long-lived release-branch model and a code-promotion model both add the extra branch hierarchy the team explicitly wants to avoid, and the code-promotion approach is described in Microsoft guidance as a relic of waterfall-era development. Forks address contributions from outside collaborators, not the day-to-day inner-loop flow of a co-located team sharing one repository.",
+    "reference": "https://learn.microsoft.com/training/modules/manage-git-branches-workflows/5-explore-github-flow",
+    "id": 1
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Traceability and flow of work",
+    "question": "A team builds GitHub-hosted code with an Azure Pipelines YAML pipeline and wants full source traceability: every work item associated with a build should automatically receive an Integrated in build link in its Development section, matching the experience available for Azure Repos. Which action enables this?",
+    "options": [
+      "Manually add an Integrated in build link to each work item after every run",
+      "Add the AB# mention to the pipeline YAML file's name field",
+      "Enable Automatically link new work items in this build in the YAML pipeline settings",
+      "Create a branch policy that requires linked work items before merge"
+    ],
+    "correct": 2,
+    "explanation": "For YAML pipelines building GitHub-hosted code, enabling the Automatically link new work items in this build option in the pipeline settings causes an Integrated in build link to appear automatically in the Development section of each associated work item when the build finishes, giving build traceability at parity with Azure Repos. The AB# syntax is for commit, pull request, and issue text, not a pipeline name field. Manually adding links to every work item is the gap this setting eliminates. A branch policy requiring linked work items governs merges; it does not produce the Integrated in build link.",
+    "reference": "https://learn.microsoft.com/azure/devops/boards/github/link-to-from-github?view=azure-devops#view-build-status-for-yaml-pipelines-integrated-in-build",
+    "id": 2
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "DevOps metrics and queries",
+    "question": "A platform team must report software delivery performance to leadership using the four DevOps Research and Assessment (DORA) key metrics. They have deployment frequency, change lead time, and change failure rate covered. Which additional metric completes the DORA four keys?",
+    "options": [
+      "Total number of repositories that have enabled the internal developer platform",
+      "Average pull request review turnaround time for the default branch",
+      "Average Story Points completed per sprint across all teams",
+      "Time to restore service (also expressed as mean time to recovery) after a production incident"
+    ],
+    "correct": 3,
+    "explanation": "Microsoft's platform engineering guidance lists the DORA software delivery performance keys as change lead time, deployment frequency, change fail rate, and time to restore service (MTTR), so time to restore service completes the set. Average Story Points per sprint is a velocity metric, repository adoption count is a platform adoption metric, and pull request review turnaround is a flow metric, none of which is one of the four DORA keys.",
+    "reference": "https://learn.microsoft.com/platform-engineering/plan#measure-success-and-proving-value",
+    "id": 3
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Branching strategy and pull request workflow",
+    "question": "A platform team running roughly 200 active pull requests per day wants developers to integrate work continuously and rely on automated tests plus feature flags to hide incomplete features, while keeping merge debt close to zero. Which branching strategy best matches these goals?",
+    "options": [
+      "A GitFlow model with a permanent develop branch and separate long-lived feature branches per team",
+      "Tagging individual commits as integration points instead of merging branches",
+      "Long-lived per-developer feature branches that integrate to main only at the end of each multi-week sprint",
+      "Branch-per-environment, where each deployment target keeps its own long-lived branch that rarely merges",
+      "Trunk-based development, where developers commit short-lived work back to a single mainline and resolve conflicts at integration time"
+    ],
+    "correct": 4,
+    "explanation": "Trunk-based development has developers commit to a single mainline so changes integrate continuously, which facilitates continuous integration and virtually eliminates merge debt; teams pair it with feature flags to keep in-progress features hidden until ready. Long-lived feature branches, a permanent develop branch, and branch-per-environment all delay integration and increase merge conflicts, the opposite of the stated goal. Tagging commits does not change how work is integrated.",
+    "reference": "https://learn.microsoft.com/azure/cloud-adoption-framework/ready/considerations/development-strategy-development-lifecycle#branch-strategy",
+    "id": 4
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Branching strategy and pull request workflow",
+    "question": "While configuring a status check branch policy for an external build service, you want a posted status to be invalidated automatically whenever new commits are pushed to the source branch, because the status reflects a specific build of the code. Which setting accomplishes this?",
+    "options": [
+      "Restrict the Authorized identity to the service account",
+      "Mark the policy requirement as Optional instead of Required",
+      "Add a path filter so the policy applies only to specific files",
+      "Enable Reset status whenever there are new changes in the status check policy's reset conditions",
+      "Set the Policy applicability so the policy applies only after the first status is posted"
+    ],
+    "correct": 3,
+    "explanation": "The reset condition \"Reset status whenever there are new changes\" invalidates a posted status when the source branch changes, which is appropriate when the status is tied to a specific build. Policy applicability controls when the policy starts applying, authorized identity restricts who can satisfy it, path filters scope which files trigger it, and marking it optional simply stops it from blocking completion, none of which reset the status on new commits.",
+    "reference": "https://learn.microsoft.com/azure/devops/repos/git/pr-status-policy?view=azure-devops#configure-the-branch-policy",
+    "id": 5
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Repository configuration and management",
+    "question": "A monorepo with a long history has grown so large that cloning and checkout are painfully slow for new engineers, even though the team wants to keep the existing single repository and its full history intact. They are looking for a Microsoft tool that accelerates these operations through local caching and background maintenance rather than restructuring the repository. Which tool addresses this need?",
+    "options": [
+      "Azure Artifacts feeds to host the source code as versioned packages",
+      "A new annotated tag on every release to reduce checkout time",
+      "Team Foundation Version Control with server workspaces",
+      "Scalar, a Git extension from Microsoft that speeds up clone and checkout on large repositories using caching and background maintenance"
+    ],
+    "correct": 3,
+    "explanation": "Scalar is a Git extension created by Microsoft that makes large repositories faster by accelerating clone and checkout operations through local metadata caching and background maintenance, without requiring the team to break up the repository. Azure Artifacts hosts packages, not the working source tree; TFVC is a different version-control system, not a Git performance accelerator; tags are commit references and do not speed up checkout of a large working tree.",
+    "reference": "https://learn.microsoft.com/training/modules/manage-git-repositories/5-implement-scalar-cross-repo",
+    "id": 6
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Package management strategy",
+    "question": "A platform team maintains shared NuGet libraries that every team in the Azure DevOps organization must consume from a single dropdown without first navigating into a specific project. Several consuming teams also need to keep their own internal feeds isolated to their own projects. When the platform team creates the shared feed, which feed scope satisfies the requirement that the feed is visible from any project in the organization?",
+    "options": [
+      "A project-scoped feed in the platform team's project",
+      "A public feed in a public project",
+      "An organization-scoped feed",
+      "A project-scoped feed that is later converted to organization scope"
+    ],
+    "correct": 2,
+    "explanation": "Organization-scoped feeds are viewable from any project in the organization and always appear in the feeds dropdown, which is exactly what a shared library consumed org-wide needs. Project-scoped feeds are only visible after navigating into the hosting project, so they do not satisfy the org-wide visibility requirement. Converting a project-scoped feed to organization scope is not supported by Azure Artifacts. A public feed targets anonymous internet users and requires a public project, which does not match an internal org-wide sharing need.",
+    "reference": "https://learn.microsoft.com/azure/devops/artifacts/feeds/project-scoped-feeds?view=azure-devops#project-scoped-vs-organization-scoped-feeds",
+    "id": 7
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Package management strategy",
+    "question": "A library author follows NuGet's package versioning guidance, which is based on Semantic Versioning 2.0.0. For each statement about NuGet versions, indicate whether it is correct.",
+    "statements": [
+      "A version string of the form Major.Minor.Patch with an optional hyphenated suffix such as -beta denotes a pre-release version.",
+      "NuGet treats a version that has no suffix as taking precedence over a pre-release version of the same Major.Minor.Patch.",
+      "Consumers must opt in to receive pre-release packages rather than getting them by default.",
+      "A backwards-compatible bug fix that changes no public API surface should be released by incrementing the Major version."
+    ],
+    "correct": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "explanation": "A hyphenated suffix such as -beta marks a pre-release version, so the first statement is correct. Under SemVer ordering NuGet chooses a version without a suffix over a pre-release of the same base version, so the second is correct. Consumers must explicitly opt in to pre-release packages, so the third is correct. The fourth is wrong: a backwards-compatible bug fix maps to a Patch increment, not a Major increment, which is reserved for breaking changes.",
+    "reference": "https://learn.microsoft.com/nuget/concepts/package-versioning#version-basics",
+    "id": 8
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Package management strategy",
+    "question": "A feed owner wants to reduce exposure to malicious public packages. They keep upstream sources enabled for convenience but want public registry versions of a package to be blocked from being saved unless explicitly allowed once internal versions of that package already exist in the feed. Which Azure Artifacts capability provides this control?",
+    "options": [
+      "The Allow External Versions setting, which a Feed Owner toggles per package to permit externally sourced versions",
+      "Immutability, which prevents external versions from being requested",
+      "Feed views, which hide external versions from all consumers",
+      "The retention policy, which deletes external versions automatically"
+    ],
+    "correct": 0,
+    "explanation": "The Allow External Versions setting lets a Feed Owner control whether externally sourced versions of a specific package may be saved; it is disabled by default to reduce exposure to malicious public packages when internally sourced versions are already present. Retention policies manage storage by deleting old versions and do not gate external consumption. Feed views filter which versions are shared but do not block saving external versions. Immutability prevents overwriting an existing version and is unrelated to gating external sourcing.",
+    "reference": "https://learn.microsoft.com/azure/devops/artifacts/concepts/upstream-behavior?view=azure-devops",
+    "id": 9
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Pipeline testing and quality gates",
+    "question": "After a team migrates from Publish Code Coverage Results v1 to v2, their PR coverage policy stops getting stuck and diff-coverage comments start appearing. A teammate adds tests for new lines yet still sees 0% diff coverage on the PR. What is the most likely cause to investigate first?",
+    "options": [
+      "JaCoCo format is unsupported for diff coverage",
+      "The newly added tests are not actually being executed as part of the build",
+      "Diff coverage only supports the v1 task, so v2 reports zero",
+      "Coverage merges across multiple triggered pipelines, hiding the new tests"
+    ],
+    "correct": 1,
+    "explanation": "The documented first cause of 0% diff coverage after adding tests is that the new tests are not running as part of the build, because coverage cannot be calculated for code that no test exercises. The claim that diff coverage supports only the v1 task is reversed: diff-coverage comments are a v2-only capability, so a v1 task would not report them. JaCoCo (and other XML formats) are supported. Coverage is not merged across multiple pipelines for PRs, so that is not why a single pipeline shows 0%.",
+    "reference": "https://learn.microsoft.com/azure/devops/pipelines/test/review-code-coverage-results?view=azure-devops#troubleshooting-guide",
+    "id": 10
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Pipeline testing and quality gates",
+    "question": "A team integrates Azure Load Testing into a CI/CD pipeline to catch performance regressions in each release candidate. They want the load test (and therefore the pipeline) to fail automatically when the average response time exceeds 300 ms or the error percentage exceeds 50%. Where do they define these conditions for the automated run?",
+    "options": [
+      "In the failureCriteria section of the load test YAML configuration file stored alongside the test script",
+      "In the Query Azure Monitor alerts gate evaluation options",
+      "In a branch policy status check on the target branch",
+      "In the Publish Test Results v2 task inputs"
+    ],
+    "correct": 0,
+    "explanation": "For CI/CD, Azure Load Testing fail criteria are defined in the failureCriteria section of the load test YAML configuration file (for example, avg(response_time_ms) > 300 and percentage(error) > 50), and when a criterion is met the run, and thus the pipeline, fails. A branch policy gates PR completion, not load-test thresholds. The Query Azure Monitor alerts gate reads alert rules, not JMeter client metrics. Publish Test Results publishes functional test outcomes, not load-test fail criteria.",
+    "reference": "https://learn.microsoft.com/azure/app-testing/load-testing/how-to-define-test-criteria#load-test-fail-criteria",
+    "id": 11
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Pipeline design: agents, runners, YAML, triggers, templates",
+    "question": "A YAML pipeline should run automatically only when commits are pushed to the main branch or any branch under releases/, but it must ignore pushes that only change files under the docs folder. Which trigger configuration meets the requirement?",
+    "options": [
+      "A schedules entry with a cron expression and branches include of main",
+      "A pr trigger targeting main and releases/* with a paths include of docs",
+      "Set trigger: none and rely on the implicit CI trigger",
+      "A CI trigger with branches include of main and releases/* plus a paths exclude of docs"
+    ],
+    "correct": 3,
+    "explanation": "A CI (push) trigger with branches include of main and releases/* limits triggering to those branches, and a paths exclude of docs prevents runs when only docs files change. A pr trigger validates pull requests, not direct pushes. A schedules entry fires on a clock, not on pushes. trigger: none disables CI triggers entirely, and specifying any trigger replaces the implicit one rather than adding to it.",
+    "reference": "https://learn.microsoft.com/azure/devops/pipelines/repos/github?view=azure-devops#ci-triggers",
+    "id": 12
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Pipeline design: agents, runners, YAML, triggers, templates",
+    "question": "An engineer is contrasting environment checks and approvals with pipeline-defined conditions in YAML. Evaluate each statement.",
+    "statements": [
+      "Approvals and checks are configured outside the YAML file, by the owner of the protected resource.",
+      "A user who can edit the pipeline YAML can modify the approval checks defined on an environment.",
+      "Before a stage can start, all checks on every resource the stage consumes must be satisfied.",
+      "A YAML stage condition expression is part of the pipeline definition and can be changed by editing the YAML."
+    ],
+    "correct": [
+      0,
+      1,
+      0,
+      0
+    ],
+    "explanation": "Statement 1 is Yes: approvals and checks are managed by the resource owner in the web UI, not in YAML. Statement 3 is Yes: before a stage runs, all checks on all resources used by that stage must be satisfied. Statement 4 is Yes: a stage condition lives in the YAML and is editable by anyone who can edit the file. Statement 2 is No: users modifying the YAML cannot modify the checks performed before a stage starts, because checks aren't defined in the YAML.",
+    "reference": "https://learn.microsoft.com/azure/devops/pipelines/process/approvals?view=azure-devops",
+    "id": 13
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Pipeline design: agents, runners, YAML, triggers, templates",
+    "question": "An architect is evaluating whether parallel jobs can be reserved for specific teams or pools, and how concurrency is consumed. Evaluate each statement about the Azure Pipelines concurrency model.",
+    "statements": [
+      "You can dedicate or partition purchased parallel job capacity to a specific project or agent pool.",
+      "Azure Pipelines counts all running jobs across all agents against the organization's parallel job total.",
+      "Registering additional self-hosted agents has no per-agent charge in Azure Pipelines.",
+      "If no parallel slot is available, a queued job waits until a slot frees up before it is routed to an agent."
+    ],
+    "correct": [
+      1,
+      0,
+      0,
+      0
+    ],
+    "explanation": "Statement 2 is Yes: the service sums all running jobs across agents and compares against granted or purchased parallel jobs. Statement 3 is Yes: you can register any number of self-hosted agents at no per-agent charge. Statement 4 is Yes: when no parallel slot is free, the job waits until one frees up before routing to an agent. Statement 1 is No: there is currently no way to partition or dedicate parallel job capacity to a specific project or agent pool.",
+    "reference": "https://learn.microsoft.com/azure/devops/pipelines/licensing/concurrent-jobs?view=azure-devops#faq",
+    "id": 14
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Deployments and release strategy",
+    "question": "After evaluating metrics from a Kubernetes canary deployment created by the manifest task, an engineer decides the new version is healthy and should become the only running version. Which manifest task action completes this, leaving only the stable variant deployed?",
+    "options": [
+      "The scale action increasing canary replicas to match stable",
+      "The promote action with the canary strategy",
+      "A second deploy action with strategy none",
+      "The reject action with the canary strategy"
+    ],
+    "correct": 1,
+    "explanation": "Running the manifest task with action promote and the canary strategy applies the canary changes as the new stable version and cleans up the ephemeral baseline and canary variants, leaving only the stable variant deployed. The reject action rolls the change back to the prior stable version. A deploy with strategy none would not clean up the canary or baseline variants as part of a promote decision, and scaling replicas does not promote the canary to stable.",
+    "reference": "https://learn.microsoft.com/azure/devops/pipelines/tasks/reference/kubernetes-manifest-v1?view=azure-pipelines#remarks",
+    "id": 15
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Deployments and release strategy",
+    "question": "A multi-stage YAML pipeline builds an app, then must deploy to a US region and a Europe region. The Europe deployment depends on a shared schema produced only after the US deployment succeeds, while the build must run before everything. Which use of dependsOn enforces the required ordering?",
+    "options": [
+      "Define dependsOn so DeployUS depends on Build, and DeployEurope depends on DeployUS",
+      "Place all deployment steps in a single stage with no inter-stage dependencies",
+      "Give every stage dependsOn the same Build stage so US and Europe run together",
+      "Omit dependsOn entirely so all three stages run in parallel for speed"
+    ],
+    "correct": 0,
+    "explanation": "Stages run in the order of their dependsOn requirements; making DeployUS depend on Build and DeployEurope depend on DeployUS guarantees Build runs first, then US, then Europe, satisfying the schema dependency. Omitting dependsOn so all run in parallel breaks the required order. Having both US and Europe depend only on Build runs them together, violating the Europe-after-US requirement. Collapsing into one stage removes the stage-level ordering controls.",
+    "reference": "https://learn.microsoft.com/azure/devops/pipelines/process/stages?view=azure-devops#specify-dependencies",
+    "id": 16
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Infrastructure as code",
+    "question": "During a Bicep pull-request review, a senior engineer worries that a refactor of a virtual network module might unintentionally delete a subnet or change an address prefix in production. They want to see exactly which resources would be created, modified, or deleted before any change is applied, without touching the live environment. Which capability should you add to the workflow?",
+    "options": [
+      "Add a manual approval gate but deploy the Bicep file directly to production to observe the result",
+      "Run the what-if operation against the target scope to preview create, modify, and delete actions before deployment",
+      "Deploy to production with complete mode and inspect the activity log afterward to learn what changed",
+      "Increase the Bicep linter rule severity so the build fails on any warning"
+    ],
+    "correct": 1,
+    "explanation": "The what-if operation predicts how resources will change if the file is deployed and makes no changes to existing resources, so it surfaces deletions and property changes before anything is applied. Deploying in complete mode and reading the activity log only tells you what changed after the fact, when damage may already be done. Linter rules catch static authoring issues, not the live impact of a deployment. A manual approval without a preview gives reviewers nothing concrete to approve.",
+    "reference": "https://learn.microsoft.com/azure/azure-resource-manager/bicep/deploy-what-if",
+    "id": 17
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Infrastructure as code",
+    "question": "A team debates an infrastructure-as-code strategy built on source control plus automated testing and deployment for Bicep. Evaluate each statement about validating Bicep changes in a CI workflow.",
+    "statements": [
+      "Linting performs offline (static) analysis of a Bicep file without contacting Azure.",
+      "Preflight validation interacts with Azure to detect issues such as incorrect resources, parameters, or policy violations before deployment.",
+      "The what-if operation applies the changes to the live environment as part of running the preview."
+    ],
+    "correct": [
+      0,
+      0,
+      1
+    ],
+    "explanation": "Bicep linting is offline static analysis that does not contact Azure (Yes). Runtime/preflight validation interacts with Azure to detect issues like invalid resources, parameters, or policies before deploying (Yes). What-if only predicts changes and makes no changes to existing resources, so it does not apply changes during the preview (No).",
+    "reference": "https://learn.microsoft.com/azure/azure-resource-manager/bicep/deploy-visual-studio-code#deployment-pane",
+    "id": 18
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Infrastructure as code",
+    "question": "A team wants Azure Deployment Environments to enforce governance while still giving developers self-service. Which statements accurately describe how Deployment Environments supports this? (Choose all that apply.)",
+    "options": [
+      "Platform engineers curate environment definitions in catalogs to enforce enterprise security policies and map projects to subscriptions, identities, and permissions by environment type",
+      "Project environment types let you preconfigure which environment types a team can create and the target subscription used per environment type",
+      "Developers must be granted the Owner role on the production subscription to create any environment",
+      "Catalogs can only be hosted in an Azure Storage account, not in a Git repository"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Platform engineers curate environment definitions in catalogs to enforce policy and map projects to subscriptions, identities, and permissions per environment type, and project environment types preconfigure which types a team can create plus the target subscription per type. Developers do not need Owner on production; the service deploys via a managed identity so developers avoid direct subscription access. Catalogs are hosted in GitHub or Azure DevOps repositories, not in a storage account.",
+    "reference": "https://learn.microsoft.com/azure/deployment-environments/concept-environments-key-concepts#project-environment-types",
+    "id": 19
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Maintain and optimize pipelines",
+    "question": "Your project run retention deletes runs after 30 days, but auditors require that runs which deployed a particular production release be kept for two years. You want to extend retention only for those specific runs without changing the project default. What mechanism should you use?",
+    "options": [
+      "Add a retention lease to the specific runs to extend their lifetime",
+      "Disable pipeline caching on the production pipeline",
+      "Lower the project-wide days-to-keep so only important runs survive",
+      "Reduce the number of recent runs kept per pipeline to zero"
+    ],
+    "correct": 0,
+    "explanation": "Retention leases extend or control the lifetime of individual pipeline runs beyond the configured project retention, and can be added manually or through the Lease API for a specific duration, which is the precise way to keep selected production runs for two years. Lowering the project-wide days-to-keep would delete more runs, not protect the important ones. Disabling caching and changing the recent-runs count have nothing to do with extending retention of specific runs.",
+    "reference": "https://learn.microsoft.com/azure/devops/pipelines/policies/retention?view=azure-devops#pipeline-runs-retention-policies",
+    "id": 20
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Authentication and authorization methods",
+    "question": "A .NET background service runs on a single Azure Functions app and needs to call Azure DevOps REST APIs to update work items. The team wants the strongest security posture with zero credential storage or rotation, and the identity must be automatically removed if that Functions app is ever deleted. Which identity should you use to authenticate the service to Azure DevOps?",
+    "options": [
+      "A system-assigned managed identity enabled on the Functions app",
+      "A user-assigned managed identity created as a standalone resource and assigned to the Functions app",
+      "A personal access token created by the service account and stored in app settings",
+      "A Microsoft Entra service principal with a stored client secret"
+    ],
+    "correct": 0,
+    "explanation": "A system-assigned managed identity is created and tied directly to a single Azure resource, has its lifecycle managed by Azure, and is automatically deleted when that resource is deleted, matching the one-app, auto-cleanup requirement with no stored credentials. A user-assigned managed identity is a standalone resource with an independent lifecycle that persists after the app is deleted, so it does not satisfy the automatic-removal requirement. A service principal with a client secret requires manual secret rotation and storage. A PAT is a long-lived stored secret and a service identity cannot even create one.",
+    "reference": "https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview#managed-identity-types",
+    "id": 21
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Authentication and authorization methods",
+    "question": "Your team's source code is hosted on GitHub. A vendor maintains one private repository for you and needs write access to only that single repository, with no visibility into the rest of your GitHub organization's repositories or settings. Following least privilege, how should you grant the vendor access?",
+    "options": [
+      "Add the vendor as an organization owner so they can self-manage their access",
+      "Add the vendor as an outside collaborator on that one repository with the Write role",
+      "Make the vendor an organization member and add them to a team with Write access",
+      "Give the vendor an organization Admin role scoped to the repository"
+    ],
+    "correct": 1,
+    "explanation": "An outside collaborator is a user who is not a member of the organization but is given explicit access to a single repository, which makes it the right fit for a contractor or vendor that needs limited access. Granting the Write role lets them push to the repository, while staying outside the organization means they get no visibility into other repositories or organization settings. Making them an organization member exposes broader org context and team structures. Organization owner grants full control of the entire organization. There is no organization Admin role scoped to a single repository; organization-level admin or owner roles are far too broad, violating least privilege.",
+    "reference": "https://learn.microsoft.com/training/modules/github-introduction-administration/4-how-github-organization-permission-works",
+    "id": 22
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Managing sensitive information in automation",
+    "question": "A team wants to keep a sensitive deployment script that handles a secret out of the main pipeline YAML so that pipeline authors who edit the main file cannot view or alter the secret-handling logic, while still passing the secret as a parameter at run time. Following Microsoft's pipeline security guidance, which approach should they use?",
+    "options": [
+      "Embed the secret value inline in the main YAML and add a code comment warning others not to change it",
+      "Disable masking so the secret prints to the log for verification, then re-enable it afterward",
+      "Store the secret as a queue-time variable so each author must type it when they run the pipeline",
+      "Place the script in a separate template stored in a secured repository and reference it, passing the secret from Key Vault, a variable group, or the pipeline UI as a parameter"
+    ],
+    "correct": 3,
+    "explanation": "Microsoft recommends abstracting secret-handling logic into a template stored in a separate, secured repository and referencing it, passing the secret as a parameter sourced from Key Vault, a variable group, or the pipeline UI; this keeps the sensitive logic out of the editable main file. Embedding a secret inline in YAML violates the rule never to store secrets as plaintext in YAML. Queue-time entry exposes the secret to whoever runs it and is not a secure storage method. Disabling masking deliberately leaks the secret to logs.",
+    "reference": "https://learn.microsoft.com/azure/devops/pipelines/security/overview?view=azure-devops",
+    "id": 23
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Configure monitoring for a DevOps environment",
+    "question": "A platform team runs production workloads on dozens of Azure virtual machines, each sending the Heartbeat record to a Log Analytics workspace through the Azure Monitor Agent. They want to be notified within roughly a minute whenever any single VM stops sending heartbeats, and they want the notification to clear automatically once the VM recovers. False alerts caused by log-ingestion latency are unacceptable. Which alerting approach should they use?",
+    "options": [
+      "A log search alert rule that queries the Heartbeat table and counts rows returned over the evaluation window",
+      "A simple log search alert that evaluates each Heartbeat row individually as it arrives",
+      "A metric alert rule on the Heartbeat metric, set to fire when the count of heartbeats from a computer drops to zero",
+      "A Smart Detection alert on the Application Insights resource associated with each VM"
+    ],
+    "correct": 2,
+    "explanation": "Detecting the absence of a heartbeat is a case where a metric alert is recommended. Each Log Analytics workspace exposes a Heartbeat metric with the computer as a dimension; a metric alert on it is near real-time, is stateful (notifies on fire and again on resolve), and is not subject to log-ingestion latency. Log search alerts (including simple log search alerts) read semi-structured log data that is inherently more latent, so Microsoft warns they are less effective and prone to misfires when detecting a lack of data. Smart Detection analyzes Application Insights failure-rate anomalies for web apps, not VM heartbeat presence.",
+    "reference": "https://learn.microsoft.com/azure/azure-monitor/vm/monitor-virtual-machine-alerts#common-alert-rules",
+    "id": 24
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Configure monitoring for a DevOps environment",
+    "question": "An operations team manages many Azure Storage accounts and wants an at-scale, ready-made view of each account's availability, latency, transactions, and capacity, with the ability to drill into failures, without deploying agents or writing queries. Which Azure Monitor capability delivers this with no configuration required?",
+    "options": [
+      "A metric alert rule on each storage account's availability metric",
+      "Storage insights, which presents a curated workbook view of storage performance, capacity, and availability",
+      "A custom Log Analytics workbook built from KQL queries against the storage diagnostic logs",
+      "Container insights pointed at the storage accounts"
+    ],
+    "correct": 1,
+    "explanation": "Storage insights provides comprehensive, curated monitoring of Azure Storage accounts, delivering a unified at-scale view of performance, capacity, and availability with drill-down workbooks for availability, performance, failures, and capacity. The docs state it does not require enabling or configuring anything because storage metrics are collected by default. Building a custom workbook requires authoring KQL, Container insights monitors Kubernetes container workloads rather than storage accounts, and a metric alert notifies on a threshold rather than providing the curated multi-account visualization.",
+    "reference": "https://learn.microsoft.com/azure/storage/common/storage-insights-overview",
+    "id": 25
+  }
+]

@@ -1,0 +1,199 @@
+{
+  "id": "az400",
+  "name": "AZ-400",
+  "fullName": "Designing and Implementing Microsoft DevOps Solutions",
+  "description": "Free 25-question preview of the AZ-400 pack. Original DevOps scenario questions written from public Microsoft Learn docs; not real exam questions. Unlock the full pack for the complete set, detailed explanations, and study mode.",
+  "duration": 50,
+  "questionCount": 25,
+  "totalQuestions": 25,
+  "passScore": 70,
+  "language": "en",
+  "schemaVersion": "1.1",
+  "badge": "Expert",
+  "icon": "fas fa-infinity",
+  "vendor": "Microsoft",
+  "certificationCode": "AZ-400",
+  "domains": [
+    "CI/CD pipelines",
+    "Source control strategy",
+    "Release and deployment",
+    "Infrastructure as code",
+    "Package management",
+    "Security and compliance",
+    "Monitoring and instrumentation",
+    "Processes and traceability",
+    "Pipeline testing",
+    "Agents and runners"
+  ],
+  "level": "Expert",
+  "productFamily": "Azure",
+  "contentType": "preview",
+  "commercialStatus": "pro-preview",
+  "preview": true,
+  "contentOrigin": "original",
+  "contentReview": {
+    "lastReviewed": "2026-06-10",
+    "sourceOfTruth": "Microsoft Learn AZ-400 study guide and certification page",
+    "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-400",
+    "objectiveVersion": "Skills measured as of April 24, 2026"
+  },
+  "objectiveDomains": [
+    {
+      "code": "AZ400-1",
+      "name": "Design and implement processes and communications",
+      "weightRange": "10-15%",
+      "source": "AZ-400 skills measured (as of April 24, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-400",
+      "mappedModules": [
+        "Traceability and flow of work",
+        "DevOps metrics and queries",
+        "Collaboration, documentation, and communication"
+      ]
+    },
+    {
+      "code": "AZ400-2",
+      "name": "Design and implement a source control strategy",
+      "weightRange": "10-15%",
+      "source": "AZ-400 skills measured (as of April 24, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-400",
+      "mappedModules": [
+        "Branching strategy and pull request workflow",
+        "Repository configuration and management"
+      ]
+    },
+    {
+      "code": "AZ400-3",
+      "name": "Design and implement build and release pipelines",
+      "weightRange": "50-55%",
+      "source": "AZ-400 skills measured (as of April 24, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-400",
+      "mappedModules": [
+        "Package management strategy",
+        "Pipeline testing and quality gates",
+        "Pipeline design: agents, runners, YAML, triggers, templates",
+        "Deployments and release strategy",
+        "Infrastructure as code",
+        "Maintain and optimize pipelines"
+      ]
+    },
+    {
+      "code": "AZ400-4",
+      "name": "Develop a security and compliance plan",
+      "weightRange": "10-15%",
+      "source": "AZ-400 skills measured (as of April 24, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-400",
+      "mappedModules": [
+        "Authentication and authorization methods",
+        "Managing sensitive information in automation",
+        "Automated security and compliance scanning"
+      ]
+    },
+    {
+      "code": "AZ400-5",
+      "name": "Implement an instrumentation strategy",
+      "weightRange": "5-10%",
+      "source": "AZ-400 skills measured (as of April 24, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-400",
+      "mappedModules": [
+        "Configure monitoring for a DevOps environment",
+        "Analyze metrics from instrumentation"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "icon": "fas fa-diagram-project",
+      "name": "Traceability and flow of work"
+    },
+    {
+      "icon": "fas fa-chart-line",
+      "name": "DevOps metrics and queries"
+    },
+    {
+      "icon": "fas fa-book-open",
+      "name": "Collaboration, documentation, and communication"
+    },
+    {
+      "icon": "fas fa-code-branch",
+      "name": "Branching strategy and pull request workflow"
+    },
+    {
+      "icon": "fas fa-database",
+      "name": "Repository configuration and management"
+    },
+    {
+      "icon": "fas fa-box",
+      "name": "Package management strategy"
+    },
+    {
+      "icon": "fas fa-circle-check",
+      "name": "Pipeline testing and quality gates"
+    },
+    {
+      "icon": "fas fa-network-wired",
+      "name": "Pipeline design: agents, runners, YAML, triggers, templates"
+    },
+    {
+      "icon": "fas fa-rocket",
+      "name": "Deployments and release strategy"
+    },
+    {
+      "icon": "fas fa-layer-group",
+      "name": "Infrastructure as code"
+    },
+    {
+      "icon": "fas fa-gauge-high",
+      "name": "Maintain and optimize pipelines"
+    },
+    {
+      "icon": "fas fa-key",
+      "name": "Authentication and authorization methods"
+    },
+    {
+      "icon": "fas fa-lock",
+      "name": "Managing sensitive information in automation"
+    },
+    {
+      "icon": "fas fa-shield-halved",
+      "name": "Automated security and compliance scanning"
+    },
+    {
+      "icon": "fas fa-desktop",
+      "name": "Configure monitoring for a DevOps environment"
+    },
+    {
+      "icon": "fas fa-magnifying-glass-chart",
+      "name": "Analyze metrics from instrumentation"
+    }
+  ],
+  "resources": [
+    {
+      "icon": "fas fa-book",
+      "name": "Microsoft Learn AZ-400 Study Guide",
+      "url": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-400"
+    },
+    {
+      "icon": "fas fa-graduation-cap",
+      "name": "Microsoft Certified: DevOps Engineer Expert",
+      "url": "https://learn.microsoft.com/credentials/certifications/devops-engineer/"
+    },
+    {
+      "icon": "fas fa-file-lines",
+      "name": "Azure DevOps documentation",
+      "url": "https://learn.microsoft.com/azure/devops/"
+    }
+  ],
+  "pro": {
+    "title": "AZ-400 Complete",
+    "questions": 280,
+    "price": "19 EUR",
+    "url": "https://examplar.gumroad.com/l/az400-complete",
+    "highlights": [
+      "280 original DevOps scenario questions across every exam objective",
+      "Detailed explanation for the correct answer and every distractor",
+      "Study mode with spaced repetition and weak-area focus",
+      "Coverage map so you see nothing is missing",
+      "Free updates when the exam changes"
+    ]
+  }
+}
