@@ -12,7 +12,9 @@ class MobileA11yReadinessTests(unittest.TestCase):
         js = (ROOT / "assets/js/script-multi-exam.js").read_text(encoding="utf-8")
 
         self.assertIn('aria-label="Toggle question navigator"', html)
-        self.assertIn('aria-expanded="false"', html)
+        # Control Room layout ships the palette expanded; the toggle still
+        # exposes its state and script-multi-exam.js keeps it in sync.
+        self.assertIn('aria-expanded="true"', html)
         self.assertIn('aria-controls="question-navigator"', html)
         self.assertIn("btn.type = 'button';", js)
         self.assertIn("btn.setAttribute('aria-current', 'step');", js)
