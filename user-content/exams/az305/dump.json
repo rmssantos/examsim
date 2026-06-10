@@ -1,0 +1,406 @@
+[
+  {
+    "id": 1,
+    "question_type": "STANDARD",
+    "module": "Design Logging and Monitoring Solutions",
+    "question": "A multinational manufacturer runs workloads in both an EU geography and a US geography. Regulatory counsel requires that operational telemetry generated in the EU never be stored outside the EU geography, while telemetry generated in the US must stay in the US. The platform team wants the smallest number of Log Analytics workspaces that still satisfies the residency mandate. Which workspace topology should you recommend?",
+    "options": [
+      "Provision a single global workspace in an EU region and rely on table-level RBAC to keep US data logically separated",
+      "Provision one workspace per Azure subscription regardless of region, then merge them later into a dedicated cluster",
+      "Provision a single workspace in a US region and configure continuous data export of EU data to EU storage",
+      "Provision one workspace per geography, placing the EU workspace in an EU region and the US workspace in a US region, and route each region's resources to its local workspace"
+    ],
+    "correct": 3,
+    "explanation": "A Log Analytics workspace resides in a single Azure region, so data sovereignty boundaries that require keeping data inside a geography are met by creating a separate workspace per geography and routing local resources to the local workspace. The design strategy is to use the fewest workspaces that still meet requirements, so two workspaces (one per geography) is correct. A single EU workspace would store US data in the EU, violating US residency; table-level RBAC controls access but not physical location. A workspace per subscription multiplies workspaces beyond what residency requires. A single US workspace stores the EU's primary telemetry in the US, and export to EU storage does not change where the workspace itself stores the live data.",
+    "reference": "https://learn.microsoft.com/azure/azure-monitor/logs/workspace-design#azure-regions"
+  },
+  {
+    "id": 2,
+    "question_type": "STANDARD",
+    "module": "Design Logging and Monitoring Solutions",
+    "question": "A security team mandates that Microsoft Sentinel run on a workspace they exclusively own, and they refuse to let operational performance data from Azure Monitor share that workspace. Each data stream is about 60 GB/day. The CFO is concerned about cost. Which statement best captures the trade-off you must present when recommending dedicated workspaces for security and operations?",
+    "options": [
+      "Separating the streams guarantees a lower bill because operational data is always free in a workspace without Microsoft Sentinel",
+      "Separating the streams has no cost impact because Microsoft Sentinel pricing applies identically regardless of workspace boundaries",
+      "Separating the streams avoids applying Microsoft Sentinel pricing to operational data, but each smaller stream may miss the combined volume needed to qualify for a commitment tier",
+      "Combining the streams is mandatory because Microsoft Sentinel cannot be enabled on a workspace that contains only security data"
+    ],
+    "correct": 2,
+    "explanation": "When Microsoft Sentinel is enabled on a workspace, all data in that workspace, including operational data, is subject to Microsoft Sentinel pricing. A dedicated operational workspace therefore avoids Sentinel charges on operational data, but splitting two ~60 GB/day streams means neither may reach the 100 GB/day commitment-tier threshold that a combined workspace would. Operational data is not free in a non-Sentinel workspace; it incurs normal Log Analytics ingestion charges. The boundary clearly does affect cost. Sentinel can absolutely be enabled on a workspace holding only security data, so combining is not mandatory.",
+    "reference": "https://learn.microsoft.com/azure/azure-monitor/logs/cost-logs#workspaces-with-microsoft-sentinel"
+  },
+  {
+    "id": 3,
+    "question_type": "MULTI",
+    "module": "Design Logging and Monitoring Solutions",
+    "question": "A platform team is standardizing how platform (resource) logs from many Azure resources are routed to monitoring destinations. They are weighing platform-telemetry data collection rules against classic diagnostic settings. Which statements about choosing data collection rules for this routing are accurate? Select all that apply.",
+    "options": [
+      "A single data collection rule can route logs from multiple resources, whereas a separate diagnostic setting is required for each resource",
+      "Data collection rules support managed identity for keyless authentication to storage accounts and Event Hubs destinations",
+      "Diagnostic settings remain necessary for resource types that do not yet support data collection rules for platform logs",
+      "Data collection rules can only deliver logs to a Log Analytics workspace and never to a storage account or Event Hub",
+      "Data collection rules eliminate the need to choose which log categories are collected because they always collect every category"
+    ],
+    "correct": [
+      0,
+      1,
+      2
+    ],
+    "explanation": "Platform-telemetry data collection rules are more scalable than diagnostic settings: one DCR can cover multiple resources while diagnostic settings require one per resource, and DCRs support managed identity for keyless authentication to storage accounts and Event Hubs. Diagnostic settings are still required for resource types that do not yet support DCRs for platform logs. The claim that DCRs can only target a Log Analytics workspace is wrong because they can also send platform logs to a storage account or Event Hubs. The claim that DCRs always collect every category is wrong; you still select the categories and can further filter with transformations.",
+    "reference": "https://learn.microsoft.com/azure/azure-monitor/data-collection/platform-logs-collect#compare-to-diagnostic-settings"
+  },
+  {
+    "id": 4,
+    "question_type": "YES_NO_MATRIX",
+    "module": "Design Logging and Monitoring Solutions",
+    "question": "An MSP is finalizing a distributed monitoring architecture where each managed customer keeps its own Log Analytics workspace and the MSP accesses them through Azure Lighthouse delegation. For each design assertion, determine whether it is correct.",
+    "statements": [
+      "A central query that fans out across more than 100 customer workspaces will not scale and is expected to run slowly",
+      "With Azure Lighthouse, the MSP can view and query customers' logs while the logs remain stored in each customer's own workspace and subscription",
+      "Search jobs and data restore can be executed across delegated customer workspaces through Azure Lighthouse delegated access"
+    ],
+    "correct": [
+      0,
+      0,
+      1
+    ],
+    "explanation": "Statement 1 is correct (Yes): the distributed multi-tenant design documents that a query over a large number of workspaces is slow and cannot scale above 100 workspaces. Statement 2 is correct (Yes): Azure Lighthouse gives the MSP delegated access to view and query each customer's logs while those logs stay in the customer's own dedicated workspace and subscription. Statement 3 is incorrect (No): cross-tenant search jobs are not supported, and Azure Lighthouse delegated access does not support search jobs or restore even when a delegated role includes the searchJobs/write permission.",
+    "reference": "https://learn.microsoft.com/azure/azure-monitor/logs/search-jobs#permissions-required"
+  },
+  {
+    "id": 5,
+    "question_type": "STANDARD",
+    "module": "Design Authentication and Authorization Solutions",
+    "question": "A manufacturer with 12,000 synchronized on-premises identities wants users to keep their existing Active Directory passwords for Microsoft 365 sign-in. A recent ransomware tabletop exercise revealed that if their on-premises domain controllers are unavailable, employees would lose access to cloud email and would have no out-of-band channel to coordinate recovery. The architect must recommend a hybrid authentication design that maximizes the ability to keep authenticating to cloud apps during a total on-premises outage, while keeping deployment footprint minimal. Which design best meets the resilience requirement?",
+    "options": [
+      "Configure password hash synchronization as the sign-in method so credential validation happens entirely in Microsoft Entra ID",
+      "Configure federation with a load-balanced AD FS farm and Web Application Proxy servers in the perimeter network",
+      "Configure pass-through authentication and leave password hash synchronization disabled to avoid storing hashes in the cloud",
+      "Configure pass-through authentication with three connector agents and rely on agent redundancy for outage survival"
+    ],
+    "correct": 0,
+    "explanation": "Password hash synchronization validates credentials in Microsoft Entra ID without any dependency on on-premises servers, so users can keep signing in to cloud apps even during a total on-premises outage; it also has the smallest footprint (no extra servers). Pass-through authentication and federation both depend on on-premises agents/servers and domain controllers, so a full on-premises outage breaks authentication regardless of agent redundancy. Disabling PHS removes the very backup that lets organizations stay online during attacks. Microsoft explicitly recommends enabling PHS for on-premises outage survival.",
+    "reference": "https://learn.microsoft.com/entra/identity/hybrid/connect/choose-ad-authn#recommendations"
+  },
+  {
+    "id": 6,
+    "question_type": "STANDARD",
+    "module": "Design Authentication and Authorization Solutions",
+    "question": "A defense contractor must authenticate users with on-premises smart cards and integrate a third-party multifactor authentication provider that performs the second factor on-premises. The compliance team mandates that all primary credential validation occur on-premises and that no password hashes ever leave the boundary. Which hybrid authentication method supports these requirements?",
+    "options": [
+      "External ID B2B collaboration with cross-tenant MFA trust",
+      "Password hash synchronization with seamless single sign-on",
+      "Federation with AD FS",
+      "Pass-through authentication with Microsoft Entra multifactor authentication"
+    ],
+    "correct": 2,
+    "explanation": "Federation hands authentication to an on-premises identity provider such as AD FS, which is the only one of the listed hybrid methods that supports smart card authentication and on-premises third-party MFA providers. Password hash synchronization performs validation in the cloud and stores hashes. Pass-through authentication cannot use an on-premises/third-party MFA method that relies on federation and must use Microsoft Entra MFA. B2B collaboration governs external partner access, not the contractor's own smart-card workforce sign-in.",
+    "reference": "https://learn.microsoft.com/entra/identity/hybrid/common-scenarios#common-authentication-methods-and-scenarios"
+  },
+  {
+    "id": 7,
+    "question_type": "YES_NO_MATRIX",
+    "module": "Design Authentication and Authorization Solutions",
+    "question": "An architect is documenting how cross-tenant access settings affect Conditional Access for B2B collaboration guests from partner Microsoft Entra tenants. Evaluate whether each statement is correct.",
+    "statements": [
+      "Enabling inbound 'Trust multifactor authentication from Microsoft Entra tenants' lets a guest who already completed MFA in their home tenant satisfy your MFA Conditional Access policy without being challenged again in your tenant.",
+      "Inbound trust settings can be configured to trust compliant device and Microsoft Entra hybrid joined device claims from the partner's home tenant.",
+      "Turning off inbound MFA trust removes your MFA Conditional Access requirement for those guests entirely.",
+      "Cross-tenant access trust settings allow you to manage your partner's device compliance policies directly in your own tenant."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "explanation": "Statement 1 is correct (Yes): when you trust MFA from external Microsoft Entra tenants, a guest who already completed MFA at home does not have to repeat it in your tenant, and your MFA policy is still considered satisfied. Statement 2 is correct (Yes): inbound trust settings include trusting compliant device and Microsoft Entra hybrid joined device claims from the partner. Statement 3 is incorrect (No): disabling MFA trust does not remove your policy; the guest must instead complete MFA again in your resource tenant. Statement 4 is incorrect (No): a device can only be managed by its home tenant, so you cannot manage a partner's device compliance from your tenant; you can only choose to trust the claim.",
+    "reference": "https://learn.microsoft.com/entra/external-id/cross-tenant-access-settings-b2b-collaboration#to-change-inbound-trust-settings-for-mfa-and-device-claims"
+  },
+  {
+    "id": 8,
+    "question_type": "MULTI",
+    "module": "Design Authentication and Authorization Solutions",
+    "question": "While reviewing a proposed Azure custom role, an architect must flag every design statement that violates a documented Azure custom role limitation. Which statements describe configurations that are NOT permitted and must be corrected?",
+    "options": [
+      "Using a wildcard (*) in the AssignableScopes property to cover all subscriptions",
+      "Listing two different management groups in the AssignableScopes property of a single custom role",
+      "Assigning a custom role that contains DataActions at a management group scope",
+      "Including DataActions in a custom role and listing one management group in AssignableScopes",
+      "Defining the role with explicit Actions strings rather than a wildcard"
+    ],
+    "correct": [
+      0,
+      1,
+      2
+    ],
+    "explanation": "Wildcards are not allowed in AssignableScopes, so that configuration must be corrected. Only one management group may be listed in a custom role's AssignableScopes, so listing two is invalid. A custom role containing DataActions cannot be assigned at a management group scope, so that assignment must be corrected. In contrast, including DataActions with a single management group in AssignableScopes is explicitly permitted (you simply assign it at subscription scope), and defining explicit Actions instead of a wildcard is the recommended best practice, so neither of those needs correcting.",
+    "reference": "https://learn.microsoft.com/azure/role-based-access-control/custom-roles#custom-role-limits"
+  },
+  {
+    "id": 9,
+    "question_type": "STANDARD",
+    "module": "Design Secrets, Keys, and Identity Governance",
+    "question": "A financial services company is standardizing Azure Key Vault for a new platform. Their security team requires that the right to grant data-plane access to secrets be restricted to a small set of administrators, that privileged access be eligible and time-limited rather than standing, and that all vault access be reported through the same console used for the rest of their Azure estate. Which data-plane authorization design best satisfies these requirements?",
+    "options": [
+      "Configure the vaults to use the access policy model but restrict the Contributor role at the resource group to limit who can edit policies",
+      "Configure the vaults to use the Azure RBAC permission model and assign Key Vault data-plane roles, integrating eligible assignments through Privileged Identity Management",
+      "Use the access policy model and rely on Azure Policy auditing to report on who has data-plane permissions",
+      "Configure the vaults to use the access policy permission model and grant each administrator a Key, Secret, Certificate Management access policy entry"
+    ],
+    "correct": 1,
+    "explanation": "Azure RBAC is the recommended data-plane authorization model for Key Vault. It restricts the right to grant access to keys, secrets, and certificates to Owner or User Access Administrator, provides a unified, centralized view of access across Azure resources, and integrates with PIM so privileged access is eligible and time-bound. The access-policy options are wrong: the legacy access-policy model is data-plane only, does not support PIM, and any holder of a role with Microsoft.KeyVault/vaults/write can grant themselves data-plane access; restricting Contributor or layering Azure Policy auditing does not deliver PIM integration or a unified access view.",
+    "reference": "https://learn.microsoft.com/azure/key-vault/general/rbac-access-policy#data-plane-access-control-recommendation"
+  },
+  {
+    "id": 10,
+    "question_type": "STANDARD",
+    "module": "Design Secrets, Keys, and Identity Governance",
+    "question": "A government agency must encrypt data at rest with customer-managed keys and is bound by a regulation that requires the agency to retain exclusive control over the root of trust, with technical guarantees that the cloud provider's personnel cannot access the key material, backed by FIPS 140-3 Level 3 validated, single-tenant hardware. The solution must still provide a managed-service availability SLA. Which Azure key management offering should you recommend?",
+    "options": [
+      "Azure platform-managed (Microsoft-managed) keys with host-level encryption",
+      "Azure Key Vault Premium with HSM-protected keys",
+      "Azure Key Vault Standard with software-protected keys",
+      "Azure Key Vault Managed HSM"
+    ],
+    "correct": 3,
+    "explanation": "Managed HSM is single-tenant, FIPS 140-3 Level 3 validated, and is the only option in the Azure portfolio where the customer controls the root of trust while still receiving a managed-service SLA; its confidential-computing and security-domain design technically precludes Microsoft from accessing key material. Platform-managed keys give the customer no key control. Key Vault Standard is multitenant, software-backed, and only FIPS 140-2 Level 1. Key Vault Premium is HSM-backed and FIPS 140-3 Level 3 but is multitenant and the root of trust is controlled by Microsoft, not the customer, so it does not meet the exclusive root-of-trust requirement.",
+    "reference": "https://learn.microsoft.com/azure/key-vault/managed-hsm/mhsm-control-data#portfolio-of-azure-key-management-products"
+  },
+  {
+    "id": 11,
+    "question_type": "MULTI",
+    "module": "Design Secrets, Keys, and Identity Governance",
+    "question": "A multinational firm wants to automate the joiner-mover-leaver access lifecycle for both employees and external partners using Microsoft Entra ID Governance entitlement management. Which design choices correctly use entitlement management capabilities to meet these goals? Select all that apply.",
+    "options": [
+      "Group related resources and access packages into catalogs and delegate catalog management to the business owners who best know who should have access",
+      "Configure the lifecycle-of-external-users setting so that when an external user loses their last access package assignment they are blocked from sign-in and their guest account is removed after the configured number of days",
+      "Require approval policies on access packages so requested access for partners can be gated by a sponsor and a resource owner",
+      "Replace Conditional Access entirely, since entitlement management evaluates sign-in risk and device compliance at authentication time",
+      "Use access packages to store and rotate the cryptographic keys that protect the partner-facing application's data at rest"
+    ],
+    "correct": [
+      0,
+      1,
+      2
+    ],
+    "explanation": "Catalogs group resources and access packages and allow delegated management to business owners; the lifecycle-of-external-users control removes or blocks guest accounts when their last assignment ends, automating the leaver step for externals; and access-package approval policies can require multi-stage approval such as a sponsor plus a resource owner. The distractors are wrong because entitlement management governs access lifecycle, not authentication-time risk or device compliance evaluation (that is Conditional Access and ID Protection), and access packages grant resource access, not store or rotate encryption keys (that is Key Vault).",
+    "reference": "https://learn.microsoft.com/entra/id-governance/entitlement-management-external-users#manage-the-lifecycle-of-external-users"
+  },
+  {
+    "id": 12,
+    "question_type": "YES_NO_MATRIX",
+    "module": "Design Secrets, Keys, and Identity Governance",
+    "question": "An identity architect is designing Microsoft Entra Privileged Identity Management for high-impact roles. For each of the following design statements, decide whether it is correct.",
+    "options": [],
+    "statements": [
+      "PIM eligible assignments grant the same level of access as active assignments; the difference is that an eligible assignment must be activated before the user can use the role.",
+      "For a Microsoft Entra role in PIM, the activation maximum duration can be set anywhere from 1 to 24 hours.",
+      "PIM can enforce multifactor authentication at the moment a user activates an eligible role assignment.",
+      "Requiring a support ticket number on activation causes PIM to validate that number against the organization's ticketing system before granting the role."
+    ],
+    "correct": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "explanation": "Statement 1 is Yes: eligible and active assignments confer identical access; the only difference is that eligible assignments require an activation action. Statement 2 is Yes: the activation maximum duration slider for a Microsoft Entra role accepts a value from 1 to 24 hours. Statement 3 is Yes: PIM can require MFA on activation of an eligible role. Statement 4 is No: requiring ticket information is an information-only field; PIM does not correlate or validate the number against any ticketing system.",
+    "reference": "https://learn.microsoft.com/entra/id-governance/privileged-identity-management/pim-how-to-change-default-settings#role-settings"
+  },
+  {
+    "id": 13,
+    "question_type": "STANDARD",
+    "module": "Design Governance and Resource Organization",
+    "question": "A multinational manufacturer is migrating to Azure and expects to grow from 12 to several hundred subscriptions over three years. The platform team must apply a single set of region-restriction and security baseline policies that all current and future subscriptions inherit automatically, and they must guarantee that no workload owner can remove the baseline. They want to minimize the number of policy assignments they maintain. Which design best satisfies these requirements?",
+    "options": [
+      "Place all subscriptions in a single resource group and assign the baseline initiative to that resource group",
+      "Build a management group hierarchy and assign the baseline initiative at a management group scope so the policies cascade by inheritance to all descendant subscriptions",
+      "Assign the baseline initiative individually to each subscription and use an automation runbook to re-create the assignment on every newly created subscription",
+      "Apply the baseline initiative to each workload's resource groups so that owners cannot change subscription-level settings"
+    ],
+    "correct": 1,
+    "explanation": "Management groups provide a governance scope above subscriptions; policy and access assignments made at a management group cascade by inheritance to all descendant management groups, subscriptions, and resources, and a resource or subscription owner cannot alter an inherited policy. Assigning at the management group scope also minimizes the number of assignments to maintain and automatically covers future subscriptions placed under that group. Per-subscription assignment plus a runbook does not minimize assignments and is fragile. A resource group cannot contain subscriptions. Assigning at resource-group scope leaves subscription-level governance ungoverned and multiplies assignments.",
+    "reference": "https://learn.microsoft.com/azure/governance/management-groups/overview#hierarchy-of-management-groups-and-subscriptions"
+  },
+  {
+    "id": 14,
+    "question_type": "STANDARD",
+    "module": "Design Governance and Resource Organization",
+    "question": "A platform team is designing the platform landing zone for an enterprise-scale Azure environment. They need a dedicated subscription that hosts the Azure Virtual WAN hub, Azure Firewall, ExpressRoute circuits, and private DNS zones used to establish hybrid connectivity for all workloads. Under which management group should this subscription reside in the Azure landing zone reference architecture?",
+    "options": [
+      "Connectivity",
+      "Identity",
+      "Corp",
+      "Sandbox"
+    ],
+    "correct": 0,
+    "explanation": "The Connectivity management group contains the dedicated connectivity subscription(s) that host platform networking resources such as Virtual WAN, Azure Firewall, virtual network gateways, ExpressRoute, and Azure DNS private zones, where hybrid connectivity to on-premises is established. The Identity management group hosts identity services such as domain controllers, not network hubs. Corp hosts corporate workloads that consume the hub. Sandbox hosts experimental subscriptions that are isolated from production connectivity.",
+    "reference": "https://learn.microsoft.com/azure/cloud-adoption-framework/ready/landing-zone/design-area/network-topology-and-connectivity#design-area-overview"
+  },
+  {
+    "id": 15,
+    "question_type": "STANDARD",
+    "module": "Design Relational Data Storage Solutions",
+    "question": "A logistics company is migrating a legacy SQL Server application to Azure. The application depends on SQL Server Agent jobs, cross-database queries by three-part name, CLR assemblies, and Service Broker messaging across databases within the same instance. The team wants a fully managed PaaS service and to avoid re-engineering the application's instance-level dependencies. Which deployment option best meets these requirements with the least application change?",
+    "options": [
+      "Azure SQL Database single database",
+      "Azure SQL Database elastic pool",
+      "SQL Server on an Azure Virtual Machine that you patch yourself",
+      "Azure SQL Managed Instance"
+    ],
+    "correct": 3,
+    "explanation": "SQL Managed Instance is the PaaS option that provides near-100% instance-level compatibility with SQL Server, including SQL Server Agent, native cross-database queries with three-part names, CLR modules, and Service Broker, so the listed dependencies work without re-engineering. Azure SQL Database (single database or elastic pool) is database-scoped: it does not support SQL Server Agent, cross-database three-part-name queries, or Service Broker, so the app would need significant rework. SQL Server on an Azure VM would run the workload but is IaaS, requiring you to manage OS and engine patching yourself, which conflicts with the fully managed requirement.",
+    "reference": "https://learn.microsoft.com/azure/azure-sql/managed-instance/sql-managed-instance-paas-overview?view=azuresql#supported-sql-features"
+  },
+  {
+    "id": 16,
+    "question_type": "STANDARD",
+    "module": "Design Relational Data Storage Solutions",
+    "question": "A SaaS analytics platform expects a single database to grow well beyond 4 TB over the next year, requires the ability to scale compute up or down within minutes regardless of data size, needs near-instantaneous backups, and must offload heavy read-only analytical queries to multiple independently sized read replicas. Which Azure SQL Database service tier should you recommend?",
+    "options": [
+      "General Purpose",
+      "DTU-based Premium",
+      "Hyperscale",
+      "Business Critical"
+    ],
+    "correct": 2,
+    "explanation": "Hyperscale decouples compute from a distributed page-server storage layer, supports databases up to 128 TB, scales compute in constant time without a size-of-data move, provides snapshot-based near-instant backups, and supports up to 30 named replicas that can each be sized independently for read scale-out. Business Critical and General Purpose cap storage at 4 TB, which the workload exceeds, and their scaling and backup times are tied to data volume. DTU-based Premium is also storage-limited and offers no named replicas or decoupled storage.",
+    "reference": "https://learn.microsoft.com/azure/azure-sql/database/service-tier-hyperscale?view=azuresql#what-are-the-hyperscale-capabilities"
+  },
+  {
+    "id": 17,
+    "question_type": "STANDARD",
+    "module": "Design Semi-Structured and Unstructured Data Storage",
+    "question": "A logistics company is modernizing a fraud-and-route analysis platform. The data is intensely connected: shipments link to carriers, carriers to routes, routes to facilities, and many entities reference each other with cyclic, many-to-many relationships. Architects must run traversal queries such as \"find all facilities reachable within three hops of a flagged carrier.\" They want a managed, globally distributable database that models vertices and edges natively. Which Azure Cosmos DB API should the design specify?",
+    "options": [
+      "API for Apache Gremlin",
+      "API for Table",
+      "API for NoSQL",
+      "API for MongoDB"
+    ],
+    "correct": 0,
+    "explanation": "The API for Apache Gremlin is a managed graph database purpose-built for property-graph data (vertices and edges) and traversal queries over highly connected, cyclic, many-to-many relationships, which is exactly this workload. API for NoSQL stores JSON documents and would force you to model relationships and multi-hop traversals manually. API for Table is a key-value store with indexing only on partition and row keys, unsuited to graph traversal. API for MongoDB targets document workloads and BSON wire compatibility, not native graph traversal.",
+    "reference": "https://learn.microsoft.com/azure/cosmos-db/gremlin/modeling#when-do-i-need-a-graph-database"
+  },
+  {
+    "id": 18,
+    "question_type": "STANDARD",
+    "module": "Design Data Integration and Analytics",
+    "question": "A retailer is designing an Azure Data Factory pipeline that must copy data nightly from an on-premises SQL Server instance that has no inbound internet connectivity and sits behind a corporate firewall, into Azure Data Lake Storage Gen2. Security requires that the on-premises store never accept inbound connections and that credentials remain inside the corporate network. Which integration runtime should the design use for the copy activity that reads from SQL Server?",
+    "options": [
+      "An Azure integration runtime with auto-resolve region",
+      "A self-hosted integration runtime installed on a machine inside the corporate network",
+      "A public Azure integration runtime restricted by a network security group",
+      "An Azure-SSIS integration runtime joined to the corporate virtual network"
+    ],
+    "correct": 1,
+    "explanation": "A self-hosted integration runtime (SHIR) is the compute that bridges a cloud data store and a data store in a private network such as an on-premises network. The SHIR node initiates an outbound connection over an Azure Relay control channel and stores credentials locally encrypted with DPAPI, so the on-premises SQL Server never needs an inbound connection and credentials stay inside the network. The Azure integration runtime runs in Azure and cannot reach a private on-premises source that blocks inbound traffic. The Azure-SSIS integration runtime is purpose-built for lifting and shifting SSIS package execution, not for hybrid copy from an arbitrary on-premises source. A 'public Azure IR restricted by an NSG' still originates from Azure and does not solve private network reachability.",
+    "reference": "https://learn.microsoft.com/azure/data-factory/create-self-hosted-integration-runtime#command-flow-and-data-flow"
+  },
+  {
+    "id": 19,
+    "question_type": "STANDARD",
+    "module": "Design Backup and Disaster Recovery Solutions",
+    "question": "A retail company runs a customer-facing payments platform classified as mission-critical. The business mandates that a full Azure region outage must cause no user-visible interruption, with a recovery time objective measured in seconds and a recovery point objective approaching zero. Cost is explicitly a secondary concern. Which multi-region recovery design should you recommend?",
+    "options": [
+      "An active-passive warm standby where the secondary region runs minimal compute and auto-scales up after failover",
+      "A backup-and-restore design that replicates backups to a geo-redundant vault in a second region",
+      "An active-passive cold standby where the secondary region's compute is deployed but stopped until a disaster is declared",
+      "An active-active deployment where multiple regions each serve production traffic and can absorb the full load if one region fails"
+    ],
+    "correct": 3,
+    "explanation": "For mission-critical (Tier 0) workloads that tolerate essentially no downtime, the Well-Architected disaster recovery guidance prescribes an active-active, multi-region deployment, which enables instant recovery with RTO in seconds and RPO approaching zero. Cold standby has the longest recovery time because compute must be started; backup-and-restore has the highest RTO/RPO and suits administrative (Tier 3) workloads; warm standby still incurs scale-up time after failover and targets business-critical workloads that can tolerate brief disruption, so none of these meet a near-zero RTO/RPO with no user-visible interruption.",
+    "reference": "https://learn.microsoft.com/azure/well-architected/design-guides/disaster-recovery#select-your-criticality-tier"
+  },
+  {
+    "id": 20,
+    "question_type": "STANDARD",
+    "module": "Design for High Availability",
+    "question": "A retail company runs a stateless web tier on a group of identical Azure VMs behind a load balancer. The workload owner requires the highest possible single-region availability SLA for the compute tier and wants the platform to manage instance placement and scaling. The target region offers three availability zones. Which compute design best meets the requirement?",
+    "options": [
+      "Deploy the VMs into a regional (nonzonal) Virtual Machine Scale Set without zone assignment",
+      "Deploy a Virtual Machine Scale Set in Flexible orchestration spread across the three availability zones (zone-spanning)",
+      "Deploy the VMs into a single availability set with multiple fault and update domains",
+      "Deploy a zonal Virtual Machine Scale Set pinned to one availability zone"
+    ],
+    "correct": 1,
+    "explanation": "A zone-spanning Virtual Machine Scale Set distributes instances across multiple availability zones and qualifies for the highest VM availability SLA (99.99%), while letting the platform centrally manage placement, scaling, and updates. An availability set only protects against rack-level (fault/update domain) failures within a datacenter and provides the lower 99.95% multi-VM SLA. A zonal scale set pins all instances to one zone, so it does not survive a zone outage. A regional/nonzonal scale set gives no guarantee that instances land in different zones, so it does not provide zone-fault resilience.",
+    "reference": "https://learn.microsoft.com/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-use-availability-zones#design-considerations-for-availability-zones"
+  },
+  {
+    "id": 21,
+    "question_type": "STANDARD",
+    "module": "Design Compute Solutions",
+    "question": "A retailer is migrating a packaged ERP application to Azure. The vendor supports the software only when it runs on a specific Windows Server build with a kernel-level agent installed, and the team must retain full control over OS patching cadence to match the vendor's certified configuration. The application cannot be refactored. Which compute hosting model best satisfies these constraints?",
+    "options": [
+      "Platform as a service (PaaS) using Azure App Service, where Azure manages the operating system",
+      "A fully managed serverless container platform that abstracts the host operating system away from the team",
+      "Functions as a service (FaaS) using Azure Functions, where the platform runs the deployed code",
+      "Infrastructure as a service (IaaS) using Azure Virtual Machines, where the team manages the guest operating system"
+    ],
+    "correct": 3,
+    "explanation": "The vendor mandates a specific OS build, a kernel-level agent, and team-controlled patching, which requires guest-OS control. IaaS (Azure Virtual Machines) is the only model in the decision tree that gives the customer full control of the operating system and lets them install arbitrary software, including kernel-level agents. PaaS (App Service) and FaaS (Functions) are managed hosting models where Azure controls the OS and patching, so the team cannot pin a certified build or install a kernel agent. A fully managed serverless container platform similarly abstracts the host OS, so it does not meet the certified-configuration requirement.",
+    "reference": "https://learn.microsoft.com/azure/architecture/guide/technology-choices/compute-decision-tree#understand-the-hosting-models"
+  },
+  {
+    "id": 22,
+    "question_type": "STANDARD",
+    "module": "Design Application Architecture",
+    "question": "A payments platform processes settlement instructions that must never be lost or duplicated, must be handled strictly in the order they were submitted per customer account, and must support grouping a debit and a credit into a single atomic operation. The team needs the messaging service that natively satisfies all of these requirements. Which Azure messaging service should you design the solution around?",
+    "options": [
+      "Azure Event Grid, using event subscriptions with retry and dead-lettering to guarantee ordered, atomic delivery",
+      "Azure Service Bus, using sessions for ordered per-account processing, duplicate detection, and transactions",
+      "Azure Event Hubs, using partition keys per account to guarantee duplicate-free atomic transfers",
+      "Azure Storage queues, relying on the DequeueCount property to enforce ordering and exactly-once handling"
+    ],
+    "correct": 1,
+    "explanation": "Service Bus is the enterprise broker designed for high-value messages that require transactions, ordering (FIFO via sessions), duplicate detection, and dead-lettering. Sessions provide ordered per-account processing and transactions let a debit and credit commit atomically. Storage queues do not guarantee ordering or transactions; DequeueCount only helps detect poison messages, not enforce order or atomicity. Event Grid is for reactive discrete-event distribution and explicitly does not support ordered messaging, transactions, or sessions. Event Hubs is a streaming ingestion platform; partitions preserve append order for telemetry but it offers no broker transactions or duplicate-detection semantics for command-style messages.",
+    "reference": "https://learn.microsoft.com/azure/service-bus-messaging/compare-messaging-services#azure-service-bus"
+  },
+  {
+    "id": 23,
+    "question_type": "STANDARD",
+    "module": "Design Migration Solutions",
+    "question": "A retailer runs a stable, custom .NET line-of-business application on Windows Server VMs in its own datacenter. The lease on the datacenter expires in four months, forcing a fast exit. The application receives no new feature work and the team confirms it will not need modernization for at least two years. Leadership wants the lowest-risk path that frees the datacenter quickly while the small team builds Azure operational experience. Following the Cloud Adoption Framework, which migration strategy should you recommend for this workload?",
+    "options": [
+      "Rehost the VMs to Azure infrastructure with minimal change (lift and shift)",
+      "Rearchitect the application onto Azure Functions and Azure Cosmos DB",
+      "Refactor the application to run on Azure App Service before the datacenter exit",
+      "Replace the application with a software-as-a-service product"
+    ],
+    "correct": 0,
+    "explanation": "Rehost (lift and shift) moves the workload to Azure infrastructure with minimal change. CAF identifies rehost as the right fit precisely when the workload is stable and Azure-compatible, the migration must be low-risk and fast, there is no near-term modernization need, and the team wants to free datacenter space and build foundational cloud operations. Rearchitect and refactor both add code-change effort and risk that cannot be absorbed in a four-month forced exit and are unjustified for a workload that will not be modernized for two years. Replace assumes a suitable SaaS exists for a custom LOB app and would discard the existing investment; the requirements give no SaaS driver.",
+    "reference": "https://learn.microsoft.com/azure/cloud-adoption-framework/plan/select-cloud-migration-strategy#select-the-right-migration-strategy"
+  },
+  {
+    "id": 24,
+    "question_type": "STANDARD",
+    "module": "Design Network Connectivity Solutions",
+    "question": "A retail enterprise is expanding from one Azure region to four regions over the next year. Each business unit will own its own subscription and workload virtual network, and connectivity will be provided as a shared platform service. The platform team is small and wants to minimize the ongoing effort of maintaining inter-hub peerings, route propagation, and gateway plumbing as new regions and branch sites are added. Which connectivity topology should the architect recommend?",
+    "options": [
+      "Azure Virtual WAN with secured virtual hubs, letting Microsoft manage the hub infrastructure, inter-hub connectivity, and routing",
+      "Independent per-subscription virtual networks with no hub, relying on the public internet for cross-region workload traffic",
+      "A single flat virtual network spanning all regions with every workload deployed into shared subnets",
+      "A self-managed hub-and-spoke virtual network in each region, with the platform team manually configuring global virtual network peering and user-defined routes between hubs"
+    ],
+    "correct": 0,
+    "explanation": "Azure Virtual WAN provides a Microsoft-managed hub that handles the hub infrastructure, inter-hub peering, and routing as a managed service, which directly reduces the operational overhead of scaling to many regions and branches while still giving built-in transitive (any-to-any) connectivity and global transit. The self-managed hub-and-spoke option is the higher-overhead alternative because the team must manually build and maintain global peerings and UDRs, which is exactly what the requirement wants to avoid. A single flat virtual network is wrong because a virtual network cannot span subscriptions and this breaks the subscription-democratization model. Relying on the public internet abandons private transit and centralized control entirely.",
+    "reference": "https://learn.microsoft.com/azure/architecture/networking/architecture/hub-spoke-virtual-wan-architecture#scenario-details"
+  },
+  {
+    "id": 25,
+    "question_type": "STANDARD",
+    "module": "Design Load Balancing and Network Performance",
+    "question": "A retailer runs a single-region public web storefront on Azure virtual machines. The application is HTTP(S)-only, is not deployed to multiple regions, and the architect wants a managed service that terminates TLS, performs URL path-based routing to different backend pools, and provides an integrated web application firewall. Following the Azure load-balancing decision guidance, which service best fits this requirement?",
+    "options": [
+      "Standard Load Balancer in a zone-redundant configuration",
+      "Azure Front Door Standard/Premium",
+      "Azure Application Gateway with the WAF tier",
+      "Azure Traffic Manager with priority routing"
+    ],
+    "correct": 2,
+    "explanation": "The decision tree resolves to a regional Layer-7 service when the workload is an internet-facing HTTP(S) application that is not deployed across multiple regions and needs SSL/TLS offload, path-based routing, and WAF. Application Gateway is the regional Layer-7 load balancer that provides exactly these capabilities (TLS termination, URL path-based routing, and an integrated WAF). Azure Front Door is a global service intended for multi-region/edge acceleration scenarios, which this single-region workload does not require. Traffic Manager is a DNS-based global director with no Layer-7 processing, TLS offload, or WAF. Standard Load Balancer is a Layer-4 service and cannot do path-based routing, TLS offload, or WAF.",
+    "reference": "https://learn.microsoft.com/azure/architecture/guide/technology-choices/load-balancing-overview#service-categorizations"
+  }
+]
