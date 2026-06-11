@@ -524,6 +524,7 @@ def render_hub(all_exams: list) -> str:
   <link rel="stylesheet" href="{root}assets/css/exam-landing.css">
   <link rel="stylesheet" href="{root}assets/css/analytics-privacy.css">
   <script src="{root}assets/js/legal-page.js" defer></script>
+  <script src="{root}assets/js/utils.js" defer></script>
   <script src="{root}assets/js/analytics.js" defer></script>
 </head>
 <body class="exam-landing">
