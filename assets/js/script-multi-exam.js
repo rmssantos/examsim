@@ -1423,7 +1423,8 @@ class MultiExamSimulator {
         const url = pro && this.safeUrl(pro.url);
         if (!url) return '';
         const title = this.escapeHtml(pro.title || 'Full pack');
-        const fullCount = Number(pro.questions) > 0 ? Math.round(Number(pro.questions)) : null;
+        const questionTotal = Number(pro.questions);
+        const fullCount = Number.isFinite(questionTotal) && questionTotal > 0 ? Math.round(questionTotal) : null;
         const scope = fullCount ? `${fullCount} questions` : 'the complete question set';
         const price = pro.price ? ` (${this.escapeHtml(String(pro.price))})` : '';
         return `<div class="recommended-pro results-pro-upsell"><i class="fas fa-unlock" aria-hidden="true"></i> <strong>${title}</strong><p>You practiced the free preview. The full pack covers ${scope} with detailed explanations and free updates.</p><a class="results-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener noreferrer">Get the full pack${price}</a></div>`;
@@ -1431,7 +1432,9 @@ class MultiExamSimulator {
 
     // Invite candidates who passed the real exam to share their story.
     renderPassStoryInvite() {
-        return `<div class="pass-story-invite"><i class="fas fa-trophy" aria-hidden="true"></i> Passed your real exam with Examplar? <a class="pass-story-link" href="${PASS_STORY_DISCUSSION_URL}" target="_blank" rel="noopener noreferrer">Share your pass story</a></div>`;
+        const url = this.safeUrl(PASS_STORY_DISCUSSION_URL);
+        if (!url) return '';
+        return `<div class="pass-story-invite"><i class="fas fa-trophy" aria-hidden="true"></i> Passed your real exam with Examplar? <a class="pass-story-link" href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer">Share your pass story</a></div>`;
     }
 
     // Cross-sell a recommended paid pack on the results screen (e.g. CLF-C02 -> SAA-C03).
