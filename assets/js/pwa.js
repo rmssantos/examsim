@@ -106,8 +106,16 @@
         refresh.className = 'primary';
         refresh.textContent = 'Refresh';
         refresh.addEventListener('click', () => {
-            updateReloadPending = true;
-            registration.waiting?.postMessage({ type: 'SKIP_WAITING' });
+            // Workers now skipWaiting at install, so by click time the update
+            // is usually already active and registration.waiting is null; a
+            // plain reload is all that is needed. Keep the message path for a
+            // worker still genuinely waiting (activation in flight).
+            if (registration.waiting) {
+                updateReloadPending = true;
+                registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+            } else {
+                window.location.reload();
+            }
         });
 
         actions.append(later, refresh);
