@@ -49,6 +49,8 @@ user-content/exams/*
 !user-content/exams/az305/**
 !user-content/exams/az400/
 !user-content/exams/az400/**
+!user-content/exams/dp900/
+!user-content/exams/dp900/**
 
 # Private exam backups/zips (keep local only)
 user-content/*.zip

@@ -1,0 +1,2102 @@
+[
+  {
+    "question_type": "STANDARD",
+    "module": "Ways to Represent Data and Common File Formats",
+    "question": "A retail company keeps every customer record in a single table where each row has exactly the same set of columns: CustomerID, FirstName, LastName, and Email. How is this data best classified?",
+    "options": [
+      "Unstructured data, because text fields can contain free-form content",
+      "Binary large object (BLOB) data, because it is stored on disk",
+      "Structured data, because it adheres to a fixed tabular schema of rows and columns",
+      "Semi-structured data, because each record can vary from the next"
+    ],
+    "correct": 2,
+    "explanation": "Structured data adheres to a fixed schema in which every instance shares the same fields, and it is most commonly represented in tables of rows and columns; a customer table where every row has the identical columns matches this exactly. The semi-structured choice is wrong because here the records do not vary, they all share one fixed schema. The unstructured choice is wrong because the data follows a defined tabular structure, not a free-form layout. The BLOB choice is wrong because BLOB refers to raw binary content such as images or video, not a relational table.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/2-data-formats",
+    "id": 1
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Ways to Represent Data and Common File Formats",
+    "question": "An application stores customer profiles where most customers have one email address, some have several, and a few have none, so the fields present differ from one record to the next. Which classification describes data that has some structure but allows variation between instances?",
+    "options": [
+      "Semi-structured data",
+      "Structured data",
+      "Unstructured data",
+      "Delimited text (CSV) data"
+    ],
+    "correct": 0,
+    "explanation": "Semi-structured data has some structure but allows variation between entity instances, which is exactly the case when one customer has multiple email addresses and another has none; JSON is a common format for representing it. Structured data is wrong because it requires a fixed schema where every record has identical fields. Delimited text such as CSV is wrong because it is a file format for storing structured rows and columns, not a classification describing how much the schema varies between records. Unstructured data is wrong because the profiles still carry named fields and organization, just with variation in which fields appear.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/2-data-formats",
+    "id": 2
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Ways to Represent Data and Common File Formats",
+    "question": "A media archive holds scanned contracts as image files, recorded support calls as audio, and training sessions as video. None of these files follow a predefined field layout. Which type of data does this archive primarily contain?",
+    "options": [
+      "Structured data",
+      "Semi-structured data",
+      "Delimited text data",
+      "Unstructured data"
+    ],
+    "correct": 3,
+    "explanation": "Unstructured data has no predefined data model or field layout for the content itself, which is exactly the case for documents, images, audio, and video. Structured data is wrong because it requires a fixed schema of fields, which the content of images and audio does not define. Semi-structured data is wrong because that category organizes its content into self-describing tags or named fields that vary by instance, whereas the primary content of these media files is not organized into defined fields; such files may still carry metadata, but that does not make the content itself structured or semi-structured. Delimited text data is wrong because it describes plain-text rows separated by characters such as commas, which does not match binary media content.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/2-data-formats",
+    "id": 3
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Ways to Represent Data and Common File Formats",
+    "question": "A data engineer must export a structured table so it can be opened by the widest possible range of applications in a plain-text, human-readable form, with fields separated by commas and one record per line. Which file format fits this requirement?",
+    "options": [
+      "Parquet",
+      "Comma-separated values (CSV)",
+      "Avro",
+      "Binary large object (BLOB)"
+    ],
+    "correct": 1,
+    "explanation": "CSV stores fields separated by commas with rows terminated by a new line, and delimited text is a good choice for structured data that needs to be read by many applications in a human-readable format. Parquet is wrong because it is a compressed binary columnar format, not human-readable plain text. Avro is wrong because it is a binary row-based format that is also not directly human-readable. BLOB is wrong because it refers to raw binary content such as images, not delimited text records.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/3-file-storage",
+    "id": 4
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Ways to Represent Data and Common File Formats",
+    "question": "A team is documenting the plain-text formats their tools can export, where data is stored as text using specific field delimiters or fixed field widths. Which of the following are examples of such delimited or fixed-position text formats? Select all that apply.",
+    "options": [
+      "Comma-separated values (CSV), where commas separate fields and a new line terminates each row",
+      "Tab-separated values (TSV), where tab characters separate the fields",
+      "Fixed-width text, where each field is allocated a fixed number of characters",
+      "Parquet, where data is stored in a compressed columnar binary layout"
+    ],
+    "correct": [
+      0,
+      1,
+      2
+    ],
+    "explanation": "CSV uses commas to separate fields with rows terminated by a new line, TSV uses tab characters to separate fields, and fixed-width text allocates each field a fixed number of characters; all three are plain-text formats for storing data with delimiters or fixed field positions, so they are correct. Parquet is incorrect because it is a compressed binary columnar format, not a delimited or fixed-position plain-text format.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/3-file-storage",
+    "id": 5
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Ways to Represent Data and Common File Formats",
+    "question": "A developer needs a text format that uses a hierarchical document schema, encloses objects in braces and collections in square brackets, and represents attributes as name and value pairs. The format must work well for both structured and semi-structured data. Which format is being described?",
+    "options": [
+      "JavaScript Object Notation (JSON)",
+      "Comma-separated values (CSV)",
+      "Optimized Row Columnar (ORC)",
+      "Fixed-width text"
+    ],
+    "correct": 0,
+    "explanation": "JSON uses a hierarchical document schema, encloses objects in braces and collections in square brackets, represents attributes as name and value pairs, and is a flexible format that suits both structured and semi-structured data. CSV is wrong because it is a flat delimited format with no nesting or braces. ORC is wrong because it is a binary columnar storage format, not a human-readable text document format. Fixed-width text is wrong because it is a flat layout with no hierarchy or name and value pairs.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/3-file-storage",
+    "id": 6
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Ways to Represent Data and Common File Formats",
+    "question": "A legacy integration still produces data that uses tags enclosed in angle brackets to define elements and attributes. This human-readable markup format was popular in the 1990s and 2000s and has largely been superseded by a less verbose alternative. Which format is described?",
+    "options": [
+      "Parquet",
+      "Comma-separated values (CSV)",
+      "Avro",
+      "Extensible Markup Language (XML)"
+    ],
+    "correct": 3,
+    "explanation": "XML is a human-readable format that uses tags enclosed in angle brackets to define elements and attributes, was popular in the 1990s and 2000s, and has largely been superseded by the less verbose JSON format. Parquet and Avro are wrong because they are compressed binary formats, not human-readable angle-bracket markup. CSV is wrong because it is a comma-delimited flat text format and does not use tags or angle brackets.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/3-file-storage",
+    "id": 7
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Ways to Represent Data and Common File Formats",
+    "question": "An analytics team frequently runs queries that read only a few columns out of very large datasets stored in a data lake, and they want a format that lets the engine skip irrelevant data and compress well. Which file format best supports these read-heavy, column-focused analytic queries?",
+    "options": [
+      "Avro",
+      "Parquet",
+      "Comma-separated values (CSV)",
+      "Extensible Markup Language (XML)"
+    ],
+    "correct": 1,
+    "explanation": "Parquet stores data in a columnar format, so read transactions can be optimized to retrieve specific columns instead of reading entire records, and it supports efficient compression; this makes it well suited to read-heavy analytics that touch a subset of columns. Avro is wrong because it stores data in a row-based format better suited to write-heavy patterns and reading whole records. CSV and XML are wrong because they are uncompressed, human-readable text formats that are not optimized for columnar reads or efficient storage.",
+    "reference": "https://learn.microsoft.com/azure/storage/blobs/data-lake-storage-best-practices#structure-data-sets",
+    "id": 8
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Ways to Represent Data and Common File Formats",
+    "question": "A streaming pipeline writes many events in succession from a message bus such as Event Hubs or Kafka, and the query pattern usually retrieves whole records rather than a few columns. Which optimized file format is the recommended fit for these write-heavy patterns?",
+    "options": [
+      "Optimized Row Columnar (ORC)",
+      "Parquet",
+      "Avro",
+      "Comma-separated values (CSV)"
+    ],
+    "correct": 2,
+    "explanation": "Avro is a row-based format recommended when I/O patterns are more write-heavy or when queries retrieve multiple rows in their entirety, and it works well with a message bus such as Event Hubs or Kafka that writes events in succession. ORC and Parquet are wrong because they are columnar formats best suited to read-heavy queries that target a subset of columns. CSV is wrong because it is an uncompressed human-readable text format, not an optimized binary format designed for high-volume streaming writes.",
+    "reference": "https://learn.microsoft.com/azure/storage/blobs/data-lake-storage-best-practices#structure-data-sets",
+    "id": 9
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Ways to Represent Data and Common File Formats",
+    "question": "While reviewing Hive workloads, an engineer notes that one optimized binary format stores data in a columnar layout, supports high compression, and indexes groups of rows so the engine can skip rows it does not need. Which format has these characteristics?",
+    "options": [
+      "JavaScript Object Notation (JSON)",
+      "Tab-separated values (TSV)",
+      "Optimized Row Columnar (ORC)",
+      "Avro"
+    ],
+    "correct": 2,
+    "explanation": "ORC (Optimized Row Columnar) is a highly efficient columnar format for Hive data that supports high compression and indexes rows in groups so the engine can skip rows, all of which the description lists. JSON and TSV are wrong because they are human-readable text formats with no columnar layout, built-in compression, or row indexing. Avro is wrong because it stores data in a row-based layout rather than a columnar one.",
+    "reference": "https://learn.microsoft.com/azure/hdinsight/hdinsight-hadoop-optimize-hive-query#use-the-orcfile-format",
+    "id": 10
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Ways to Represent Data and Common File Formats",
+    "question": "Which of the following are commonly used as semi-structured, human-readable text formats? Select all that apply.",
+    "options": [
+      "JavaScript Object Notation (JSON)",
+      "Extensible Markup Language (XML)",
+      "Parquet",
+      "Optimized Row Columnar (ORC)"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "JSON uses a hierarchical document schema of objects and attributes and is a flexible, human-readable format good for semi-structured data, and XML is a human-readable markup format that uses tags to define elements and attributes, so both are correct. Parquet and ORC are incorrect because they are compressed binary, columnar storage formats optimized for analytics, not human-readable text formats for representing semi-structured documents.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/3-file-storage",
+    "id": 11
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Ways to Represent Data and Common File Formats",
+    "question": "A data lake team is comparing the optimized binary formats Avro, Parquet, and ORC. Which statements about these formats are accurate? Select all that apply.",
+    "options": [
+      "They are machine-readable binary formats that embed a schema in each file, making them self-describing",
+      "Parquet and ORC store data in a columnar format",
+      "Avro stores data in a row-based format",
+      "All three are uncompressed, human-readable text formats"
+    ],
+    "correct": [
+      0,
+      1,
+      2
+    ],
+    "explanation": "Avro, Parquet, and ORC are machine-readable binary formats that embed a schema in each file, which makes them self-describing; Parquet and ORC store data in a columnar format; and Avro stores data in a row-based format, so those three statements are correct. The remaining statement is wrong because these are binary (machine-readable) formats that support compression, not uncompressed human-readable text such as CSV or JSON.",
+    "reference": "https://learn.microsoft.com/azure/storage/blobs/data-lake-storage-best-practices#structure-data-sets",
+    "id": 12
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Ways to Represent Data and Common File Formats",
+    "question": "For each statement about ways to represent data and common file formats, indicate whether it is true.",
+    "statements": [
+      "Structured data adheres to a fixed schema and is most commonly represented in tables of rows and columns.",
+      "Documents, images, audio, and video are typically classified as unstructured data.",
+      "CSV is a compressed binary format optimized for columnar analytics queries.",
+      "Avro is a row-based format, while Parquet stores data in a columnar format."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "explanation": "Statement 1 is true (Yes): structured data adheres to a fixed schema and is most commonly tabular, with rows for instances and columns for attributes. Statement 2 is true (Yes): documents, images, audio, and video have no specific structure and are classified as unstructured data. Statement 3 is false (No): CSV is a plain-text, human-readable delimited format, not a compressed binary columnar format; columnar analytic optimization describes Parquet and ORC. Statement 4 is true (Yes): Avro stores data in a row-based format while Parquet stores data in a columnar format.",
+    "reference": "https://learn.microsoft.com/azure/storage/blobs/data-lake-storage-best-practices#structure-data-sets",
+    "id": 13
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Types of Databases and Data Storage Options",
+    "question": "A retail company tracks customers, products, and sales orders, and needs to enforce that every order references an existing customer while avoiding duplicate storage of customer details. Which type of database is the best fit for storing this structured, normalized data?",
+    "options": [
+      "A relational database",
+      "A key-value database",
+      "A graph database",
+      "A column-family database"
+    ],
+    "correct": 0,
+    "explanation": "A relational database stores structured data in tables that represent entities such as customers, products, and orders, uses primary and foreign keys to reference entities across tables, and supports normalization so that details like a customer's information are stored only once. A key-value database simply pairs a unique key with an opaque value and does not enforce relationships between entities. A graph database is optimized for traversing relationships rather than enforcing tabular referential integrity for normalized records. A column-family database groups columns into families for sparse, wide data and does not provide the relational referential-integrity model this scenario describes.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/4-databases",
+    "id": 14
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Types of Databases and Data Storage Options",
+    "question": "A development team is cataloging the common categories of non-relational (NoSQL) databases for an internal design guide. Besides graph databases, which set of three categories represents the other common non-relational database types described by Microsoft?",
+    "options": [
+      "Columnstore index, in-memory, and temporal databases",
+      "Key-value, document, and column-family databases",
+      "Star schema, snowflake, and fact-table databases",
+      "Hierarchical, network, and object-oriented databases"
+    ],
+    "correct": 1,
+    "explanation": "Microsoft describes four common non-relational database types: key-value, document, column-family, and graph. So alongside graph, the other three are key-value, document, and column-family. The columnstore index, in-memory, and temporal options describe features of relational engines, not categories of NoSQL databases. Star schema, snowflake, and fact tables are dimensional-modeling structures used in analytical data warehouses, not NoSQL database categories. Hierarchical, network, and object-oriented are older or distinct database paradigms, not the non-relational categories Microsoft lists for this objective.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/4-databases",
+    "id": 15
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Types of Databases and Data Storage Options",
+    "question": "An engineering team wants each stored record to consist of a collection of named fields and values, typically formatted as a JSON document that the database is optimized to parse and query, with the ability to query on non-key fields. Which database type matches this description?",
+    "options": [
+      "A key-value database",
+      "A column-family database",
+      "A document database",
+      "A graph database"
+    ],
+    "correct": 2,
+    "explanation": "A document database stores each record as a document, commonly in JSON, made up of named fields and values, and the system is optimized to parse and query those documents, including querying on non-key fields. A key-value database stores an opaque value retrieved only by its key and is not optimized to query inside the value. A column-family database organizes data into rows and column families for wide, sparse tabular data rather than self-describing JSON documents. A graph database stores nodes and edges to model relationships, not field-and-value documents.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/technology-choices/understand-data-store-models#nonrelational-data-stores",
+    "id": 16
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Types of Databases and Data Storage Options",
+    "question": "A mobile application needs an extremely simple store where each record is a unique key paired with an associated value in any format, and the application always retrieves data by specifying the key. Which database type best matches this access pattern?",
+    "options": [
+      "A document database",
+      "A graph database",
+      "A relational database",
+      "A key-value database"
+    ],
+    "correct": 3,
+    "explanation": "A key-value database associates each value with a unique key, the value can be in any format, and retrieval is based on specifying that key, which exactly matches the described access pattern. A document database is a specialized key-value store whose values are queryable JSON documents, going beyond the plain key-based lookup described here. A graph database is built to traverse relationships between nodes, not to perform simple key lookups. A relational database organizes data into related tables queried with SQL, which is more complex than the simple key-based retrieval required.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/4-databases",
+    "id": 17
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Types of Databases and Data Storage Options",
+    "question": "A team designs a store for tabular data made up of rows and columns, but wants to divide the columns into logically related groups so that a single group can be read without scanning all of an entity's data. Which database type provides this organization?",
+    "options": [
+      "A column-family database",
+      "A document database",
+      "A key-value database",
+      "A graph database"
+    ],
+    "correct": 0,
+    "explanation": "A column-family (wide-column) database stores tabular data in rows and columns but lets you divide the columns into groups called column families, where each family holds a set of logically related columns and can be read independently. A document database stores self-describing JSON documents rather than grouped tabular columns. A key-value database stores a single opaque value per key with no column structure. A graph database stores nodes and edges to represent relationships, not grouped columns of tabular data.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/4-databases",
+    "id": 18
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Types of Databases and Data Storage Options",
+    "question": "A social platform must answer questions such as which people are connected to a given user and how two users are linked through mutual friends, where the relationships themselves are the most important part of the data. Which database type is purpose-built for this?",
+    "options": [
+      "A key-value database",
+      "A graph database",
+      "A column-family database",
+      "A document database"
+    ],
+    "correct": 1,
+    "explanation": "A graph database stores entities as nodes with edges that define the relationships between them, making it efficient to perform queries that traverse the network of objects and the connections among them, which is exactly what analyzing how people are connected requires. A key-value database only supports lookup of a value by its key and cannot efficiently traverse relationships. A column-family database is optimized for wide, sparse tabular data, not relationship traversal. A document database stores documents of fields and values and is not optimized for navigating relationships between many entities.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/4-databases",
+    "id": 19
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Types of Databases and Data Storage Options",
+    "question": "In a graph database, an organization wants to represent its employees and the departments they belong to. How are the entities (employees and departments) and the connections between them represented?",
+    "options": [
+      "Entities are rows and connections are foreign-key columns",
+      "Entities are documents and connections are embedded arrays",
+      "Entities are nodes and connections are edges",
+      "Entities are keys and connections are values"
+    ],
+    "correct": 2,
+    "explanation": "In a graph database, entities are stored as nodes and the relationships between them are stored as edges; both nodes and edges can have properties. Rows and foreign-key columns describe how a relational database links tables, not how a graph stores data. Documents with embedded arrays describe a document database approach. Keys paired with values describe a key-value store. Only nodes and edges correctly describe the graph model.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/technology-choices/understand-data-store-models#nonrelational-data-stores",
+    "id": 20
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Types of Databases and Data Storage Options",
+    "question": "A team is building an application whose records have a flexible structure that changes frequently, and the store must scale out across many servers to absorb very high write volumes. Strict cross-table ACID transactions are not required. Which kind of database is the better overall fit for these requirements?",
+    "options": [
+      "A relational database, because it is optimized for fixed-schema data with table joins and strong consistency",
+      "A non-relational (NoSQL) database",
+      "A plain text file copied to each server by hand",
+      "A spreadsheet shared among the application's users"
+    ],
+    "correct": 1,
+    "explanation": "Non-relational (NoSQL) databases are designed for flexible, frequently changing schemas, horizontal scale-out, and high write throughput, and they relax some relational behavior such as enforced schema and broad cross-table transaction scope, so they are the better fit when the data structure changes often, the system must scale out for heavy writes, and strict cross-table ACID transactions are not needed. A relational database is optimized for well-structured data with defined relationships and strong consistency, which makes it less suited to this particular workload whose changing structure and heavy scale-out writes are exactly the requirements NoSQL targets. A plain text file copied by hand provides no querying, concurrency, or scale-out and is not a database. A shared spreadsheet is not a managed database and cannot scale to high-volume concurrent writes.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/technology-choices/understand-data-store-models#nonrelational-data-stores",
+    "id": 21
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Types of Databases and Data Storage Options",
+    "question": "A content-management system stores articles where each item has a flexible set of named fields, some articles include nested lists and child collections, and the schema is expected to evolve over time per item. Which database type best supports this semi-structured, evolving data?",
+    "options": [
+      "A document database",
+      "A relational database",
+      "A key-value database",
+      "A column-family database"
+    ],
+    "correct": 0,
+    "explanation": "A document database stores semi-structured documents, often in JSON, where each document includes named fields and data that can be simple values or complex elements such as lists and child collections, and its per-document schema flexibility supports gradual evolution, matching the content-management scenario. A relational database enforces a fixed schema across rows in a table, making per-item schema evolution awkward. A key-value database treats the value as opaque and cannot query or index the nested fields. A column-family database is designed for wide, sparse tabular data grouped into families rather than rich nested documents.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/technology-choices/understand-data-store-models#nonrelational-data-stores",
+    "id": 22
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Types of Databases and Data Storage Options",
+    "question": "A team is documenting the defining characteristics of a relational database for new hires. Which statements accurately describe relational databases? (Select all that apply.)",
+    "options": [
+      "Data is stored in tables of rows and columns that represent entities",
+      "Tables are managed and queried using Structured Query Language (SQL)",
+      "Each record is simply a unique key paired with an opaque value of any format",
+      "Data is stored as nodes and edges to model relationships between entities"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Relational databases store structured data in tables of rows and columns that represent entities such as customers or orders, and those tables are managed and queried using SQL, an ANSI-standard language, so both of these statements are correct. Storing each record as a unique key paired with an opaque value describes a key-value database, not a relational one. Storing data as nodes and edges to model relationships describes a graph database. Therefore those two statements are wrong for a relational database.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/4-databases",
+    "id": 23
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Types of Databases and Data Storage Options",
+    "question": "An architect is matching workloads to the most suitable non-relational database type. Which pairings of workload to database type are appropriate? (Select all that apply.)",
+    "options": [
+      "Traversing a network of connected entities to find indirect relationships maps to a graph database",
+      "Retrieving a stored value quickly by a single unique key, with no need to query other properties, maps to a key-value database",
+      "Storing and querying flexible JSON documents with named fields and secondary indexes maps to a column-family database",
+      "Detecting connections among entities such as fraud rings maps to a key-value database"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Traversing a network of connected entities to discover indirect relationships is exactly what a graph database, with its nodes and edges, is designed for, so that pairing is correct. Retrieving a value quickly by a single unique key without querying other properties is the defining access pattern of a key-value database, so that pairing is also correct. Storing and querying flexible JSON documents with named fields and secondary indexes describes a document database, not a column-family database, so that pairing is wrong. Detecting connections among entities such as fraud rings calls for a graph database, not a key-value database, so that pairing is wrong as well.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/technology-choices/understand-data-store-models#nonrelational-data-stores",
+    "id": 24
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Types of Databases and Data Storage Options",
+    "question": "For each of the following statements about database types, indicate whether the statement is true.",
+    "statements": [
+      "A document database is a specialized form of key-value database in which the value is a JSON document the system can parse and query.",
+      "Non-relational databases are often referred to as NoSQL databases.",
+      "A column-family database stores data as nodes and edges to model relationships between entities.",
+      "Relational databases use normalization so that a value such as a customer's details can be stored only once and referenced by a key."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "explanation": "Statement 1 is true: a document database is a specialized form of key-value database in which the value is a JSON document that the system is optimized to parse and query, so it is keyed Yes. Statement 2 is true: non-relational databases are commonly called NoSQL databases, even though some support a SQL-like language, so it is keyed Yes. Statement 3 is false: storing data as nodes and edges to model relationships describes a graph database, whereas a column-family database stores tabular rows and columns grouped into column families, so it is keyed No. Statement 4 is true: relational databases use normalization and keys so that details such as a customer's information are stored only once and referenced elsewhere, so it is keyed Yes.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/4-databases",
+    "id": 25
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Data Workloads and Data Roles",
+    "question": "A retail company runs a point-of-sale system that constantly creates, reads, updates, and deletes individual order and payment records as customers check out throughout the day. How is this kind of data processing workload best classified?",
+    "options": [
+      "Online analytical processing (OLAP)",
+      "Online transactional processing (OLTP)",
+      "Batch historical reporting",
+      "Semantic modeling"
+    ],
+    "correct": 1,
+    "explanation": "A point-of-sale system that records discrete business events with frequent create, retrieve, update, and delete (CRUD) operations on individual records is the textbook definition of an online transactional processing (OLTP) workload. The option describing online analytical processing is wrong because OLAP systems are read-mostly and built for aggregating large volumes of historical data, not for high-volume individual transactions. Batch historical reporting describes periodic analysis of accumulated data rather than live transaction capture. Semantic modeling is a read-optimized abstraction over analytical data for reporting, not the act of processing live business transactions.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/5-transactional-data-processing",
+    "id": 26
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Data Workloads and Data Roles",
+    "question": "In a banking transfer, money is debited from one account and credited to another. The system must guarantee that either both the debit and the credit complete, or neither of them is applied, so the operation is never left half-finished. Which ACID property describes this guarantee?",
+    "options": [
+      "Durability",
+      "Isolation",
+      "Atomicity",
+      "Consistency"
+    ],
+    "correct": 2,
+    "explanation": "Atomicity means a transaction is treated as a single unit that succeeds completely or fails completely, so the debit and the credit must both happen or both be rolled back. The durability property addresses whether a committed transaction survives a system failure, not whether the steps complete together. Isolation concerns whether concurrent transactions interfere with one another. Consistency ensures the database moves from one valid state to another, but it is the all-or-nothing completion of the two steps that is specifically the atomicity guarantee.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/5-transactional-data-processing",
+    "id": 27
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Data Workloads and Data Roles",
+    "question": "While a fund-transfer transaction is still in progress, a separate balance-check transaction runs at the same time. The database must ensure that the balance check does not see a half-applied state, such as the debit being visible before the matching credit. Which ACID property provides this protection?",
+    "options": [
+      "Isolation",
+      "Atomicity",
+      "Durability",
+      "Consistency"
+    ],
+    "correct": 0,
+    "explanation": "Isolation ensures that concurrent transactions do not interfere with one another, so a balance-check running alongside an in-progress transfer cannot observe a partially applied intermediate state. Atomicity is about a single transaction completing fully or not at all, not about how concurrent transactions see each other's intermediate work. Durability is about committed changes persisting after a failure. Consistency is about each transaction leaving the data in a valid state overall; the specific protection against concurrent transactions reading mid-flight data is isolation.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/5-transactional-data-processing",
+    "id": 28
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Data Workloads and Data Roles",
+    "question": "After an order-payment transaction is committed, the updated balances must still be present even if the database server loses power and is later restarted. Which ACID property ensures committed changes are permanently persisted?",
+    "options": [
+      "Consistency",
+      "Isolation",
+      "Atomicity",
+      "Durability"
+    ],
+    "correct": 3,
+    "explanation": "Durability guarantees that once a transaction is committed it remains committed and its effects survive a system failure such as a power loss. Consistency ensures a transaction moves the data only between valid states but does not by itself promise survival across a restart. Isolation governs how concurrent transactions are shielded from each other. Atomicity ensures the transaction is all-or-nothing while it runs, but persistence of the committed result after a crash is specifically the durability property.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/5-transactional-data-processing",
+    "id": 29
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Data Workloads and Data Roles",
+    "question": "An analytics team needs to run complex aggregate queries and trend analysis over years of accumulated sales history to support business reporting. Which characteristic best describes an online analytical processing (OLAP) system suited to this need?",
+    "options": [
+      "It is optimized for heavy-read, low-write workloads and often preserves historical data for analysis",
+      "It is optimized for high-volume individual create and update transactions with ACID guarantees",
+      "It enforces pessimistic row locking so concurrent writers never block each other",
+      "It stores each business event as a single normalized record for immediate retrieval"
+    ],
+    "correct": 0,
+    "explanation": "OLAP databases are optimized for heavy-read and low-write tasks and frequently preserve historical data for time-series and trend analysis, which is exactly what large-scale aggregate reporting requires. The option describing high-volume individual create and update transactions with ACID guarantees describes an OLTP system, not OLAP. The locking statement describes a transactional concurrency concern and is also mischaracterized, since OLAP workloads are read-mostly and do not center on concurrent writers. Storing each event as a single normalized record for immediate retrieval again describes transactional processing rather than read-optimized analytical processing.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/relational-data/online-analytical-processing",
+    "id": 30
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Data Workloads and Data Roles",
+    "question": "A team is documenting which data role is accountable for granting and denying user access to a database, scheduling backups, and restoring data after a failure. Which role owns these responsibilities?",
+    "options": [
+      "Data analyst",
+      "Database administrator",
+      "Data engineer",
+      "Data scientist"
+    ],
+    "correct": 1,
+    "explanation": "A database administrator is responsible for the security of the data, granting or denying user privileges, implementing backup and recovery plans, and restoring data following a failure. A data analyst explores and analyzes data to build reports and visualizations and does not own backup, recovery, or access control. A data engineer builds ingestion pipelines and data stores rather than administering database access and backups. A data scientist focuses on advanced modeling and deriving insights, not on database security and recovery operations.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-roles-responsibilities-world-of-data/2-explore-job-roles",
+    "id": 31
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Data Workloads and Data Roles",
+    "question": "An organization needs someone to design and implement data ingestion pipelines, apply cleansing and transformation activities, and build data stores that feed analytical workloads. Which data role is the best fit for these responsibilities?",
+    "options": [
+      "Database administrator",
+      "Data analyst",
+      "Data engineer",
+      "Business user"
+    ],
+    "correct": 2,
+    "explanation": "A data engineer designs and implements data ingestion pipelines, performs cleansing and transformation activities, and builds the data stores used for analytical workloads, working across relational and nonrelational technologies. A database administrator focuses on database availability, performance, security, and backup and recovery rather than building transformation pipelines. A data analyst consumes prepared data to create reports and visualizations rather than engineering the pipelines that deliver it. A business user typically consumes reports and dashboards and is not responsible for building data pipelines.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-roles-responsibilities-world-of-data/2-explore-job-roles",
+    "id": 32
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Data Workloads and Data Roles",
+    "question": "A manager wants a professional who can explore the organization's data to identify trends and relationships, build analytical models, and present findings through reports and visualizations that help the business make decisions. Which role should the manager hire?",
+    "options": [
+      "Data analyst",
+      "Database administrator",
+      "Data engineer",
+      "AI engineer"
+    ],
+    "correct": 0,
+    "explanation": "A data analyst enables a business to maximize the value of its data by exploring it to identify trends and relationships, designing and building analytical models, and delivering insights through reports and visualizations. A database administrator manages availability, performance, security, and backups rather than producing business reports. A data engineer builds the pipelines and data stores that supply data but does not focus on creating the visual reports for decision makers. An AI engineer builds and integrates AI-powered features such as those using large language models, which is a different focus from business reporting and visualization.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-roles-responsibilities-world-of-data/2-explore-job-roles",
+    "id": 33
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Data Workloads and Data Roles",
+    "question": "Compared with a transactional (OLTP) database, how is a data warehouse used for analytical workloads typically described?",
+    "options": [
+      "As a write-heavy store optimized for many small concurrent transactions",
+      "As a relational store optimized primarily for read operations that support reporting and visualization",
+      "As a store that cannot use a relational schema and must remain fully normalized",
+      "As a cache that holds only the current day's individual transactions"
+    ],
+    "correct": 1,
+    "explanation": "A data warehouse is described as an established way to store data in a relational schema that is optimized for read operations, primarily queries that support reporting and data visualization. Describing it as write-heavy and optimized for many small concurrent transactions instead characterizes an OLTP system. The claim that it cannot use a relational schema is incorrect, because a data warehouse uses a relational schema and analytical schemas often denormalize rather than stay fully normalized. Describing it as a cache holding only the current day's individual transactions contradicts the analytical purpose of storing large volumes of historical data for reporting.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-core-data-concepts/6-analytical-processing",
+    "id": 34
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Data Workloads and Data Roles",
+    "question": "A team is mapping responsibilities to the data analyst role for a cloud-based analytics solution. Which of the following are core data analyst responsibilities? (Select all that apply.)",
+    "options": [
+      "Exploring data to identify and explain trends and relationships within it",
+      "Building reports, dashboards, and visualizations that help an organization make informed decisions",
+      "Designing and building data ingestion and transformation pipelines that feed analytical stores",
+      "Configuring backups and managing user access and permissions for the database"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "A data analyst explores data to identify trends and relationships within it, and delivers insights through reports, dashboards, and visualizations that enable an organization to make informed decisions, so both of those statements describe analyst work. Designing and building data ingestion and transformation pipelines that feed analytical stores is a data engineer responsibility, not an analyst one. Configuring backups and managing user access and permissions are database administrator responsibilities. Neither of those belongs to the data analyst role.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-roles-responsibilities-world-of-data/2-explore-job-roles",
+    "id": 35
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Data Workloads and Data Roles",
+    "question": "An architect is distinguishing transactional (OLTP) workloads from analytical (OLAP) workloads. Which statements correctly describe analytical workloads? (Select all that apply.)",
+    "options": [
+      "They are optimized for heavy-read, low-write access patterns",
+      "They commonly store large volumes of historical data for trend analysis",
+      "Their primary purpose is to process high volumes of individual business transactions in real time",
+      "They often aggregate data so that summary queries return results quickly"
+    ],
+    "correct": [
+      0,
+      1,
+      3
+    ],
+    "explanation": "Analytical (OLAP) workloads are optimized for heavy-read, low-write access, commonly retain large volumes of historical data for trend and time-series analysis, and often preaggregate data so that summary queries return quickly. Processing high volumes of individual business transactions in real time is the defining purpose of a transactional (OLTP) workload, not an analytical one, so that statement is not a correct selection.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/relational-data/online-analytical-processing",
+    "id": 36
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Data Workloads and Data Roles",
+    "question": "Evaluate each statement about data workloads and data roles. For each, indicate whether it is true.",
+    "statements": [
+      "An online transactional processing (OLTP) system relies on transactions that support ACID semantics: atomicity, consistency, isolation, and durability.",
+      "A data engineer is the role primarily responsible for granting or denying users access to a database and for restoring data after a failure.",
+      "Analytical processing systems are typically read-only or read-mostly and store large volumes of historical data.",
+      "A data analyst is primarily responsible for creating reports and visualizations that help an organization make informed decisions."
+    ],
+    "correct": [
+      0,
+      1,
+      0,
+      0
+    ],
+    "explanation": "Statement one is true: OLTP systems enforce transactions that support ACID semantics, namely atomicity, consistency, isolation, and durability. Statement two is false: granting or denying database access and restoring data after a failure are database administrator responsibilities, whereas a data engineer builds ingestion pipelines and data stores. Statement three is true: analytical processing systems are read-only or read-mostly and store large volumes of historical data. Statement four is true: a data analyst explores data and creates reports and visualizations that enable an organization to make informed decisions.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-roles-responsibilities-world-of-data/2-explore-job-roles",
+    "id": 37
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Data Workloads and Data Roles",
+    "question": "Evaluate each statement about transactional versus analytical processing. For each, indicate whether it is true.",
+    "statements": [
+      "Transactional (OLTP) systems support create, retrieve, update, and delete (CRUD) operations on individual records.",
+      "Running resource-intensive aggregate analytics directly against an OLTP system can slow it down and block other transactions.",
+      "Online analytical processing (OLAP) systems are write-heavy and optimized for many small concurrent updates.",
+      "A semantic model in analytical processing is suited to read-heavy scenarios rather than write-heavy transactional processing."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "explanation": "Statement one is true: OLTP systems support create, retrieve, update, and delete (CRUD) operations applied transactionally to individual records. Statement two is true: aggregate analytics that span millions of records are resource-intensive on an OLTP system and can slow it down by blocking other transactions, which is why analytical workloads are usually separated. Statement three is false: OLAP systems are optimized for heavy-read, low-write workloads, not write-heavy concurrent updates, which describes OLTP. Statement four is true: semantic modeling is predominately for read-heavy scenarios such as analytics and business intelligence rather than write-heavy transactional processing.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/relational-data/online-analytical-processing#semantic-modeling",
+    "id": 38
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "A retail team is modeling its data in a relational database. They want to store information about each customer so that every customer record holds the same set of attributes such as name, email, and city. In the relational model, what does a single row in the Customer table represent?",
+    "options": [
+      "One instance of the customer entity",
+      "The data type allowed for a single column",
+      "A virtual result of a saved query",
+      "The set of permissions granted to a user"
+    ],
+    "correct": 0,
+    "explanation": "In the relational model, an entity such as a customer is modeled as a table, and each row in that table represents a single instance of the entity (one customer). 'The data type allowed for a single column' describes a column's definition, not a row. 'A virtual result of a saved query' describes a view, which is a separate database object. 'The set of permissions granted to a user' relates to access control, not to what a row represents.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-relational-data-offerings/2-understand-relational-data",
+    "id": 39
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "While defining a Product table, an analyst notes that the Price column accepts decimal numbers, the Quantity column accepts whole numbers, and the OrderDate column accepts date/time values. What characteristic of relational tables does this enforcement of a specific kind of value per column describe?",
+    "options": [
+      "Each row may contain a different set of columns",
+      "Each column stores data of a specific data type",
+      "Columns automatically detect their type from inserted values",
+      "Tables store data without any defined structure"
+    ],
+    "correct": 1,
+    "explanation": "Relational tables have a defined schema in which each column stores data of a specific data type, so a price column holds decimal values and a quantity column holds integers. 'Each row may contain a different set of columns' is wrong because every row in a relational table shares the same columns. 'Columns automatically detect their type from inserted values' is incorrect because the data type is declared when the table is defined, not inferred per value. 'Tables store data without any defined structure' contradicts the relational model, which is structured data with a fixed schema.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-relational-data-offerings/2-understand-relational-data",
+    "id": 40
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "An order-management database links each order to the customer who placed it. The Order table stores a column whose value must match an existing identifier in the Customer table so that orders can never reference a customer that does not exist. What is this column called?",
+    "options": [
+      "A clustered index",
+      "A stored procedure",
+      "A foreign key",
+      "A primary key"
+    ],
+    "correct": 2,
+    "explanation": "A foreign key is a column (or columns) in one table that references a key in another table (typically its primary key, though it can also reference a UNIQUE constraint), and it enforces referential integrity so a value must correspond to an existing key in the related table. A primary key uniquely identifies rows within its own table rather than linking to another table. A clustered index controls physical sort order for fast lookups and does not enforce a cross-table reference. A stored procedure is saved executable SQL, not a relationship-defining column.",
+    "reference": "https://learn.microsoft.com/sql/relational-databases/tables/create-foreign-key-relationships?view=sql-server-ver17#limitations",
+    "id": 41
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "A database designer needs to guarantee that every row in the Employee table can be uniquely identified and that no two rows share the same identifying value. Which database construct is specifically intended to enforce this uniqueness for each row in the table?",
+    "options": [
+      "A foreign key",
+      "A view",
+      "A primary key",
+      "A GRANT statement"
+    ],
+    "correct": 2,
+    "explanation": "A primary key is the column or combination of columns whose values uniquely identify each row and enforce the table's entity integrity, guaranteeing no duplicate identifying values. A foreign key links to another table's primary key and does not by itself enforce uniqueness in its own table. A view is a virtual table over a query and does not define row identity. A GRANT statement controls permissions and has nothing to do with uniquely identifying rows.",
+    "reference": "https://learn.microsoft.com/sql/relational-databases/tables/primary-and-foreign-key-constraints?view=sql-server-ver17#primary-key-constraints",
+    "id": 42
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "A company tracks sales in a single spreadsheet where each line repeats the customer's name and address alongside the product details for every item sold. They migrate to a relational design and split customers, products, and orders into separate tables linked by keys. What is the primary purpose of this normalization process?",
+    "options": [
+      "To minimize data duplication and enforce data integrity",
+      "To remove the need for primary keys in the design",
+      "To store the data without any defined schema",
+      "To guarantee faster results for every possible query"
+    ],
+    "correct": 0,
+    "explanation": "Normalization is a schema design process that minimizes data duplication and enforces data integrity by separating each entity into its own table and linking them with keys, so a value such as a customer address is stored once. 'To remove the need for primary keys' is wrong because normalization relies on primary keys to identify each row. 'To store the data without any defined schema' is incorrect because normalization produces a structured, defined schema. 'To guarantee faster results for every possible query' is not its purpose; normalization targets reduced redundancy and integrity, and can sometimes require additional joins.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-relational-data-offerings/3-normalization",
+    "id": 43
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "In a normalized order database, a customer's mailing address is stored in exactly one place. A business analyst asks why this design is preferred over repeating the address on every order line. Which benefit best explains storing the address in a single location?",
+    "options": [
+      "Queries can no longer join the Order and Customer tables",
+      "The database no longer requires any data types",
+      "Each table can store rows with different columns",
+      "Changing the address requires updating only one row"
+    ],
+    "correct": 3,
+    "explanation": "When an attribute such as a customer address is stored once, changing it requires modifying only a single row, which removes duplication and avoids inconsistent copies. 'Queries can no longer join the Order and Customer tables' is wrong because joins are exactly how the related data is recombined. 'The database no longer requires any data types' is false; normalized columns still have defined data types. 'Each table can store rows with different columns' contradicts the relational model, where rows in a table share the same columns.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-relational-data-offerings/3-normalization",
+    "id": 44
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "A developer must add a brand-new table to a relational database to hold supplier records. Which category of SQL statements is designed for creating, modifying, and removing tables and other database structures?",
+    "options": [
+      "Data Manipulation Language (DML)",
+      "Data Definition Language (DDL)",
+      "Data Control Language (DCL)",
+      "A stored procedure"
+    ],
+    "correct": 1,
+    "explanation": "Data Definition Language (DDL) statements, such as CREATE, ALTER, and DROP, are used to create, modify, and remove tables and other objects in a database. Data Manipulation Language (DML) works with the rows inside tables (for example SELECT, INSERT, UPDATE, DELETE) rather than defining the structures. Data Control Language (DCL) manages permissions with statements like GRANT and REVOKE. A stored procedure is a database object that contains saved SQL, not a category of SQL statements.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-relational-data-offerings/4-query-with-sql",
+    "id": 45
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "An application needs to read existing rows, add new rows, and change values in rows of the Customer table. Which family of SQL statements is used to manipulate the data stored in the rows of tables?",
+    "options": [
+      "Data Control Language (DCL)",
+      "Data Definition Language (DDL)",
+      "Data Manipulation Language (DML)",
+      "Referential integrity constraints"
+    ],
+    "correct": 2,
+    "explanation": "Data Manipulation Language (DML) statements, including SELECT, INSERT, UPDATE, and DELETE, manipulate the rows in tables by retrieving, adding, modifying, and removing data. Data Control Language (DCL) manages permissions rather than data content. Data Definition Language (DDL) defines and changes the structures (such as tables), not the rows within them. Referential integrity constraints enforce valid relationships between tables and are not a statement family for manipulating row data.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-relational-data-offerings/4-query-with-sql",
+    "id": 46
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "A database administrator wants to allow a specific user to read and insert data in the Product table, and later be able to remove that permission. Which family of SQL statements is intended for granting and revoking permissions on database objects?",
+    "options": [
+      "Data Control Language (DCL)",
+      "Data Manipulation Language (DML)",
+      "Data Definition Language (DDL)",
+      "A view definition"
+    ],
+    "correct": 0,
+    "explanation": "Data Control Language (DCL) statements such as GRANT, DENY, and REVOKE are used to manage access by granting or removing permissions on database objects. Data Manipulation Language (DML) changes the data in rows but does not control permissions. Data Definition Language (DDL) defines object structures rather than access rights. A view definition is a stored query that presents data and is not a statement family for managing permissions.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-relational-data-offerings/4-query-with-sql",
+    "id": 47
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "A reporting team frequently runs the same complex query that joins the Order and Customer tables to show delivery details. They want to expose this combined result as a single object that can be queried like a table, without physically duplicating the data into a new table. Which database object best fits this need?",
+    "options": [
+      "An index",
+      "A view",
+      "A primary key",
+      "A foreign key"
+    ],
+    "correct": 1,
+    "explanation": "A view is a virtual table based on the results of a SELECT query; it lets users query a combined result as though it were a table without storing a separate physical copy of the data. An index is a structure that speeds up lookups, not a queryable virtual table. A primary key uniquely identifies rows, and a foreign key links tables, neither of which exposes a saved query result as an object.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-relational-data-offerings/5-database-objects",
+    "id": 48
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "Queries that filter the large Product table by the Name column have become slow because the database must scan the whole table row by row. A developer wants a structure that holds a sorted copy of the Name values with pointers to the matching rows so lookups on that column are faster. Which database object should be created?",
+    "options": [
+      "A stored procedure",
+      "A view",
+      "An index",
+      "A foreign key"
+    ],
+    "correct": 2,
+    "explanation": "An index stores a sorted copy of one or more columns with pointers to the corresponding rows, letting the query optimizer locate matching rows quickly instead of scanning the whole table, which is ideal for speeding up filters on a column such as Name. A stored procedure encapsulates executable SQL but does not by itself accelerate column lookups. A view presents a saved query result and does not inherently speed up searches. A foreign key enforces a relationship between tables rather than improving lookup speed.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-relational-data-offerings/5-database-objects",
+    "id": 49
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "An onboarding guide for new analysts lists several items and asks which ones are common database objects found in a relational database. Select all that are database objects.",
+    "options": [
+      "A view",
+      "An index",
+      "A stored procedure",
+      "Normalization"
+    ],
+    "correct": [
+      0,
+      1,
+      2
+    ],
+    "explanation": "A view (a virtual table based on a SELECT query), an index (a structure that speeds up data lookups), and a stored procedure (saved SQL that runs on command) are all common database objects in a relational database. Normalization is a database design technique used to reduce data duplication, not a database object, so it is not a correct selection.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-relational-data-offerings/5-database-objects",
+    "id": 50
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "A new database developer is matching common SQL statements to the language family each one belongs to. Which of the following statement-to-family pairings are correct? Select all that apply.",
+    "options": [
+      "CREATE TABLE is a Data Definition Language (DDL) statement",
+      "GRANT is a Data Control Language (DCL) statement",
+      "UPDATE is a Data Manipulation Language (DML) statement",
+      "SELECT is a Data Definition Language (DDL) statement"
+    ],
+    "correct": [
+      0,
+      1,
+      2
+    ],
+    "explanation": "Data Definition Language (DDL) statements such as CREATE, ALTER, and DROP define database structures, so classifying CREATE TABLE as DDL is correct. Data Control Language (DCL) statements such as GRANT, DENY, and REVOKE manage permissions, so classifying GRANT as DCL is correct. Data Manipulation Language (DML) statements work with the data in rows, so classifying UPDATE as DML is correct. Classifying SELECT as a DDL statement is wrong: SELECT retrieves data and belongs to DML, not DDL.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-relational-data-offerings/4-query-with-sql",
+    "id": 51
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "A new database engineer is reviewing the characteristics of data stored in a relational table. Which of the following statements accurately describe relational tables? Select all that apply.",
+    "options": [
+      "Every row in a table has the same set of columns",
+      "Each column is defined to store a specific data type",
+      "A column can hold values of any mixture of unrelated types per row",
+      "A table has no schema and accepts arbitrarily shaped records"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Relational tables are structured data where every row shares the same set of columns, and each column is defined to store a specific data type such as text, decimal, or date/time. 'A column can hold values of any mixture of unrelated types per row' is wrong because a column is constrained to its declared data type. 'A table has no schema and accepts arbitrarily shaped records' is incorrect because relational tables have a defined schema with consistent columns.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-relational-data-offerings/2-understand-relational-data",
+    "id": 52
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "A study group is reviewing statements about common database objects in a relational database. For each statement, decide whether it is correct.",
+    "statements": [
+      "A view is a virtual table based on the results of a SELECT query.",
+      "A stored procedure defines SQL statements that can be run on command and can accept parameters.",
+      "An index is primarily used to enforce permissions on a table.",
+      "Adding indexes to a table is free and never affects insert, update, or delete performance."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "explanation": "Statement one is true: a view is a virtual table based on the results of a SELECT query. Statement two is true: a stored procedure encapsulates SQL statements that run on command and can be defined with parameters for flexible, reusable actions. Statement three is false: an index speeds up data lookups, while permissions are managed with Data Control Language statements such as GRANT and REVOKE. Statement four is false: indexes consume storage and add overhead to data-modification operations such as inserts, updates, and deletes (especially those affecting indexed columns), which can slow those operations, so they are not free.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-relational-data-offerings/5-database-objects",
+    "id": 53
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Relational Concepts, Normalization, and SQL",
+    "question": "An instructor presents statements about keys, relationships, and normalization in relational databases. For each statement, decide whether it is correct.",
+    "statements": [
+      "A primary key value uniquely identifies each row within its table.",
+      "A foreign key references a key in a related table (typically its primary key) and helps enforce referential integrity.",
+      "Normalization is intended to increase duplication of data across tables.",
+      "A primary key can be a composite key made from a unique combination of multiple columns."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "explanation": "Statement one is true: a primary key uniquely identifies each row and enforces entity integrity within its table. Statement two is true: a foreign key references a key in a related table (typically its primary key) and the relational database can use it to enforce referential integrity, preventing references to nonexistent rows. Statement three is false: normalization minimizes data duplication rather than increasing it. Statement four is true: a key can be defined as a composite key based on a unique combination of multiple columns, such as combining an order number and an item number.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-relational-data-offerings/3-normalization",
+    "id": 54
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Relational Data Services",
+    "question": "A startup is building a brand-new, cloud-native ordering application and wants to spend as little time as possible on database administration. The team does not want to manage virtual machines, the operating system, or apply database engine patches, and they want built-in backups and high availability handled by Azure. Which relational offering best fits these goals?",
+    "options": [
+      "Azure SQL Database (a fully managed platform as a service offering)",
+      "SQL Server installed on an Azure virtual machine that the team patches themselves",
+      "An on-premises SQL Server cluster connected to Azure over a VPN",
+      "A SQL Server failover cluster the team builds across two self-managed Azure VMs"
+    ],
+    "correct": 0,
+    "explanation": "Azure SQL Database is a relational database-as-a-service in the platform as a service (PaaS) category: Azure handles patching, backups, and high availability, and the customer no longer manages virtual machines, the operating system, or the hardware. The SQL Server on an Azure VM choice and the self-managed VM failover cluster choice are infrastructure as a service, so the team would still own OS and engine patching. An on-premises cluster is not an Azure relational service at all and still leaves the team managing everything.",
+    "reference": "https://learn.microsoft.com/azure/azure-sql/azure-sql-iaas-vs-paas-what-is-overview?view=azuresql#service-comparison",
+    "id": 55
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Relational Data Services",
+    "question": "A software vendor runs a SaaS application that provisions a separate database per customer. The customer databases have variable, unpredictable usage peaks that rarely occur at the same time, and the vendor wants those databases to share a common pool of compute resources within a fixed budget rather than over-provisioning each one. Which Azure SQL Database deployment option is designed for this pattern?",
+    "options": [
+      "A single database with its own dedicated set of resources",
+      "An elastic pool that shares a set of resources across multiple databases",
+      "A SQL Server on Azure VM hosting one database per customer",
+      "A read replica of each customer database"
+    ],
+    "correct": 1,
+    "explanation": "An elastic pool is a collection of databases on a logical server that share a set amount of resources at a set price, designed for SaaS multitenant patterns where individual databases have variable, unpredictable usage that peaks at different times. A single database has its own dedicated resources, which means over-provisioning each one for its own peak. A SQL Server on Azure VM is an IaaS choice that does not provide the SQL Database elastic pooling mechanism. A read replica scales out reads of one database; it does not let many databases share a resource budget.",
+    "reference": "https://learn.microsoft.com/azure/azure-sql/database/elastic-pool-overview?view=azuresql#what-are-sql-elastic-pools",
+    "id": 56
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Relational Data Services",
+    "question": "An enterprise is migrating a large estate of on-premises SQL Server databases to a managed Azure service. The applications depend on instance-scoped features such as SQL Agent jobs and cross-database queries, and the team wants the highest possible compatibility with the SQL Server database engine while still getting PaaS benefits like automated patching and backups. Which service should they choose?",
+    "options": [
+      "Azure Database for PostgreSQL",
+      "Azure SQL Database single database",
+      "Azure SQL Managed Instance",
+      "Azure Database for MySQL"
+    ],
+    "correct": 2,
+    "explanation": "Azure SQL Managed Instance is a PaaS service with near 100% compatibility with the SQL Server database engine, including instance-scoped features, and it is positioned as best for most migrations of existing SQL Server applications with minimal changes. Azure SQL Database single database is PaaS but is database-scoped and lacks some instance-level features. Azure Database for PostgreSQL and Azure Database for MySQL run entirely different open-source engines and are not SQL Server compatible.",
+    "reference": "https://learn.microsoft.com/azure/azure-sql/managed-instance/sql-managed-instance-paas-overview?view=azuresql#overview",
+    "id": 57
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Relational Data Services",
+    "question": "A team must lift and shift a legacy application whose database routines call out to the underlying operating system, require specific OS-level configuration, and need control over when the SQL Server service and OS are patched. They want to run the same SQL Server in Azure with full administrative control over both the engine and the operating system. Which option meets these requirements?",
+    "options": [
+      "Azure SQL Database serverless",
+      "Azure SQL Managed Instance",
+      "SQL Server on Azure Virtual Machines",
+      "An Azure SQL Database elastic pool"
+    ],
+    "correct": 2,
+    "explanation": "SQL Server on Azure Virtual Machines is the infrastructure as a service option that runs full SQL Server on a VM and gives full administrative control over both the SQL Server instance and the underlying operating system, including deciding when to apply system updates. Azure SQL Database (serverless or in an elastic pool) and Azure SQL Managed Instance are PaaS offerings where Azure manages the operating system, so they do not provide OS-level access or the ability to schedule OS patching yourself.",
+    "reference": "https://learn.microsoft.com/azure/azure-sql/azure-sql-iaas-vs-paas-what-is-overview?view=azuresql#service-comparison",
+    "id": 58
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Relational Data Services",
+    "question": "An organization standardized on the open-source PostgreSQL engine and wants a fully managed Azure relational service so it can keep using community PostgreSQL features and extensions such as PostGIS while Azure handles backups, patching, and high availability. Which service should the organization select?",
+    "options": [
+      "Azure Database for PostgreSQL",
+      "Azure SQL Database",
+      "Azure SQL Managed Instance",
+      "Azure Database for MySQL"
+    ],
+    "correct": 0,
+    "explanation": "Azure Database for PostgreSQL is a fully managed relational database service built on the community edition of the PostgreSQL engine, so it preserves PostgreSQL features and extensions while Azure manages backups, patching, and high availability. Azure SQL Database and Azure SQL Managed Instance are based on the SQL Server engine, not PostgreSQL. Azure Database for MySQL runs the MySQL engine, which is a different open-source database and would not run PostgreSQL workloads.",
+    "reference": "https://learn.microsoft.com/azure/postgresql/overview",
+    "id": 59
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Relational Data Services",
+    "question": "A web development shop runs an application backed by the open-source MySQL engine and wants to move it to a managed Azure relational service that runs the MySQL community edition with minimal application changes. Which Azure service is the appropriate target?",
+    "options": [
+      "Azure Cosmos DB for NoSQL",
+      "Azure SQL Database",
+      "Azure Database for MySQL",
+      "Azure Database for PostgreSQL"
+    ],
+    "correct": 2,
+    "explanation": "Azure Database for MySQL is a fully managed service that runs the MySQL Community Edition engine, which gives full application compatibility and allows existing MySQL applications to migrate with minimal refactoring. Azure SQL Database runs the SQL Server engine and Azure Database for PostgreSQL runs the PostgreSQL engine, so neither is MySQL. Azure Cosmos DB for NoSQL is a non-relational database and is not a managed MySQL service.",
+    "reference": "https://learn.microsoft.com/azure/mysql/flexible-server/overview",
+    "id": 60
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Relational Data Services",
+    "question": "During a cloud-readiness review, an architect summarizes the trade-off between PaaS and IaaS relational options on Azure. Which statement correctly describes the difference in administrative responsibility?",
+    "options": [
+      "With PaaS options Azure manages the operating system and engine patching, while with the IaaS option the customer is responsible for patching the OS and SQL Server",
+      "With PaaS options the customer must patch the operating system, while the IaaS option requires no patching at all",
+      "Both PaaS and IaaS options require the customer to manage the underlying virtual machines",
+      "The IaaS option removes all administrative responsibility from the customer"
+    ],
+    "correct": 0,
+    "explanation": "With the PaaS options (Azure SQL Database and Azure SQL Managed Instance) Azure manages the database engine, operating system, and hardware, so the customer no longer patches the OS or engine. With SQL Server on Azure Virtual Machines (IaaS) the customer has full control and is responsible for deciding when to update the operating system and database software. The other statements reverse or overstate this: PaaS does not require the customer to patch the OS, PaaS does not require managing VMs, and IaaS does not remove all administrative responsibility.",
+    "reference": "https://learn.microsoft.com/azure/azure-sql/azure-sql-iaas-vs-paas-what-is-overview?view=azuresql#administration",
+    "id": 61
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Relational Data Services",
+    "question": "A new cloud-born application needs a single relational database with its own dedicated set of resources, managed through a logical server, and the team wants the option to use serverless compute that automatically scales. Which Azure SQL Database deployment option matches this description?",
+    "options": [
+      "An elastic pool shared across many databases",
+      "A single database",
+      "SQL Server on an Azure Virtual Machine",
+      "Azure SQL Managed Instance"
+    ],
+    "correct": 1,
+    "explanation": "The single database deployment option of Azure SQL Database provides one database with its own dedicated set of resources managed via a logical server, and serverless and Hyperscale options are available for it. An elastic pool shares resources across multiple databases rather than dedicating them to one. SQL Server on an Azure VM is an IaaS product, not an Azure SQL Database deployment option, and Azure SQL Managed Instance is a separate PaaS product made up of system and user databases sharing instance resources.",
+    "reference": "https://learn.microsoft.com/azure/azure-sql/azure-sql-iaas-vs-paas-what-is-overview?view=azuresql#service-comparison",
+    "id": 62
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Relational Data Services",
+    "question": "An IT director is naming the three products that make up the Azure SQL family of relational database services built on the SQL Server engine. Which set correctly lists those three products?",
+    "options": [
+      "Azure SQL Database, Azure Database for MySQL, Azure Database for PostgreSQL",
+      "Azure SQL Database, Azure SQL Managed Instance, SQL Server on Azure Virtual Machines",
+      "Azure SQL Database, Azure Cosmos DB, Azure Database for MySQL",
+      "Azure SQL Managed Instance, Azure Cosmos DB, SQL Server on Azure Virtual Machines"
+    ],
+    "correct": 1,
+    "explanation": "The Azure SQL family of SQL Server engine products consists of Azure SQL Database, Azure SQL Managed Instance, and SQL Server on Azure Virtual Machines. The other sets are incorrect because Azure Database for MySQL and Azure Database for PostgreSQL are open-source engine services, not part of the SQL Server based Azure SQL family, and Azure Cosmos DB is a non-relational (NoSQL) database, not a member of the Azure SQL family.",
+    "reference": "https://learn.microsoft.com/azure/azure-sql/azure-sql-iaas-vs-paas-what-is-overview?view=azuresql",
+    "id": 63
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Relational Data Services",
+    "question": "A team runs a single dev/test database that is used only intermittently throughout the day, with long idle periods. They want the compute to scale automatically with demand and to pause automatically during inactivity so they pay only for storage while it is idle. Which Azure relational option best fits this requirement?",
+    "options": [
+      "Azure SQL Managed Instance",
+      "Azure SQL Database (serverless compute tier)",
+      "SQL Server on Azure Virtual Machines",
+      "Azure Database for PostgreSQL"
+    ],
+    "correct": 1,
+    "explanation": "The serverless compute tier for Azure SQL Database automatically scales compute based on workload demand and automatically pauses the database during inactive periods, when only storage is billed, then resumes when activity returns. This makes it ideal for single databases with intermittent, unpredictable usage. Azure SQL Managed Instance and SQL Server on Azure Virtual Machines provision compute that does not auto-pause in this way. Azure Database for PostgreSQL runs the PostgreSQL engine and does not offer the Azure SQL Database serverless auto-pause compute tier.",
+    "reference": "https://learn.microsoft.com/azure/azure-sql/database/serverless-tier-overview?view=azuresql",
+    "id": 64
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Relational Data Services",
+    "question": "An architect is classifying the Azure relational options by cloud service model. Which one is delivered as Infrastructure as a Service (IaaS), meaning the customer manages the operating system, rather than as a managed Platform as a Service (PaaS) offering?",
+    "options": [
+      "Azure SQL Database",
+      "Azure SQL Managed Instance",
+      "SQL Server on Azure Virtual Machines",
+      "Azure Database for PostgreSQL"
+    ],
+    "correct": 2,
+    "explanation": "SQL Server on Azure Virtual Machines falls into the Infrastructure as a Service (IaaS) category: SQL Server runs inside a virtual machine, and the customer has full control over (and responsibility for) the operating system and the SQL Server instance, including when to apply OS and engine updates. Azure SQL Database is a database-as-a-service in the PaaS category. Azure SQL Managed Instance is also a PaaS offering. Azure Database for PostgreSQL is a fully managed PaaS service as well. In each of those PaaS options Azure manages the operating system, so none of them is the IaaS choice.",
+    "reference": "https://learn.microsoft.com/azure/azure-sql/azure-sql-iaas-vs-paas-what-is-overview?view=azuresql#service-comparison",
+    "id": 65
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Azure Relational Data Services",
+    "question": "A solutions architect is selecting the open-source relational database services in Azure for teams that want a fully managed service running a community open-source engine. Which of the following are open-source-engine relational database services on Azure? (Choose two.)",
+    "options": [
+      "Azure Database for PostgreSQL",
+      "Azure Database for MySQL",
+      "Azure SQL Managed Instance",
+      "SQL Server on Azure Virtual Machines"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Azure Database for PostgreSQL is a managed service based on the open-source PostgreSQL community engine, and Azure Database for MySQL is a managed service based on the open-source MySQL Community Edition engine, so both are open-source relational services. Azure SQL Managed Instance and SQL Server on Azure Virtual Machines both run Microsoft SQL Server, which is a commercial engine and part of the Azure SQL family, so neither is an open-source database service.",
+    "reference": "https://learn.microsoft.com/azure/postgresql/overview",
+    "id": 66
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Azure Relational Data Services",
+    "question": "A team is evaluating Azure SQL Database (a PaaS offering). Which of the following responsibilities are handled automatically by Azure rather than by the customer? (Choose two.)",
+    "options": [
+      "Patching and upgrading the database engine software",
+      "Built-in automated backups of the database",
+      "Designing the database schema and managing database logins and users",
+      "Manually installing SQL Server onto a virtual machine"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "With Azure SQL Database, the database engine software is automatically configured, patched, and upgraded by Azure, and the service provides built-in automated backups, so both of those are handled by Azure. Designing the database schema and managing database logins and users remain the customer's responsibility even under PaaS; Azure does not do this for you. Manually installing SQL Server onto a virtual machine is an IaaS task (SQL Server on Azure Virtual Machines), where the customer also manages the operating system. Neither of those describes an Azure-handled PaaS responsibility.",
+    "reference": "https://learn.microsoft.com/azure/azure-sql/azure-sql-iaas-vs-paas-what-is-overview?view=azuresql#administration",
+    "id": 67
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Azure Relational Data Services",
+    "question": "An architect is documenting the deployment options available for Azure SQL Database. Which of the following are valid Azure SQL Database deployment options? (Choose two.)",
+    "options": [
+      "Single database",
+      "Elastic pool",
+      "Managed instance virtual cluster",
+      "Self-installed SQL Server on a customer-managed VM"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Azure SQL Database offers a single database (one database with its own dedicated resources on a logical server) and an elastic pool (a collection of databases sharing resources on a logical server) as its deployment options. A managed instance virtual cluster belongs to Azure SQL Managed Instance, a separate product, not to Azure SQL Database. Self-installing SQL Server on a customer-managed VM is the IaaS approach (SQL Server on Azure Virtual Machines) and is not an Azure SQL Database deployment option.",
+    "reference": "https://learn.microsoft.com/azure/azure-sql/azure-sql-iaas-vs-paas-what-is-overview?view=azuresql#service-comparison",
+    "id": 68
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Azure Relational Data Services",
+    "question": "Evaluate each statement about Azure relational data services for accuracy. For each statement, indicate Yes if it is true and No if it is false.",
+    "statements": [
+      "Azure SQL Managed Instance is a platform as a service (PaaS) offering with near 100% compatibility with the SQL Server database engine.",
+      "SQL Server on Azure Virtual Machines is an infrastructure as a service (IaaS) offering that gives the customer full control over the operating system and the SQL Server instance.",
+      "Azure Database for PostgreSQL is based on the Microsoft SQL Server database engine.",
+      "Azure Database for MySQL is a fully managed service that runs the MySQL community edition engine."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "explanation": "Statement 1 is true (Yes): Azure SQL Managed Instance is a PaaS service with near 100% SQL Server engine compatibility. Statement 2 is true (Yes): SQL Server on Azure Virtual Machines is IaaS and gives full control over the operating system and the SQL Server instance. Statement 3 is false (No): Azure Database for PostgreSQL is built on the open-source PostgreSQL community engine, not the SQL Server engine. Statement 4 is true (Yes): Azure Database for MySQL is a fully managed service that runs the MySQL Community Edition engine.",
+    "reference": "https://learn.microsoft.com/azure/azure-sql/managed-instance/sql-managed-instance-paas-overview?view=azuresql#overview",
+    "id": 69
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Storage: Blob, File, and Table",
+    "question": "A media company needs to store millions of uploaded photos, videos, and PDF documents so that a web application can stream and serve them directly over HTTP at massive scale. The data has no fixed schema and is treated as discrete objects. Which Azure Storage service best fits this requirement?",
+    "options": [
+      "Azure Blob storage",
+      "Azure Files",
+      "Azure Table storage",
+      "Azure Queue storage"
+    ],
+    "correct": 0,
+    "explanation": "Azure Blob storage is an object store designed for large amounts of unstructured data such as images, video, audio, and documents, and it can serve that content directly to a browser. Azure Files provides managed SMB/NFS file shares for applications that expect a mounted file system, not an object store for web-scale media. Azure Table storage holds structured key/attribute (NoSQL) data, not binary media objects. Azure Queue storage is for asynchronous messaging between application components, not for storing large media files.",
+    "reference": "https://learn.microsoft.com/azure/storage/blobs/storage-blobs-introduction",
+    "id": 70
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Storage: Blob, File, and Table",
+    "question": "An operations team writes a continuous stream of log entries from virtual machines, always adding new records to the end of an existing object and never modifying earlier entries. Which type of blob is optimized for this append-only logging pattern?",
+    "options": [
+      "Page blob",
+      "Append blob",
+      "Block blob",
+      "Snapshot blob"
+    ],
+    "correct": 1,
+    "explanation": "Append blobs are made up of blocks and are optimized for append operations, where data is added only to the end of the blob, making them ideal for logging scenarios such as VM logs. Page blobs are collections of 512-byte pages optimized for random read/write and back Azure VM disks, not append-only logging. Block blobs are optimized for storing and uploading text and binary files such as documents and media, not for continuous append. \"Snapshot blob\" is not one of the three blob types; a snapshot is a point-in-time copy of a blob, not a distinct blob type.",
+    "reference": "https://learn.microsoft.com/azure/storage/blobs/storage-blobs-introduction#blob-storage-resources",
+    "id": 71
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Storage: Blob, File, and Table",
+    "question": "A retailer keeps order-confirmation files that are read constantly during the first days after a purchase, then almost never afterward. They want to retain each file online for immediate read access while paying lower storage costs once it is rarely touched, accepting somewhat higher per-read charges. Which blob access tier is the best long-term destination for these rarely accessed but still online files?",
+    "options": [
+      "Hot tier",
+      "Archive tier",
+      "Cold tier",
+      "Premium block blob storage"
+    ],
+    "correct": 2,
+    "explanation": "The cold tier is an online tier optimized for data that is rarely accessed but still requires fast retrieval; it has lower storage costs and higher access costs than the hot and cool tiers, which matches the requirement for low storage cost with immediate (online) reads. The hot tier has the highest storage cost and is meant for frequently accessed data, so it does not minimize storage cost for rarely touched files. The archive tier is offline and a blob must be rehydrated before it can be read, so it cannot serve immediate reads. Premium block blob storage targets high transaction rates and low latency rather than cost-optimized storage of rarely accessed data.",
+    "reference": "https://learn.microsoft.com/azure/storage/blobs/access-tiers-overview#online-access-tiers",
+    "id": 72
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Storage: Blob, File, and Table",
+    "question": "A compliance team moved seven-year-old audit records to the Azure Blob storage archive tier to minimize storage cost. An auditor now requests one of those records. What must happen before the archived blob can be read?",
+    "options": [
+      "The blob must be rehydrated to an online tier before it can be read.",
+      "The blob can be read directly from the archive tier with no extra step.",
+      "The blob must be converted from a block blob to a page blob.",
+      "The storage account redundancy must be changed to read-access geo-redundant storage."
+    ],
+    "correct": 0,
+    "explanation": "A blob in the archive tier is offline and cannot be read or modified; to read or download it you must first rehydrate it to an online tier (hot, cool, or cold), which can take hours. Reading directly from the archive tier is not possible because the tier is offline. Converting the blob type is unrelated to archive access and would not make archived data readable. Changing the account redundancy configuration affects data resiliency and replication, not whether an archived blob is online and readable.",
+    "reference": "https://learn.microsoft.com/azure/storage/blobs/archive-blob",
+    "id": 73
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Storage: Blob, File, and Table",
+    "question": "A team is migrating a legacy on-premises application that reads and writes files using standard operating-system file APIs against a shared network drive. They want to move that share to Azure with minimal code changes and mount it concurrently from several virtual machines. Which Azure Storage service should they choose?",
+    "options": [
+      "Azure Table storage",
+      "Azure Blob storage block blobs",
+      "Azure Queue storage",
+      "Azure Files"
+    ],
+    "correct": 3,
+    "explanation": "Azure Files provides fully managed file shares that are mounted over the industry-standard SMB and NFS protocols, so a lift-and-shift application that uses native file-system APIs can keep using those APIs while multiple clients access the share concurrently. Azure Table storage is a NoSQL key/attribute store accessed programmatically, not a mountable file share. Block blobs are object storage addressed over REST/HTTP, not a file system that supports native file APIs and concurrent mounts. Azure Queue storage handles asynchronous messages between components and is not a file share.",
+    "reference": "https://learn.microsoft.com/azure/storage/files/storage-files-introduction",
+    "id": 74
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Storage: Blob, File, and Table",
+    "question": "A developer needs to store flexible records such as user profiles and device metadata where different rows can have different sets of properties, queries are simple key-based lookups with no joins or foreign keys, and cost should stay low at large volume. Which Azure Storage service is designed for this structured NoSQL key/attribute data?",
+    "options": [
+      "Azure Files",
+      "Azure Table storage",
+      "Azure Blob storage",
+      "Azure Disk storage"
+    ],
+    "correct": 1,
+    "explanation": "Azure Table storage stores non-relational structured data (structured NoSQL) as a key/attribute store with a schemaless design, so different entities in the same table can have different properties, and it is cost-effective for large volumes of data accessed without complex joins. Azure Files provides file shares, not a queryable key/attribute entity store. Azure Blob storage holds unstructured objects such as files and media, not structured key/attribute entities. Azure Disk storage provides block-level disks attached to virtual machines, which is unrelated to NoSQL entity storage.",
+    "reference": "https://learn.microsoft.com/azure/storage/tables/table-storage-overview",
+    "id": 75
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Storage: Blob, File, and Table",
+    "question": "An administrator wants to enable an Azure file share so it can be mounted by Linux clients that require POSIX-compliant file semantics and UNIX-style permissions. Which file-sharing protocol supported by Azure Files should the administrator configure for this share?",
+    "options": [
+      "FTP (File Transfer Protocol)",
+      "iSCSI (Internet Small Computer Systems Interface)",
+      "NFS (Network File System)",
+      "HTTP (Hypertext Transfer Protocol)"
+    ],
+    "correct": 2,
+    "explanation": "Azure Files supports the NFS protocol for file shares, which provides POSIX-compliant file system semantics and UNIX-style permissions and is mounted from Linux clients. FTP is a file-transfer protocol and is not one of the protocols Azure Files exposes for mounting shares. iSCSI is a block-storage protocol used by services such as Azure Elastic SAN, not by Azure Files shares. HTTP underlies the FileREST API for programmatic access, but it does not provide a mounted POSIX file system with UNIX permissions; the share protocols Azure Files offers for mounting are SMB and NFS.",
+    "reference": "https://learn.microsoft.com/azure/storage/files/files-nfs-protocol",
+    "id": 76
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Storage: Blob, File, and Table",
+    "question": "When uploading a very large video file to Azure Blob storage, an application splits the file into many pieces that are uploaded in parallel and then committed together as a single object. Which blob type is built around this block-and-commit model for efficiently storing text and binary files?",
+    "options": [
+      "Page blob",
+      "Append blob",
+      "Block blob",
+      "Queue message"
+    ],
+    "correct": 2,
+    "explanation": "Block blobs are composed of blocks that can be uploaded individually (often in parallel) and then committed together, which makes them ideal for storing text and binary data such as large media files and documents. Page blobs are organized as 512-byte pages for random read/write and back virtual machine disks, not the block-commit upload model. Append blobs only allow adding blocks to the end of the blob and are aimed at logging, not parallel multi-part uploads of an arbitrary large file. A queue message is a unit of Azure Queue storage messaging, not a blob type.",
+    "reference": "https://learn.microsoft.com/rest/api/storageservices/understanding-block-blobs--append-blobs--and-page-blobs#about-block-blobs",
+    "id": 77
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Azure Storage: Blob, File, and Table",
+    "question": "A solution architect is reviewing the characteristics of the Azure Blob storage archive access tier. Which statements about the archive tier are correct? (Choose two.)",
+    "options": [
+      "It is an offline tier intended for rarely accessed data, with a recommended minimum storage duration of 180 days.",
+      "Among the standard access tiers it offers the lowest storage cost but the highest data access and retrieval costs.",
+      "It provides the same millisecond first-byte retrieval latency as the hot tier.",
+      "It is the recommended tier for data that is read frequently throughout the day."
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Correct: the archive tier is an offline tier for rarely accessed data, and data should remain there for a recommended minimum of 180 days (earlier deletion or tiering incurs an early deletion charge); and it offers the lowest storage cost while charging the highest access and retrieval costs. Incorrect: the archive tier does not deliver millisecond latency like the hot tier; retrieval from archive takes on the order of hours. Incorrect: archive is intended for rarely accessed data, not data read frequently throughout the day, for which an online tier such as hot is appropriate.",
+    "reference": "https://learn.microsoft.com/azure/storage/blobs/access-tiers-overview#archive-access-tier",
+    "id": 78
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Azure Storage: Blob, File, and Table",
+    "question": "A platform team is summarizing the capabilities of Azure Files for fully managed cloud file shares. Which statements accurately describe Azure Files? (Choose two.)",
+    "options": [
+      "It provides fully managed file shares accessible through the industry-standard SMB and NFS protocols.",
+      "An Azure file share can be mounted concurrently by multiple clients, including cloud and on-premises deployments.",
+      "It stores data only as schemaless key/attribute entities queried with a partition key and row key.",
+      "It requires customers to patch the underlying file-server operating system and replace failed disks themselves."
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Correct: Azure Files provides fully managed file shares reachable over the standard SMB and NFS protocols; and those shares can be mounted concurrently by many clients from cloud or on-premises environments. Incorrect: storing data as schemaless key/attribute entities with a partition key and row key describes Azure Table storage, not Azure Files. Incorrect: because Azure Files is fully managed, customers do not patch a server operating system or replace faulty hardware; Microsoft handles the underlying infrastructure.",
+    "reference": "https://learn.microsoft.com/azure/storage/files/storage-files-introduction#key-benefits-of-azure-files",
+    "id": 79
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Azure Storage: Blob, File, and Table",
+    "question": "Evaluate each statement about Azure Storage services as either true (Yes) or false (No).",
+    "statements": [
+      "Azure Blob storage is designed to store unstructured object data such as documents, media files, and backups.",
+      "Azure Table storage is a NoSQL key/attribute store with a schemaless design for structured, non-relational data.",
+      "Azure Files lets you mount a single file share using the SMB and NFS protocols at the same time.",
+      "Page blobs are optimized for random read and write operations and are used to back Azure virtual machine disks."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "explanation": "Statement 1 is true: Blob storage is an object store for unstructured data such as documents, media, and backups. Statement 2 is true: Table storage is a NoSQL key/attribute store with a schemaless design for structured non-relational data. Statement 3 is false: an individual Azure file share cannot be accessed with both SMB and NFS at once; a share uses one protocol, although SMB and NFS shares can coexist in the same storage account. Statement 4 is true: page blobs are collections of 512-byte pages optimized for random read/write and serve as the backing storage for Azure VM disks (VHDs).",
+    "reference": "https://learn.microsoft.com/azure/storage/files/files-nfs-protocol",
+    "id": 80
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Azure Storage: Blob, File, and Table",
+    "question": "Evaluate each statement about Azure Blob storage access tiers as either true (Yes) or false (No).",
+    "statements": [
+      "The hot tier has the highest storage cost but the lowest access cost and is best for frequently accessed data.",
+      "The cool tier is intended for infrequently accessed data and has a recommended minimum retention period of 30 days.",
+      "Setting the access tier (hot, cool, cold, or archive) is supported on block blobs.",
+      "Moving data to a cooler tier always lowers total cost regardless of how often the data is accessed."
+    ],
+    "correct": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "explanation": "Statement 1 is true: the hot tier has the highest storage cost and the lowest access cost and is optimized for frequently accessed data. Statement 2 is true: the cool tier is for infrequently accessed data with a recommended minimum retention of 30 days. Statement 3 is true: setting the access tier is supported on block blobs (it is not supported for append and page blobs). Statement 4 is false: cooler tiers have higher access and transaction costs, so for frequently accessed or unpredictable data the higher access charges and early-deletion penalties can exceed the storage savings, meaning a cooler tier does not always reduce total cost.",
+    "reference": "https://learn.microsoft.com/azure/storage/blobs/access-tiers-overview",
+    "id": 81
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Cosmos DB Capabilities and APIs",
+    "question": "A startup is choosing a managed Azure database for a customer-facing application that must serve users on several continents with consistently fast response times and stay online even during a regional outage. The data is semi-structured JSON rather than rigid relational tables. Which Azure service best matches these requirements?",
+    "options": [
+      "Azure SQL Database, a managed relational engine optimized for normalized tabular data",
+      "Azure Cache for an in-memory key-value store used to accelerate other databases",
+      "Azure Cosmos DB, a globally distributed NoSQL database with single-digit millisecond latency",
+      "Azure Blob Storage, an object store for unstructured files such as images and backups"
+    ],
+    "correct": 2,
+    "explanation": "Azure Cosmos DB is documented as a globally distributed, multi-model NoSQL database that provides single-digit millisecond latency and high availability, making it the natural fit for a globally responsive JSON application. A managed relational engine is designed for normalized tabular data and is not the NoSQL document store described. An in-memory cache accelerates other data stores rather than serving as the primary durable database. An object store holds unstructured files like images or backups, not queryable JSON application records.",
+    "reference": "https://learn.microsoft.com/azure/cosmos-db/distribute-data-globally",
+    "id": 82
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Cosmos DB Capabilities and APIs",
+    "question": "A connected-vehicle platform ingests bursts of sensor readings from millions of devices worldwide and must write and query that telemetry with very low latency at massive scale. According to Microsoft's guidance, why is Azure Cosmos DB considered well suited to IoT and telematics workloads like this one?",
+    "options": [
+      "It enforces a fixed relational schema that validates every incoming sensor record before storage",
+      "It is purpose-built primarily for interactive batch analytics and data-warehouse style reporting",
+      "It requires all devices to connect to a single region so that telemetry stays centralized",
+      "It is designed to handle massive volumes of reads and writes with low-latency response times and a persistent change feed for new and updated data"
+    ],
+    "correct": 3,
+    "explanation": "Microsoft's use-case guidance positions Cosmos DB for IoT and telematics because it handles massive amounts of reads and writes with low-latency response times, and its change feed is a persistent, append-only log of changes that downstream processing can read. Enforcing a fixed relational schema contradicts Cosmos DB's flexible, schema-agnostic JSON model. Interactive batch analytics and warehouse reporting (OLAP) are explicitly called a poor fit, where Microsoft instead suggests an analytics platform. Requiring a single region contradicts Cosmos DB's global distribution, which places data close to users in any region.",
+    "reference": "https://learn.microsoft.com/azure/cosmos-db/use-cases#iot-and-telematics",
+    "id": 83
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Cosmos DB Capabilities and APIs",
+    "question": "An online retailer stores its product catalog in Azure Cosmos DB. Different product categories carry different attributes, and those attributes change from season to season as new models are released. Which characteristic of Azure Cosmos DB makes it a good fit for storing this catalog data?",
+    "options": [
+      "It requires every item in a container to share an identical, predefined column layout",
+      "It supports flexible schemas and hierarchical data, so items can carry varying attributes that evolve over time",
+      "It limits each container to a single Azure region to keep catalog data consistent",
+      "It stores catalog entries only as binary objects that cannot be queried by their properties"
+    ],
+    "correct": 1,
+    "explanation": "Microsoft's retail and marketing guidance states that catalog attributes can vary between entities and change over time, and that Cosmos DB supports flexible schemas and hierarchical data, which is why it suits product-catalog scenarios. Requiring an identical predefined layout for every item describes a rigid relational table, the opposite of Cosmos DB's schema-agnostic model. Limiting a container to one region contradicts Cosmos DB's turnkey global distribution. Storing entries only as opaque binary objects contradicts Cosmos DB's automatic indexing, which lets you query items by their properties.",
+    "reference": "https://learn.microsoft.com/azure/cosmos-db/use-cases#retail-and-marketing",
+    "id": 84
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Cosmos DB Capabilities and APIs",
+    "question": "A payments application is deployed in three Azure regions, and the team wants users in every region to perform both writes and reads against the nearest local replica so that no single region becomes a write bottleneck. Which Azure Cosmos DB capability enables this active-active design?",
+    "options": [
+      "Provisioning a read-only secondary replica in each region while writes funnel to one primary region",
+      "Configuring multi-region writes so that every region associated with the account supports both writes and reads",
+      "Storing each region's data in a separate, unsynchronized Cosmos DB account",
+      "Restricting the account to a single region and adding an in-region cache for hot items"
+    ],
+    "correct": 1,
+    "explanation": "Cosmos DB's multi-region writes replication protocol makes every region associated with the account support both writes and reads, which is exactly the active-active pattern described. A read-only secondary that funnels writes to one primary is single-master, not the multi-region write design requested. Separate unsynchronized accounts would not replicate data between regions, breaking a single global dataset. Restricting to one region with a cache eliminates the multi-region capability entirely.",
+    "reference": "https://learn.microsoft.com/azure/cosmos-db/distribute-data-globally#key-benefits-of-global-distribution",
+    "id": 85
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Cosmos DB Capabilities and APIs",
+    "question": "A development team is starting a brand-new application, is free to choose any client libraries, and wants the database with the broadest native feature set, automatic indexing, and a SQL-like query language over JSON documents. Which Azure Cosmos DB API should they select?",
+    "options": [
+      "Azure Cosmos DB for Apache Cassandra",
+      "Azure Cosmos DB for Apache Gremlin",
+      "Azure Cosmos DB for Table",
+      "Azure Cosmos DB for NoSQL"
+    ],
+    "correct": 3,
+    "explanation": "Azure Cosmos DB for NoSQL is the native API and is recommended for new applications that are flexible on drivers; it stores JSON documents and offers a SQL-like query language with automatic indexing. The API for Cassandra is a compatibility API for existing wide-column Cassandra workloads using CQL. The API for Gremlin is a graph API for highly connected vertex-and-edge data. The API for Table is a key-value compatibility API aimed at Azure Table Storage applications, not a SQL-over-JSON document model.",
+    "reference": "https://learn.microsoft.com/azure/cosmos-db/overview",
+    "id": 86
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Cosmos DB Capabilities and APIs",
+    "question": "An organization runs an existing application built on MongoDB drivers and tools and wants to move it to a fully managed Azure database with as few code changes as possible, ideally just updating the connection string. Which Azure Cosmos DB API is designed for this scenario?",
+    "options": [
+      "Azure Cosmos DB for Table, which targets key-value workloads using Azure Table Storage APIs",
+      "Azure Cosmos DB for Apache Gremlin, which targets graph traversal workloads",
+      "Azure Cosmos DB for MongoDB, which supports the MongoDB wire protocol so existing drivers and tools keep working",
+      "Azure Cosmos DB for Apache Cassandra, which uses the Cassandra Query Language"
+    ],
+    "correct": 2,
+    "explanation": "Azure Cosmos DB for MongoDB supports the MongoDB wire protocol, so existing MongoDB drivers, SDKs, and tools continue to work with minimal changes, often just updating the connection string. The Table API is for key-value workloads using Azure Table Storage APIs, not MongoDB clients. The Gremlin API is for graph traversal of vertices and edges. The Cassandra API speaks the Cassandra Query Language and serves wide-column Cassandra workloads, not MongoDB applications.",
+    "reference": "https://learn.microsoft.com/azure/cosmos-db/mongodb/overview",
+    "id": 87
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Cosmos DB Capabilities and APIs",
+    "question": "A telecommunications company maintains an Apache Cassandra deployment that uses wide-column tables and the Cassandra Query Language. The team wants to move to a fully managed Azure service while reusing their existing Cassandra drivers and tools without rearchitecting the application. Which Azure Cosmos DB API fits best?",
+    "options": [
+      "Azure Cosmos DB for Apache Cassandra, which supports CQL and is compatible with existing Cassandra drivers and tools",
+      "Azure Cosmos DB for NoSQL, which exposes a custom JSON document model and SQL-like query language",
+      "Azure Cosmos DB for MongoDB, which supports the MongoDB wire protocol",
+      "Azure Cosmos DB for Table, which exposes the Azure Table Storage key-value model"
+    ],
+    "correct": 0,
+    "explanation": "Azure Cosmos DB for Apache Cassandra supports the Cassandra Query Language (CQL) and is compatible with existing Cassandra drivers and tools, letting teams migrate or extend wide-column workloads without rearchitecting. The NoSQL API uses a JSON document model and a SQL-like query language, which would require rewriting the data access layer. The MongoDB API targets MongoDB clients, not Cassandra. The Table API exposes a key-value model based on Azure Table Storage, which does not match CQL wide-column tables.",
+    "reference": "https://learn.microsoft.com/azure/cosmos-db/cassandra/overview",
+    "id": 88
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Cosmos DB Capabilities and APIs",
+    "question": "A social platform needs to model people, the products they buy, and the many relationships between them so it can power a recommendation engine that traverses connections such as \"friends who purchased related items.\" Which Azure Cosmos DB API is purpose-built for storing and traversing this kind of highly connected data?",
+    "options": [
+      "Azure Cosmos DB for Apache Gremlin, a graph API that stores vertices and edges and traverses relationships",
+      "Azure Cosmos DB for Table, a key-value store for fast lookups by partition and row key",
+      "Azure Cosmos DB for Apache Cassandra, a wide-column store for high-write time-series data",
+      "Azure Cosmos DB for MongoDB, a document store compatible with the MongoDB wire protocol"
+    ],
+    "correct": 0,
+    "explanation": "Azure Cosmos DB for Apache Gremlin is a graph database that stores property-graph data as vertices (nodes) and edges (relationships) and is designed for scenarios such as social networks and recommendation engines where relationships matter as much as the data. The Table API is a key-value store optimized for lookups by partition and row key, not relationship traversal. The Cassandra API is a wide-column store suited to high-write time-series data. The MongoDB API is a document store and does not natively traverse graph relationships.",
+    "reference": "https://learn.microsoft.com/azure/cosmos-db/gremlin/overview",
+    "id": 89
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Cosmos DB Capabilities and APIs",
+    "question": "A team currently uses Azure Table Storage for a key-value device registry and wants premium capabilities such as automatic indexing of all properties and turnkey global distribution, while keeping its existing Azure Table Storage SDKs and tools. Which Azure Cosmos DB API should they choose?",
+    "options": [
+      "Azure Cosmos DB for Apache Gremlin",
+      "Azure Cosmos DB for Apache Cassandra",
+      "Azure Cosmos DB for Table",
+      "Azure Cosmos DB for MongoDB"
+    ],
+    "correct": 2,
+    "explanation": "Azure Cosmos DB for Table lets you store and query key-value data using the familiar Azure Table Storage APIs and is compatible with existing Azure Table Storage SDKs and tools, while adding premium enhancements such as automatic indexing of all properties and turnkey global distribution. The Gremlin API targets graph data, the Cassandra API targets CQL wide-column workloads, and the MongoDB API targets MongoDB document clients, so none of those preserve Azure Table Storage SDK compatibility.",
+    "reference": "https://learn.microsoft.com/azure/cosmos-db/table/overview",
+    "id": 90
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Azure Cosmos DB Capabilities and APIs",
+    "question": "An architect is evaluating Azure Cosmos DB for a mission-critical, globally deployed application. Which statements accurately describe Azure Cosmos DB's global distribution capabilities? Select all that apply.",
+    "options": [
+      "Data is transparently replicated to every Azure region associated with the account",
+      "Regions can be added to or removed from the account without pausing or redeploying the application",
+      "An account can be associated with only one Azure region for its entire lifetime",
+      "Global distribution requires the application to manually copy data between regions on a schedule"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Microsoft documents that Cosmos DB transparently replicates data to all regions associated with the account, and that you can add or remove regions at any time without pausing or redeploying the application. The claim that an account is locked to a single region for its lifetime is wrong because regions can be changed on demand. The claim that the application must manually copy data on a schedule is wrong because the service handles replication automatically rather than requiring custom copy jobs.",
+    "reference": "https://learn.microsoft.com/azure/cosmos-db/distribute-data-globally",
+    "id": 91
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Azure Cosmos DB Capabilities and APIs",
+    "question": "A team is mapping existing data models to the right Azure Cosmos DB API before migrating. Which of the following API-to-workload pairings are correct? Select all that apply.",
+    "options": [
+      "An application using MongoDB drivers and JSON-like documents maps to the API for MongoDB",
+      "A wide-column workload that queries with the Cassandra Query Language maps to the API for Apache Cassandra",
+      "A graph of vertices and edges traversed with Gremlin maps to the API for Table",
+      "A relational reporting workload that needs SQL joins across normalized tables maps to the API for NoSQL"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "An application built on MongoDB drivers and JSON-like documents maps to the API for MongoDB, which supports the MongoDB wire protocol. A wide-column workload querying with CQL maps to the API for Apache Cassandra. Pairing a graph of vertices and edges with the API for Table is wrong because graph traversal belongs to the API for Gremlin, while the Table API is a key-value model. Pairing a relational reporting workload needing SQL joins across normalized tables with the API for NoSQL is wrong because the API for NoSQL is a schema-agnostic JSON document store, and a relational engine such as Azure SQL or Azure Database for PostgreSQL is the appropriate fit for that need.",
+    "reference": "https://learn.microsoft.com/azure/cosmos-db/choose-api",
+    "id": 92
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Azure Cosmos DB Capabilities and APIs",
+    "question": "An architect is summarizing Azure Cosmos DB capabilities for a design review. For each statement, indicate whether it is true (Yes) or false (No).",
+    "statements": [
+      "Azure Cosmos DB is a globally distributed, multi-model NoSQL database that offers single-digit millisecond latency.",
+      "The Azure Cosmos DB for MongoDB API lets you use existing MongoDB drivers and tools by supporting the MongoDB wire protocol.",
+      "Azure Cosmos DB is recommended primarily as a data warehouse for interactive and batch analytical (OLAP) reporting.",
+      "Azure Cosmos DB supports multiple data models, including document, key-value, graph, and column-family data."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "explanation": "Statement 1 is true: Cosmos DB is documented as a globally distributed, multi-model NoSQL database with single-digit millisecond latency. Statement 2 is true: the API for MongoDB supports the MongoDB wire protocol so existing MongoDB drivers and tools keep working. Statement 3 is false: Microsoft explicitly calls analytical (OLAP) reporting a poor fit for Cosmos DB and suggests an analytics platform instead, so it is not recommended as a data warehouse. Statement 4 is true: Cosmos DB supports multiple data models including document, key-value, graph, and columnar (column-family) data through its various APIs.",
+    "reference": "https://learn.microsoft.com/azure/cosmos-db/use-cases#introduction",
+    "id": 93
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Large-Scale Analytics: Ingestion, Processing, and Data Stores",
+    "question": "A retail analytics team is documenting the layers of their large-scale analytics solution. They want to label the stage where data from transactional databases, files, and real-time streams is loaded into an analytical store and is cleaned, filtered, and restructured for analysis. Which architecture layer does that work belong to?",
+    "options": [
+      "The analytical data model layer, where semantic models and measures are defined",
+      "The data visualization layer, where reports and dashboards are produced",
+      "The data ingestion and processing layer, where source data is loaded and transformed for analysis",
+      "The data serving layer, where finished reports are distributed to end users"
+    ],
+    "correct": 2,
+    "explanation": "In the standard large-scale analytics architecture, the data ingestion and processing layer is where data from transactional stores, files, and streams is loaded into a data lake or warehouse using an ETL or ELT process that cleans, filters, and restructures it for analysis. The analytical data model layer instead defines semantic models, relationships, and measures over already-stored data. The data visualization layer produces reports and dashboards from the model or store. A distribution-of-finished-reports layer is not the stage where raw source data is loaded and transformed.",
+    "reference": "https://learn.microsoft.com/training/modules/examine-components-of-modern-data-warehouse/2-describe-warehousing",
+    "id": 94
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Large-Scale Analytics: Ingestion, Processing, and Data Stores",
+    "question": "An engineering team must move customer records from an older on-premises system into a tightly constrained reporting database. Heavy cleansing and complex business-rule transformations must run on a dedicated engine before any data reaches the destination, because the destination has limited compute. Which data integration approach fits this requirement?",
+    "options": [
+      "A streaming approach that processes each event individually as it arrives",
+      "An extract, transform, and load (ETL) approach that transforms the data before loading it into the destination",
+      "An extract, load, and transform (ELT) approach that loads raw data first and transforms it inside the destination",
+      "A reverse ETL approach that pushes curated data from analytics back into operational applications"
+    ],
+    "correct": 1,
+    "explanation": "ETL transforms data using a separate, specialized transformation engine before it is loaded into the destination, which suits a constrained target that cannot perform heavy transformation itself. ELT does the opposite by loading raw data first and then relying on the target store's own compute to transform it, so it is a poor fit when the target has limited compute. A streaming approach processes events continuously rather than performing curated batch transformation before load. Reverse ETL moves modeled data from analytical systems back to operational tools, which is not what this scenario describes.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/relational-data/etl#choosing-etl-or-elt",
+    "id": 95
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Large-Scale Analytics: Ingestion, Processing, and Data Stores",
+    "question": "Sales records have been copied as flat files into scalable cloud storage, and the team now wants the modern data warehouse itself to perform the cleansing and reshaping using its own elastic compute, avoiding a separate transformation engine. Which characteristic distinguishes the ELT approach they are describing?",
+    "options": [
+      "Data is transformed by a dedicated transformation engine and only loaded after it is fully cleansed",
+      "Data is never stored in its raw form and must conform to a fixed schema before ingestion",
+      "Each record is transformed individually in flight before it is allowed to land in storage",
+      "Data is loaded into the target store first, and the target store's processing capabilities perform the transformation"
+    ],
+    "correct": 3,
+    "explanation": "ELT (extract, load, transform) loads the data into the target store first and then uses the target store's own processing capabilities to transform it, which removes the need for a separate transformation engine and scales as the target store scales. The option describing a dedicated transformation engine that loads only after cleansing describes ETL, not ELT. ELT actually preserves raw data and is associated with big-data and modern-warehouse workloads, so the claim that raw data is never stored is wrong. Per-record in-flight transformation describes stream processing rather than ELT.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/relational-data/etl#extract,-load,-transform-elt",
+    "id": 96
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Large-Scale Analytics: Ingestion, Processing, and Data Stores",
+    "question": "A finance department wants a relational analytical store where order data is organized into a central fact table linked to dimension tables for customer, product, store, and time, so analysts can aggregate revenue with SQL. Which analytical data store matches this description?",
+    "options": [
+      "A data warehouse using a star schema of fact and dimension tables",
+      "A data lake that stores raw files and applies schema only when the data is read",
+      "A document database optimized for storing flexible JSON items",
+      "An event streaming store optimized for time-series telemetry queried with KQL"
+    ],
+    "correct": 0,
+    "explanation": "A data warehouse is a relational store whose schema is optimized for analytics, commonly arranging numeric measures in central fact tables related to dimension tables (a star schema) so data can be aggregated with SQL. A data lake stores raw files and applies schema-on-read rather than enforcing a relational fact-and-dimension model. A document database stores flexible JSON items for operational workloads, not a relational analytical schema. An event streaming store optimized for telemetry and KQL targets real-time time-series analytics, not relational fact-and-dimension aggregation.",
+    "reference": "https://learn.microsoft.com/training/modules/examine-components-of-modern-data-warehouse/4-analytical-data-stores",
+    "id": 97
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Large-Scale Analytics: Ingestion, Processing, and Data Stores",
+    "question": "A data science team needs to land large volumes of structured, semi-structured, and unstructured files in their native, raw format without forcing a predefined schema at write time, and then apply a schema later when the files are read for analysis. Which analytical data store is designed for this pattern?",
+    "options": [
+      "A relational data warehouse that enforces a fixed schema as data is written",
+      "A normalized transactional database tuned for high-frequency single-row updates",
+      "A data lake, which stores raw files and uses a schema-on-read approach",
+      "An in-memory cache used to accelerate repeated key lookups"
+    ],
+    "correct": 2,
+    "explanation": "A data lake is a file store that holds data in its native, raw format and applies schema-on-read, defining a tabular schema only when the data is read for analysis, which makes it ideal for mixed structured, semi-structured, and unstructured data. A relational data warehouse enforces structure when data is written (schema-on-write), the opposite of this requirement. A normalized transactional database is tuned for operational single-row updates, not raw large-scale file storage. An in-memory cache accelerates lookups and does not serve as a raw analytical file store.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/scenarios/data-lake",
+    "id": 98
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Large-Scale Analytics: Ingestion, Processing, and Data Stores",
+    "question": "An organization keeps raw data as files in a data lake but also wants relational features such as schema enforcement, transactional consistency, and a SQL endpoint to query those files as tables, all on a single platform. Which approach provides this combination?",
+    "options": [
+      "Replacing the data lake entirely with a normalized operational database",
+      "A data lakehouse, which combines data lake storage with data warehouse capabilities",
+      "Exporting all files to a spreadsheet for manual analysis",
+      "A message queue that buffers events between producers and consumers"
+    ],
+    "correct": 1,
+    "explanation": "A data lakehouse combines the features of a data lake and a data warehouse: raw data stays as files in the lake, while an open table format such as Delta Lake provides schema enforcement and ACID (transactional) consistency over those files, and the platform's SQL query engine exposes them as queryable tables through a SQL endpoint. Replacing the lake with a normalized operational database abandons the raw-file storage and the analytical purpose. Exporting to a spreadsheet does not provide large-scale schema-enforced SQL querying. A message queue moves events between systems and is not an analytical store that exposes files as tables.",
+    "reference": "https://learn.microsoft.com/fabric/data-engineering/lakehouse-overview",
+    "id": 99
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Large-Scale Analytics: Ingestion, Processing, and Data Stores",
+    "question": "A data platform team needs a managed cloud service to build pipelines that orchestrate and automate the movement of data from many disparate sources into an analytical store, including transforming the data along the way. Which Azure service is purpose-built for this data integration orchestration?",
+    "options": [
+      "Power BI, used to build reports and interactive dashboards",
+      "Azure Cosmos DB, a globally distributed operational NoSQL database",
+      "Microsoft Entra ID, used to manage identities and access",
+      "Azure Data Factory, a cloud-based service that orchestrates and automates data movement and transformation"
+    ],
+    "correct": 3,
+    "explanation": "Azure Data Factory is a cloud-based data integration service that orchestrates and automates the movement and transformation of data, letting you build pipelines that ingest from disparate sources, transform the data, and publish results to analytical stores. Power BI consumes and visualizes data but does not orchestrate ingestion pipelines. Azure Cosmos DB is an operational NoSQL database, not a pipeline orchestrator. Microsoft Entra ID handles identity and access management and has no role in moving or transforming analytical data.",
+    "reference": "https://learn.microsoft.com/azure/data-factory/introduction#top-level-concepts",
+    "id": 100
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Large-Scale Analytics: Ingestion, Processing, and Data Stores",
+    "question": "While reviewing an Azure Data Factory solution, a new engineer asks what a pipeline actually is. How is a pipeline best described within Azure Data Factory?",
+    "options": [
+      "A logical grouping of activities that together perform a task and can be managed, scheduled, and deployed as a set",
+      "A connection definition that stores the credentials needed to reach an external data source",
+      "A representation of the structure of data within a data store, such as a table or file",
+      "A compute cluster that physically executes Spark jobs for transformations"
+    ],
+    "correct": 0,
+    "explanation": "In Azure Data Factory, a pipeline is a logical grouping of activities that together perform a task, letting you manage, schedule, and deploy the activities as a single set rather than individually. A connection definition that stores credentials to reach a source is a linked service, not a pipeline. A representation of the structure of data such as a table or file is a dataset. A compute cluster that runs Spark jobs is part of the integration runtime or data-flow execution environment, not the pipeline construct itself.",
+    "reference": "https://learn.microsoft.com/azure/data-factory/introduction#top-level-concepts",
+    "id": 101
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Large-Scale Analytics: Ingestion, Processing, and Data Stores",
+    "question": "A logistics company must report on three years of historical, highly structured shipment data using complex SQL aggregations across many concurrent business-intelligence users, and the data fits cleanly into a relational schema. Which analytical data store is the most appropriate choice for this workload?",
+    "options": [
+      "A data lake holding only raw, unstructured files with schema applied at read time",
+      "An operational document database tuned for single-item reads and writes",
+      "A relational data warehouse optimized for structured data queried with SQL",
+      "A message broker that routes events between producers and consumers"
+    ],
+    "correct": 2,
+    "explanation": "A relational data warehouse is the right fit when data is structured, fits a relational schema, and must be queried with SQL for analytical aggregations across many concurrent users. A data lake holding raw, unstructured files with schema-on-read is better for exploratory analysis of mixed or raw data, not high-concurrency structured BI reporting. An operational document database is optimized for single-item operational access, not large-scale analytical aggregation. A message broker moves events and is not an analytical store at all.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/technology-choices/fabric-analytical-data-stores#overview-of-primary-analytical-data-stores-in-microsoft-fabric",
+    "id": 102
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Large-Scale Analytics: Ingestion, Processing, and Data Stores",
+    "question": "An architect is contrasting a data warehouse with a data lake for an analytics solution. Which statements accurately describe how these two analytical data stores differ? (Choose all that apply.)",
+    "options": [
+      "A data warehouse enforces a structured relational schema when data is written (schema-on-write)",
+      "A data lake stores data in its raw, native format and applies schema-on-read at analysis time",
+      "A data lake requires every file to conform to a fixed relational schema before it can be stored",
+      "A data warehouse can only store unstructured binary files such as images and video"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "A data warehouse is a relational store that enforces structure as data is written, an approach known as schema-on-write, so that statement is correct. A data lake stores data in its raw, native format and applies a schema only when the data is read for analysis (schema-on-read), so that statement is also correct. The claim that a data lake requires a fixed relational schema before storage is wrong because schema-on-read is precisely the absence of such enforcement. The claim that a data warehouse can only store unstructured binary files is wrong because a warehouse is designed for structured relational data, not raw images or video.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/scenarios/data-lake#when-to-use-a-data-lake",
+    "id": 103
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Large-Scale Analytics: Ingestion, Processing, and Data Stores",
+    "question": "A data engineer is describing the data ingestion and processing stage of a large-scale analytics pipeline. Which statements about this stage are correct? (Choose all that apply.)",
+    "options": [
+      "Ingestion can include both batch processing of static data and real-time processing of streaming data",
+      "The processing is often performed by distributed systems that handle high data volumes in parallel using multi-node clusters",
+      "Ingestion is limited strictly to one source at a time and cannot combine multiple data sources",
+      "Loading typically uses either an ETL or an ELT process to clean, filter, and restructure the data for analysis"
+    ],
+    "correct": [
+      0,
+      1,
+      3
+    ],
+    "explanation": "Data ingestion includes both batch processing of static data and real-time processing of streaming data, so that statement is correct. The processing is commonly performed by distributed systems that process high volumes in parallel across multi-node clusters, so that statement is correct. The load operation usually involves an ETL or ELT process that cleans, filters, and restructures the data for analysis, so that statement is correct. The claim that ingestion is limited to a single source is wrong because analytics pipelines routinely consolidate data from multiple transactional stores, files, and streams.",
+    "reference": "https://learn.microsoft.com/training/modules/examine-components-of-modern-data-warehouse/2-describe-warehousing",
+    "id": 104
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Large-Scale Analytics: Ingestion, Processing, and Data Stores",
+    "question": "A team is learning the core building blocks of Azure Data Factory so they can orchestrate data movement. Which statements correctly describe Data Factory components? (Choose all that apply.)",
+    "options": [
+      "A linked service defines the connection information needed to connect to an external resource, similar to a connection string",
+      "An activity represents a processing step in a pipeline, such as copying data from one store to another",
+      "A dataset is the compute cluster that physically runs transformation logic",
+      "A pipeline can run its activities sequentially in a chain or independently in parallel"
+    ],
+    "correct": [
+      0,
+      1,
+      3
+    ],
+    "explanation": "A linked service defines the connection information needed to reach an external resource and works much like a connection string, so that statement is correct. An activity represents a processing step in a pipeline, such as a copy activity that moves data between stores, so that statement is correct. A pipeline's activities can be chained to run sequentially or arranged to run independently in parallel, so that statement is correct. The claim that a dataset is the compute cluster running transformations is wrong: a dataset references or points to the data structure used as input or output, while compute is provided by the integration runtime or data-flow engine.",
+    "reference": "https://learn.microsoft.com/azure/data-factory/introduction#top-level-concepts",
+    "id": 105
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Large-Scale Analytics: Ingestion, Processing, and Data Stores",
+    "question": "Evaluate each statement about analytical data stores and data integration approaches for large-scale analytics. Indicate whether each statement is true.",
+    "statements": [
+      "In an ETL process, data is transformed before it is loaded into the analytical store.",
+      "In an ELT process, data is loaded into the target store first and then transformed there.",
+      "A data warehouse stores raw, unstructured files without enforcing any schema.",
+      "Azure Data Factory can be used to orchestrate data ingestion and movement in an analytics pipeline."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "explanation": "Statement 1 is true: in ETL the data is transformed before being loaded into the analytical store. Statement 2 is true: in ELT the data is extracted and loaded into the target store first, and the transformation then takes place inside that target data store. Statement 3 is false: storing raw files without schema enforcement describes a data lake, whereas a data warehouse is a relational store that enforces a structured schema. Statement 4 is true: Azure Data Factory is a data integration service used to orchestrate data ingestion and movement across stores in an analytics pipeline.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/relational-data/etl",
+    "id": 106
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Databricks, Synapse, and Microsoft Fabric",
+    "question": "A data science team wants a collaborative, cloud-based analytics platform built on Apache Spark, where they can run notebooks, machine learning, and large-scale data processing without manually configuring or initializing Spark themselves. Which Azure service is described?",
+    "options": [
+      "Azure Databricks",
+      "Azure Blob Storage",
+      "Azure Cosmos DB",
+      "Azure Key Vault"
+    ],
+    "correct": 0,
+    "explanation": "Azure Databricks is an optimized, Apache Spark-based analytics platform; when you deploy a compute cluster, Spark is configured and deployed for you, so you do not need to initialize a Spark context or session yourself. Azure Blob Storage is object storage and provides no Spark compute. Azure Cosmos DB is a NoSQL operational database, not a Spark analytics platform. Azure Key Vault stores secrets, keys, and certificates and performs no data processing.",
+    "reference": "https://learn.microsoft.com/azure/databricks/spark/faq#how-does-apache-spark-work-on-azure-databricks",
+    "id": 107
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Databricks, Synapse, and Microsoft Fabric",
+    "question": "An organization is evaluating a single end-to-end analytics product that unifies data movement, data engineering, data warehousing, real-time intelligence, and business intelligence, and is delivered as software-as-a-service so teams do not have to assemble separate services from multiple vendors. Which Microsoft offering matches this description?",
+    "options": [
+      "Microsoft Fabric",
+      "Azure Virtual Machines",
+      "Azure DNS",
+      "Azure Logic Apps"
+    ],
+    "correct": 0,
+    "explanation": "Microsoft Fabric is an all-in-one analytics platform delivered as a SaaS offering that unifies experiences such as Data Factory, Data Engineering, Data Warehouse, Real-Time Intelligence, and Power BI in a single environment. Azure Virtual Machines is infrastructure-as-a-service compute, not an integrated analytics product. Azure DNS resolves domain names and has nothing to do with analytics. Azure Logic Apps automates workflows and integrations but is not an end-to-end analytics platform.",
+    "reference": "https://learn.microsoft.com/fabric/fundamentals/microsoft-fabric-overview",
+    "id": 108
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Databricks, Synapse, and Microsoft Fabric",
+    "question": "In Microsoft Fabric, every tenant automatically includes a single, unified, logical data lake that serves as the centralized store for all analytics data across the organization, often compared to OneDrive. What is the name of this data lake?",
+    "options": [
+      "Azure NetApp Files",
+      "OneLake",
+      "Azure Files",
+      "Azure Managed Disks"
+    ],
+    "correct": 1,
+    "explanation": "OneLake is the single, unified, logical data lake that comes automatically with every Microsoft Fabric tenant and is designed to be the single place for all analytics data, described as the OneDrive for data. Azure NetApp Files is an enterprise file-storage service and is not the Fabric data lake. Azure Files provides managed SMB and NFS file shares, not the Fabric analytics lake. Azure Managed Disks are block-storage volumes attached to virtual machines.",
+    "reference": "https://learn.microsoft.com/fabric/onelake/onelake-overview",
+    "id": 109
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Databricks, Synapse, and Microsoft Fabric",
+    "question": "A finance department needs a relational, enterprise-scale data warehouse to support a star-schema model that analysts will query with T-SQL for business intelligence reporting. Which Microsoft Fabric experience is the most appropriate choice?",
+    "options": [
+      "Real-Time Intelligence eventhouse",
+      "Power BI report",
+      "Data Warehouse",
+      "Data Factory pipeline"
+    ],
+    "correct": 2,
+    "explanation": "The Fabric Data Warehouse provides a relational, enterprise-scale warehouse developed primarily with T-SQL, with full multi-table ACID transactions, making it ideal for star or snowflake schemas and BI reporting. A Real-Time Intelligence eventhouse is built for ingesting and analyzing streaming and time-series data, not relational star-schema warehousing. A Power BI report is a visualization layer, not the warehouse that stores and serves the relational model. A Data Factory pipeline orchestrates and moves data but does not provide the relational warehouse store itself.",
+    "reference": "https://learn.microsoft.com/fabric/data-warehouse/data-warehousing",
+    "id": 110
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Databricks, Synapse, and Microsoft Fabric",
+    "question": "How does OneLake let multiple Microsoft Fabric engines, such as the T-SQL engine and the Apache Spark engine, work with the same tabular data?",
+    "options": [
+      "Each engine maintains its own separate copy of the data that must be synchronized nightly",
+      "Engines can only read data after it is exported to a separate Azure SQL Database",
+      "Tabular data is stored once in the open Delta Parquet format, so engines use a single copy without duplication",
+      "Data must be converted to a proprietary binary format unique to each engine before use"
+    ],
+    "correct": 2,
+    "explanation": "OneLake stores all tabular data in the open Delta Parquet format, so different analytical engines (T-SQL, Apache Spark, Analysis Services, and others) can operate over a single copy of the data without movement or duplication. Maintaining separate copies per engine with nightly synchronization contradicts the one-copy design. Exporting to Azure SQL Database first is unnecessary because engines read directly from OneLake. Converting to a proprietary per-engine format is wrong because the format is open Delta Parquet shared across engines.",
+    "reference": "https://learn.microsoft.com/fabric/onelake/onelake-overview#one-copy-of-data",
+    "id": 111
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Databricks, Synapse, and Microsoft Fabric",
+    "question": "Apache Spark is frequently chosen for big-data workloads. Which statement best describes what kind of processing engine Apache Spark is?",
+    "options": [
+      "A distributed processing engine that splits work into parallel tasks across multiple worker nodes in a cluster",
+      "A single-threaded engine that runs all computations on one machine sequentially",
+      "A relational transaction processor designed for high-volume single-row inserts and updates",
+      "A managed DNS resolver that distributes network requests across regions"
+    ],
+    "correct": 0,
+    "explanation": "Apache Spark is an open-source distributed computing system for big-data workloads; a driver program coordinates work that executors run as parallel tasks across worker nodes in a cluster. Describing it as single-threaded on one machine is wrong because Spark's purpose is parallel, distributed execution. It is not an OLTP relational transaction processor optimized for single-row inserts and updates. It is not a DNS resolver, which has no relation to data processing.",
+    "reference": "https://learn.microsoft.com/azure/synapse-analytics/spark/apache-spark-overview#what-is-apache-spark",
+    "id": 112
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Databricks, Synapse, and Microsoft Fabric",
+    "question": "A team has files in a data lake (Parquet and CSV) and wants to run ad-hoc T-SQL queries directly over those files without first provisioning or reserving dedicated compute and without loading the data into tables. Which capability of Azure Synapse Analytics best fits this need?",
+    "options": [
+      "Dedicated SQL pool",
+      "Serverless SQL pool",
+      "Power BI import mode",
+      "Azure Cosmos DB analytical store"
+    ],
+    "correct": 1,
+    "explanation": "The serverless SQL pool is an on-demand query service that lets you use familiar T-SQL to query data in the data lake in place, with no need to reserve compute or copy and load data into a specialized store. A dedicated SQL pool requires provisioning reserved compute (measured in Data Warehousing Units) and is suited to predictable workloads, not pay-per-query in-place exploration. Power BI import mode is a visualization storage mode, not a T-SQL query service over lake files. Azure Cosmos DB analytical store is a column store for a NoSQL database, not the Synapse on-demand T-SQL engine.",
+    "reference": "https://learn.microsoft.com/azure/synapse-analytics/sql/on-demand-workspace-overview",
+    "id": 113
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Databricks, Synapse, and Microsoft Fabric",
+    "question": "Within Microsoft Fabric, which experience is purpose-built for orchestrating data movement and transformation using pipelines and low-code dataflows with hundreds of connectors?",
+    "options": [
+      "Power BI",
+      "Real-Time Intelligence",
+      "Data Science",
+      "Data Factory"
+    ],
+    "correct": 3,
+    "explanation": "Data Factory in Fabric provides data integration and orchestration, including pipelines for orchestrating data movement and transformation and Dataflow Gen2 for low-code ingestion and transformation with hundreds of connectors. Power BI is the business intelligence and visualization experience, not the integration and orchestration tool. Real-Time Intelligence focuses on ingesting and analyzing streaming and event data. Data Science provides tools to build, train, and deploy machine learning models, not pipeline orchestration.",
+    "reference": "https://learn.microsoft.com/fabric/data-factory/data-factory-overview",
+    "id": 114
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Azure Databricks, Synapse, and Microsoft Fabric",
+    "question": "A retailer already has a large amount of analytics data sitting in Amazon S3 and in Azure Data Lake Storage. They want to make that external data appear inside OneLake and analyze it with Fabric engines without physically copying or migrating it. Which OneLake feature enables this zero-copy access?",
+    "options": [
+      "Shortcuts",
+      "Soft delete",
+      "Zone-redundant storage",
+      "Direct Lake refresh scheduling"
+    ],
+    "correct": 0,
+    "explanation": "A OneLake shortcut is a reference to data stored in other locations (within OneLake or external sources such as Azure Data Lake Storage and Amazon S3) that makes the referenced files appear local, providing zero-copy access without ETL or migration. Soft delete is a data-protection feature that retains deleted files for recovery, not a way to reference external data. Zone-redundant storage protects against datacenter failures and is unrelated to referencing external sources. Direct Lake is a Power BI semantic-model access mode, not a mechanism for mounting external storage into OneLake.",
+    "reference": "https://learn.microsoft.com/fabric/onelake/onelake-overview#one-copy-of-data",
+    "id": 115
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Azure Databricks, Synapse, and Microsoft Fabric",
+    "question": "Which of the following are integrated workload experiences available within the Microsoft Fabric platform? Select all that apply.",
+    "options": [
+      "Data Engineering",
+      "Power BI",
+      "Azure ExpressRoute",
+      "Data Factory"
+    ],
+    "correct": [
+      0,
+      1,
+      3
+    ],
+    "explanation": "Microsoft Fabric unifies multiple analytics experiences in one platform, including Data Engineering (lakehouses and Spark notebooks), Power BI (reporting and visualization), and Data Factory (data integration and orchestration). Azure ExpressRoute is a private network connectivity service between on-premises networks and Azure and is not a Fabric analytics workload, so it is the only incorrect option.",
+    "reference": "https://learn.microsoft.com/fabric/fundamentals/microsoft-fabric-overview#fabric-compute-engines",
+    "id": 116
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Azure Databricks, Synapse, and Microsoft Fabric",
+    "question": "Which statements accurately describe OneLake in Microsoft Fabric? Select all that apply.",
+    "options": [
+      "It is built on top of Azure Data Lake Storage (ADLS) Gen2",
+      "It supports shortcuts that reference data in other locations (such as ADLS Gen2 or Amazon S3) without copying it",
+      "Each Fabric workload requires its own separate, isolated data lake that cannot be shared",
+      "It stores data only in a proprietary binary format that a single Fabric engine can read"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "OneLake is built on Azure Data Lake Storage (ADLS) Gen2, and it supports shortcuts, which are references to data stored in other locations such as another lakehouse, ADLS Gen2, or Amazon S3, making that data appear local without copying it. The claim that each workload needs its own separate, isolated lake is incorrect: OneLake is a single, unified lake shared across all workloads. The claim that it stores data only in a proprietary binary format readable by a single engine is incorrect: OneLake stores tabular data in the open Delta Parquet format so multiple analytical engines can use one copy.",
+    "reference": "https://learn.microsoft.com/fabric/onelake/onelake-shortcuts#types-of-shortcuts",
+    "id": 117
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Azure Databricks, Synapse, and Microsoft Fabric",
+    "question": "For each of the following statements about large-scale analytics services on Azure, indicate whether the statement is true.",
+    "statements": [
+      "Azure Databricks is an analytics platform based on Apache Spark.",
+      "Microsoft Fabric is delivered as a software-as-a-service (SaaS) platform.",
+      "Apache Spark processes data on a single node and cannot distribute work across multiple machines.",
+      "Azure Synapse Analytics brings together enterprise data warehousing and big data analytics."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "explanation": "Statement 1 is true: Azure Databricks is an Apache Spark-based analytics platform. Statement 2 is true: Microsoft Fabric is delivered as a SaaS platform built on Azure. Statement 3 is false: Apache Spark is a distributed processing engine that splits work into parallel tasks across worker nodes in a cluster, so it does not run solely on a single node. Statement 4 is true: Azure Synapse Analytics is an analytics service that brings together enterprise data warehousing and big data analytics.",
+    "reference": "https://learn.microsoft.com/azure/synapse-analytics/overview-what-is",
+    "id": 118
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Real-Time Data Analytics",
+    "question": "A logistics company collects all of a day's delivery records and runs a single job overnight to calculate per-region totals. New records that arrive during the day simply wait in storage until the scheduled run. How is this data being processed?",
+    "options": [
+      "Stream processing, because each delivery record is handled the moment it is created",
+      "Stream processing, because the job runs automatically without a person starting it",
+      "Batch processing, because records are collected and stored, then processed together as a group on a schedule",
+      "Real-time processing, because the totals are available within milliseconds of each delivery"
+    ],
+    "correct": 2,
+    "explanation": "In batch processing, newly arriving records are collected and stored, and the whole group is processed together in a single operation, often on a scheduled interval such as overnight; this matches the described nightly per-region job. Both stream-processing options are wrong: stream processing handles each new piece of data the moment it arrives rather than waiting for a scheduled run, and automatic scheduling alone does not make a workload a stream. The real-time/millisecond option is wrong because batch latency is typically hours, not milliseconds.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-fundamentals-stream-processing/2-batch-stream",
+    "id": 119
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Real-Time Data Analytics",
+    "question": "An analyst is describing how streaming data differs from the data used in a traditional batch job. Which characteristic best describes streaming data?",
+    "options": [
+      "It is a continuous, effectively unbounded flow of events processed with very low latency, typically over a rolling time window or the most recent data",
+      "It is a fixed, complete dataset that must be fully prepared before any processing can begin",
+      "It is always smaller in total volume than any dataset processed in batch",
+      "It is processed only after being copied into a data warehouse for historical reporting"
+    ],
+    "correct": 0,
+    "explanation": "Streaming data arrives continuously as an unbounded series of events and is processed in real time with latency in the order of seconds or milliseconds, usually against the most recent data or a rolling time window. The fixed/complete-dataset option describes batch processing, where all input must be prepared before processing begins. The claim that streaming data is always smaller in total volume is false, because a continuous stream can accumulate enormous volume over time. The data-warehouse option is wrong because streaming is processed as events arrive, not only after loading into a warehouse for historical reporting.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-fundamentals-stream-processing/2-batch-stream",
+    "id": 120
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Real-Time Data Analytics",
+    "question": "A team wants a managed Azure platform-as-a-service offering that lets them define a job which ingests events from a streaming source, applies a perpetual query using a SQL-like language, and writes results to an output, without managing any clusters. Which service fits this description?",
+    "options": [
+      "Azure Blob Storage",
+      "Azure Data Factory",
+      "Azure SQL Database",
+      "Azure Stream Analytics"
+    ],
+    "correct": 3,
+    "explanation": "Azure Stream Analytics is a platform-as-a-service offering for defining streaming jobs that ingest data from a streaming source, apply a perpetual query, and write the results to an output, using a SQL-like query language and no cluster management. Azure Blob Storage is object file storage and performs no perpetual query processing. Azure Data Factory is an orchestration and data-integration (ETL/ELT) service oriented around pipelines, not a continuous stream-query engine. Azure SQL Database is a relational transactional database used to store and query data, not to run perpetual streaming queries.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-fundamentals-stream-processing/3-explore-common-elements",
+    "id": 121
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Real-Time Data Analytics",
+    "question": "A retailer wants a single integrated experience inside Microsoft Fabric to ingest streaming events, store and query them, build live dashboards, and trigger automated alerts when conditions are met, all within the same Fabric workspace. Which capability should they use?",
+    "options": [
+      "Power BI paginated reports",
+      "Microsoft Fabric Real-Time Intelligence",
+      "Azure IoT Hub",
+      "OneLake shortcuts"
+    ],
+    "correct": 1,
+    "explanation": "Microsoft Fabric Real-Time Intelligence is the integrated set of tools built into Fabric for ingesting, storing, querying, visualizing, and acting on streaming data within one workspace; it includes components for ingestion, an event-optimized store queried with KQL, real-time dashboards, and alerting. Power BI paginated reports produce fixed-layout printable reports, not a streaming ingest-to-action pipeline. Azure IoT Hub is a device-to-cloud ingestion service, not the integrated Fabric analytics toolset. OneLake shortcuts reference existing data across locations and do not provide streaming ingestion, dashboards, or alerting.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-fundamentals-stream-processing/4-fabric-real-time-intelligence",
+    "id": 122
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Real-Time Data Analytics",
+    "question": "A solution architect is selecting Azure ingestion services that can act as the streaming source that feeds events into a stream processing engine. Which of the following are commonly used to ingest event data for stream processing on Azure? (Choose two.)",
+    "options": [
+      "Azure Event Hubs, a big data event ingestion service that can receive and process millions of events per second from applications and devices",
+      "Azure IoT Hub, a data ingestion service similar to Event Hubs but optimized for event data from Internet-of-Things devices",
+      "Azure Key Vault, a service for securely storing secrets, keys, and certificates",
+      "Azure DNS, a service for hosting domain name resolution records"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Azure Event Hubs is a big data streaming platform and event ingestion service that can receive and process millions of events per second using a partitioned consumer model, and Azure IoT Hub is a similar high-scale ingestion service optimized for event data from IoT devices; both are commonly used as streaming sources that feed a stream processing engine. Azure Key Vault only stores secrets, keys, and certificates and does not ingest event streams. Azure DNS only resolves domain names and has no role in ingesting streaming event data.",
+    "reference": "https://learn.microsoft.com/azure/event-hubs/event-hubs-about",
+    "id": 123
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Real-Time Data Analytics",
+    "question": "A data team is reviewing statements about choosing between batch and stream processing. For each statement, indicate whether it is correct.",
+    "statements": [
+      "A fire-detection system that must instantly trigger alarms and unlock doors as soon as smoke is sensed is better suited to stream processing than to batch processing.",
+      "Stream processing typically delivers results with latency measured in seconds or milliseconds, while batch processing latency is typically measured in hours.",
+      "A monthly billing run that processes all of the previous month's transactions in one scheduled job is a typical example of stream processing.",
+      "Many large-scale analytics solutions combine both batch and stream processing so they can support both historical and real-time analysis."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "explanation": "Statement 1 is correct (Yes): stream processing is ideal for time-critical operations that require an instant real-time response, such as a fire-detection system triggering alarms immediately. Statement 2 is correct (Yes): stream processing latency is typically seconds or milliseconds while batch latency is typically hours. Statement 3 is incorrect (No): a scheduled monthly billing run that processes a whole month's transactions together is a classic example of batch processing, not stream processing. Statement 4 is correct (Yes): many large-scale solutions mix batch and stream processing to enable both historical and real-time analysis.",
+    "reference": "https://learn.microsoft.com/training/modules/explore-fundamentals-stream-processing/2-batch-stream",
+    "id": 124
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Data Visualization with Power BI",
+    "question": "A business analyst needs a Windows desktop tool to connect to multiple data sources, shape the data, build a data model, and design an interactive report before any of it is shared with colleagues. Which Power BI component is built for this authoring and modeling work?",
+    "options": [
+      "The Power BI mobile apps for iOS and Android",
+      "Power BI Desktop",
+      "The Power BI service at app.powerbi.com",
+      "Power BI Report Server administration console"
+    ],
+    "correct": 1,
+    "explanation": "Power BI Desktop is the authoring application installed on Windows; it is where you connect to data sources, transform data, build the data model, and create reports, making it the tool for full data modeling and report design. The Power BI service (app.powerbi.com) is the cloud platform optimized for publishing, sharing, and collaboration rather than the primary modeling/authoring environment. The Power BI mobile apps are for viewing and interacting with already-published reports and dashboards on phones and tablets, not for building models. The Report Server administration console manages an on-premises report server and is not a data-modeling authoring tool.",
+    "reference": "https://learn.microsoft.com/power-bi/fundamentals/power-bi-overview#power-bi-desktop-vs-the-power-bi-service",
+    "id": 125
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Data Visualization with Power BI",
+    "question": "After designing a report in Power BI Desktop, a team wants colleagues across the organization to view and interact with it in a browser and collaborate in shared workspaces. To which destination is the report published so others can consume it?",
+    "options": [
+      "Power BI Report Builder",
+      "The Power Query Editor",
+      "The Power BI service",
+      "A local .pbix file on a shared network drive"
+    ],
+    "correct": 2,
+    "explanation": "Reports authored in Power BI Desktop are published to the Power BI service, the cloud platform where content lives in workspaces and can be shared, viewed in a browser, and collaborated on. Power BI Report Builder is used to author paginated (pixel-perfect, printable) reports, not the place you publish a Desktop report for browser-based sharing. The Power Query Editor is a data-transformation surface inside Desktop, not a publishing destination. Saving a .pbix file on a network drive does not provide the interactive, browser-based viewing, sharing, and collaboration features that publishing to the service provides.",
+    "reference": "https://learn.microsoft.com/power-bi/fundamentals/power-bi-overview#power-bi-step-by-step",
+    "id": 126
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Data Visualization with Power BI",
+    "question": "In a Power BI semantic model, an author writes a DAX formula such as Total Sales = SUM(Sales[SalesAmount]) so that a single summarized value is recalculated dynamically for whatever category or filter a visual applies. What kind of model object is being created?",
+    "options": [
+      "A relationship between two tables",
+      "A slicer on the report canvas",
+      "A dashboard tile",
+      "A measure"
+    ],
+    "correct": 3,
+    "explanation": "A measure is a DAX-based calculation that produces a scalar summarized value at query time, recalculated according to the filter context of each visual; an explicit measure typically uses aggregation functions like SUM, and its result is never stored in the model. A relationship propagates filters between tables but is not itself a calculation that returns a summarized value. A slicer is an on-canvas filtering control, not a stored model calculation. A dashboard tile is a pinned visualization in the Power BI service, not a model object defined with DAX.",
+    "reference": "https://learn.microsoft.com/power-bi/guidance/star-schema#measures",
+    "id": 127
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Data Visualization with Power BI",
+    "question": "A finance team tracks monthly revenue across a two-year period and wants a visual that emphasizes the overall shape of the trend and any seasonal patterns over continuous time. Which built-in Power BI visualization best fits this analytical question?",
+    "options": [
+      "A line chart",
+      "A pie chart",
+      "A treemap",
+      "A table"
+    ],
+    "correct": 0,
+    "explanation": "A line chart displays continuous data as points connected by a line and is designed to emphasize the overall shape of values over time, making it ideal for revealing trends and seasonal patterns. A pie chart shows the contribution of parts to a whole at a single point in time and is unsuited to showing change across many time periods. A treemap displays hierarchical proportions as nested rectangles, not a time-based trend. A table presents exact values in a grid and is best for reading precise numbers, not for visually conveying the shape of a trend over time.",
+    "reference": "https://learn.microsoft.com/power-bi/visuals/power-bi-line-chart",
+    "id": 128
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Data Visualization with Power BI",
+    "question": "A Power BI author is deciding when to deliver insights as a dashboard versus as a report in the Power BI service. Which statements correctly describe Power BI dashboards? (Choose two.)",
+    "options": [
+      "A dashboard is a single-page canvas that consolidates pinned tiles, which can come from more than one report or semantic model.",
+      "A dashboard supports interactive filtering and slicing of its tiles that consumers can save.",
+      "A dashboard tile can be pinned from a report, and selecting the tile typically opens the underlying report.",
+      "A dashboard can span multiple pages, with each page bound to a single semantic model."
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "A dashboard is a single-page canvas in the Power BI service whose visualizations (tiles) can be pinned from one or more underlying reports and semantic models, giving a consolidated at-a-glance view. Tiles are pinned from reports, and selecting a tile usually navigates to the report page where the visualization was created, so both of these are correct. The claim that dashboards support saved interactive filtering and slicing is wrong: dashboards do not let consumers filter or slice the canvas (that interactivity belongs to reports). The claim that a dashboard spans multiple pages bound to a single model is also wrong: a dashboard is limited to one page, while it is a report that has one or more pages and is built on a single semantic model.",
+    "reference": "https://learn.microsoft.com/power-bi/create-reports/service-dashboards#dashboards-versus-reports",
+    "id": 129
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Data Visualization with Power BI",
+    "question": "A newcomer to Power BI is matching analytical questions to appropriate built-in visualizations. For each statement, decide whether it correctly describes when to use that visualization.",
+    "statements": [
+      "A KPI visual is a good choice to communicate progress toward a measurable goal, such as how far ahead or behind a metric is versus its target.",
+      "Bar and column charts are the standard choice for comparing specific values across different categories.",
+      "A scatter chart is the appropriate visual for showing the relationship between two numerical values and revealing clusters or outliers.",
+      "A pie chart is the recommended visual for comparing many exact values across dozens of categories at once."
+    ],
+    "correct": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "explanation": "Statement 1 is true: a KPI visual communicates the amount of progress made toward a measurable goal and answers questions like how far ahead or behind a metric is relative to its target. Statement 2 is true: bar and column charts are the standard for comparing specific values across different categories. Statement 3 is true: a scatter chart plots data points at the intersection of two numerical values to reveal relationships, correlations, clusters, and outliers. Statement 4 is false: pie charts show part-to-whole relationships and are recommended only when there is a small number of categories; for reading many exact values across numerous categories a table is the better fit, so this statement is keyed No.",
+    "reference": "https://learn.microsoft.com/power-bi/visuals/power-bi-visualizations-overview#charts-for-comparison-and-trends",
+    "id": 130
+  }
+]
