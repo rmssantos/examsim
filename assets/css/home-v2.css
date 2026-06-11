@@ -167,13 +167,32 @@ body:not(.dark-mode) .home-board { border-color: transparent; }
 
 /* ===== Hero: dark control-room band, edge to edge ===== */
 .cr-hero-zone {
+  position: relative;
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  background: var(--rail-bg);
+  /* soft teal bloom behind the stats column */
+  background:
+    radial-gradient(640px 300px at 78% 12%, rgba(45, 212, 191, 0.08), transparent 70%),
+    var(--rail-bg);
   border-bottom: 1px solid var(--rail-line);
   color: var(--rail-text);
   margin-bottom: 1.4rem;
+  overflow: hidden;
 }
+/* faint blueprint grid, fading out towards the lower-left */
+.cr-hero-zone::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(170, 178, 192, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(170, 178, 192, 0.055) 1px, transparent 1px);
+  background-size: 34px 34px;
+  -webkit-mask-image: radial-gradient(130% 130% at 75% 0%, #000 25%, transparent 72%);
+  mask-image: radial-gradient(130% 130% at 75% 0%, #000 25%, transparent 72%);
+  pointer-events: none;
+}
+.cr-hero-zone > * { position: relative; z-index: 1; }
 .cr-topnav {
   max-width: 1180px;
   margin: 0 auto;
