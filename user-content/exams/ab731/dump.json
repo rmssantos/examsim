@@ -891,7 +891,7 @@
       0,
       0
     ],
-    "explanation": "Value should be tied to outcomes, not only usage volume.",
+    "explanation": "AI value should connect to business outcomes, and risk reduction is a valid value dimension. Usage metrics alone do not prove ROI, and scalable agent processes keep appropriate human oversight.",
     "question_type": "YES_NO_MATRIX",
     "reference": "https://learn.microsoft.com/agents/adoption-maturity-model/maturity-model-business-process#how-to-get-started-and-measure-value"
   },
@@ -975,7 +975,7 @@
       "Improve grounding, training, review criteria, and change management before scaling"
     ],
     "correct": 3,
-    "explanation": "Trust gaps should be addressed before broad rollout.",
+    "explanation": "User trust is a decision gate: fix grounding, training, review criteria, and change management before scaling. Ignoring feedback, scaling anyway, or counting licenses leaves the adoption risk unresolved.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/azure/cloud-adoption-framework/ai-agents/business-strategy-plan#define-success-metrics"
   },
@@ -1074,7 +1074,7 @@
       "Avoid testing with users"
     ],
     "correct": 0,
-    "explanation": "Grounding in relevant data improves answer specificity.",
+    "explanation": "Grounding the bot in approved support articles and case context (the RAG pattern) lets it answer from company knowledge instead of generic model output. Branding tweaks, removing sources, or skipping testing do not add relevance.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/azure/search/retrieval-augmented-generation-overview"
   },
@@ -1232,7 +1232,7 @@
       "Remove review logs"
     ],
     "correct": 0,
-    "explanation": "Transparency helps users understand and verify AI output.",
+    "explanation": "Citing sources or explaining what data grounded a response helps people see where AI output comes from and verify it. Hiding sources, blocking feedback, or removing review logs undermines transparency and accountability.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/azure/foundry/responsible-ai/openai/overview"
   },
@@ -1607,7 +1607,7 @@
       "Renaming a chat"
     ],
     "correct": 0,
-    "explanation": "Vision services analyze image or visual content.",
+    "explanation": "Azure Vision analyzes visual content, so it suits inspecting images for product defects. Calendar invites, transcript summaries, and chat renaming are text or productivity tasks, not image analysis.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/azure/ai-services/computer-vision/overview-image-analysis"
   },
@@ -1676,7 +1676,7 @@
       "Model choice has no business impact"
     ],
     "correct": 2,
-    "explanation": "Model size affects cost, latency, quality, and suitability.",
+    "explanation": "Smaller models can be faster and cheaper to run, and for well-defined tasks they may deliver acceptable quality. Comparing sizes lets leaders balance cost, latency, and quality instead of defaulting to the largest model.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/azure/aks/concepts-ai-ml-language-models"
   },
@@ -1774,7 +1774,7 @@
       2,
       3
     ],
-    "explanation": "Governance needs cross-functional representation.",
+    "explanation": "AI governance needs cross-functional representation: business leadership for sponsorship plus legal, compliance, security, and privacy expertise. A single enthusiastic user lacks the authority and oversight scope.",
     "question_type": "MULTI",
     "reference": "https://learn.microsoft.com/azure/cloud-adoption-framework/ai-agents/responsible-ai-across-organization"
   },
