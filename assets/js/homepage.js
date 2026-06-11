@@ -148,7 +148,16 @@ this.examSelection.style.display = '';
 window.ExamApp.setElementHidden(this.libraryEmptyState, true);
 const detailsPanel = document.getElementById('exam-details-placeholder');
 if (detailsPanel?.parentElement === this.examSelection) {
-	detailsPanel.remove();
+	// Park the panel outside the grid before innerHTML wipes the cards.
+	// Removing it from the DOM here destroyed it for the rest of the
+	// session: placeDetailsPanel() looks it up by id and found nothing,
+	// so expanding any card after a re-render (hide/undo/filter) died.
+	const librarySection = document.querySelector('.exam-library-section');
+	if (librarySection) {
+		librarySection.insertBefore(detailsPanel, this.examSelection);
+	} else {
+		detailsPanel.remove();
+	}
 }
 this.examSelection.innerHTML = '';
 
