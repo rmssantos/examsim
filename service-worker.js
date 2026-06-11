@@ -2,7 +2,7 @@
 // Public release history is recorded in CHANGELOG.md. Bump the vX.Y below on any
 // deploy that changes cached assets;
 // tests/test_sprint1_readiness.py enforces the examsim-pwa-vX.Y format.
-const CACHE_VERSION = 'examsim-pwa-v5.2';
+const CACHE_VERSION = 'examsim-pwa-v5.3';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -38,10 +38,6 @@ const CORE_ASSETS = [
   './assets/vendor/fontawesome/webfonts/fa-solid-900.woff2',
   './assets/vendor/fontawesome/webfonts/fa-regular-400.woff2',
   './assets/vendor/fontawesome/webfonts/fa-brands-400.woff2',
-  './assets/css/style-new.css',
-  './assets/css/multi-exam-styles.css',
-  './assets/css/modern-enhancements.css',
-  './assets/css/exam-enhancements.css',
   './assets/css/exam-v2.css',
   './assets/css/home-v2.css',
   './assets/css/analytics-privacy.css',
@@ -89,10 +85,6 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/js/image-storage.js',
   './assets/js/study-scheduler.js',
   './assets/js/study-storage.js',
-  './assets/css/style-new.css',
-  './assets/css/multi-exam-styles.css',
-  './assets/css/modern-enhancements.css',
-  './assets/css/exam-enhancements.css',
   './assets/css/exam-v2.css',
   './assets/css/home-v2.css',
   './assets/css/analytics-privacy.css',

@@ -638,10 +638,14 @@ class MultiExamSimulator {
         // Update UI to show selected exam
         this.updateExamInfo(exam);
 
-        // Show exam info and start button
-        document.getElementById('current-exam-info').style.display = 'block';
-        document.querySelector('.start-exam-cta').style.display = 'block';
-        document.getElementById('modules-section').style.display = 'block';
+        // Show exam info and start button (these legacy sidebar blocks were
+        // removed from the homepage markup, so guard every access)
+        const currentExamInfo = document.getElementById('current-exam-info');
+        if (currentExamInfo) currentExamInfo.style.display = 'block';
+        const startExamCta = document.querySelector('.start-exam-cta');
+        if (startExamCta) startExamCta.style.display = 'block';
+        const legacyModulesSection = document.getElementById('modules-section');
+        if (legacyModulesSection) legacyModulesSection.style.display = 'block';
 
         // Update modules and resources
         this.updateModulesAndResources(exam);
@@ -650,11 +654,15 @@ class MultiExamSimulator {
     }
 
     updateExamInfo(exam) {
-        document.getElementById('current-exam-name').textContent = exam.name;
-        document.getElementById('exam-duration').textContent = `${exam.duration} minutes`;
-        document.getElementById('exam-questions').textContent = `${exam.questionCount} questions`;
-        document.getElementById('exam-pass-score').textContent = `${exam.passScore}%`;
-        document.getElementById('exam-images').textContent = 'With Images';
+        const setText = (id, text) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        };
+        setText('current-exam-name', exam.name);
+        setText('exam-duration', `${exam.duration} minutes`);
+        setText('exam-questions', `${exam.questionCount} questions`);
+        setText('exam-pass-score', `${exam.passScore}%`);
+        setText('exam-images', 'With Images');
     }
 
     safeIconClass(icon, fallback = 'fas fa-book') {
@@ -683,32 +691,36 @@ class MultiExamSimulator {
     }
 
     updateModulesAndResources(exam) {
-        // Update modules list
+        // Update modules list (legacy sidebar block; may be absent)
         const modulesList = document.getElementById('modules-list');
-        modulesList.innerHTML = '';
-        exam.modules.forEach(module => {
-            const li = document.createElement('li');
-            this.appendIcon(li, module.icon, 'fas fa-book');
-            li.appendChild(document.createTextNode(` ${module.name || 'Module'}`));
-            modulesList.appendChild(li);
-        });
+        if (modulesList) {
+            modulesList.innerHTML = '';
+            exam.modules.forEach(module => {
+                const li = document.createElement('li');
+                this.appendIcon(li, module.icon, 'fas fa-book');
+                li.appendChild(document.createTextNode(` ${module.name || 'Module'}`));
+                modulesList.appendChild(li);
+            });
+        }
 
-        // Update resources list
+        // Update resources list (legacy sidebar block; may be absent)
         const resourcesList = document.getElementById('resources-list');
-        resourcesList.innerHTML = '';
-        exam.resources.forEach(resource => {
-            const safeHref = this.safeUrl(resource.url);
-            if (!safeHref) return;
+        if (resourcesList) {
+            resourcesList.innerHTML = '';
+            exam.resources.forEach(resource => {
+                const safeHref = this.safeUrl(resource.url);
+                if (!safeHref) return;
 
-            const a = document.createElement('a');
-            a.href = safeHref;
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
-            a.className = 'resource-compact';
-            this.appendIcon(a, resource.icon, 'fas fa-link');
-            a.appendChild(document.createTextNode(` ${resource.name || 'Resource'}`));
-            resourcesList.appendChild(a);
-        });
+                const a = document.createElement('a');
+                a.href = safeHref;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.className = 'resource-compact';
+                this.appendIcon(a, resource.icon, 'fas fa-link');
+                a.appendChild(document.createTextNode(` ${resource.name || 'Resource'}`));
+                resourcesList.appendChild(a);
+            });
+        }
     }
 
     setupKeyboardShortcuts() {

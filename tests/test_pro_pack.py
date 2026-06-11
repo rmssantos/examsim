@@ -66,7 +66,7 @@ class ProPackTests(unittest.TestCase):
         self.assertIn("variant: 'details'", js)
         self.assertNotIn("exam-card-import", js)
         self.assertIn("e.target.closest('.exam-library-section')", js)
-        self.assertIn("Drop exam pack to import", (ROOT / "assets/css/homepage-styles.css").read_text(encoding="utf-8"))
+        self.assertIn("Drop exam pack to import", (ROOT / "assets/css/home-v2.css").read_text(encoding="utf-8"))
         self.assertIn("formatCommercialStatus", js)
 
     def test_encrypt_pack_tool_round_trips(self):
