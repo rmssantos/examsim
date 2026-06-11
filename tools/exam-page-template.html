@@ -6,7 +6,7 @@
   <meta name="theme-color" content="$theme_color">
   <meta name="description" content="$description">
   <link rel="canonical" href="$canonical">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.applicationinsights.azure.com; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Examplar">
   <meta property="og:title" content="$og_title">
@@ -23,7 +23,9 @@
   <title>$title</title>
   <link rel="stylesheet" href="${root}assets/vendor/fontawesome/css/all.min.css">
   <link rel="stylesheet" href="${root}assets/css/exam-landing.css">
+  <link rel="stylesheet" href="${root}assets/css/analytics-privacy.css">
   <script src="${root}assets/js/legal-page.js" defer></script>
+  <script src="${root}assets/js/analytics.js" defer></script>
   <script type="application/ld+json">
 $jsonld
   </script>

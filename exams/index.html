@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1e3c72">
   <meta name="description" content="Free, local-first, offline-capable practice exams for cloud and security certifications. Original questions and no account required.">
   <link rel="canonical" href="https://examplar.app/exams/">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.applicationinsights.azure.com; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Examplar">
   <meta property="og:title" content="All practice exams | Examplar">
@@ -20,7 +20,9 @@
   <title>All practice exams | Examplar</title>
   <link rel="stylesheet" href="../assets/vendor/fontawesome/css/all.min.css">
   <link rel="stylesheet" href="../assets/css/exam-landing.css">
+  <link rel="stylesheet" href="../assets/css/analytics-privacy.css">
   <script src="../assets/js/legal-page.js" defer></script>
+  <script src="../assets/js/analytics.js" defer></script>
 </head>
 <body class="exam-landing">
   <header class="landing-topbar">

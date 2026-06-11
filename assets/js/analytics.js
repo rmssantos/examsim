@@ -74,6 +74,7 @@
 
     function pageNameFromPath(pathname = window.location.pathname) {
         const path = String(pathname || '');
+        if (path.includes('/exams/')) return 'landing';
         const page = path.split('/').pop() || 'index.html';
         if (page === 'editor') return 'editor';
         if (page === 'exam') return 'exam';
