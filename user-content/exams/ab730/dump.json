@@ -928,7 +928,7 @@
       1,
       3
     ],
-    "explanation": "A productive flow is prompt, refine, verify, then use.",
+    "explanation": "Start with a clear, contextual prompt and sharpen it with follow-ups. Because AI output can contain errors, review the response and its cited sources before applying the result to business work.",
     "question_type": "SEQUENCE",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
@@ -1046,7 +1046,7 @@
       1,
       0
     ],
-    "explanation": "Sensitive data still needs protection when AI is used.",
+    "explanation": "Copilot honors permissions and sensitivity labels, so they remain highly relevant. Keeping needless secrets out of prompts and reviewing generated or confidential output before sharing protects sensitive data.",
     "question_type": "YES_NO_MATRIX",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-privacy"
   },
@@ -1194,7 +1194,7 @@
       1,
       2
     ],
-    "explanation": "Audience, format, and context improve response quality.",
+    "explanation": "Effective prompts include context, goal, source, and expectations. Naming the audience, desired format, and relevant source material sharpens results, while unclear instructions degrade output quality.",
     "question_type": "MULTI",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
@@ -1279,7 +1279,7 @@
       "To change source permissions"
     ],
     "correct": 1,
-    "explanation": "Renaming chats helps organize prior work.",
+    "explanation": "Copilot keeps chats in a history list, and a descriptive name makes a useful conversation easy to locate and resume later. Renaming does not change citations, source permissions, or the legal status of any output.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/paths/explore-microsoft-365-copilot-business-chat/"
   },
@@ -1348,7 +1348,7 @@
       0,
       0
     ],
-    "explanation": "References help grounding but do not bypass access control.",
+    "explanation": "Referencing a file grounds Copilot in the intended source, and prompts can ask for cited examples. Relevant context improves response usefulness, but file references never bypass permissions; access stays scoped to the user.",
     "question_type": "YES_NO_MATRIX",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-architecture"
   },
@@ -1397,7 +1397,7 @@
       "Remove team-specific secrets and document placeholders for variable inputs"
     ],
     "correct": 3,
-    "explanation": "Reusable prompts should be safe and adaptable.",
+    "explanation": "A prompt shared across teams should not embed sensitive or team-specific data, since everyone it is shared with can see it. Documented placeholders, like [Product X], let each team supply its own inputs.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/modules/write-effective-prompts-do-more-prompting/"
   },
@@ -1565,7 +1565,7 @@
       "When many users need the same workflow"
     ],
     "correct": 2,
-    "explanation": "One-time tasks often do not require an agent.",
+    "explanation": "If a single ad hoc prompt in Copilot chat fully meets the need, the default experience is enough. Custom agents pay off for recurring processes, curated knowledge, and workflows shared by many users.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/microsoft-copilot-extend-copilot-extensions"
   },
@@ -1600,7 +1600,7 @@
       "The browser zoom level"
     ],
     "correct": 1,
-    "explanation": "Scope and instructions shape agent behavior.",
+    "explanation": "Instructions direct the agent's behavior and tasks, the description scopes when it is used, and starter prompts steer users to supported scenarios. Display settings like icon color or zoom do not affect answers.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder-build-agents"
   },
@@ -1719,7 +1719,7 @@
       "Publish immediately"
     ],
     "correct": 1,
-    "explanation": "Unsupported claims should be removed or verified.",
+    "explanation": "Copilot can produce ungrounded content that sounds plausible but is not in the source material. Microsoft guidance is to review and verify AI output, so the claim should be verified or removed before use.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-application-card"
   },
