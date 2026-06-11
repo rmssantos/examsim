@@ -19,7 +19,7 @@ class Dp900PackTests(unittest.TestCase):
         self.assertIn("dp900", index)
 
     def test_size_and_official_references(self):
-        self.assertGreaterEqual(len(self.dump), 120)
+        self.assertEqual(len(self.dump), 130)
         for q in self.dump:
             ref = q.get("reference", "")
             self.assertTrue(
