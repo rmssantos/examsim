@@ -1,3 +1,4 @@
+import re
 import unittest
 from pathlib import Path
 
@@ -6,6 +7,24 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class HomeHeaderLayoutTests(unittest.TestCase):
+    def test_every_theme_toggle_icon_is_swappable(self):
+        runtime = (ROOT / "assets/js/script-multi-exam.js").read_text(encoding="utf-8")
+
+        # The runtime swaps moon/sun only on .theme-icon elements; a toggle
+        # button whose icon lacks the class sticks on the moon forever.
+        self.assertRegex(runtime, r"querySelectorAll\(\s*['\"]\.theme-icon['\"]\s*\)")
+
+        for page in ("index.html", "exam.html"):
+            html = (ROOT / page).read_text(encoding="utf-8")
+            icons = re.findall(
+                r'<button[^>]*class="[^"]*theme-toggle[^"]*"[^>]*>\s*<i[^>]*class="([^"]*)"',
+                html,
+            )
+            with self.subTest(page=page):
+                self.assertTrue(icons, f"no theme-toggle button found in {page}")
+                for classes in icons:
+                    self.assertIn("theme-icon", classes)
+
     def test_home_hero_uses_full_bleed_band_layout(self):
         css = (ROOT / "assets/css/home-v2.css").read_text(encoding="utf-8")
 
