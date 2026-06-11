@@ -12,7 +12,7 @@ class HomeHeaderLayoutTests(unittest.TestCase):
 
         # The runtime swaps moon/sun only on .theme-icon elements; a toggle
         # button whose icon lacks the class sticks on the moon forever.
-        self.assertIn("document.querySelectorAll('.theme-icon')", runtime)
+        self.assertRegex(runtime, r"querySelectorAll\(\s*['\"]\.theme-icon['\"]\s*\)")
 
         for page in ("index.html", "exam.html"):
             html = (ROOT / page).read_text(encoding="utf-8")
