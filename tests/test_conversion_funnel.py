@@ -62,6 +62,8 @@ analytics.trackProUnlockClicked('az104', malicious);
 analytics.trackProModalOpened('saac03', malicious);
 analytics.trackProPurchaseClicked('az104', malicious);
 analytics.trackProImportClicked('saac03', malicious);
+analytics.trackProResultsCtaClicked('az104', malicious);
+analytics.trackPassStoryClicked('az104', malicious);
 
 console.log(JSON.stringify(sent.map((envelope) => envelope.data.baseData)));
 """
@@ -83,6 +85,8 @@ console.log(JSON.stringify(sent.map((envelope) => envelope.data.baseData)));
                 "pro_modal_opened",
                 "pro_purchase_clicked",
                 "pro_import_clicked",
+                "pro_purchase_clicked",
+                "pass_story_clicked",
             ],
         )
 
@@ -91,6 +95,13 @@ console.log(JSON.stringify(sent.map((envelope) => envelope.data.baseData)));
             {"exam_id": "saac03", "exam_source": "bundled"},
             {"exam_id": "az104", "exam_source": "bundled", "store": "gumroad"},
             {"exam_id": "saac03", "exam_source": "bundled"},
+            {
+                "exam_id": "az104",
+                "exam_source": "bundled",
+                "store": "gumroad",
+                "placement": "results_pro_upsell",
+            },
+            {"exam_id": "az104", "exam_source": "bundled", "placement": "results"},
         ]
         common = {
             "app": "examsim",
@@ -116,12 +127,33 @@ console.log(JSON.stringify(sent.map((envelope) => envelope.data.baseData)));
             with self.subTest(call=call):
                 self.assertEqual(source.count(call), 1)
 
+    def test_results_screen_wires_pro_upsell_and_pass_story(self):
+        runtime = (ROOT / "assets/js/script-multi-exam.js").read_text(encoding="utf-8")
+        init = (ROOT / "assets/js/exam-init.js").read_text(encoding="utf-8")
+
+        # exam-init must hand the pack's own pro offer to the runtime, otherwise
+        # pro-preview packs finish with no purchase path on the results screen.
+        self.assertIn("pro: metadata.pro || null", init)
+
+        # The results slot renders the pack's own upsell ahead of the cross-sell,
+        # and the pass-story invite links to the public discussion.
+        self.assertIn("renderProUpsell", runtime)
+        self.assertIn("github.com/rmssantos/examsim/discussions/77", runtime)
+
+        for call in (
+            "trackProResultsCtaClicked?.(this.currentExam)",
+            "trackPassStoryClicked?.(this.currentExam)",
+        ):
+            with self.subTest(call=call):
+                self.assertEqual(runtime.count(call), 1)
+
     def test_privacy_copy_discloses_commercial_and_azure_metadata(self):
         page = (ROOT / "privacy-and-storage.html").read_text(encoding="utf-8").lower()
         analytics = (ROOT / "assets/js/analytics.js").read_text(encoding="utf-8").lower()
 
         for phrase in (
             "unlock, pro modal, purchase-link, and import-activation counts",
+            "results-screen upsell and pass-story link counts",
             "country, region, and city",
             "browser, operating system, device type, and device model",
             "temporarily uses the sender ip",

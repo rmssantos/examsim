@@ -7,6 +7,8 @@ const OFFICIAL_DOCUMENTATION_HOSTS = Object.freeze([
     'learn.microsoft.com'
 ]);
 
+const PASS_STORY_DISCUSSION_URL = 'https://github.com/rmssantos/examsim/discussions/77';
+
 function isOfficialDocumentationUrl(value) {
     try {
         const parsed = new URL(String(value || ''));
@@ -595,6 +597,7 @@ class MultiExamSimulator {
                 questions: fromMemory.questions,
                 modules: metadata.modules || [],
                 recommendedPro: metadata.recommendedPro || null,
+                pro: metadata.pro || null,
                 resources: metadata.resources || []
             };
             return true;
@@ -622,6 +625,7 @@ class MultiExamSimulator {
                 questions,
                 modules: metadata.modules || [],
                 recommendedPro: metadata.recommendedPro || null,
+                pro: metadata.pro || null,
                 resources: metadata.resources || []
             };
             return true;
@@ -1411,6 +1415,23 @@ class MultiExamSimulator {
             return `<a href="${this.escapeHtml(h)}" target="_blank" rel="noopener noreferrer" aria-label="Source ${i + 1} (${this.escapeHtml(host)})">Source ${i + 1}</a>`;
         }).join(' &middot; ');
         return `<div class="explanation-source"><i class="fas fa-book" aria-hidden="true"></i> <strong>Sources:</strong> ${links}</div>`;
+    }
+
+    // Upsell the pack's own full version on the results screen (pro-preview packs).
+    renderProUpsell(metadata) {
+        const pro = metadata && metadata.pro;
+        const url = pro && this.safeUrl(pro.url);
+        if (!url) return '';
+        const title = this.escapeHtml(pro.title || 'Full pack');
+        const fullCount = Number(pro.questions) > 0 ? Math.round(Number(pro.questions)) : null;
+        const scope = fullCount ? `${fullCount} questions` : 'the complete question set';
+        const price = pro.price ? ` (${this.escapeHtml(String(pro.price))})` : '';
+        return `<div class="recommended-pro results-pro-upsell"><i class="fas fa-unlock" aria-hidden="true"></i> <strong>${title}</strong><p>You practiced the free preview. The full pack covers ${scope} with detailed explanations and free updates.</p><a class="results-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener noreferrer">Get the full pack${price}</a></div>`;
+    }
+
+    // Invite candidates who passed the real exam to share their story.
+    renderPassStoryInvite() {
+        return `<div class="pass-story-invite"><i class="fas fa-trophy" aria-hidden="true"></i> Passed your real exam with Examplar? <a class="pass-story-link" href="${PASS_STORY_DISCUSSION_URL}" target="_blank" rel="noopener noreferrer">Share your pass story</a></div>`;
     }
 
     // Cross-sell a recommended paid pack on the results screen (e.g. CLF-C02 -> SAA-C03).
@@ -2457,17 +2478,31 @@ class MultiExamSimulator {
         // Generate detailed review
         this.generateDetailedReview();
 
-        // Recommended next pack (cross-sell), shown only when metadata provides one
+        // Pack's own full-version upsell first (pro-preview packs), otherwise the
+        // recommended next pack (free packs); the pass-story invite renders on both.
         const recMeta = this.examData[this.currentExam];
         const recSlot = document.getElementById('results-recommended-pro');
         if (recSlot) {
-            recSlot.innerHTML = this.renderRecommendedPro(recMeta);
+            const upsell = this.renderProUpsell(recMeta);
+            recSlot.innerHTML = (upsell || this.renderRecommendedPro(recMeta)) + this.renderPassStoryInvite();
+            const proCta = recSlot.querySelector('.results-pro-cta');
+            if (proCta) {
+                proCta.addEventListener('click', () => {
+                    window.ExamApp?.analytics?.trackProResultsCtaClicked?.(this.currentExam);
+                });
+            }
             const cta = recSlot.querySelector('.recommended-pro-cta');
             if (cta) {
                 // Attribute the click to the source exam (the one just completed); the
                 // 'results_recommended_pro' placement already identifies it as the cross-sell.
                 cta.addEventListener('click', () => {
                     window.ExamApp?.analytics?.trackRecommendedPackClicked?.(this.currentExam);
+                });
+            }
+            const passStory = recSlot.querySelector('.pass-story-link');
+            if (passStory) {
+                passStory.addEventListener('click', () => {
+                    window.ExamApp?.analytics?.trackPassStoryClicked?.(this.currentExam);
                 });
             }
         }

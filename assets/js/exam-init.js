@@ -163,6 +163,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         questions: questions,
         modules: metadata.modules || [],
         recommendedPro: metadata.recommendedPro || null,
+        pro: metadata.pro || null,
         selectedModules: isCustomModulePractice ? selectedModules : null
       };
 

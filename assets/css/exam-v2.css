@@ -1686,6 +1686,22 @@ button { font-family: inherit; }
   font-weight: 600;
   color: var(--accent);
 }
+.results-pro-upsell {
+  border-color: var(--accent-chip-border);
+  background: var(--accent-tint);
+}
+.results-pro-cta {
+  display: inline-block;
+  padding: 0.55rem 1.1rem;
+  background: var(--accent);
+  color: var(--btn-primary-text);
+  font-weight: 600;
+  border-radius: var(--radius);
+}
+.results-pro-cta:hover { background: var(--accent-deep); }
+.results-pro-cta:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pass-story-invite { margin: 10px 0 0; font-size: 0.9em; color: var(--text-soft); }
+.pass-story-invite a { color: var(--accent); font-weight: 600; }
 
 /* results actions */
 .results-actions-modern {

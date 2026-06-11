@@ -355,6 +355,21 @@
         return trackEvent('pro_import_clicked', getExamProperties(examId));
     }
 
+    function trackProResultsCtaClicked(examId) {
+        return trackEvent('pro_purchase_clicked', {
+            ...getExamProperties(examId),
+            store: 'gumroad',
+            placement: 'results_pro_upsell'
+        });
+    }
+
+    function trackPassStoryClicked(examId) {
+        return trackEvent('pass_story_clicked', {
+            ...getExamProperties(examId),
+            placement: 'results'
+        });
+    }
+
     function trackStudyStarted(examId, details = {}) {
         return trackEvent('study_started', getExamProperties(examId), {
             question_count: details.questionCount,
@@ -595,6 +610,8 @@
         trackProModalOpened,
         trackProPurchaseClicked,
         trackProImportClicked,
+        trackProResultsCtaClicked,
+        trackPassStoryClicked,
         trackStudyStarted,
         trackStudyQuestionAnswered,
         trackStudyCompleted,
