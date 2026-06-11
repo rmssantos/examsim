@@ -140,5 +140,11 @@
       "url": "https://learn.microsoft.com/en-us/training/courses/dp-900t00"
     }
   ],
-  "totalQuestions": 130
+  "totalQuestions": 130,
+  "recommendedPro": {
+    "examId": "dp700",
+    "title": "DP-700 Complete",
+    "url": "https://examplar.gumroad.com/l/dp700-complete",
+    "blurb": "Passed the Data Fundamentals? Level up to Fabric Data Engineer with the DP-700 Complete pack."
+  }
 }
