@@ -94,7 +94,12 @@ main#main-content { padding-top: 0; }
 [data-theme="dark"] body, .dark-mode body,
 body.dark-mode, body[data-theme="dark"] { background: var(--h-bg); }
 
-.container { max-width: 1180px; }
+/* page column: centering used to come from the retired style-new.css */
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 0.75rem;
+}
 
 /* ===== Theme controls (live in the top nav; the inline exam rail keeps
    exam-v2's display:contents treatment) ===== */
@@ -799,17 +804,23 @@ body.dragging-file .exam-library-section::after {
 .exam-card.importing-exam { opacity: 0.6; pointer-events: none; }
 
 /* ===== Exam details panel ===== */
+/* Reads as its own elevated layer so it never blends into the card grid:
+   teal top strip, tinted border, faint accent wash and a real shadow. */
 .exam-details-placeholder {
   display: none;
-  background: var(--h-surface);
-  border: 1px solid var(--h-line);
+  background: color-mix(in srgb, var(--h-accent) 3%, var(--h-surface));
+  border: 1px solid var(--h-accent-chip-border);
+  border-top: 3px solid var(--h-accent);
   border-radius: var(--h-radius-lg);
   padding: 1.1rem 1.25rem;
-  box-shadow: var(--h-card-shadow);
+  box-shadow: 0 14px 36px color-mix(in srgb, var(--h-text) 12%, transparent);
 }
 .exam-details-placeholder.visible { display: block; }
 /* homepage.js parks the panel inside the exam grid; span every column */
-.exam-grid .exam-details-placeholder { grid-column: 1 / -1; }
+.exam-grid .exam-details-placeholder {
+  grid-column: 1 / -1;
+  margin: 0.25rem 0 0.4rem;
+}
 .exam-details-header {
   display: flex;
   align-items: flex-start;
