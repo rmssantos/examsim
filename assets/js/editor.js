@@ -808,7 +808,6 @@
 
       hint = document.createElement('div');
       hint.id = 'persistence-hint';
-      hint.style.cssText = 'background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px;margin-top:12px;font-size:13px;color:#856404;';
       hint.innerHTML = '';
 
       // Insert after export button's parent
@@ -818,14 +817,14 @@
     const examId = state.exam === 'custom' && state.customCode ? state.customCode : state.exam || 'custom-exam';
     const safeExamId = escapeHtml(examId);
     hint.innerHTML = `
-      <strong><i class="fas fa-info-circle"></i> Local edits only</strong>
-      <p style="margin:8px 0 0 0;line-height:1.5;">Saving here changes only this browser. Other users keep seeing the published exam until a repository update is accepted.</p>
-      <ol style="margin:8px 0 0 20px;padding:0;line-height:1.6;">
+      <strong><i class="fas fa-info-circle" aria-hidden="true"></i> Local edits only</strong>
+      <p>Saving here changes only this browser. Other users keep seeing the published exam until a repository update is accepted.</p>
+      <ol>
         <li>Click <em>Export Questions</em> to download <code>${safeExamId}_dump_YYYY-MM-DD.json</code>.</li>
         <li>For a direct contribution, open a pull request replacing <code>user-content/exams/${safeExamId}/dump.json</code>.</li>
         <li>If you only want to suggest a correction, open a GitHub issue with exam ID <code>${safeExamId}</code>, question ID, current text, and proposed correction.</li>
       </ol>
-      <small style="opacity:0.8;">Until then, edits live in this browser's local storage.</small>
+      <small>Until then, edits live in this browser's local storage.</small>
     `;
 
     // Only show hint if there are actual changes saved
@@ -891,23 +890,23 @@
     const safeExamId = escapeHtml(examId);
     const safeFilename = escapeHtml(filename);
     const modal = document.createElement('div');
-    modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s;';
+    modal.className = 'ed-modal-overlay';
 
     const content = document.createElement('div');
-    content.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:500px;box-shadow:0 10px 40px rgba(0,0,0,0.3);';
+    content.className = 'ed-modal';
 
     content.innerHTML = `
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-        <i class="fas fa-check-circle" style="font-size:32px;color:#28a745;"></i>
+      <div class="ed-modal-head">
+        <i class="fas fa-check-circle ed-modal-icon success" aria-hidden="true"></i>
         <div>
-          <h3 style="margin:0;color:#333;font-size:18px;">Export Complete!</h3>
-          <p style="margin:4px 0 0 0;color:#666;font-size:14px;">Downloaded: <code>${safeFilename}</code></p>
+          <h3>Export Complete!</h3>
+          <p>Downloaded: <code>${safeFilename}</code></p>
         </div>
       </div>
 
-      <div style="background:#e7f1ff;border:1px solid #2b7cff;border-radius:8px;padding:14px;margin-bottom:16px;">
-        <strong style="color:#0b60a9;"><i class="fas fa-arrow-right"></i> Next Steps:</strong>
-        <ol style="margin:8px 0 0 20px;padding:0;line-height:1.8;color:#333;">
+      <div class="ed-note info">
+        <strong><i class="fas fa-arrow-right" aria-hidden="true"></i> Next Steps:</strong>
+        <ol>
           <li>Locate the downloaded file: <code>${safeFilename}</code>.</li>
           <li>Replace <code>user-content/exams/${safeExamId}/dump.json</code> (or create that folder for a brand-new exam).</li>
           <li>Optional: update <code>metadata.json</code> and copy any referenced images into <code>user-content/exams/${safeExamId}/images/</code>.</li>
@@ -915,16 +914,14 @@
         </ol>
       </div>
 
-      <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;">
-        <strong style="color:#856404;"><i class="fas fa-info-circle"></i> Note:</strong>
-        <span style="color:#856404;">
-          Backup the original dump.json before replacing. You can always use "Reset to Original" to restore.
-        </span>
+      <div class="ed-note warning">
+        <strong><i class="fas fa-info-circle" aria-hidden="true"></i> Note:</strong>
+        Backup the original dump.json before replacing. You can always use "Reset to Original" to restore.
       </div>
 
-      <div style="display:flex;gap:10px;justify-content:flex-end;">
-        <button id="closeExportModal" class="btn primary" style="padding:10px 20px;">
-          <i class="fas fa-check"></i> Got it
+      <div class="ed-modal-actions">
+        <button id="closeExportModal" class="btn primary">
+          <i class="fas fa-check" aria-hidden="true"></i> Got it
         </button>
       </div>
     `;
@@ -1032,38 +1029,36 @@
   function showDeleteConfirmation(callback){
     // Create modal overlay
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s;';
+    overlay.className = 'ed-modal-overlay';
 
     // Create modal
     const modal = document.createElement('div');
-    modal.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.3);animation:slideIn 0.3s;';
+    modal.className = 'ed-modal';
 
     modal.innerHTML = `
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-        <i class="fas fa-exclamation-triangle" style="font-size:32px;color:#dc3545;"></i>
+      <div class="ed-modal-head">
+        <i class="fas fa-exclamation-triangle ed-modal-icon danger" aria-hidden="true"></i>
         <div>
-          <h3 style="margin:0;color:#333;font-size:18px;">Delete Question?</h3>
-          <p style="margin:4px 0 0 0;color:#666;font-size:14px;">This action will permanently delete the question from the exam file.</p>
+          <h3>Delete Question?</h3>
+          <p>This action will permanently delete the question from the exam file.</p>
         </div>
       </div>
 
-      <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px;margin-bottom:16px;">
-        <p style="margin:0;font-size:13px;color:#856404;">
-          <strong><i class="fas fa-info-circle"></i> Note:</strong> The question will be removed immediately and saved automatically. This cannot be undone unless you use "Reset to Original" to restore all original questions.
-        </p>
+      <div class="ed-note warning">
+        <p><strong><i class="fas fa-info-circle" aria-hidden="true"></i> Note:</strong> The question will be removed immediately and saved automatically. This cannot be undone unless you use "Reset to Original" to restore all original questions.</p>
       </div>
 
-      <label style="display:flex;align-items:center;gap:8px;margin-bottom:16px;cursor:pointer;user-select:none;">
-        <input type="checkbox" id="dontAskAgain" style="width:18px;height:18px;cursor:pointer;">
-        <span style="font-size:14px;color:#555;">Don't ask me again for this session</span>
+      <label class="ed-check-row">
+        <input type="checkbox" id="dontAskAgain">
+        <span>Don't ask me again for this session</span>
       </label>
 
-      <div style="display:flex;gap:10px;justify-content:flex-end;">
-        <button id="cancelDelete" class="btn" style="padding:10px 20px;">
-          <i class="fas fa-times"></i> Cancel
+      <div class="ed-modal-actions">
+        <button id="cancelDelete" class="btn">
+          <i class="fas fa-times" aria-hidden="true"></i> Cancel
         </button>
-        <button id="confirmDelete" class="btn danger" style="padding:10px 20px;">
-          <i class="fas fa-trash"></i> Delete
+        <button id="confirmDelete" class="btn danger">
+          <i class="fas fa-trash" aria-hidden="true"></i> Delete
         </button>
       </div>
     `;
@@ -1344,15 +1339,6 @@
     if (!toast) {
       toast = document.createElement('div');
       toast.id = 'editor-toast';
-      toast.style.position = 'fixed';
-      toast.style.bottom = '20px';
-      toast.style.right = '20px';
-      toast.style.background = '#2b7cff';
-      toast.style.color = '#fff';
-      toast.style.padding = '10px 14px';
-      toast.style.borderRadius = '8px';
-      toast.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
-      toast.style.zIndex = '9999';
       document.body.appendChild(toast);
     }
     toast.textContent = text;
