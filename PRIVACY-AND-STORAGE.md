@@ -39,6 +39,7 @@ The public deployment can collect:
 - import success/failure and coarse file size/type buckets;
 - progress and editor import/export actions;
 - unlock, pro modal, purchase-link, and import-activation counts;
+- results-screen upsell and pass-story link counts;
 - pass/fail, coarse score and duration buckets;
 - sanitized `ref`, `utm_source`, `utm_medium`, and `utm_campaign` labels;
 - external referrer hostname without the full URL or path.
