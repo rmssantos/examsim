@@ -1794,7 +1794,6 @@ body:not(.dark-mode) .getting-started-card { background: var(--h-surface); borde
 }
 .modules-select-btn:hover { border-color: var(--h-accent); color: var(--h-accent); }
 .modules-select-btn:focus-visible { outline: 2px solid var(--h-accent); outline-offset: 1px; }
-.modules-select-btn:hover { border-color: var(--h-accent); color: var(--h-accent); }
 .modules-select-separator { color: var(--h-text-faint); }
 .selectable-list { display: flex; flex-direction: column; gap: 0.35rem; max-height: 320px; overflow-y: auto; }
 /* module li = clickable row; .module-checkbox-wrapper only hosts the box */

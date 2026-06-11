@@ -1345,12 +1345,6 @@ button { font-family: inherit; }
   letter-spacing: 0.02em;
 }
 .summary-visuals {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: stretch;
-  gap: 0.5rem;
-}
-.summary-visuals {
   display: flex;
   align-items: center;
   gap: 0.9rem;
@@ -1796,7 +1790,6 @@ button { font-family: inherit; }
   .question-container { padding: 1.1rem 1rem; }
   .cr-qhead { gap: 0.5rem; }
   .sequence-wrapper, .ddselect-wrap { grid-template-columns: 1fr; }
-  .summary-visuals { grid-template-columns: minmax(0, 1fr) auto; }
 }
 
 @media (max-width: 520px) {

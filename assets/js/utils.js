@@ -497,15 +497,19 @@ window.showCustomAlert = function(titleText, messageText, type = 'info') {
     closeBtn.addEventListener('click', () => modal.remove());
     content.appendChild(closeBtn);
 
+    // Global helper: normalize the variant so arbitrary strings cannot leak
+    // into the class attribute.
+    const safeType = ['error', 'success', 'warning', 'info'].includes(type) ? type : 'info';
+
     const iconWrapper = document.createElement('div');
-    iconWrapper.className = `custom-alert-icon ${type}`;
+    iconWrapper.className = `custom-alert-icon ${safeType}`;
 
     const icon = document.createElement('i');
-    if (type === 'error') {
+    if (safeType === 'error') {
         icon.className = 'fas fa-exclamation-circle';
-    } else if (type === 'success') {
+    } else if (safeType === 'success') {
         icon.className = 'fas fa-check-circle';
-    } else if (type === 'warning') {
+    } else if (safeType === 'warning') {
         icon.className = 'fas fa-exclamation-triangle';
     } else {
         icon.className = 'fas fa-info-circle';
