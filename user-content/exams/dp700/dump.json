@@ -1,0 +1,410 @@
+[
+  {
+    "question_type": "STANDARD",
+    "module": "Configure Microsoft Fabric Workspace Settings",
+    "question": "A data engineering team at an online grocery retailer runs short, exploratory PySpark notebooks against small reference datasets. They want the lowest possible session start time and do not need to tune node sizes or scaling behavior. Which workspace Spark compute option best fits this requirement?",
+    "options": [
+      "Use the starter pool, which is prehydrated with Medium nodes and starts a Spark session in roughly 5 to 10 seconds",
+      "Create a custom Spark pool with XX-Large nodes so each session has the most memory available",
+      "Create a custom Spark pool and disable autoscale so a fixed cluster is always provisioned",
+      "Attach a custom environment with a large set of public libraries so sessions are reused across notebooks"
+    ],
+    "correct": 0,
+    "explanation": "The starter pool is automatically created per workspace, uses prehydrated Medium-size clusters, and delivers Spark session starts of about 5 to 10 seconds with no node sizing required, which matches the team's goal of fast, low-overhead sessions. Creating a custom Spark pool (whether with XX-Large nodes or a fixed cluster) introduces provisioning latency of roughly 3 minutes for the cold start, which is the opposite of the goal. Attaching an environment loaded with public libraries forces library personalization at session start, adding 30 seconds to several minutes, so it slows startup rather than speeding it up.",
+    "reference": "https://learn.microsoft.com/fabric/data-engineering/spark-compute#starter-pools",
+    "id": 1
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Configure Microsoft Fabric Workspace Settings",
+    "question": "A workspace admin is configuring a custom Spark pool in the Fabric workspace Spark settings. Which of the following are configurable on a custom Spark pool? (Choose two.)",
+    "options": [
+      "The node size, selected from sizes such as Small, Medium, Large, X-Large, and XX-Large",
+      "Autoscale, which scales the pool between a configured minimum and maximum number of nodes",
+      "The pay-as-you-go per-GB rate charged for OneLake storage",
+      "The default sensitivity label applied to all items in the workspace"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "On a custom Spark pool you can select the node size from the available sizes and enable autoscale to scale between a minimum and maximum node count, along with dynamic executor allocation. Both of these are pool-level compute settings. The OneLake per-GB storage rate is a billing rate, not a Spark pool setting. A default sensitivity label is a governance setting delegated at the domain or tenant level, not part of a custom Spark pool configuration.",
+    "reference": "https://learn.microsoft.com/fabric/data-engineering/create-custom-spark-pools#create-custom-spark-pools",
+    "id": 2
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Lifecycle Management and Deployment Pipelines",
+    "question": "A data engineering team at an online grocery retailer wants to back up and version the lakehouses, notebooks, and pipelines they build in Microsoft Fabric, collaborate through pull requests, and revert to earlier states using a cloud-hosted repository. Which statements about Fabric Git integration are correct? (Select all that apply.)",
+    "options": [
+      "Git integration can connect a workspace to Azure DevOps, GitHub, or GitHub Enterprise, all cloud-hosted",
+      "Git integration is configured and operates at the workspace level, preserving the workspace folder structure in the repository",
+      "Git integration requires an on-premises Git server reachable over the corporate network",
+      "If the workspace contains items not supported for Git integration, the entire workspace is blocked from connecting to Git"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Fabric Git integration supports Azure DevOps, GitHub, and GitHub Enterprise (all cloud-hosted), and the integration is at the workspace level, with the workspace structure including subfolders preserved in the repository. The other statements are false: on-premises Git servers are not supported, and a workspace with unsupported items can still connect (those items are simply ignored rather than blocking the connection).",
+    "reference": "https://learn.microsoft.com/fabric/cicd/git-integration/intro-to-git-integration#supported-git-providers",
+    "id": 3
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Lifecycle Management and Deployment Pipelines",
+    "question": "Two engineers at a logistics firm edited the same Fabric notebook: one changed it in the Git-connected workspace and the other pushed a different change to the same item in the remote branch. In the Source control pane the item now shows a Conflict status. What is true about committing and updating while this conflict exists?",
+    "options": [
+      "Fabric automatically merges both versions line by line and clears the conflict",
+      "Commit is enabled but Update is blocked until the next scheduled sync",
+      "Both Commit and Update are disabled for the workspace until the conflict is resolved",
+      "Update is disabled for the conflicted item, but Commit remains available so changes are not lost"
+    ],
+    "correct": 2,
+    "explanation": "A conflict occurs when the same item is changed in both the workspace and the remote Git branch. While the conflict exists, the Git status reads Conflict and both Commit and Update are disabled until the conflict is resolved (by choosing a version in the UI, reverting to a synced state, or resolving in Git). Fabric does not auto-merge conflicting item definitions, so the options describing selective enablement or automatic merging are incorrect.",
+    "reference": "https://learn.microsoft.com/fabric/cicd/git-integration/conflict-resolution",
+    "id": 4
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Workspace, Item, and OneLake Access Controls",
+    "question": "A data engineering team stores a curated lakehouse in a workspace that also holds dozens of unrelated experimental items. A partner consultant needs read access to query just that one lakehouse through its SQL analytics endpoint, and the security team insists the consultant must not be able to see or browse any other item in the workspace. What is the appropriate way to grant this access?",
+    "options": [
+      "Assign the consultant the Viewer role on the workspace and rely on the consultant ignoring the other items",
+      "Assign the consultant the Contributor role on the workspace so the SQL analytics endpoint is reachable",
+      "Add the consultant to the workspace Admin role and then remove every other item from their view",
+      "Share the lakehouse directly with the consultant, which grants Read on the lakehouse and its SQL analytics endpoint without granting workspace membership"
+    ],
+    "correct": 3,
+    "explanation": "Sharing the lakehouse grants the recipient Read on the lakehouse and its SQL analytics endpoint without giving any workspace role, so the consultant sees only the shared item and nothing else in the workspace, which is the least-privilege solution. Assigning any workspace role (Viewer, Contributor, or Admin) lets the user see all items in the workspace, violating the isolation requirement, and Contributor and Admin additionally grant write or management capabilities the consultant should not have.",
+    "reference": "https://learn.microsoft.com/fabric/data-engineering/lakehouse-sharing",
+    "id": 5
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Workspace, Item, and OneLake Access Controls",
+    "question": "An organization is documenting which actions require the workspace Admin or Member role versus which are available to Contributor. Which of the following capabilities are reserved for Admin or Member and are NOT available to a user holding only the Contributor role? (Select all that apply.)",
+    "options": [
+      "Allow others to reshare items in the workspace",
+      "Add members or others with lower permissions to the workspace",
+      "Write or delete pipelines and notebooks in the workspace",
+      "Execute or cancel execution of pipelines in the workspace"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Allowing others to reshare items and adding members are both capabilities that Admin and Member have but Contributor does not, so each is correctly keyed. Writing or deleting pipelines and notebooks, and executing or canceling pipeline runs, are both available to Contributor (as well as Admin and Member), so neither of those is reserved for Admin/Member and each is correctly excluded.",
+    "reference": "https://learn.microsoft.com/fabric/fundamentals/roles-workspaces#microsoft-fabric-workspace-roles",
+    "id": 6
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Data Protection: RLS, CLS, OLS, Masking, Labels, Endorsement",
+    "question": "A data engineering lead in a manufacturing company has built a semantic model that several teams now depend on. The lead believes it is ready for broader reuse and wants to flag it so colleagues can find and trust it, but the lead is not on the organization's list of authorized reviewers. Which endorsement action can the lead apply directly to the item?",
+    "options": [
+      "Certify the item, because anyone with write permission can certify",
+      "Promote the item, because any user with write permissions on the item can promote it",
+      "Apply the Master data badge, because the lead owns the semantic model",
+      "Certify the item after requesting and being auto-granted reviewer rights at promotion time"
+    ],
+    "correct": 1,
+    "explanation": "Promotion can be applied by any user who has write permissions on the item, which fits a lead who wants to highlight a model for reuse. Certification can only be applied by reviewers a Fabric administrator has authorized (via specified security groups); the lead is not authorized, so they could only request certification, not apply it. The Master data badge likewise can only be applied by users the Fabric administrator authorizes, not simply by the item owner. There is no mechanism that auto-grants reviewer rights when promoting, so certifying at promotion time is not valid.",
+    "reference": "https://learn.microsoft.com/fabric/fundamentals/endorsement-promote-certify#promote-items",
+    "id": 7
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Data Protection: RLS, CLS, OLS, Masking, Labels, Endorsement",
+    "question": "A data engineer must pick the right protection feature for a Fabric Lakehouse using OneLake security, where rules authored once must be enforced consistently across the SQL analytics endpoint, notebooks, and Power BI. Which statements about OneLake security are correct? Select all that apply.",
+    "options": [
+      "Row-level security restricts which rows a role member sees by using a SQL WHERE predicate authored within a OneLake security role",
+      "Object-level (table and folder) security grants a role access to specific tables or folders within a data item",
+      "OneLake security RLS and CLS rules are enforced only by Spark notebooks and are ignored by the SQL analytics endpoint",
+      "Granting Read on a table through a OneLake security role gives no row or column constraints unless RLS or CLS is also defined in that role"
+    ],
+    "correct": [
+      0,
+      1,
+      3
+    ],
+    "explanation": "OneLake security row-level security restricts visible rows via a SQL WHERE predicate defined inside a OneLake security role, and object-level (table and folder) security grants a role access to specific tables or folders in an item, so both are correct. Granting Read on a table gives full access to its rows and columns unless the role also adds RLS or CLS constraints, which is also correct. The statement that the rules are enforced only by Spark and ignored by the SQL analytics endpoint is false: OneLake security rules authored once are enforced consistently across Fabric engines, including the SQL analytics endpoint in user identity mode, notebooks, and Power BI.",
+    "reference": "https://learn.microsoft.com/fabric/onelake/security/table-folder-security",
+    "id": 8
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Orchestrate Processes: Pipelines, Notebooks, Dataflows, and Triggers",
+    "question": "A healthcare analytics team has a business analyst who is highly experienced with Power Query from Excel and Power BI. She needs to connect to several source systems, profile the data, remove duplicates, standardize medical codes, and write clean tables to a lakehouse, all without writing Spark or SQL code. Which Microsoft Fabric item best fits this work?",
+    "options": [
+      "Dataflow Gen2, which provides the low-code Power Query experience with built-in connectors, data profiling, and transformation functions",
+      "A Spark notebook, which provides a code-first environment with access to Spark libraries",
+      "A data pipeline using only a Copy activity, which moves raw data with lightweight type conversion and column mapping",
+      "An eventstream, which performs no-code or SQL-based processing of continuously arriving event data"
+    ],
+    "correct": 0,
+    "explanation": "Dataflow Gen2 is the right choice because it delivers the familiar Power Query (M) experience with many built-in connectors, data profiling, and a large library of visual transformations, matching her no-code skill set and cleansing/standardization tasks. A Spark notebook is code-first and aimed at developers writing Python/Scala/SQL, which she wants to avoid. A pipeline Copy activity only moves data with lightweight conversions and cannot perform rich profiling and de-duplication transformations on its own. An eventstream targets continuously arriving streaming/event data, not batch cleansing of files and database tables.",
+    "reference": "https://learn.microsoft.com/fabric/data-factory/decision-guide-data-integration#transformation-strategies",
+    "id": 9
+  },
+  {
+    "question_type": "MULTI",
+    "module": "Orchestrate Processes: Pipelines, Notebooks, Dataflows, and Triggers",
+    "question": "A team is comparing Dataflow Gen2 and Fabric notebooks for transformation work. Which statements accurately describe Dataflow Gen2 in Microsoft Fabric? (Choose all that apply.)",
+    "options": [
+      "It provides a low-code Power Query experience for visual, step-by-step data preparation",
+      "It can be added to a pipeline as a Dataflow activity for orchestration",
+      "It requires writing Spark code in Python or Scala to run transformations",
+      "It can only be triggered manually and supports no automatic refresh"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "The Power Query low-code experience is correct because Dataflow Gen2 uses the same Power Query technology found in Excel and Power BI for visual transformations. Adding it to a pipeline as a Dataflow activity is correct because pipelines can orchestrate a dataflow refresh through the Dataflow activity. Requiring Spark code is wrong: Dataflow Gen2 is explicitly a no-code/low-code tool, whereas Spark notebooks are the code-first approach. Manual-only with no automatic refresh is wrong because Dataflow Gen2 supports scheduled refresh in addition to on-demand refresh.",
+    "reference": "https://learn.microsoft.com/fabric/fundamentals/prepare-transform-data",
+    "id": 10
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Loading Patterns: Full, Incremental, and Dimensional",
+    "question": "A data engineering team configures a Copy job in Fabric Data Factory to incrementally load an orders table from an on-premises SQL Server into a lakehouse. The source has no change tracking enabled, but every insert and update sets a LastModifiedDatetime column. They want each run after the first to copy only rows changed since the previous run. Which column characteristic makes a valid watermark for this watermark-based incremental copy?",
+    "options": [
+      "A textual status code such as 'OPEN' or 'CLOSED' that changes when the order state changes",
+      "A randomly generated GUID assigned to each row at insert time",
+      "A column whose value increases monotonically whenever a row is inserted or updated, such as a datetime or rowversion column",
+      "A nullable free-text comments field that users may edit"
+    ],
+    "correct": 2,
+    "explanation": "Watermark-based incremental copy detects new or changed rows by copying only rows whose watermark value is greater than the highest value previously copied, so the column must increase monotonically on insert or update. Supported types include datetime, date, integer, rowversion, and strings interpreted as datetime. A status code that toggles between text values is not comparable in a way that reliably identifies newer rows. A random GUID does not increase over time, so it cannot indicate which rows are new. A nullable free-text field is unreliable because edits do not produce monotonically increasing values, and rows with NULL watermark values are excluded from subsequent incremental runs.",
+    "reference": "https://learn.microsoft.com/fabric/data-factory/incremental-copy-job#supported-watermark-column-types",
+    "id": 11
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Loading Patterns: Full, Incremental, and Dimensional",
+    "question": "A team is implementing incremental loads and reprocessing safeguards for a Fabric Warehouse and lakehouse. Evaluate each of the following statements as true or false according to official Microsoft Fabric documentation.",
+    "statements": [
+      "In a Copy job, watermark-based incremental copy detects inserts and updates but cannot detect rows deleted at the source.",
+      "Resetting incremental copy in a Copy job deletes or truncates the data already written to the destination table.",
+      "When a Copy job that uses Append mode is reset and reruns over previously loaded data, it can write those rows again and create duplicates.",
+      "A Delta Lake MERGE keyed on a business key can update matched rows and insert unmatched rows, making a dimension load idempotent on rerun."
+    ],
+    "correct": [
+      0,
+      1,
+      0,
+      0
+    ],
+    "explanation": "Statement 1 is true: watermark-based incremental copy detects inserts and updates but cannot detect deletes (only CDC detects deletes). Statement 2 is false: Reset clears only the Copy job's incremental state (watermark/checkpoint) and explicitly does not delete, truncate, or change destination data. Statement 3 is true: with Append mode, resetting and rereading previously loaded data can write those rows again and cause duplicates, which is why the docs advise clearing the destination first. Statement 4 is true: a Delta Lake MERGE updates matched rows and inserts unmatched rows, so rerunning converges to the same result, giving an idempotent upsert.",
+    "reference": "https://learn.microsoft.com/fabric/data-factory/incremental-copy-job#reset-incremental-copy",
+    "id": 12
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Choosing a Data Store and Transformation Engine",
+    "question": "A data engineering team must build a curated, enterprise reporting layer organized as star schemas with conformed dimensions. Their requirement is that loading details about a sales order across three related fact and dimension tables must either all commit together or all roll back, and the team wants to develop entirely in T-SQL stored procedures. Which Fabric data store should they choose?",
+    "options": [
+      "Lakehouse",
+      "Warehouse",
+      "Eventhouse (KQL database)",
+      "Lakehouse SQL analytics endpoint"
+    ],
+    "correct": 1,
+    "explanation": "A Fabric Warehouse provides full multi-table ACID transactions through its T-SQL engine, supports stored procedures, views, and functions, and is the recommended store for enterprise star/snowflake schemas and BI. A Lakehouse does not provide multi-table transaction support and is developed primarily in Spark rather than T-SQL stored procedures. An Eventhouse uses KQL and targets streaming time-series data, not curated relational warehousing. The Lakehouse SQL analytics endpoint is read-only and cannot perform the write operations that a multi-table load requires.",
+    "reference": "https://learn.microsoft.com/fabric/data-warehouse/data-warehousing",
+    "id": 13
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "Choosing a Data Store and Transformation Engine",
+    "question": "A data architect is validating claims about choosing data stores and transformation engines in Microsoft Fabric. For each statement, decide whether it is true according to official Microsoft documentation.",
+    "statements": [
+      "A Fabric Warehouse supports full multi-table ACID transactions in T-SQL.",
+      "The primary write engine of a Lakehouse is Spark (PySpark, Spark SQL, Scala, R).",
+      "An Eventhouse uses Kusto Query Language (KQL) as its native query language for event and time-series data.",
+      "The SQL analytics endpoint of a Lakehouse supports full DML so you can INSERT and UPDATE lakehouse Delta tables through it.",
+      "Dataflows Gen2 provide a low-code Power Query experience for data preparation and transformation."
+    ],
+    "correct": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "explanation": "Statement 1 is true: the Warehouse provides full multi-table ACID transaction support through its SQL engine. Statement 2 is true: the documented primary write engine for the Lakehouse is Spark across PySpark, Spark SQL, Scala, and R. Statement 3 is true: an Eventhouse/KQL database uses KQL natively for event and time-series analytics. Statement 4 is false: the Lakehouse SQL analytics endpoint is read-only and supports no DML, so INSERT and UPDATE are not available there (writes require Spark). Statement 5 is true: Dataflows Gen2 deliver a low-code Power Query experience for data preparation and transformation.",
+    "reference": "https://learn.microsoft.com/azure/architecture/data-guide/technology-choices/fabric-analytical-data-stores#comparison-of-analytical-data-stores",
+    "id": 14
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "OneLake Shortcuts, Mirroring, and Pipeline Ingestion",
+    "question": "A media company needs to bulk-load several petabytes of raw binary files from on-premises file systems and various third-party cloud sources into a bronze-layer lakehouse on a schedule. The team prefers a low-code or no-code experience, does not need any transformations during this load, and wants high-scale data movement across many connectors. Which Fabric data integration option is the most appropriate?",
+    "options": [
+      "A Spark notebook that reads each source with custom connector code.",
+      "Mirroring configured against each third-party source system.",
+      "A Dataflow Gen2 using Power Query to shape the data during ingestion.",
+      "A pipeline Copy activity, which provides high-scale low-code ingestion across many connectors."
+    ],
+    "correct": 3,
+    "explanation": "The pipeline Copy activity is Microsoft's recommended low-code/no-code choice for high-scale raw ingestion across many sources, capable of moving petabyte-scale data on a schedule, which matches a bronze-layer raw copy with no transformation. A Spark notebook contradicts the low-code preference and would require maintaining custom connector code. Mirroring is for continuously replicating operational databases, not for bulk-loading file systems and arbitrary third-party files. Dataflow Gen2's strength is Power Query transformation, which the scenario explicitly does not need.",
+    "reference": "https://learn.microsoft.com/fabric/fundamentals/decision-guide-pipeline-dataflow-spark#scenario-1",
+    "id": 15
+  },
+  {
+    "question_type": "YES_NO_MATRIX",
+    "module": "OneLake Shortcuts, Mirroring, and Pipeline Ingestion",
+    "question": "A team is finalizing their understanding of OneLake shortcuts before a deployment. Evaluate each statement about OneLake shortcuts as true or false.",
+    "statements": [
+      "A shortcut references data without copying it, so deleting the shortcut leaves the target data unaffected.",
+      "Shortcut caching for supported external sources can serve later reads from a workspace cache to reduce cross-cloud egress costs.",
+      "Internal OneLake shortcuts physically replicate the target data into the local lakehouse before it can be queried.",
+      "ADLS Gen2 and Amazon S3 are both supported external sources for OneLake shortcuts."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "explanation": "Statement one is true: shortcuts are independent pointers, and deleting a shortcut does not affect the target. Statement two is true: caching for supported external sources (S3, S3 compatible, GCS, and on-premises gateway) stores read files in a per-workspace cache and serves later reads from it to cut egress. Statement three is false: internal shortcuts reference data in place and never physically replicate it before querying. Statement four is true: both ADLS Gen2 and Amazon S3 are listed supported external shortcut sources.",
+    "reference": "https://learn.microsoft.com/fabric/onelake/onelake-shortcuts#caching",
+    "id": 16
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Transforming Batch Data: PySpark, SQL, and KQL",
+    "question": "A data engineer at an online retailer is cleaning a customer DataFrame in a Fabric notebook. The c_acctbal column contains nulls for customers who never funded their account, and the business wants those treated as a zero balance before downstream aggregation. Which PySpark operation produces a DataFrame where only the null values in c_acctbal are replaced with 0 while leaving every other column untouched?",
+    "options": [
+      "df.na.fill(0, subset=[\"c_acctbal\"])",
+      "df.na.drop(subset=[\"c_acctbal\"])",
+      "df.dropDuplicates([\"c_acctbal\"])",
+      "df.filter(col(\"c_acctbal\").isNotNull())"
+    ],
+    "correct": 0,
+    "explanation": "na.fill with a subset replaces null values in the named column with the supplied value (0), leaving other columns unchanged, which matches the requirement to treat unfunded accounts as a zero balance. na.drop removes the rows that have nulls instead of filling them. dropDuplicates removes duplicate rows and does nothing to nulls. filter with isNotNull discards the rows that need to be set to zero. Only fill replaces the missing values in place.",
+    "reference": "https://learn.microsoft.com/azure/databricks/pyspark/reference/classes/dataframe/fillna",
+    "id": 17
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Transforming Batch Data: PySpark, SQL, and KQL",
+    "question": "While preparing a gold table in a Fabric notebook, an engineer must combine an orders DataFrame with a customers DataFrame so that each order row is enriched with its matching customer attributes, keeping only orders that have a corresponding customer. Which PySpark expression performs this?",
+    "options": [
+      "df_orders.union(df_customers)",
+      "df_orders.crossJoin(df_customers)",
+      "df_orders.join(df_customers, on=df_orders[\"o_custkey\"] == df_customers[\"c_custkey\"], how=\"inner\")",
+      "df_orders.join(df_customers, on=df_orders[\"o_custkey\"] == df_customers[\"c_custkey\"], how=\"outer\")"
+    ],
+    "correct": 2,
+    "explanation": "An inner join keeps only the rows where the join condition matches across both DataFrames, so each order is enriched with its matching customer and orders without a customer are dropped, which is exactly the stated requirement. union appends rows of two DataFrames with the same schema and does not enrich columns. crossJoin produces the Cartesian product, not a key match. An outer join would also retain unmatched rows from both sides, contradicting the requirement to keep only matched orders.",
+    "reference": "https://learn.microsoft.com/azure/databricks/pyspark/basics#transform-data-with-dataframes",
+    "id": 18
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Streaming Ingestion and Real-Time Intelligence",
+    "question": "A retail analytics team must ingest clickstream events from Azure Event Hubs into Fabric and route them to both an eventhouse and a lakehouse, applying simple field renaming and filtering along the way. The team wants a low-code, drag-and-drop experience and explicitly wants to avoid writing or maintaining Spark or KQL code for this ingestion path. Which streaming engine best fits these requirements?",
+    "options": [
+      "Fabric Eventstream, using its visual event processing editor to connect sources, transform, and route to destinations",
+      "Spark Structured Streaming jobs authored in a Fabric notebook with PySpark",
+      "A KQL queryset running scheduled summarize queries against a raw table",
+      "Dataflow Gen2 with a Power Query batch refresh schedule"
+    ],
+    "correct": 0,
+    "explanation": "Eventstream is the Real-Time Intelligence capability for bringing real-time events into Fabric, transforming them, and routing them to multiple destinations without writing code, using a drag-and-drop event processing editor. Spark Structured Streaming requires writing PySpark/Scala code in a notebook, which the team wants to avoid. A KQL queryset analyzes data already in an eventhouse and is not an ingestion/routing engine. Dataflow Gen2 is a batch transformation tool, not a continuous streaming ingestion engine.",
+    "reference": "https://learn.microsoft.com/fabric/real-time-intelligence/event-streams/overview",
+    "id": 19
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Streaming Ingestion and Real-Time Intelligence",
+    "question": "A data engineering team already maintains substantial PySpark transformation libraries and wants to reuse them while processing a live stream that requires complex, custom logic and machine-learning model scoring on each micro-batch. They want familiar Spark APIs and deep Delta Lake integration. Which engine is the most appropriate choice for this streaming workload?",
+    "options": [
+      "The Eventstream no-code event processing editor",
+      "A Fabric Activator rule monitoring the stream",
+      "Spark Structured Streaming in a Fabric notebook",
+      "A KQL update policy on the destination table"
+    ],
+    "correct": 2,
+    "explanation": "Spark Structured Streaming provides a unified analytics platform built on Apache Spark that can handle complex data transformations and machine-learning pipelines with familiar Spark APIs and deep Delta Lake integration, which matches reusing existing PySpark libraries and per-micro-batch model scoring. The Eventstream no-code editor is for visual, low-code transformations, not arbitrary PySpark and ML logic. Activator monitors conditions and triggers actions; it is not a transformation engine. A KQL update policy transforms data only at ingestion into an eventhouse table and cannot run PySpark or ML libraries.",
+    "reference": "https://learn.microsoft.com/fabric/data-engineering/notebook-with-event-stream",
+    "id": 20
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Monitor Fabric Items and Configure Alerts",
+    "question": "A retailer ingests sales data with a Fabric data pipeline that has five activities. Last night the pipeline failed on the fourth activity after a transient source-database timeout. The engineer has fixed the connectivity issue and wants to reprocess only the activities that did not complete, without re-executing the activities that already succeeded. Within the pipeline run detail view in the monitoring experience, which action accomplishes this?",
+    "options": [
+      "Export the activity runs to CSV and re-import them",
+      "Rerun the pipeline from the failed activity",
+      "Switch the run to Gantt view to reset its state",
+      "Delete the pipeline schedule and recreate it"
+    ],
+    "correct": 1,
+    "explanation": "From the pipeline run detail view you can rerun the entire pipeline or rerun from the failed activity, which resumes execution at the point of failure so the already-succeeded activities are not repeated. Exporting activity runs to CSV only produces a report and does not re-execute anything. The Gantt view is a visualization of run durations and does not change or reset run state. Deleting and recreating the schedule changes future triggering but does not reprocess the failed run.",
+    "reference": "https://learn.microsoft.com/fabric/data-factory/monitor-pipeline-runs#monitor-pipeline-runs",
+    "id": 21
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Resolve Errors: Pipelines, Dataflows Gen2, and Notebooks",
+    "question": "A logistics company runs a nightly data pipeline in Fabric Data Factory. This morning the pipeline shows a Failed status, but the engineer only sees a high-level message and wants to read the exact error returned by the Copy data activity that failed. Inside the pipeline run detail view of the Monitoring hub, what is the most direct way to obtain the detailed error message and the data the activity received?",
+    "options": [
+      "Switch the Monitoring hub to Gantt view and read the bar length for the failed activity",
+      "Export the run list to CSV and open the file to find the activity error",
+      "Enable Workspace Monitoring and query the ItemJobEventLogs table for the run",
+      "Select the Output (or Input) link to the right of the failed activity row in the Activity Runs list"
+    ],
+    "correct": 3,
+    "explanation": "In the pipeline run detail page, each activity row exposes Input and Output links; selecting the Output link opens the detailed JSON, including the full error message returned by the failed activity. Gantt view only visualizes durations and does not show the error text. Export to CSV produces a summary of runs, not the per-activity error payload. Workspace Monitoring (the ItemJobEventLogs table) captures pipeline-level L1 events and is useful for trend analysis, but it is not the most direct path to a single activity's error output, which is one click away in the run detail.",
+    "reference": "https://learn.microsoft.com/fabric/data-factory/monitor-pipeline-runs#monitor-pipeline-runs",
+    "id": 22
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Resolve Errors: Eventhouse, Eventstream, T-SQL, and Shortcuts",
+    "question": "A logistics company streams JSON telemetry through a Fabric eventstream into an eventhouse. After enabling workspace monitoring, a data engineer queries the EventStreamErrorMetrics table and sees the count for the error type Deserialization Errors climbing sharply on the source node, while Data Conversion Errors and Runtime Errors stay at zero. Based on what this error type represents, what is the most likely root cause?",
+    "options": [
+      "The incoming events arrive in a format that does not match the expected schema, so the engine cannot read them.",
+      "Output events cannot be cast to the destination table's column types during write.",
+      "The eventstream lacks permission to write to the eventhouse destination.",
+      "The eventhouse capacity has been paused, so events are backlogged."
+    ],
+    "correct": 0,
+    "explanation": "Per the Eventstream monitoring tables documentation, Deserialization Errors are errors that occur when trying to read incoming events, and they usually mean the incoming data format doesn't match the expected schema. The option about casting output events to destination column types describes Data Conversion Errors, which the engineer observed at zero. A write-permission failure or capacity pause would surface as Runtime Errors or node-status changes, not as deserialization errors, so those options are wrong.",
+    "reference": "https://learn.microsoft.com/fabric/real-time-intelligence/event-streams/fabric-workspace-monitoring-tables#eventstreamerrormetrics",
+    "id": 23
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Optimize Lakehouse Tables, Warehouse, and Query Performance",
+    "question": "A logistics company's gold-layer lakehouse tables feed a Power BI Direct Lake semantic model, and analysts complain about slow cold-cache report queries. A data engineer wants a write-time optimization that reorganizes the Parquet file layout (sorting, encoding, and compression) so the Power BI and SQL engines read the data faster, while keeping the files fully open-source Parquet compliant. Which capability should the engineer apply when writing these tables?",
+    "options": [
+      "Increase the VACUUM retention period to 30 days",
+      "Disable automatic statistics generation",
+      "Convert the tables to legacy Hive Parquet format",
+      "Apply V-Order to the table writes"
+    ],
+    "correct": 3,
+    "explanation": "V-Order is a write-time optimization for Parquet files that applies special sorting, row-group distribution, dictionary encoding, and compression so Fabric compute engines (notably Power BI Direct Lake and the SQL engine) read data faster, and the files remain 100% compliant with open-source Parquet. Raising VACUUM retention only keeps unreferenced files longer and does not change read layout. Disabling statistics removes information the optimizer needs and degrades plans. Legacy Hive Parquet tables are not Delta tables and lose Fabric's optimizations and maintenance support.",
+    "reference": "https://learn.microsoft.com/fabric/data-engineering/delta-optimization-and-v-order",
+    "id": 24
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Optimize Spark, Pipelines, Eventstreams, and Eventhouses",
+    "question": "A logistics company runs a scheduled pipeline that executes five notebooks in a ForEach loop. Each notebook uses the same default lakehouse, the same environment, and identical Spark compute settings, but the cumulative per-notebook session startup time makes the pipeline slow. Which approach reduces the startup overhead while keeping the same lakehouse and environment?",
+    "options": [
+      "Increase the maximum node count on the pool so each notebook session starts faster",
+      "Enable high concurrency mode for pipeline notebooks and use a shared session tag so the notebooks pack into one Spark session",
+      "Switch each notebook to a different default lakehouse so sessions can start in parallel",
+      "Disable the intelligent cache so disk space is freed for new sessions"
+    ],
+    "correct": 1,
+    "explanation": "High concurrency mode lets compatible notebooks share one running Spark session, so subsequent notebooks attach instantly instead of paying session startup time; for pipelines you enable it at the workspace level and group notebooks with a common session tag. Increasing the maximum node count does not remove per-session startup latency. Giving each notebook a different default lakehouse breaks the session-sharing requirement, forcing separate sessions. Disabling the intelligent cache slows repeated file reads and is unrelated to session startup.",
+    "reference": "https://learn.microsoft.com/fabric/data-engineering/configure-high-concurrency-session-notebooks-in-pipelines#configure-high-concurrency-mode",
+    "id": 25
+  }
+]

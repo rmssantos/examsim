@@ -1,0 +1,170 @@
+{
+  "id": "dp700",
+  "name": "DP-700",
+  "fullName": "Implementing Data Engineering Solutions Using Microsoft Fabric",
+  "description": "Free 25-question preview of the Examplar DP-700 (Microsoft Fabric Data Engineer Associate) practice pack. Original scenario questions written from official Microsoft Learn documentation, aligned to the DP-700 study guide (skills measured as of April 20, 2026). The full 280-question pack is available separately. Not real exam questions.",
+  "duration": 40,
+  "questionCount": 25,
+  "passScore": 70,
+  "language": "en",
+  "schemaVersion": "1.1",
+  "badge": "Associate",
+  "icon": "fas fa-microchip",
+  "vendor": "Microsoft",
+  "certificationCode": "DP-700",
+  "domains": [
+    "Microsoft Fabric",
+    "Data Engineering",
+    "Associate"
+  ],
+  "level": "Associate",
+  "productFamily": "Microsoft Fabric",
+  "contentType": "preview",
+  "commercialStatus": "pro-preview",
+  "contentOrigin": "original",
+  "objectiveDomains": [
+    {
+      "code": "DP700-D1",
+      "name": "Implement and manage an analytics solution",
+      "weightRange": "30-35%",
+      "source": "Microsoft DP-700 study guide",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-700",
+      "mappedModules": [
+        "Configure Microsoft Fabric Workspace Settings",
+        "Lifecycle Management and Deployment Pipelines",
+        "Workspace, Item, and OneLake Access Controls",
+        "Data Protection: RLS, CLS, OLS, Masking, Labels, Endorsement",
+        "Orchestrate Processes: Pipelines, Notebooks, Dataflows, and Triggers"
+      ]
+    },
+    {
+      "code": "DP700-D2",
+      "name": "Ingest and transform data",
+      "weightRange": "30-35%",
+      "source": "Microsoft DP-700 study guide",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-700",
+      "mappedModules": [
+        "Loading Patterns: Full, Incremental, and Dimensional",
+        "Choosing a Data Store and Transformation Engine",
+        "OneLake Shortcuts, Mirroring, and Pipeline Ingestion",
+        "Transforming Batch Data: PySpark, SQL, and KQL",
+        "Streaming Ingestion and Real-Time Intelligence"
+      ]
+    },
+    {
+      "code": "DP700-D3",
+      "name": "Monitor and optimize an analytics solution",
+      "weightRange": "30-35%",
+      "source": "Microsoft DP-700 study guide",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-700",
+      "mappedModules": [
+        "Monitor Fabric Items and Configure Alerts",
+        "Resolve Errors: Pipelines, Dataflows Gen2, and Notebooks",
+        "Resolve Errors: Eventhouse, Eventstream, T-SQL, and Shortcuts",
+        "Optimize Lakehouse Tables, Warehouse, and Query Performance",
+        "Optimize Spark, Pipelines, Eventstreams, and Eventhouses"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "icon": "fas fa-sliders",
+      "name": "Configure Microsoft Fabric Workspace Settings"
+    },
+    {
+      "icon": "fas fa-code-branch",
+      "name": "Lifecycle Management and Deployment Pipelines"
+    },
+    {
+      "icon": "fas fa-user-lock",
+      "name": "Workspace, Item, and OneLake Access Controls"
+    },
+    {
+      "icon": "fas fa-shield-halved",
+      "name": "Data Protection: RLS, CLS, OLS, Masking, Labels, Endorsement"
+    },
+    {
+      "icon": "fas fa-diagram-project",
+      "name": "Orchestrate Processes: Pipelines, Notebooks, Dataflows, and Triggers"
+    },
+    {
+      "icon": "fas fa-layer-group",
+      "name": "Loading Patterns: Full, Incremental, and Dimensional"
+    },
+    {
+      "icon": "fas fa-database",
+      "name": "Choosing a Data Store and Transformation Engine"
+    },
+    {
+      "icon": "fas fa-link",
+      "name": "OneLake Shortcuts, Mirroring, and Pipeline Ingestion"
+    },
+    {
+      "icon": "fas fa-wand-magic-sparkles",
+      "name": "Transforming Batch Data: PySpark, SQL, and KQL"
+    },
+    {
+      "icon": "fas fa-tower-broadcast",
+      "name": "Streaming Ingestion and Real-Time Intelligence"
+    },
+    {
+      "icon": "fas fa-gauge-high",
+      "name": "Monitor Fabric Items and Configure Alerts"
+    },
+    {
+      "icon": "fas fa-bug",
+      "name": "Resolve Errors: Pipelines, Dataflows Gen2, and Notebooks"
+    },
+    {
+      "icon": "fas fa-triangle-exclamation",
+      "name": "Resolve Errors: Eventhouse, Eventstream, T-SQL, and Shortcuts"
+    },
+    {
+      "icon": "fas fa-bolt",
+      "name": "Optimize Lakehouse Tables, Warehouse, and Query Performance"
+    },
+    {
+      "icon": "fas fa-rocket",
+      "name": "Optimize Spark, Pipelines, Eventstreams, and Eventhouses"
+    }
+  ],
+  "contentReview": {
+    "lastReviewed": "2026-06-11",
+    "sourceOfTruth": "Microsoft DP-700 study guide (skills measured as of April 20, 2026)",
+    "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-700",
+    "objectiveVersion": "DP-700 skills measured as of April 20, 2026"
+  },
+  "resources": [
+    {
+      "icon": "fas fa-book",
+      "name": "Microsoft DP-700 Study Guide",
+      "url": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-700"
+    },
+    {
+      "icon": "fas fa-graduation-cap",
+      "name": "Microsoft Certified: Fabric Data Engineer Associate",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/fabric-data-engineer-associate/"
+    },
+    {
+      "icon": "fas fa-laptop-code",
+      "name": "What is Data engineering in Microsoft Fabric?",
+      "url": "https://learn.microsoft.com/en-us/fabric/data-engineering/data-engineering-overview"
+    }
+  ],
+  "totalQuestions": 25,
+  "preview": true,
+  "pro": {
+    "title": "DP-700 Complete",
+    "questions": 280,
+    "price": "17 EUR",
+    "url": "https://examplar.gumroad.com/l/dp700-complete",
+    "highlights": [
+      "280 original scenario questions across every DP-700 exam objective",
+      "Detailed explanation for the correct answer and every distractor",
+      "An official Microsoft Learn reference on every question",
+      "Study mode with spaced repetition and weak-area focus",
+      "Coverage map so you see nothing is missing",
+      "Free updates when the exam changes"
+    ]
+  }
+}
