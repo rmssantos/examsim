@@ -2,7 +2,7 @@
 // Public release history is recorded in CHANGELOG.md. Bump the vX.Y below on any
 // deploy that changes cached assets;
 // tests/test_sprint1_readiness.py enforces the examsim-pwa-vX.Y format.
-const CACHE_VERSION = 'examsim-pwa-v4.9';
+const CACHE_VERSION = 'examsim-pwa-v5.2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -41,12 +41,12 @@ const CORE_ASSETS = [
   './assets/css/style-new.css',
   './assets/css/multi-exam-styles.css',
   './assets/css/modern-enhancements.css',
-  './assets/css/homepage-styles.css',
   './assets/css/exam-enhancements.css',
+  './assets/css/exam-v2.css',
+  './assets/css/home-v2.css',
   './assets/css/analytics-privacy.css',
   './assets/css/app-footer.css',
   './assets/css/legal-page.css',
-  './assets/css/index-inline.css',
   './assets/css/editor-styles.css',
   './assets/css/exam-landing.css',
   './assets/media/favicon-64.png',
@@ -92,12 +92,12 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/css/style-new.css',
   './assets/css/multi-exam-styles.css',
   './assets/css/modern-enhancements.css',
-  './assets/css/homepage-styles.css',
   './assets/css/exam-enhancements.css',
+  './assets/css/exam-v2.css',
+  './assets/css/home-v2.css',
   './assets/css/analytics-privacy.css',
   './assets/css/app-footer.css',
   './assets/css/legal-page.css',
-  './assets/css/index-inline.css',
   './assets/css/editor-styles.css',
   './assets/css/exam-landing.css'
 ];
@@ -179,6 +179,10 @@ async function networkFirst(request) {
 }
 
 self.addEventListener('install', event => {
+  // Activate updates immediately: without this, the previous worker keeps
+  // serving stale cache-first assets (e.g. brand images) until every tab
+  // closes or the user accepts the update toast.
+  self.skipWaiting();
   event.waitUntil((async () => {
     const cache = await caches.open(STATIC_CACHE);
     await cache.addAll(CORE_ASSETS);

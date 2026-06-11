@@ -2,15 +2,15 @@
    Mirrors the main site palette and supports the shared dark theme
    (body.dark-mode, toggled by assets/js/legal-page.js). */
 body.exam-landing {
-  --primary: #0066cc;
-  --primary-dark: #1e3c72;
-  --accent: #00bcf2;
+  --primary: #0f766e;
+  --primary-dark: #0b5d57;
+  --accent: #2dd4bf;
   --ink: #1e293b;
   --muted: #5b6b7f;
-  --card: rgba(255, 255, 255, 0.96);
-  --card-border: rgba(30, 60, 114, 0.12);
-  --shadow: 0 8px 24px rgba(30, 60, 114, 0.08);
-  --page-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  --card: #ffffff;
+  --card-border: #e3e6ea;
+  --shadow: 0 1px 2px rgba(31, 39, 51, 0.05);
+  --page-bg: #f1f3f5;
 
   margin: 0;
   min-height: 100vh;
@@ -21,14 +21,14 @@ body.exam-landing {
 }
 
 body.exam-landing.dark-mode {
-  --primary: #38bdf8;
-  --accent: #00bcf2;
+  --primary: #2bb3a3;
+  --accent: #2dd4bf;
   --ink: #f1f5f9;
   --muted: #cbd5e1;
-  --card: rgba(30, 41, 59, 0.92);
-  --card-border: rgba(255, 255, 255, 0.08);
-  --shadow: 0 10px 28px rgba(0, 0, 0, 0.30);
-  --page-bg: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  --card: #1a212c;
+  --card-border: #28303d;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --page-bg: #10141b;
 }
 
 /* Topbar */
@@ -77,31 +77,37 @@ body.exam-landing.dark-mode {
 .exam-landing .breadcrumbs a { color: var(--primary); text-decoration: none; }
 .exam-landing .breadcrumbs a:hover { text-decoration: underline; }
 
-/* Hero (gradient banner, mirrors the homepage) */
+/* Hero (graphite control-room band, mirrors the homepage) */
 .exam-landing .landing-hero {
   position: relative;
   overflow: hidden;
-  padding: 40px;
-  color: #fff;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 55%, #00bcf2 145%);
-  border-radius: 18px;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  padding: 34px 36px;
+  color: #aab2c0;
+  background:
+    radial-gradient(520px 240px at 80% 0%, rgba(45, 212, 191, 0.09), transparent 70%),
+    #1d232f;
+  border: 1px solid #313947;
+  border-radius: 16px;
+  box-shadow: none;
 }
+.exam-landing .landing-hero h1,
+.exam-landing .landing-hero strong { color: #e8ebf0; }
 .exam-landing .landing-kicker {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 14px;
-  padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  padding: 5px 12px;
+  color: #2dd4bf;
+  background: rgba(45, 212, 191, 0.08);
+  border: 1px solid rgba(45, 212, 191, 0.35);
   border-radius: 999px;
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.exam-landing .landing-hero h1 { margin: 0 0 6px; font-size: 2.3rem; line-height: 1.12; }
+.exam-landing .landing-hero h1 { margin: 0 0 6px; font-size: 2rem; line-height: 1.15; }
 .exam-landing .landing-subhead { margin: 0 0 14px; font-size: 1.15rem; opacity: 0.92; }
 .exam-landing .landing-intro { margin: 0; max-width: 640px; font-size: 1.02rem; opacity: 0.94; }
 .exam-landing .hero-cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
@@ -109,29 +115,30 @@ body.exam-landing.dark-mode {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 13px 24px;
-  border-radius: 12px;
+  padding: 11px 22px;
+  border-radius: 8px;
   font-weight: 700;
   text-decoration: none;
-  background: #fff;
-  color: var(--primary-dark);
-  box-shadow: 0 10px 24px rgba(2, 12, 27, 0.25);
-  transition: transform .12s ease;
+  background: #2dd4bf;
+  color: #08312d;
+  box-shadow: none;
+  transition: filter .12s ease;
 }
-.exam-landing .landing-cta:hover { transform: translateY(-1px); }
+.exam-landing .landing-cta:hover { filter: brightness(1.08); }
 .exam-landing .landing-cta-ghost {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 13px 22px;
-  border-radius: 12px;
-  font-weight: 700;
+  padding: 11px 20px;
+  border-radius: 8px;
+  font-weight: 600;
   text-decoration: none;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #e8ebf0;
+  background: transparent;
+  border: 1px solid #313947;
+  transition: border-color .12s ease;
 }
-.exam-landing .landing-cta-ghost:hover { background: rgba(255, 255, 255, 0.22); }
+.exam-landing .landing-cta-ghost:hover { border-color: #aab2c0; background: transparent; }
 
 /* Section cards */
 .exam-landing .exam-section {
@@ -155,7 +162,7 @@ body.exam-landing.dark-mode {
   width: 4px;
   height: 1.05em;
   border-radius: 4px;
-  background: linear-gradient(180deg, var(--primary), var(--accent));
+  background: var(--primary);
 }
 
 /* Facts table */
@@ -174,9 +181,9 @@ body.exam-landing.dark-mode {
   font-weight: 800;
   padding: 14px 18px;
   color: var(--ink);
-  background: rgba(0, 102, 204, 0.06);
+  background: rgba(15, 118, 110, 0.06);
 }
-.exam-landing.dark-mode .exam-facts caption { background: rgba(56, 189, 248, 0.12); }
+.exam-landing.dark-mode .exam-facts caption { background: rgba(43, 179, 163, 0.14); }
 .exam-landing .exam-facts th,
 .exam-landing .exam-facts td { text-align: left; padding: 11px 18px; border-top: 1px solid var(--card-border); }
 .exam-landing .exam-facts th { width: 46%; color: var(--muted); font-weight: 600; }
@@ -206,15 +213,15 @@ body.exam-landing.dark-mode {
 /* Pro upsell */
 .exam-landing .exam-pro {
   margin-top: 22px;
-  padding: 26px;
-  background: linear-gradient(135deg, rgba(30, 60, 114, 0.06), rgba(0, 188, 242, 0.10));
-  border: 1px solid rgba(0, 102, 204, 0.22);
+  padding: 24px 26px;
+  background: rgba(15, 118, 110, 0.05);
+  border: 1px solid rgba(15, 118, 110, 0.22);
   border-left: 4px solid var(--primary);
   border-radius: 14px;
 }
 .exam-landing.dark-mode .exam-pro {
-  background: linear-gradient(135deg, rgba(0, 188, 242, 0.10), rgba(30, 60, 114, 0.20));
-  border-color: rgba(56, 189, 248, 0.30);
+  background: rgba(43, 179, 163, 0.08);
+  border-color: rgba(43, 179, 163, 0.3);
 }
 .exam-landing .exam-pro h2 { margin-top: 0; }
 .exam-landing .pro-price { font-weight: 800; color: var(--primary); }
@@ -224,15 +231,17 @@ body.exam-landing.dark-mode {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 22px;
-  border-radius: 12px;
+  padding: 11px 22px;
+  border-radius: 8px;
   font-weight: 700;
   text-decoration: none;
   color: #fff;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  box-shadow: 0 10px 22px rgba(0, 102, 204, 0.25);
+  background: var(--primary);
+  box-shadow: none;
+  transition: filter .12s ease;
 }
-.exam-landing .pro-cta:hover { filter: brightness(1.05); }
+.exam-landing .pro-cta:hover { filter: brightness(1.1); }
+.exam-landing.dark-mode .pro-cta { color: #0d1a18; }
 
 /* Hub grid */
 .exam-landing .hub-grid {
@@ -269,7 +278,7 @@ body.exam-landing.dark-mode {
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--primary);
-  background: rgba(0, 188, 242, 0.14);
+  background: rgba(15, 118, 110, 0.1);
 }
 
 /* Footer */

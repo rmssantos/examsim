@@ -25,9 +25,9 @@
                 align-items: center;
                 width: min(420px, calc(100vw - 32px));
                 padding: 14px;
-                color: #f8fafc;
-                background: linear-gradient(135deg, #102433, #123f42);
-                border: 1px solid rgba(125, 211, 252, 0.32);
+                color: #e8ebf0;
+                background: #1d232f;
+                border: 1px solid rgba(45, 212, 191, 0.35);
                 border-radius: 8px;
                 box-shadow: 0 18px 44px rgba(15, 23, 42, 0.35);
             }
@@ -90,7 +90,7 @@
         const title = document.createElement('strong');
         title.textContent = 'Update available';
         const text = document.createElement('span');
-        text.textContent = 'Refresh to load the latest ExamSim files and exam metadata.';
+        text.textContent = 'Refresh to load the latest Examplar files and exam metadata.';
         copy.append(title, text);
 
         const actions = document.createElement('div');

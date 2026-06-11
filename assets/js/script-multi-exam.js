@@ -3026,7 +3026,7 @@ function showProgressModal(allProgress) {
     content.appendChild(title);
 
     const list = document.createElement('div');
-    list.style.cssText = 'display:grid;gap:20px;';
+    list.className = 'progress-stats-list';
 
     Object.entries(allProgress).forEach(([examId, progress]) => {
         const examName = getExamName(examId);
@@ -3039,34 +3039,33 @@ function showProgressModal(allProgress) {
         const trend = calculateTrend(recentAttempts);
 
         const card = document.createElement('div');
-        card.style.cssText = 'background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);border-radius:12px;padding:20px;border:2px solid #dee2e6;';
+        card.className = 'progress-exam-card';
 
         const header = document.createElement('div');
-        header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;gap:12px;flex-wrap:wrap;';
+        header.className = 'progress-exam-head';
         const heading = document.createElement('h3');
-        heading.style.cssText = 'margin:0;color:#1e3c72;font-size:22px;';
+        heading.className = 'progress-exam-name';
         heading.appendChild(createProgressIcon('fas fa-graduation-cap'));
         heading.appendChild(document.createTextNode(` ${examName}`));
         header.appendChild(heading);
 
         const best = document.createElement('span');
-        best.style.cssText = `background:${bestScore >= 70 ? '#28a745' : '#dc3545'};color:white;padding:6px 12px;border-radius:20px;font-size:14px;font-weight:bold;`;
+        best.className = `progress-best ${bestScore >= 70 ? 'passed' : 'failed'}`;
         best.textContent = `Best: ${bestScore}%`;
         header.appendChild(best);
         card.appendChild(header);
 
         const metrics = document.createElement('div');
-        metrics.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:15px;';
-        metrics.appendChild(createMetricCard('Attempts', String(attempts.length), '#1e3c72'));
-        metrics.appendChild(createMetricCard('Avg Score', `${avgScore}%`, '#007bff'));
-        metrics.appendChild(createMetricCard('Pass Rate', `${passRate}%`, '#28a745'));
-        metrics.appendChild(createMetricCard('Trend', trend, '#1e3c72'));
+        metrics.className = 'progress-metric-grid';
+        metrics.appendChild(createMetricCard('Attempts', String(attempts.length)));
+        metrics.appendChild(createMetricCard('Avg Score', `${avgScore}%`));
+        metrics.appendChild(createMetricCard('Pass Rate', `${passRate}%`));
+        metrics.appendChild(createMetricCard('Trend', trend));
         card.appendChild(metrics);
 
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'view-attempts-btn';
-        button.style.cssText = 'width:100%;padding:12px;background:linear-gradient(135deg,#1e3c72,#2a5298);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s ease;';
         button.appendChild(createProgressIcon('fas fa-list'));
         button.appendChild(document.createTextNode(' View All Attempts'));
         button.addEventListener('click', () => showExamAttempts(examId));
@@ -3092,14 +3091,14 @@ function createProgressIcon(className) {
     return icon;
 }
 
-function createMetricCard(label, value, color) {
+function createMetricCard(label, value) {
     const card = document.createElement('div');
-    card.style.cssText = 'background:white;padding:15px;border-radius:8px;text-align:center;';
+    card.className = 'progress-metric-tile';
     const labelEl = document.createElement('div');
-    labelEl.style.cssText = 'color:#6c757d;font-size:12px;text-transform:uppercase;margin-bottom:5px;';
+    labelEl.className = 'progress-metric-label';
     labelEl.textContent = label;
     const valueEl = document.createElement('div');
-    valueEl.style.cssText = `font-size:24px;font-weight:bold;color:${color};`;
+    valueEl.className = 'progress-metric-value';
     valueEl.textContent = value;
     card.appendChild(labelEl);
     card.appendChild(valueEl);
@@ -3166,12 +3165,12 @@ window.showExamAttempts = function(examId) {
     content.appendChild(title);
 
     const subtitle = document.createElement('p');
-    subtitle.style.cssText = 'color:#6c757d;margin-bottom:25px;';
+    subtitle.className = 'progress-modal-sub';
     subtitle.textContent = `All ${attempts.length} attempts sorted by most recent`;
     content.appendChild(subtitle);
 
     const list = document.createElement('div');
-    list.style.cssText = 'display:grid;gap:12px;';
+    list.className = 'progress-stats-list';
 
     // Sort by date (most recent first)
     const sortedAttempts = [...attempts].reverse();
@@ -3187,44 +3186,42 @@ window.showExamAttempts = function(examId) {
             minute: '2-digit'
         });
         const passed = attempt.passed;
-        const statusColor = passed ? '#28a745' : '#dc3545';
+        const stateClass = passed ? 'passed' : 'failed';
         const statusIcon = passed ? 'fa-check-circle' : 'fa-times-circle';
         const statusText = passed ? 'PASSED' : 'FAILED';
 
         const card = document.createElement('div');
-        card.style.cssText = `background:${passed ? 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)' : 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)'};border-radius:10px;padding:16px;border:2px solid ${passed ? '#28a745' : '#dc3545'};`;
+        card.className = `attempt-card ${stateClass}`;
         const row = document.createElement('div');
-        row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;';
+        row.className = 'attempt-row';
 
         const left = document.createElement('div');
         const attemptTitle = document.createElement('div');
-        attemptTitle.style.cssText = 'font-weight:bold;font-size:16px;color:#212529;margin-bottom:4px;';
+        attemptTitle.className = 'attempt-title';
         attemptTitle.appendChild(createProgressIcon('fas fa-clipboard-check'));
         attemptTitle.appendChild(document.createTextNode(` Attempt #${attemptNum}`));
         left.appendChild(attemptTitle);
 
         const dateLine = document.createElement('div');
-        dateLine.style.cssText = 'font-size:13px;color:#6c757d;';
+        dateLine.className = 'attempt-date-line';
         dateLine.appendChild(createProgressIcon('fas fa-calendar-alt'));
         dateLine.appendChild(document.createTextNode(` ${dateStr}`));
         left.appendChild(dateLine);
 
         if (attempt.modules && Array.isArray(attempt.modules) && attempt.modules.length > 0) {
             const modulesLine = document.createElement('div');
-            modulesLine.style.cssText = 'font-size:12px;color:#495057;margin-top:6px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;line-height:1.4;';
+            modulesLine.className = 'attempt-modules';
 
-            const tagIcon = createProgressIcon('fas fa-tags');
-            tagIcon.style.color = '#6c757d';
-            modulesLine.appendChild(tagIcon);
+            modulesLine.appendChild(createProgressIcon('fas fa-tags'));
 
             const modulesLabel = document.createElement('span');
-            modulesLabel.style.fontWeight = '600';
+            modulesLabel.className = 'attempt-modules-label';
             modulesLabel.textContent = 'Modules: ';
             modulesLine.appendChild(modulesLabel);
 
             const modulesText = document.createElement('span');
+            modulesText.className = 'attempt-modules-text';
             modulesText.textContent = attempt.modules.join(', ');
-            modulesText.style.cssText = 'background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:4px;font-style:italic;display:inline-block;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
             modulesText.title = attempt.modules.join(', '); // Show full list on hover
 
             modulesLine.appendChild(modulesText);
@@ -3234,12 +3231,12 @@ window.showExamAttempts = function(examId) {
         row.appendChild(left);
 
         const right = document.createElement('div');
-        right.style.cssText = 'display:flex;align-items:center;gap:20px;flex-wrap:wrap;';
-        right.appendChild(createAttemptMetric('Score', `${attempt.score}%`, statusColor, '28px'));
-        right.appendChild(createAttemptMetric('Time', `${attempt.timeSpent}min`, '#007bff', '20px'));
+        right.className = 'attempt-right';
+        right.appendChild(createAttemptMetric('Score', `${attempt.score}%`, stateClass));
+        right.appendChild(createAttemptMetric('Time', `${attempt.timeSpent}min`));
 
         const status = document.createElement('div');
-        status.style.cssText = `background:${statusColor};color:white;padding:8px 16px;border-radius:20px;font-weight:bold;font-size:13px;`;
+        status.className = `attempt-status-chip ${stateClass}`;
         status.appendChild(createProgressIcon(`fas ${statusIcon}`));
         status.appendChild(document.createTextNode(` ${statusText}`));
         right.appendChild(status);
@@ -3280,11 +3277,10 @@ window.showExamAttempts = function(examId) {
     content.appendChild(list);
 
     const footer = document.createElement('div');
-    footer.style.cssText = 'margin-top:20px;text-align:center;';
+    footer.className = 'progress-modal-footer-row';
     const backBtn = document.createElement('button');
     backBtn.type = 'button';
     backBtn.className = 'back-to-overview-btn';
-    backBtn.style.cssText = 'padding:10px 20px;background:#6c757d;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;';
     backBtn.appendChild(createProgressIcon('fas fa-arrow-left'));
     backBtn.appendChild(document.createTextNode(' Back to Overview'));
     backBtn.addEventListener('click', () => {
@@ -3302,14 +3298,14 @@ window.showExamAttempts = function(examId) {
     });
 };
 
-function createAttemptMetric(label, value, color, size) {
+function createAttemptMetric(label, value, stateClass) {
     const metric = document.createElement('div');
-    metric.style.cssText = 'text-align:center;';
+    metric.className = 'attempt-metric' + (stateClass ? ` ${stateClass}` : '');
     const labelEl = document.createElement('div');
-    labelEl.style.cssText = 'color:#6c757d;font-size:11px;text-transform:uppercase;margin-bottom:3px;';
+    labelEl.className = 'attempt-metric-label';
     labelEl.textContent = label;
     const valueEl = document.createElement('div');
-    valueEl.style.cssText = `font-size:${size};font-weight:bold;color:${color};`;
+    valueEl.className = 'attempt-metric-value';
     valueEl.textContent = value;
     metric.appendChild(labelEl);
     metric.appendChild(valueEl);

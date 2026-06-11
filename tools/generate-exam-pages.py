@@ -521,7 +521,7 @@ def render_hub(all_exams: list) -> str:
 <body class="exam-landing">
   <header class="landing-topbar">
     <a class="landing-brand" href="{root}index.html">
-      <img src="{root}assets/media/examplar-mark.png" alt="Examplar" width="40" height="36" decoding="async">
+      <img src="{root}assets/media/examplar-mark.png" alt="Examplar" width="40" height="40" decoding="async">
       <span>Examplar</span>
     </a>
     <button id="legalThemeToggle" class="landing-theme-toggle" type="button" title="Switch to dark mode" aria-label="Switch to dark mode">

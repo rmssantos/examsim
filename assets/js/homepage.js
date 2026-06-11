@@ -373,6 +373,7 @@ return Number(metadata.totalQuestions || metadata.questionCount || examData?.que
 }
 
 updateLibraryResultCount(visibleCount, totalCount) {
+this.updateHiddenExamsChip();
 if (!this.libraryResultCount) return;
 const total = Number(totalCount || 0);
 const visible = Number(visibleCount || 0);
@@ -383,6 +384,24 @@ if (total === 0) {
 this.libraryResultCount.textContent = visible === total
 	? `${total} exam${total === 1 ? '' : 's'} available`
 	: `Showing ${visible} of ${total} exams`;
+}
+
+// Keep hidden exams discoverable: a quiet chip next to the result count
+// that reopens Manage Exams, where cards can be re-activated.
+updateHiddenExamsChip() {
+const chip = document.getElementById('library-hidden-chip');
+if (!chip || !window.examManager) return;
+const hidden = window.examManager.getAllExamIds().filter(id => !window.examManager.isExamActive(id));
+if (hidden.length === 0) {
+	window.ExamApp.setElementHidden(chip, true);
+	return;
+}
+chip.textContent = `${hidden.length} hidden exam${hidden.length === 1 ? '' : 's'} · Manage`;
+window.ExamApp.setElementHidden(chip, false);
+if (!chip.dataset.bound) {
+	chip.dataset.bound = '1';
+	chip.addEventListener('click', () => this.openConfigModal());
+}
 }
 
 refreshLibrary() {
@@ -2318,7 +2337,48 @@ async deactivateExam(examId) {
 if (!window.ExamApp.isSafeExamId(examId)) return;
 window.examManager.deactivateExam(examId);
 await this.loadAvailableExams();
-this.showNotification(`Exam "${examId}" hidden from homepage.`, 2000);
+this.showHiddenExamToast(examId);
+}
+
+// Hiding a card is easy to do and hard to discover how to undo; offer the
+// way back (Undo + Manage exams) right where the action happened.
+showHiddenExamToast(examId) {
+document.getElementById('hidden-exam-toast')?.remove();
+const toast = document.createElement('div');
+toast.id = 'hidden-exam-toast';
+toast.className = 'examplar-toast';
+
+// Live region on the message only; the container holds interactive buttons,
+// which a status role would re-announce awkwardly.
+const msg = document.createElement('span');
+msg.className = 'examplar-toast-text';
+msg.setAttribute('role', 'status');
+msg.textContent = `"${this.getExamName(examId)}" hidden from the library.`;
+toast.appendChild(msg);
+
+const undo = document.createElement('button');
+undo.type = 'button';
+undo.className = 'examplar-toast-action primary';
+undo.textContent = 'Undo';
+undo.addEventListener('click', async () => {
+	toast.remove();
+	window.examManager.activateExam(examId);
+	await this.loadAvailableExams();
+});
+toast.appendChild(undo);
+
+const manage = document.createElement('button');
+manage.type = 'button';
+manage.className = 'examplar-toast-action';
+manage.textContent = 'Manage exams';
+manage.addEventListener('click', () => {
+	toast.remove();
+	this.openConfigModal();
+});
+toast.appendChild(manage);
+
+document.body.appendChild(toast);
+setTimeout(() => toast.remove(), 10000);
 }
 
 showNotification(message, duration = 3000) {

@@ -5,7 +5,7 @@
   z-index: 20000;
   padding: 10px 14px;
   border-radius: 8px;
-  background: #123b70;
+  background: #1d232f;
   color: #fff;
   font-weight: 700;
   text-decoration: none;
@@ -14,7 +14,7 @@
 
 .skip-link:focus-visible {
   transform: translateY(0);
-  outline: 3px solid #00c4ff;
+  outline: 3px solid #2dd4bf;
   outline-offset: 2px;
 }
 
@@ -24,7 +24,7 @@
   gap: 0.5rem;
   min-height: 38px;
   padding: 0.625rem 1rem;
-  color: #0066cc;
+  color: #0f766e;
   background: rgba(255, 255, 255, 0.95);
   border: 1.5px solid rgba(30, 60, 114, 0.2);
   border-radius: 10px;
@@ -39,7 +39,7 @@
 
 .app-nav-action:hover,
 .app-nav-action:focus-visible {
-  color: #0066cc;
+  color: #0f766e;
   background: rgba(248, 249, 250, 1);
   border-color: rgba(30, 60, 114, 0.35);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
@@ -105,15 +105,15 @@
 .app-footer-links a:hover,
 .app-footer-links a:focus-visible {
   color: #0f172a;
-  background: rgba(99, 102, 241, 0.08);
-  border-color: rgba(99, 102, 241, 0.18);
+  background: rgba(15, 118, 110, 0.08);
+  border-color: rgba(15, 118, 110, 0.18);
   outline: none;
 }
 
 .app-footer-links a[aria-current="page"] {
-  color: #0066cc;
-  background: rgba(219, 234, 254, 0.74);
-  border-color: rgba(37, 99, 235, 0.24);
+  color: #0f766e;
+  background: rgba(15, 118, 110, 0.1);
+  border-color: rgba(15, 118, 110, 0.28);
 }
 
 body:not(.dark-mode):not([data-theme="dark"]) .app-footer {
@@ -137,9 +137,9 @@ body:not(.dark-mode):not([data-theme="dark"]) .app-footer-links a {
 
 body:not(.dark-mode):not([data-theme="dark"]) .app-footer-links a:hover,
 body:not(.dark-mode):not([data-theme="dark"]) .app-footer-links a:focus-visible {
-  color: #1d4ed8;
-  background: rgba(219, 234, 254, 0.74);
-  border-color: rgba(37, 99, 235, 0.24);
+  color: #0b5d57;
+  background: rgba(15, 118, 110, 0.1);
+  border-color: rgba(15, 118, 110, 0.28);
 }
 
 .dark-mode .app-footer,
@@ -160,8 +160,8 @@ body:not(.dark-mode):not([data-theme="dark"]) .app-footer-links a:focus-visible 
 [data-theme="dark"] .app-nav-action:hover,
 [data-theme="dark"] .app-nav-action:focus-visible {
   color: #ffffff;
-  background: #0066cc;
-  border-color: #0066cc;
+  background: #0f766e;
+  border-color: #0f766e;
 }
 
 .dark-mode .app-footer-note strong,
@@ -186,8 +186,8 @@ body:not(.dark-mode):not([data-theme="dark"]) .app-footer-links a:focus-visible 
 .dark-mode .app-footer-links a[aria-current="page"],
 [data-theme="dark"] .app-footer-links a[aria-current="page"] {
   color: #ffffff;
-  background: rgba(0, 102, 204, 0.28);
-  border-color: rgba(0, 188, 242, 0.35);
+  background: rgba(43, 179, 163, 0.25);
+  border-color: rgba(45, 212, 191, 0.4);
 }
 
 @media (max-width: 720px) {
