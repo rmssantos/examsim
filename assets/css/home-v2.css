@@ -35,6 +35,7 @@
   --h-good-line: #cfe5db;
   --h-bad: #b03a3a;
   --h-bad-tint: #faeeee;
+  --h-bad-line: #ecd2d2;
   --h-flag: #b07d2b;
   --h-flag-tint: #fdf6e7;
   --h-flag-line: #ecdcb8;
@@ -71,6 +72,7 @@
   --h-good-line: #2b4a3a;
   --h-bad: #dd8f8f;
   --h-bad-tint: #2f2022;
+  --h-bad-line: #4d3032;
   --h-flag: #d3aa64;
   --h-flag-tint: #2e271a;
   --h-flag-line: #4a3e26;
@@ -611,6 +613,18 @@ body.dragging-file .exam-library-section::after {
   text-align: center;
   color: var(--h-text-faint);
   padding: 2rem 1rem;
+}
+
+/* image placeholder for the inline file-mode exam screens (its old home,
+   index-inline.css, is no longer loaded; spinner/error live in
+   multi-exam-styles.css which still is) */
+.image-placeholder {
+  background: var(--h-surface-soft);
+  color: var(--h-text-faint);
+  padding: 20px;
+  text-align: center;
+  border-radius: var(--h-radius);
+  border: 1px dashed var(--h-line-strong);
 }
 .library-empty-state i { font-size: 1.6rem; margin-bottom: 0.5rem; color: var(--h-text-faint); }
 .library-empty-state h3 { color: var(--h-text); font-size: 1rem; margin-bottom: 0.25rem; }

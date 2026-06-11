@@ -2347,10 +2347,12 @@ document.getElementById('hidden-exam-toast')?.remove();
 const toast = document.createElement('div');
 toast.id = 'hidden-exam-toast';
 toast.className = 'examplar-toast';
-toast.setAttribute('role', 'status');
 
+// Live region on the message only; the container holds interactive buttons,
+// which a status role would re-announce awkwardly.
 const msg = document.createElement('span');
 msg.className = 'examplar-toast-text';
+msg.setAttribute('role', 'status');
 msg.textContent = `"${this.getExamName(examId)}" hidden from the library.`;
 toast.appendChild(msg);
 
