@@ -22,8 +22,7 @@ class MobileA11yReadinessTests(unittest.TestCase):
         self.assertIn("toggle.setAttribute('aria-expanded', String(!shouldHide));", js)
 
     def test_exam_focus_indicators_cover_icon_and_question_controls(self):
-        exam_css = (ROOT / "assets/css/exam-enhancements.css").read_text(encoding="utf-8")
-        multi_css = (ROOT / "assets/css/multi-exam-styles.css").read_text(encoding="utf-8")
+        exam_css = (ROOT / "assets/css/exam-v2.css").read_text(encoding="utf-8")
 
         for selector in (
             "#close-feedback:focus-visible",
@@ -31,12 +30,12 @@ class MobileA11yReadinessTests(unittest.TestCase):
             ".nav-grid button:focus-visible",
             ".yn-btn:focus-visible",
             ".seq-btn:focus-visible",
+            ".ddselect-btn:focus-visible",
+            ".chip-remove:focus-visible",
         ):
             self.assertIn(selector, exam_css)
 
-        self.assertIn(".ddselect-btn:focus-visible", multi_css)
-        self.assertIn(".chip-remove:focus-visible", multi_css)
-        self.assertRegex(multi_css, r"\.ddselect-btn\s*\{[\s\S]*?min-height:\s*44px;")
+        self.assertRegex(exam_css, r"\.ddselect-btn\s*\{[\s\S]*?min-height:\s*44px;")
 
     def test_pro_modal_traps_tab_focus(self):
         js = (ROOT / "assets/js/homepage.js").read_text(encoding="utf-8")
@@ -70,35 +69,23 @@ class MobileA11yReadinessTests(unittest.TestCase):
         self.assertIn('aria-label="Delete option ${idx + 1}"', js)
         self.assertIn('<i class="fas fa-trash" aria-hidden="true"></i>', js)
 
-    def test_mobile_exam_header_uses_compact_two_row_layout(self):
-        css = (ROOT / "assets/css/exam-enhancements.css").read_text(encoding="utf-8")
+    def test_mobile_exam_rail_collapses_to_top_strip(self):
+        css = (ROOT / "assets/css/exam-v2.css").read_text(encoding="utf-8")
         mobile_block = css[css.index("@media (max-width: 760px)") :]
 
-        self.assertRegex(
-            mobile_block,
-            r"\.exam-header\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto;",
-        )
-        self.assertRegex(mobile_block, r"\.exam-info-header\s*\{[\s\S]*?flex-direction:\s*row;")
-        self.assertRegex(mobile_block, r"\.exam-info-header\s*\{[\s\S]*?grid-column:\s*1\s*/\s*-1;")
-        self.assertRegex(mobile_block, r"\.exam-progress\s*\{[\s\S]*?grid-template-columns:\s*1fr\s+auto\s+auto;")
-        self.assertRegex(mobile_block, r"\.exam-header\s+\.exam-timer\s*\{[\s\S]*?min-width:\s*5\.7rem;")
-        self.assertRegex(
-            mobile_block,
-            r"body:has\(#exam-screen\.screen\.active\)\s+\.theme-controls\s*\{[\s\S]*?display:\s*none;",
-        )
+        self.assertRegex(mobile_block, r"\.cr-layout\s*\{[^}]*grid-template-columns:\s*1fr;")
+        self.assertRegex(mobile_block, r"\.cr-rail\s*\{[^}]*position:\s*static;")
+        self.assertRegex(mobile_block, r"\.toggle-navigator\s*\{[^}]*display:\s*inline-flex;")
+        self.assertRegex(mobile_block, r"\.nav-grid button\s*\{[^}]*min-height:\s*44px;")
 
-    def test_results_summary_uses_compact_score_panel(self):
-        css = (ROOT / "assets/css/exam-enhancements.css").read_text(encoding="utf-8")
-        results_block = css[css.index("#results-screen .summary-visuals") : css.index("/* Metrics row styling */")]
+    def test_results_summary_uses_flat_score_panel(self):
+        css = (ROOT / "assets/css/exam-v2.css").read_text(encoding="utf-8")
+        results_block = css[css.index("/* ===== Results screen ===== */") :]
 
-        self.assertIn("#results-screen .summary-visuals", results_block)
-        self.assertRegex(results_block, r"grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto")
-        self.assertRegex(results_block, r"#results-screen\s+\.score-ring\s*\{[\s\S]*?height:\s*76px")
-        self.assertRegex(results_block, r"#results-screen\s+\.score-ring\s*\{[\s\S]*?border-radius:\s*14px")
+        self.assertRegex(results_block, r"\.summary-visuals\s*\{[^}]*display:\s*flex;")
+        self.assertRegex(results_block, r"\.score-percentage\s*\{[^}]*font-family:\s*var\(--font-num\);")
+        self.assertRegex(results_block, r"\.status-icon\s*\{[\s\S]*?animation:\s*none;")
         self.assertNotIn("conic-gradient", results_block)
-        self.assertRegex(results_block, r"#results-screen\s+\.status-icon\s*\{[\s\S]*?height:\s*76px")
-        self.assertRegex(results_block, r"#results-screen\s+\.status-icon\s*\{[\s\S]*?border-radius:\s*14px")
-        self.assertRegex(results_block, r"#results-screen\s+\.status-icon\s*\{[\s\S]*?animation:\s*none")
 
         js = (ROOT / "assets/js/script-multi-exam.js").read_text(encoding="utf-8")
         show_results_start = js.index("    showResults(score, passed")

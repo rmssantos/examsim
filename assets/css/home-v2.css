@@ -96,55 +96,25 @@ body.dark-mode, body[data-theme="dark"] { background: var(--h-bg); }
 
 .container { max-width: 1180px; }
 
-/* ===== Theme controls (fixed, over the hero band) ===== */
-.theme-controls {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 1000;
+/* ===== Theme controls (live in the top nav; the inline exam rail keeps
+   exam-v2's display:contents treatment) ===== */
+.cr-topnav .theme-controls {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
-.theme-toggle {
-  background: var(--h-surface);
-  border: 1px solid var(--h-line-strong);
-  border-radius: var(--h-radius);
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  color: var(--h-text-soft);
-  box-shadow: var(--h-card-shadow);
-  transition: color 0.15s, border-color 0.15s, transform 0.15s;
-}
-.theme-toggle:hover { color: var(--h-accent); border-color: var(--h-accent); transform: none; }
-.theme-toggle:focus-visible { outline: 2px solid var(--h-accent); outline-offset: 2px; }
-.theme-controls .theme-public-link {
+.cr-topnav .theme-controls .theme-public-link {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   height: 36px;
   padding: 0 0.8rem;
-  background: var(--h-surface);
-  border: 1px solid var(--h-line-strong);
   border-radius: var(--h-radius);
-  color: var(--h-text-soft);
   font-size: 0.8125rem;
   font-weight: 600;
   text-decoration: none;
-  box-shadow: var(--h-card-shadow);
   transition: color 0.15s, border-color 0.15s;
 }
-.theme-controls .theme-public-link:hover { color: var(--h-accent); border-color: var(--h-accent); }
-[data-theme="dark"] .theme-controls .theme-public-link,
-.dark-mode .theme-controls .theme-public-link {
-  background: var(--h-surface);
-  color: var(--h-text-soft);
-}
-[data-theme="dark"] .theme-controls .theme-public-link:hover,
-.dark-mode .theme-controls .theme-public-link:hover { color: var(--h-accent); }
 
 /* legacy style-new centers the whole welcome screen; restore natural flow */
 #welcome-screen {
@@ -239,22 +209,24 @@ body:not(.dark-mode) .home-board { border-color: transparent; }
 .cr-topnav-links > a:hover { color: var(--rail-text-strong); }
 .cr-topnav-links > a:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
 /* theme controls live in the nav here, not floating */
-.cr-topnav .theme-controls {
-  position: static;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
 .cr-topnav .theme-toggle {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: var(--h-radius);
   background: transparent;
-  border-color: var(--rail-line);
+  border: 1px solid var(--rail-line);
   color: var(--rail-text);
   box-shadow: none;
+  transition: color 0.15s, border-color 0.15s;
 }
 .cr-topnav .theme-toggle:hover { color: var(--accent-bright); border-color: var(--accent-bright); }
+.cr-topnav .theme-toggle:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
 .cr-topnav .theme-controls .theme-public-link {
   background: transparent;
-  border-color: var(--rail-line);
+  border: 1px solid var(--rail-line);
   color: var(--rail-text);
   box-shadow: none;
 }
@@ -613,20 +585,7 @@ body.dragging-file .exam-library-section::after {
   text-align: center;
   color: var(--h-text-faint);
   padding: 2rem 1rem;
-}
-
-/* image placeholder for the inline file-mode exam screens (its old home,
-   index-inline.css, is no longer loaded; spinner/error live in
-   multi-exam-styles.css which still is) */
-.image-placeholder {
-  background: var(--h-surface-soft);
-  color: var(--h-text-faint);
-  padding: 20px;
-  text-align: center;
-  border-radius: var(--h-radius);
-  border: 1px dashed var(--h-line-strong);
-}
-.library-empty-state i { font-size: 1.6rem; margin-bottom: 0.5rem; color: var(--h-text-faint); }
+}.library-empty-state i { font-size: 1.6rem; margin-bottom: 0.5rem; color: var(--h-text-faint); }
 .library-empty-state h3 { color: var(--h-text); font-size: 1rem; margin-bottom: 0.25rem; }
 
 /* ===== Exam cards ===== */
@@ -1162,15 +1121,6 @@ body.dragging-file .exam-library-section::after {
 .btn-import:hover { background: var(--h-accent-deep); }
 
 /* ===== Sidebar cards (stacked below the library) ===== */
-/* One quick Start on the card + one configured Start in the details panel
-   is enough; these sidebar blocks duplicate the details panel (preview
-   stats, exam info, module coverage, extra Start buttons). Hidden with
-   !important because legacy JS still writes inline display on them. */
-#hero-preview,
-#current-exam-info,
-.start-exam-cta,
-#modules-section { display: none !important; }
-
 .sidebar {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -1178,8 +1128,6 @@ body.dragging-file .exam-library-section::after {
   position: static;
 }
 .getting-started-card,
-.preview-card,
-.exam-info-card,
 .progress-section {
   background: var(--h-surface);
   border: 1px solid var(--h-line);
@@ -1205,57 +1153,6 @@ body:not(.dark-mode) .getting-started-card { background: var(--h-surface); borde
 }
 .gs-cta:hover { text-decoration: underline; }
 
-.preview-card .preview-header { margin-bottom: 0.5rem; }
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--h-text-faint);
-  background: var(--h-surface-soft);
-  border: 1px solid var(--h-line);
-  border-radius: 999px;
-  padding: 0.2rem 0.6rem;
-}
-.preview-card h3 { font-size: 0.95rem; color: var(--h-text); margin-bottom: 0.15rem; }
-.preview-subtitle { font-size: 0.78rem; color: var(--h-text-faint); margin-bottom: 0.7rem; }
-.preview-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 0.7rem; }
-.preview-stat { text-align: center; background: var(--h-surface-soft); border: 1px solid var(--h-line); border-radius: var(--h-radius); padding: 0.5rem 0.25rem; }
-.preview-stat .stat-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--h-text-faint); display: block; }
-.preview-stat .stat-number { font-family: var(--h-font-num); font-size: 0.95rem; font-weight: 700; color: var(--h-text); display: block; }
-.preview-stat small { font-size: 0.64rem; color: var(--h-text-faint); }
-.preview-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.8rem; }
-.preview-tags .tag {
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: var(--h-text-soft);
-  background: var(--h-surface-soft);
-  border: 1px solid var(--h-line);
-  border-radius: 999px;
-  padding: 0.14rem 0.5rem;
-}
-.preview-action-btn {
-  width: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  font: inherit;
-  font-size: 0.8438rem;
-  font-weight: 600;
-  background: var(--h-surface);
-  border: 1px solid var(--h-line-strong);
-  color: var(--h-text-soft);
-  border-radius: var(--h-radius);
-  padding: 0.55rem;
-  cursor: pointer;
-}
-.preview-action-btn:hover { border-color: var(--h-accent); color: var(--h-accent); }
-
-.exam-info-card h3 { font-size: 0.95rem; color: var(--h-text); margin-bottom: 0.6rem; }
 .progress-section h3 {
   font-size: 0.95rem;
   color: var(--h-text);
@@ -1281,15 +1178,6 @@ body:not(.dark-mode) .getting-started-card { background: var(--h-surface); borde
   cursor: pointer;
 }
 .btn-progress:hover { border-color: var(--h-accent); color: var(--h-accent); }
-.start-exam-cta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-}
 
 /* ===== Library tools row ===== */
 .home-tools { text-align: center; padding-bottom: 0.5rem; }
@@ -1970,29 +1858,6 @@ body:not(.dark-mode) .getting-started-card { background: var(--h-surface); borde
   color: var(--h-text-faint);
 }
 
-/* ===== Sidebar start CTA (legacy style-new pins a gradient pill with !important) ===== */
-.start-exam-cta .btn-start-exam {
-  font-size: 0.9rem !important;
-  font-weight: 600 !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
-  border-radius: var(--h-radius) !important;
-  padding: 0.6rem 1.3rem !important;
-  background: var(--h-accent) !important;
-  color: var(--h-btn-primary-text) !important;
-  border: none !important;
-  box-shadow: none !important;
-  width: 100%;
-  justify-content: center;
-}
-.start-exam-cta .btn-start-exam i { font-size: 0.85rem !important; }
-.start-exam-cta .btn-start-exam::before { content: none !important; }
-.start-exam-cta .btn-start-exam:hover {
-  background: var(--h-accent-deep) !important;
-  transform: none !important;
-  box-shadow: none !important;
-}
-
 /* ===== Responsive ===== */
 @media (max-width: 880px) {
   .hero-banner__inner { grid-template-columns: 1fr; gap: 1.25rem; padding: 1.5rem 1.4rem; }
@@ -2004,6 +1869,7 @@ body:not(.dark-mode) .getting-started-card { background: var(--h-surface); borde
   .quick-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .exam-grid { grid-template-columns: 1fr; }
   .exam-details-actions { width: 100%; }
+  .section-subtitle { display: none; }
   .theme-controls .theme-public-link span { display: none; }
 }
 

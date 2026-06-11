@@ -23,10 +23,7 @@
 	<link rel="apple-touch-icon" href="assets/media/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="64x64" href="assets/media/favicon-64.png">
 	<title>Examplar | Local-first certification exam practice</title>
-	<link rel="stylesheet" href="assets/css/style-new.css">
-	<link rel="stylesheet" href="assets/css/multi-exam-styles.css">
-	<link rel="stylesheet" href="assets/css/modern-enhancements.css">
-	<link rel="stylesheet" href="assets/css/exam-enhancements.css">
+	<link rel="stylesheet" href="assets/css/exam-v2.css">
 	<link rel="stylesheet" href="assets/css/analytics-privacy.css">
 	<link rel="stylesheet" href="assets/css/app-footer.css">
 	<link href="assets/vendor/fontawesome/css/all.min.css" rel="stylesheet">
@@ -354,7 +351,7 @@
 
 					</div>
 
-					<!-- Sidebar - Hidden in new layout -->
+					<!-- Sidebar: global progress + first-run card -->
 					<aside class="sidebar">
 						<!-- First-run: consolidated getting-started (shown only with no selection and no history) -->
 						<div id="home-getting-started" class="getting-started-card is-hidden">
@@ -367,96 +364,6 @@
 								<li><i aria-hidden="true" class="fas fa-lock"></i> Your progress stays on this device</li>
 							</ul>
 							<a href="#exam-selection" class="gs-cta"><i aria-hidden="true" class="fas fa-play"></i> Browse the library</a>
-						</div>
-						<!-- Preview Card -->
-						<div class="preview-card" id="hero-preview">
-							<div class="preview-header">
-								<span class="status-badge" id="preview-status-pill">
-									<i aria-hidden="true" class="fas fa-hourglass-half"></i>
-									Waiting
-								</span>
-							</div>
-							<h3 id="preview-exam-name">Ready to practice</h3>
-							<p id="preview-exam-subtitle" class="preview-subtitle">Select an exam to track progress</p>
-							
-							<div class="preview-stats">
-								<div class="preview-stat">
-									<span class="stat-label">Last Score</span>
-									<span class="stat-number" id="preview-last-score">—</span>
-									<small id="preview-last-date">No attempts</small>
-								</div>
-								<div class="preview-stat">
-									<span class="stat-label">Best</span>
-									<span class="stat-number" id="preview-best-score">—</span>
-									<small id="preview-best-exam">—</small>
-								</div>
-								<div class="preview-stat">
-									<span class="stat-label">Avg Time</span>
-									<span class="stat-number" id="preview-time-spent">—</span>
-									<small id="preview-pass-rate">—</small>
-								</div>
-							</div>
-							
-							<div class="preview-tags" id="preview-highlights">
-								<span class="tag">Import to begin</span>
-								<span class="tag">Track progress</span>
-								<span class="tag">Detailed stats</span>
-							</div>
-							
-							<button id="preview-action-btn" class="preview-action-btn" type="button">
-								<i aria-hidden="true" class="fas fa-compass"></i>
-								<span>Browse Library</span>
-							</button>
-						</div>
-
-						<!-- Current Exam Info -->
-						<div id="current-exam-info" class="exam-info-card is-hidden">
-							<h3>Current Exam: <span id="current-exam-name">—</span>
-								<span class="current-exam-indicator">Selected</span>
-							</h3>
-							<div class="info-card-container">
-								<div class="info-card">
-									<i aria-hidden="true" class="fas fa-clock"></i>
-									<span id="exam-duration">—</span>
-									<small>Exam duration</small>
-								</div>
-								<div class="info-card">
-									<i aria-hidden="true" class="fas fa-question-circle"></i>
-									<span id="exam-questions">45 questions</span>
-									<small>Number of questions</small>
-								</div>
-								<div class="info-card">
-									<i aria-hidden="true" class="fas fa-trophy"></i>
-									<span id="exam-pass-score">75%</span>
-									<small>Passing score</small>
-								</div>
-								<div class="info-card">
-									<i aria-hidden="true" class="fas fa-images"></i>
-									<span id="exam-images">With Images</span>
-									<small>Visual content</small>
-								</div>
-							</div>
-						</div>
-
-						<div class="start-exam-cta is-hidden">
-							<button id="start-exam" class="btn btn-primary btn-start-exam">
-								<i aria-hidden="true" class="fas fa-play"></i> 
-								<span>Start Exam</span>
-							</button>
-						</div>
-
-						<div id="modules-section" class="modules-and-resources is-hidden">
-							<h3><i aria-hidden="true" class="fas fa-graduation-cap"></i> Exam Coverage & Study Resources</h3>
-							<div class="modules-resources-grid">
-								<div class="modules-section">
-									<h4>Covered Modules:</h4>
-									<ul id="modules-list" class="modules-list"></ul>
-								</div>
-								<div class="resources-section">
-									<h4>Study Resources:</h4>
-									<div id="resources-list" class="resources-compact"></div>
-								</div>
-							</div>
 						</div>
 
 						<div id="home-progress-section" class="progress-section">
@@ -537,208 +444,217 @@
 			</footer>
 		</div>
 
-		<!-- Exam Screen -->
+		<!-- Exam Screen (inline fallback for file-mode; mirrors exam.html) -->
 		<div id="exam-screen" class="screen" hidden aria-hidden="true">
-			<div class="theme-controls">
-				<button class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
-					<i aria-hidden="true" class="fas fa-moon theme-icon"></i>
-				</button>
-			</div>
-			<div class="exam-header">
-				<div class="exam-info-header">
-					<span id="current-exam-badge" class="exam-badge">—</span>
-					<button id="switch-exam" class="btn btn-outline-sm">
-						<i aria-hidden="true" class="fas fa-exchange-alt"></i> Switch Exam
-					</button>
-				</div>
-				<div class="exam-progress">
-					<div class="progress-bar" role="progressbar" aria-label="Exam progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-						<div id="progress-fill" class="progress-fill"></div>
+			<div class="cr-layout">
+				<aside class="cr-rail" aria-label="Exam overview">
+					<div class="cr-brand-row">
+						<span class="cr-brand"><span class="cr-brand-mark" aria-hidden="true">E</span> Examplar</span>
+						<div class="theme-controls">
+							<button id="toggle-navigator" class="toggle-navigator" title="Question Navigator" aria-label="Toggle question navigator" aria-expanded="true" aria-controls="question-navigator">
+								<i class="fas fa-th" aria-hidden="true"></i>
+							</button>
+							<button class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+								<i aria-hidden="true" class="fas fa-moon theme-icon"></i>
+							</button>
+						</div>
 					</div>
-					<span id="question-counter">1 / 50</span>
-					<button id="toggle-navigator" class="toggle-navigator" title="Question Navigator">
-						<i class="fas fa-th" aria-hidden="true"></i>
-					</button>
-				</div>
-				<div class="exam-timer">
-					<i aria-hidden="true" class="fas fa-clock"></i>
-					<span id="timer">45:00</span>
-				</div>
-			</div>
 
-			<div class="question-container">
-				<div id="question-number" class="question-number">Question 1</div>
-                
-				<!-- Question Type Indicator -->
-				<div id="question-type-indicator" class="question-type-indicator is-hidden" hidden aria-hidden="true">
-					<i aria-hidden="true" class="fas fa-info-circle"></i>
-					<span id="question-type-text">Drag & Drop Question</span>
-				</div>
-                
-				<div id="question-text" class="question-text"></div>
-                
-				<!-- Question Images Container -->
-				<div id="question-images" class="question-images-container"></div>
-                
-				<div id="options-container" class="options-container"></div>
-                
-				<div class="question-controls">
-					<button id="mark-review-btn" class="btn btn-outline">
-						<i aria-hidden="true" class="fas fa-flag"></i> Mark for Review
-					</button>
-					<button id="show-answer-btn" class="btn btn-info">
-						<i aria-hidden="true" class="fas fa-lightbulb"></i> Show Answer
-					</button>
-				</div>
-                
-				<div id="answer-feedback" class="answer-feedback is-hidden" hidden aria-hidden="true" role="status" aria-live="polite">
-					<div class="feedback-header">
-						<span class="feedback-status"></span>
-						<button id="close-feedback" class="close-feedback" aria-label="Close feedback">
-							<i aria-hidden="true" class="fas fa-times"></i>
+					<div class="cr-pack">
+						<span id="current-exam-badge" class="exam-badge">&mdash;</span>
+					</div>
+
+					<div class="exam-timer">
+						<span class="cr-timer-label"><i aria-hidden="true" class="fas fa-clock"></i> Time remaining</span>
+						<span id="timer">45:00</span>
+					</div>
+
+					<div id="question-navigator" class="question-navigator">
+						<span class="cr-palette-label">Questions</span>
+						<div class="nav-grid" id="nav-grid"></div>
+						<div class="nav-legend">
+							<span class="nav-legend-item"><span class="nav-dot answered"></span> Answered</span>
+							<span class="nav-legend-item"><span class="nav-dot current"></span> Current</span>
+							<span class="nav-legend-item"><span class="nav-dot marked"></span> Marked</span>
+							<span class="nav-legend-item"><span class="nav-dot unanswered"></span> Unanswered</span>
+						</div>
+					</div>
+
+					<div class="exam-bottom-actions">
+						<button id="finish-exam" class="btn btn-warning finish-btn is-hidden" hidden aria-hidden="true">
+							<i aria-hidden="true" class="fas fa-check"></i> <span>Finish Exam</span>
+						</button>
+						<button id="review-marked-btn" class="btn-review-marked" title="Review marked questions">
+							<i aria-hidden="true" class="fas fa-flag"></i> <span>Review Marked</span>
+						</button>
+						<button id="switch-exam" class="btn btn-outline-sm" title="Switch exam">
+							<i aria-hidden="true" class="fas fa-exchange-alt"></i> <span>Switch Exam</span>
 						</button>
 					</div>
-					<div class="feedback-content">
-						<div class="correct-answer"></div>
-						<div class="explanation"></div>
-						<!-- Explanation Images Container -->
-						<div id="explanation-images" class="explanation-images-container"></div>
-					</div>
-				</div>
-                
-				<div class="navigation-buttons">
-					<button id="prev-btn" class="btn btn-secondary" disabled>
-						<i aria-hidden="true" class="fas fa-arrow-left"></i> Previous
-					</button>
-					<button id="next-btn" class="btn btn-primary">
-						Next <i aria-hidden="true" class="fas fa-arrow-right"></i>
-					</button>
-				</div>
-				<div id="question-navigator" class="question-navigator is-hidden" hidden aria-hidden="true">
-					<div class="nav-grid" id="nav-grid"></div>
-					<div class="nav-legend">
-						<span class="nav-legend-item"><span class="nav-dot answered"></span> Answered</span>
-						<span class="nav-legend-item"><span class="nav-dot current"></span> Current</span>
-						<span class="nav-legend-item"><span class="nav-dot marked"></span> Marked</span>
-						<span class="nav-legend-item"><span class="nav-dot unanswered"></span> Unanswered</span>
-					</div>
-				</div>
-			</div>
+				</aside>
 
-			<div class="exam-bottom-actions">
-				<button id="review-marked-btn" class="btn-review-marked" title="Review marked questions">
-					<i aria-hidden="true" class="fas fa-flag"></i> Review Marked
-				</button>
-				<button id="finish-exam" class="btn btn-warning finish-btn is-hidden" hidden aria-hidden="true">
-					<i aria-hidden="true" class="fas fa-check"></i> Finish Exam
-				</button>
+				<div class="cr-main">
+					<div class="cr-workspace">
+						<div class="exam-progress">
+							<div class="progress-bar" role="progressbar" aria-label="Exam progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+								<div id="progress-fill" class="progress-fill"></div>
+							</div>
+						</div>
+
+						<div class="cr-qhead">
+							<div id="question-number" class="question-number">Question 1</div>
+							<div id="question-type-indicator" class="question-type-indicator is-hidden" hidden aria-hidden="true">
+								<i aria-hidden="true" class="fas fa-info-circle"></i>
+								<span id="question-type-text"></span>
+							</div>
+							<span id="question-counter">&nbsp;</span>
+							<button id="mark-review-btn">
+								<i aria-hidden="true" class="fas fa-flag"></i> Mark for Review
+							</button>
+						</div>
+
+						<div class="question-container">
+							<div id="question-text" class="question-text"></div>
+							<div id="question-images" class="question-images-container"></div>
+							<div id="options-container" class="options-container"></div>
+							<div id="answer-feedback" class="answer-feedback is-hidden" hidden aria-hidden="true" role="status" aria-live="polite">
+								<div class="feedback-header">
+									<span class="feedback-status"></span>
+									<button id="close-feedback" class="close-feedback" aria-label="Close feedback">
+										<i aria-hidden="true" class="fas fa-times"></i>
+									</button>
+								</div>
+								<div class="feedback-content">
+									<div class="correct-answer"></div>
+									<div class="explanation"></div>
+									<div id="explanation-images" class="explanation-images-container"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="navigation-buttons">
+						<button id="prev-btn" class="btn btn-secondary" disabled>
+							<i aria-hidden="true" class="fas fa-arrow-left"></i> Previous
+						</button>
+						<button id="show-answer-btn" class="btn btn-info">
+							<i aria-hidden="true" class="fas fa-lightbulb"></i> Show Answer
+						</button>
+						<span class="cr-spacer"></span>
+						<button id="next-btn" class="btn btn-primary">
+							Next <i aria-hidden="true" class="fas fa-arrow-right"></i>
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
 
-		<!-- Results Screen (same as before, but with dynamic exam name) -->
+		<!-- Results Screen (inline fallback; mirrors exam.html) -->
 		<div id="results-screen" class="screen" hidden aria-hidden="true">
-			<div class="theme-controls">
-				<button class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
-					<i aria-hidden="true" class="fas fa-moon theme-icon"></i>
-				</button>
-			</div>
-            
 			<div class="results-container">
-				<!-- Hero Results Section -->
-				<div class="results-hero">
-					<div class="results-icon">
-						<div id="result-status-icon" class="status-icon">
-							<i aria-hidden="true" class="fas fa-check-circle"></i>
-						</div>
-					</div>
-					<div id="result-status" class="result-status">PASSED</div>
-					<div class="result-subtitle">Congratulations! You have successfully completed the exam.</div>
-					<div class="main-score">
-						<span id="percentage-score" class="score-percentage">85%</span>
-						<span class="score-label">Final Score</span>
-					</div>
-					<div id="exam-name-result" class="exam-name-badge">—</div>
+				<div class="cr-report-head">
+					<span class="cr-brand"><span class="cr-brand-mark" aria-hidden="true">E</span> Examplar</span>
+					<span class="cr-report-title">Exam report</span>
 				</div>
-
-				<!-- Performance Dashboard -->
-				<div class="performance-dashboard">
-					<h3 class="dashboard-title">
-						<i aria-hidden="true" class="fas fa-chart-line"></i>
-						Performance Overview
-					</h3>
-                    
-					<div class="stats-grid-modern">
-						<div class="stat-card-modern correct">
-							<div class="stat-icon">
-								<i aria-hidden="true" class="fas fa-check-circle"></i>
+				<div class="results-shell">
+					<div class="results-layout">
+						<section class="results-summary-card" id="resultsSummaryCard">
+							<div class="summary-top-row">
+								<span id="result-status" class="result-status result-status-chip">PASSED</span>
+								<span id="exam-name-result" class="exam-name-pill">Exam</span>
 							</div>
-							<div class="stat-content">
-								<span id="correct-count" class="stat-number">0</span>
-								<span class="stat-label">Correct Answers</span>
-								<div class="stat-bar">
-									<div id="correct-progress" class="stat-progress correct-progress"></div>
+							<div class="summary-visuals">
+								<div class="score-ring" id="scoreRing">
+									<div class="score-ring-inner">
+										<span id="percentage-score" class="score-percentage">0%</span>
+										<span class="score-label">Final Score</span>
+									</div>
+								</div>
+								<div class="status-icon" id="result-status-icon">
+									<i aria-hidden="true" class="fas fa-check-circle"></i>
 								</div>
 							</div>
-						</div>
-                        
-						<div class="stat-card-modern incorrect">
-							<div class="stat-icon">
-								<i aria-hidden="true" class="fas fa-times-circle"></i>
-							</div>
-							<div class="stat-content">
-								<span id="incorrect-count" class="stat-number">0</span>
-								<span class="stat-label">Incorrect Answers</span>
-								<div class="stat-bar">
-									<div id="incorrect-progress" class="stat-progress incorrect-progress"></div>
+							<div class="summary-metrics">
+								<div class="summary-metric">
+									<span class="metric-label">Correct</span>
+									<span id="correct-count" class="metric-value">0</span>
+								</div>
+								<div class="summary-metric">
+									<span class="metric-label">Incorrect</span>
+									<span id="incorrect-count" class="metric-value">0</span>
+								</div>
+								<div class="summary-metric">
+									<span class="metric-label">Time</span>
+									<span id="time-spent" class="metric-value">0min</span>
 								</div>
 							</div>
-						</div>
-                        
-						<div class="stat-card-modern time">
-							<div class="stat-icon">
-								<i aria-hidden="true" class="fas fa-stopwatch"></i>
-							</div>
-							<div class="stat-content">
-								<span id="time-spent" class="stat-number">25min</span>
-								<span class="stat-label">Time Taken</span>
-								<div class="time-indicator">
-									<span class="time-remaining">20min saved</span>
+							<div class="summary-divider"></div>
+							<div class="summary-meta">
+								<div>
+									<span class="meta-label">Questions answered</span>
+									<strong id="total-questions-result">0</strong>
+								</div>
+								<div>
+									<span class="meta-label">Passing threshold</span>
+									<strong id="pass-score-target">70%</strong>
 								</div>
 							</div>
-						</div>
+						</section>
+
+						<section class="results-insights-card">
+							<div class="insights-header">
+								<h3><i aria-hidden="true" class="fas fa-chart-line"></i> Performance Insights</h3>
+								<p>See how this session compares to the target score.</p>
+							</div>
+							<div class="insight-progress">
+								<div class="insight-label-row">
+									<span>Accuracy</span>
+									<span id="accuracy-percentage" class="insight-value">0%</span>
+								</div>
+								<div class="insight-bar">
+									<div id="correct-progress" class="stat-progress insight-correct"></div>
+								</div>
+							</div>
+							<div class="insight-progress">
+								<div class="insight-label-row">
+									<span>Missed</span>
+									<span id="missed-percentage" class="insight-value">0%</span>
+								</div>
+								<div class="insight-bar">
+									<div id="incorrect-progress" class="stat-progress insight-incorrect"></div>
+								</div>
+							</div>
+							<ul class="insights-list">
+								<li>
+									<span>Score vs pass mark</span>
+									<strong id="score-vs-pass">0 / 0%</strong>
+								</li>
+								<li>
+									<span>Time spent</span>
+									<strong id="time-spent-secondary">0min</strong>
+								</li>
+							</ul>
+							<div class="insight-hint">
+								<i aria-hidden="true" class="fas fa-info-circle"></i>
+								<span>Use Retake Exam to immediately replay with updated question order.</span>
+							</div>
+						</section>
 					</div>
-				</div>
 
-				<!-- Module Performance -->
-				<div class="module-performance">
-					<h3 class="section-title">
-						<i aria-hidden="true" class="fas fa-brain"></i>
-						Module Performance
-					</h3>
-					<div id="module-stats" class="module-stats-grid"></div>
-				</div>
+					<section id="detailed-review" class="detailed-review"></section>
 
-				<!-- Action Buttons -->
-				<div class="results-actions-modern">
-					<button id="restart-exam" class="action-btn restart-btn">
-						<div class="btn-icon">
-							<i aria-hidden="true" class="fas fa-redo-alt"></i>
-						</div>
-						<div class="btn-content">
-							<span class="btn-title">Retake Exam</span>
-							<span class="btn-subtitle">Try again with new questions</span>
-						</div>
-					</button>
-                    
-					<button id="back-to-home" class="action-btn home-btn">
-						<div class="btn-icon">
-							<i aria-hidden="true" class="fas fa-home"></i>
-						</div>
-						<div class="btn-content">
-							<span class="btn-title">Back to Home</span>
-							<span class="btn-subtitle">Return to exam selection</span>
-						</div>
-					</button>
+					<div id="results-recommended-pro" class="recommended-pro-slot"></div>
+
+					<div class="results-actions-modern">
+						<button id="restart-exam" class="action-btn restart-btn">
+							<div class="btn-icon"><i aria-hidden="true" class="fas fa-redo-alt"></i></div>
+							<div class="btn-content"><span class="btn-title">Retake Exam</span></div>
+						</button>
+						<button id="back-to-home" class="action-btn home-btn">
+							<div class="btn-icon"><i aria-hidden="true" class="fas fa-home"></i></div>
+							<div class="btn-content"><span class="btn-title">Back to Home</span></div>
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -800,4 +716,3 @@
 	<script src="assets/js/homepage.js"></script>
 </body>
 </html>
-
