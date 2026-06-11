@@ -222,6 +222,11 @@ def faq_pairs(meta: dict) -> list:
             f"official objectives for {full}. They are not copied from the live exam.",
         ),
         (
+            f"Can I use this as a timed {code} practice test?",
+            f"Yes. Exam mode runs a timed {code} practice test that mirrors the real "
+            "exam format, and study mode adds instant feedback with spaced repetition.",
+        ),
+        (
             "Does my data stay private?",
             "Questions, answers, imported content, and progress remain in your browser. "
             "The public site uses limited opt-out product telemetry; local and private "
@@ -288,7 +293,8 @@ def page_description(meta: dict) -> str:
     count_txt = f"{count} free practice questions" if count else "free practice questions"
     return (
         f"Free {code} practice exam for {full}. {count_txt}, original and "
-        "syllabus-aligned. No account required and offline-capable after the first load. "
+        "syllabus-aligned. Run it as a timed practice test or in study mode. "
+        "No account required and offline-capable after the first load. "
         "Study data remains in your browser."
     )
 
@@ -502,7 +508,7 @@ def render_hub(all_exams: list) -> str:
   <meta name="theme-color" content="{THEME_COLOR}">
   <meta name="description" content="{esc(description)}">
   <link rel="canonical" href="{SITE}/exams/">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.applicationinsights.azure.com; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Examplar">
   <meta property="og:title" content="All practice exams | Examplar">
@@ -516,7 +522,10 @@ def render_hub(all_exams: list) -> str:
   <title>All practice exams | Examplar</title>
   <link rel="stylesheet" href="{root}assets/vendor/fontawesome/css/all.min.css">
   <link rel="stylesheet" href="{root}assets/css/exam-landing.css">
+  <link rel="stylesheet" href="{root}assets/css/analytics-privacy.css">
   <script src="{root}assets/js/legal-page.js" defer></script>
+  <script src="{root}assets/js/utils.js" defer></script>
+  <script src="{root}assets/js/analytics.js" defer></script>
 </head>
 <body class="exam-landing">
   <header class="landing-topbar">

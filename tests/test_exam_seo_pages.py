@@ -269,6 +269,48 @@ class PricingTests(unittest.TestCase):
         self.assertEqual(currencies, {"EUR"})  # free + paid share the paid currency
 
 
+class AnalyticsWiringTests(unittest.TestCase):
+    def _render(self, meta):
+        template = (ROOT / "tools" / "exam-page-template.html").read_text(encoding="utf-8")
+        return gen.render_exam_page(meta, [meta], template)
+
+    def test_pages_load_analytics_with_csp_allowance(self):
+        # Landing pages are the SEO entry point; without the analytics client
+        # (and a CSP connect-src that permits ingestion) organic traffic is
+        # invisible. Mirror the allowance used by index.html.
+        for html_out in (self._render(SAMPLE), gen.render_hub([SAMPLE])):
+            self.assertIn("assets/js/analytics.js", html_out)
+            self.assertIn("assets/css/analytics-privacy.css", html_out)
+            self.assertIn(
+                "connect-src 'self' https://*.applicationinsights.azure.com", html_out
+            )
+
+    def test_pages_load_utils_before_analytics(self):
+        # analytics.js delegates host detection to window.ExamApp.isPublicSiteHost,
+        # which utils.js defines; without utils.js loaded first the client throws
+        # at init and the landing pages stay unmeasured.
+        for html_out in (self._render(SAMPLE), gen.render_hub([SAMPLE])):
+            self.assertIn("assets/js/utils.js", html_out)
+            self.assertLess(
+                html_out.index("assets/js/utils.js"),
+                html_out.index("assets/js/analytics.js"),
+            )
+
+    def test_analytics_classifies_landing_pages(self):
+        js = (ROOT / "assets" / "js" / "analytics.js").read_text(encoding="utf-8")
+        self.assertIn("'landing'", js)
+
+
+class KeywordCoverageTests(unittest.TestCase):
+    def test_page_covers_both_query_phrasings(self):
+        # "practice test" is the higher-volume search variant; it must appear in
+        # indexable copy alongside (not replacing) the "practice exam" phrasing.
+        template = (ROOT / "tools" / "exam-page-template.html").read_text(encoding="utf-8")
+        page = gen.render_exam_page(SAMPLE, [SAMPLE], template).lower()
+        self.assertIn("practice exam", page)
+        self.assertIn("practice test", page)
+
+
 class HardeningTests(unittest.TestCase):
     def test_http_url_allows_only_http_schemes(self):
         self.assertEqual(gen.http_url("https://x.test/a"), "https://x.test/a")

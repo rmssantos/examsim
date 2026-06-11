@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1e3c72">
   <meta name="description" content="Free 25-question preview pack for the AWS Certified Solutions Architect - Associate (SAA-C03) exam. Original questions written from public AWS documentation; these are not real exam questions. Examplar is not affiliated with or endorsed by Amazon Web Services. Unlock the full pack for the complete rotating question pool, detailed explanations, and study mode.">
   <link rel="canonical" href="https://examplar.app/exams/saac03/">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.applicationinsights.azure.com; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Examplar">
   <meta property="og:title" content="SAA-C03 Practice Exam (Free 25-Question Preview) | Examplar">
@@ -23,7 +23,10 @@
   <title>SAA-C03 Practice Exam (Free 25-Question Preview) | Examplar</title>
   <link rel="stylesheet" href="../../assets/vendor/fontawesome/css/all.min.css">
   <link rel="stylesheet" href="../../assets/css/exam-landing.css">
+  <link rel="stylesheet" href="../../assets/css/analytics-privacy.css">
   <script src="../../assets/js/legal-page.js" defer></script>
+  <script src="../../assets/js/utils.js" defer></script>
+  <script src="../../assets/js/analytics.js" defer></script>
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -102,6 +105,14 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "No. These are original, syllabus-aligned questions written to match the official objectives for AWS Certified Solutions Architect - Associate. They are not copied from the live exam."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use this as a timed SAA-C03 practice test?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Exam mode runs a timed SAA-C03 practice test that mirrors the real exam format, and study mode adds instant feedback with spaced repetition."
           }
         },
         {
@@ -218,6 +229,10 @@
       <details class="faq-item">
         <summary>Are these real SAA-C03 exam questions?</summary>
         <p>No. These are original, syllabus-aligned questions written to match the official objectives for AWS Certified Solutions Architect - Associate. They are not copied from the live exam.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I use this as a timed SAA-C03 practice test?</summary>
+        <p>Yes. Exam mode runs a timed SAA-C03 practice test that mirrors the real exam format, and study mode adds instant feedback with spaced repetition.</p>
       </details>
       <details class="faq-item">
         <summary>Does my data stay private?</summary>
