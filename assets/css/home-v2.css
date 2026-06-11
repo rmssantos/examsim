@@ -808,12 +808,13 @@ body.dragging-file .exam-library-section::after {
    teal top strip, tinted border, faint accent wash and a real shadow. */
 .exam-details-placeholder {
   display: none;
-  background: color-mix(in srgb, var(--h-accent) 3%, var(--h-surface));
+  background: var(--h-surface);
   border: 1px solid var(--h-accent-chip-border);
   border-top: 3px solid var(--h-accent);
   border-radius: var(--h-radius-lg);
-  padding: 1.1rem 1.25rem;
-  box-shadow: 0 14px 36px color-mix(in srgb, var(--h-text) 12%, transparent);
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 14px 36px color-mix(in srgb, var(--h-text) 14%, transparent);
 }
 .exam-details-placeholder.visible { display: block; }
 /* homepage.js parks the panel inside the exam grid; span every column */
@@ -821,18 +822,26 @@ body.dragging-file .exam-library-section::after {
   grid-column: 1 / -1;
   margin: 0.25rem 0 0.4rem;
 }
+/* graphite cockpit header band */
 .exam-details-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-bottom: 0.9rem;
+  margin: 0;
+  padding: 1rem 1.25rem 1.05rem;
+  background:
+    radial-gradient(420px 160px at 85% 0%, rgba(45, 212, 191, 0.1), transparent 70%),
+    var(--rail-bg);
+  border-bottom: 1px solid var(--rail-line);
+  color: var(--rail-text);
 }
+.exam-details-content { padding: 1rem 1.25rem 1.15rem; }
 .exam-details-title-area h2 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--h-text);
+  color: var(--rail-text-strong);
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -843,14 +852,48 @@ body.dragging-file .exam-library-section::after {
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--h-accent-deep);
-  background: var(--h-accent-tint);
-  border: 1px solid var(--h-accent-chip-border);
+  color: var(--accent-bright);
+  background: rgba(45, 212, 191, 0.08);
+  border: 1px solid rgba(45, 212, 191, 0.4);
   border-radius: 5px;
   padding: 0.12rem 0.45rem;
 }
-#details-exam-subtitle { font-size: 0.8438rem; color: var(--h-text-soft); margin: 0 0 0.5rem; }
+#details-exam-subtitle { font-size: 0.8438rem; color: var(--rail-text); margin: 0 0 0.5rem; }
 .details-exam-taxonomy { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+/* taxonomy chips sit on the graphite band here */
+.details-exam-taxonomy .exam-taxonomy-chip {
+  background: var(--rail-bg-soft);
+  border-color: var(--rail-line);
+  color: var(--rail-text);
+}
+.details-exam-taxonomy .exam-taxonomy-chip i { color: var(--rail-text); }
+.details-exam-taxonomy .exam-taxonomy-chip--code {
+  background: rgba(45, 212, 191, 0.1);
+  border-color: rgba(45, 212, 191, 0.35);
+  color: var(--accent-bright);
+}
+.details-exam-taxonomy .exam-taxonomy-chip--code i { color: var(--accent-bright); }
+/* ghost actions on the band */
+.exam-details-header .btn-start-exam-inline.btn-study-inline,
+.exam-details-header .btn-start-exam-inline.btn-review-inline {
+  background: transparent !important;
+  border-color: var(--rail-line) !important;
+  color: var(--rail-text) !important;
+}
+.exam-details-header .btn-start-exam-inline.btn-study-inline:hover,
+.exam-details-header .btn-start-exam-inline.btn-review-inline:hover {
+  border-color: var(--accent-bright) !important;
+  color: var(--accent-bright) !important;
+}
+.exam-details-header .btn-close-details {
+  background: transparent;
+  border-color: var(--rail-line);
+  color: var(--rail-text);
+}
+.exam-details-header .btn-close-details:hover {
+  border-color: var(--rail-text);
+  color: var(--rail-text-strong);
+}
 .exam-details-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 /* legacy style-new.css styles .btn-start-exam with !important; counter it */
 .btn-start-exam-inline {
