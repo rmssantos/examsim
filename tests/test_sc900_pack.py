@@ -44,6 +44,11 @@ class Sc900PackTests(unittest.TestCase):
     def test_total_questions_matches_dump(self):
         self.assertEqual(self.meta.get("totalQuestions"), len(self.dump))
 
+    def test_recommends_sc300(self):
+        rec = self.meta.get("recommendedPro", {})
+        self.assertEqual(rec.get("examId"), "sc300")
+        self.assertTrue(str(rec.get("url", "")).startswith("https://"))
+
 
 if __name__ == "__main__":
     unittest.main()

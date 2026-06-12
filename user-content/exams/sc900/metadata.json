@@ -129,5 +129,11 @@
         "Risk & Compliance Solutions"
       ]
     }
-  ]
+  ],
+  "recommendedPro": {
+    "examId": "sc300",
+    "title": "SC-300 Complete",
+    "url": "https://examplar.gumroad.com/l/sc300-complete",
+    "blurb": "Passed the security fundamentals? Level up to Identity and Access Administrator with the SC-300 Complete pack."
+  }
 }

@@ -1,0 +1,403 @@
+[
+  {
+    "id": 1,
+    "question_type": "STANDARD",
+    "module": "Choose Foundry Services for Generative AI and Agents",
+    "question": "A retail chatbot team needs a Foundry model for a high-traffic customer-service endpoint where every reply must return with the lowest possible latency and the workload is dominated by short, simple turns. Which model family is the best starting point?",
+    "options": [
+      "GPT-5, because it applies the deepest reasoning to every request",
+      "DeepSeek-R1, because open-weight reasoning models always respond fastest",
+      "GPT-4.1 mini, because it targets low-latency, high-throughput scenarios",
+      "Phi-4, because small language models are designed for large cloud chat APIs"
+    ],
+    "correct": 2,
+    "explanation": "GPT-4.1 mini is positioned as the fastest family for low-latency, high-throughput scenarios, which matches a high-traffic endpoint dominated by short turns. GPT-5 is the most capable family for complex reasoning and multimodal work, but that depth adds latency that this simple workload does not need. DeepSeek-R1 is an open-weight reasoning model optimized for reasoning at scale, not for minimal latency. Phi-4 is a small language model intended for on-device or resource-constrained environments rather than a large cloud service endpoint.",
+    "reference": "https://learn.microsoft.com/azure/foundry/what-is-foundry#available-models"
+  },
+  {
+    "id": 2,
+    "question_type": "MULTI",
+    "module": "Choose Foundry Services for Generative AI and Agents",
+    "question": "A solution architect is documenting the characteristics of Models sold by Azure (Azure Direct models). Select the statements that accurately describe this category.",
+    "options": [
+      "They are hosted and sold by Microsoft and covered by Azure service-level agreements",
+      "They are supported only by the original third-party provider rather than Microsoft",
+      "They include all Azure OpenAI models",
+      "Some of them offer fungible provisioned throughput across models"
+    ],
+    "correct": [
+      0,
+      2,
+      3
+    ],
+    "explanation": "Models sold by Azure are hosted and sold by Microsoft under Microsoft Product Terms, covered by Azure service-level agreements, and they include all Azure OpenAI models plus selected provider models; some also offer fungible provisioned throughput so quota and reservations can be used flexibly across those models. The statement that they are supported only by the third-party provider is wrong, because that describes Models from partners and community, which are maintained by their providers rather than by Microsoft.",
+    "reference": "https://learn.microsoft.com/azure/foundry/concepts/foundry-models-overview#models-sold-by-azure"
+  },
+  {
+    "id": 3,
+    "question_type": "MULTI",
+    "module": "Choose Foundry Services for Generative AI and Agents",
+    "question": "A team is deciding between managed compute and serverless deployment. Select the considerations that favor choosing managed compute.",
+    "options": [
+      "You want to be billed per input and output token with no infrastructure to manage",
+      "You need to deploy open or custom model weights onto dedicated GPU capacity",
+      "You want the simplest API-only access to a model that Microsoft hosts",
+      "You can accept hourly per-accelerator billing rather than per-token billing"
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "explanation": "Managed compute is the right fit when you need to deploy open or custom model weights onto dedicated GPU capacity and you can accept hourly per-accelerator billing. Token-based billing with no infrastructure to manage and simple API-only access to a Microsoft-hosted model both describe serverless or standard deployment, not managed compute.",
+    "reference": "https://learn.microsoft.com/azure/foundry/concepts/deployments-overview"
+  },
+  {
+    "id": 4,
+    "question_type": "YES_NO_MATRIX",
+    "module": "Choose Foundry Services for Generative AI and Agents",
+    "question": "A team is choosing Foundry deployment types for several workloads. For each statement, indicate whether it is correct.",
+    "statements": [
+      "Global Batch can reduce cost for large jobs that are not time-sensitive.",
+      "Developer deployments provide a production service-level agreement.",
+      "Global Provisioned deployments reserve capacity for more predictable latency.",
+      "Instant models require you to create a deployment before you can call them."
+    ],
+    "correct": [
+      0,
+      1,
+      0,
+      1
+    ],
+    "explanation": "Global Batch is intended for large asynchronous jobs and offers significant cost savings, so the first statement is correct. Developer deployments are explicitly offered without a service-level agreement, so claiming a production SLA is incorrect. Global Provisioned reserves provisioned throughput units that produce more predictable, lower-variance latency, so that statement is correct. Instant models let you call supported models by name with no deployment, so requiring a deployment first is incorrect.",
+    "reference": "https://learn.microsoft.com/azure/foundry/foundry-models/concepts/deployment-types#choose-the-right-deployment-type"
+  },
+  {
+    "id": 5,
+    "question_type": "YES_NO_MATRIX",
+    "module": "Choose Foundry Services for Generative AI and Agents",
+    "question": "A developer is reviewing how the Foundry model catalog is organized. For each statement, indicate whether it is correct.",
+    "statements": [
+      "Models from partners and community make up most of the catalog.",
+      "Models sold by Azure are supported by Microsoft.",
+      "Every model in the catalog is hosted and billed only through the original provider's own cloud.",
+      "The catalog includes small language models such as Phi-4."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "explanation": "Models from partners and community constitute most of the catalog, so that statement is correct. Models sold by Azure are supported by Microsoft, so that statement is correct. The claim that every model is hosted and billed only through the provider's own cloud is wrong, because Models sold by Azure are hosted and billed through Azure. The catalog spans many model types including small language models such as Phi-4, so that statement is correct.",
+    "reference": "https://learn.microsoft.com/azure/foundry/concepts/foundry-models-overview"
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Choose Foundry Services for Generative AI and Agents",
+    "question": "When selecting and deploying a Foundry model for an application, why must you choose the specific model before choosing its deployment type?",
+    "options": [
+      "Because the deployment type permanently sets the model's training data",
+      "Because the deployment type must be chosen before any workload requirements are known",
+      "Because not all models support every deployment type, so the chosen model constrains which deployment types are available",
+      "Because a model cannot be browsed in the catalog until a deployment type is created"
+    ],
+    "correct": 2,
+    "explanation": "Microsoft documents that not all models support all deployment types, so the model you choose constrains which deployment types are available, which is why model selection precedes deployment-type selection. The deployment type does not set the model's training data, workload requirements are identified before either choice, and models can be browsed in the catalog before any deployment exists.",
+    "reference": "https://learn.microsoft.com/azure/foundry/foundry-models/concepts/deployment-types",
+    "id": 6
+  },
+  {
+    "id": 7,
+    "question_type": "STANDARD",
+    "module": "Set Up AI Solutions in Foundry",
+    "question": "A developer is starting a new AI application and needs the project-level container in Microsoft Foundry used to build and organize the app and its agents. What should they create first?",
+    "options": [
+      "A Foundry project, the container you create to build and organize AI apps and agents",
+      "A single model deployment with no surrounding project",
+      "An empty Azure resource group with nothing else",
+      "A standalone vector store"
+    ],
+    "correct": 0,
+    "explanation": "A Foundry project is the container developers create to build and organize AI applications and agents, so it is the right starting point. A model deployment serves inference for a specific model but is not the project-level container the question asks for. An empty resource group is generic Azure plumbing and does not provide the Foundry building experience. A vector store is a storage construct used by features such as file search, not the overall project container.",
+    "reference": "https://learn.microsoft.com/azure/foundry/how-to/create-projects"
+  },
+  {
+    "id": 8,
+    "question_type": "MULTI",
+    "module": "Set Up AI Solutions in Foundry",
+    "question": "A developer is documenting how connections work in Foundry projects. Select the statements that are true.",
+    "options": [
+      "Connections can be created in the Foundry portal",
+      "Connections store the model weights on the developer's laptop",
+      "Connections can be deployed through Bicep templates",
+      "Connections are required for building Standard Agents and knowledge tools"
+    ],
+    "correct": [
+      0,
+      2,
+      3
+    ],
+    "explanation": "Connections can be created in the Foundry portal, can be deployed as infrastructure through Bicep templates, and are required for building Standard Agents and agent knowledge tools. The claim that a connection stores model weights on a developer's laptop is false, because a connection only authenticates and grants access to a resource rather than hosting any model.",
+    "reference": "https://learn.microsoft.com/azure/foundry/how-to/connections-add"
+  },
+  {
+    "id": 9,
+    "question_type": "YES_NO_MATRIX",
+    "module": "Set Up AI Solutions in Foundry",
+    "question": "A developer is reviewing how connections are set up and used in Foundry projects. For each statement, indicate whether it is correct.",
+    "statements": [
+      "Connections let a project consume Microsoft and other resources.",
+      "Connections can be created in the Foundry portal or with a Bicep template.",
+      "A user with no role assignment can add a connection.",
+      "Connections are required to build Standard Agents."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "explanation": "Connections let a project consume Microsoft and other resources, and they can be created in the Foundry portal or through a Bicep template, so the first two statements are correct. Adding a connection requires an appropriate role, so the claim that a user with no role can add one is incorrect. Connections are required to build Standard Agents, so that statement is correct.",
+    "reference": "https://learn.microsoft.com/azure/foundry/how-to/connections-add"
+  },
+  {
+    "question_type": "STANDARD",
+    "module": "Set Up AI Solutions in Foundry",
+    "question": "You created an Azure AI Foundry project and want an application to call a model through a standard deployment. Which condition must be satisfied before your application code can successfully send inference requests?",
+    "options": [
+      "A resource connection to Azure AI Search must be created before any model can be called",
+      "A model deployment exists in the project and the application has the project's inference endpoint and a credential such as an API key or Microsoft Entra token",
+      "A custom domain must be assigned to the project before its inference endpoint becomes active",
+      "The model must be fine-tuned before it can be served through a standard deployment"
+    ],
+    "correct": 1,
+    "explanation": "Before an application can call a model, a deployment of that model must exist in the project and the application needs the project's inference endpoint plus a credential, either an API key or a Microsoft Entra token. Creating the project is a prerequisite, but a resource connection, for example to Azure AI Search or Storage, is only required for specific scenarios such as agents or retrieval, not for a basic model call. A custom domain is not required for the endpoint to work, and fine-tuning is optional rather than a prerequisite for a standard deployment.",
+    "reference": "https://learn.microsoft.com/azure/foundry/concepts/deployments-overview",
+    "id": 10
+  },
+  {
+    "id": 11,
+    "question_type": "STANDARD",
+    "module": "Manage, Monitor, and Secure AI Systems",
+    "question": "A production application starts receiving HTTP 429 responses from a model deployment during peak traffic. What does this indicate, and how should the team respond?",
+    "options": [
+      "A 500 error meaning the model is permanently offline; recreate the resource",
+      "A 429 Too Many Requests error meaning the rate limit was exceeded; request a quota increase or retry with backoff",
+      "A success code that requires no action at all",
+      "A 404 meaning the deployment was deleted; redeploy immediately"
+    ],
+    "correct": 1,
+    "explanation": "A 429 Too Many Requests error means the request rate exceeded the allowed limit for the current quota, so the team can request a quota increase or retry after the suggested time using backoff. It is not a 500 offline error, not a benign success code, and not a 404 indicating deletion, so those responses would misdiagnose the situation.",
+    "reference": "https://learn.microsoft.com/azure/foundry/openai/quotas-limits"
+  },
+  {
+    "id": 12,
+    "question_type": "STANDARD",
+    "module": "Responsible AI for Generative and Agentic Systems",
+    "question": "A compliance officer is worried the model might reproduce copyrighted text such as song lyrics in its output. Which Content Safety capability helps detect this?",
+    "options": [
+      "A feature that blocks any user input longer than ten characters",
+      "A feature that rewrites the system prompt automatically",
+      "A feature that validates JSON schemas in responses",
+      "Protected material detection for text, which scans AI-generated text for known protected content such as song lyrics and articles"
+    ],
+    "correct": 3,
+    "explanation": "Protected material detection for text scans AI-generated text for known protected content such as song lyrics, articles, and other recognized material, helping prevent uncredited reproduction. Blocking short inputs, rewriting prompts, and validating JSON schemas do not address copyrighted-content detection.",
+    "reference": "https://learn.microsoft.com/azure/ai-services/content-safety/concepts/protected-material"
+  },
+  {
+    "id": 13,
+    "question_type": "STANDARD",
+    "module": "Build Generative Applications: Models and RAG",
+    "question": "An AI engineer needs answers grounded in the company's private documents rather than the model's general training. Which approach best describes retrieval-augmented generation (RAG)?",
+    "options": [
+      "A pattern that combines search with large language models so responses are grounded in your data",
+      "A method to train a new model from scratch on public internet data",
+      "A way to compress model weights for faster loading",
+      "A billing model that charges per generated token"
+    ],
+    "correct": 0,
+    "explanation": "RAG is a pattern that combines search with large language models so that responses are grounded in your own data, retrieving relevant content and providing it to the model. It does not train a model from scratch, compress weights, or describe a billing model; those are unrelated concepts.",
+    "reference": "https://learn.microsoft.com/azure/foundry/concepts/retrieval-augmented-generation"
+  },
+  {
+    "id": 14,
+    "question_type": "STANDARD",
+    "module": "Build Generative Applications: Workflows, Evaluation, and SDKs",
+    "question": "When learning the Foundry SDK, which action is described as the basic building block of AI applications?",
+    "options": [
+      "Deleting existing model deployments",
+      "Sending an input to a model and receiving a response, that is, chatting with a model",
+      "Rotating the subscription access keys",
+      "Resizing the underlying virtual machines"
+    ],
+    "correct": 1,
+    "explanation": "Chatting with a model, sending an input and receiving a response, is the basic building block of AI applications in the SDK quickstart. Deleting deployments, rotating keys, and resizing VMs are administrative tasks, not the fundamental interaction pattern.",
+    "reference": "https://learn.microsoft.com/azure/foundry/quickstarts/get-started-code#chat-with-a-model"
+  },
+  {
+    "id": 15,
+    "question_type": "STANDARD",
+    "module": "Build Agents: Roles, Tools, and Memory",
+    "question": "A team already maintains an Azure AI Search index of curated knowledge-base articles and wants their agent to ground answers in that existing index. Which built-in tool should they configure?",
+    "options": [
+      "File Search over newly uploaded files",
+      "Web search of the public internet",
+      "The Azure AI Search tool, which grounds the agent in an existing Azure AI Search index",
+      "Code Interpreter"
+    ],
+    "correct": 2,
+    "explanation": "The Azure AI Search tool grounds an agent using data from an existing Azure AI Search index, which matches a team that already curates such an index. File Search builds vector stores from files uploaded to the agent rather than reusing an existing index. Web search targets public internet content. Code Interpreter executes Python and does not perform retrieval against a search index.",
+    "reference": "https://learn.microsoft.com/azure/foundry/agents/how-to/tools/ai-search"
+  },
+  {
+    "id": 16,
+    "question_type": "STANDARD",
+    "module": "Build Agents: Multi-Agent, Autonomy, and Monitoring",
+    "question": "What is the purpose of agent memory in Microsoft Foundry?",
+    "options": [
+      "To permanently delete past conversations for privacy",
+      "To store model weights on the local disk",
+      "To meter billing per stored token",
+      "To retain and recall relevant context across interactions"
+    ],
+    "correct": 3,
+    "explanation": "Agent memory retains and recalls relevant context across interactions so an agent can maintain continuity over time. It is not a deletion feature, a place to store model weights, or a billing meter.",
+    "reference": "https://learn.microsoft.com/azure/foundry/agents/concepts/what-is-memory"
+  },
+  {
+    "id": 17,
+    "question_type": "STANDARD",
+    "module": "Optimize Generative AI: Prompting and Parameters",
+    "question": "A team wants more creative and varied marketing copy from a chat model. Which adjustment to the temperature parameter best supports this?",
+    "options": [
+      "Increase the temperature, since higher values produce more random, creative responses",
+      "Set the temperature to 0, which is required for any creative output",
+      "Lower the temperature, since lower values increase randomness",
+      "Leave temperature unchanged, since it has no effect on randomness"
+    ],
+    "correct": 0,
+    "explanation": "Temperature controls randomness, and higher values such as 0.8 make output more random and creative, which suits varied marketing copy. Setting it to 0 makes output more deterministic, lower values reduce rather than increase randomness, and temperature does affect randomness, so the other options are wrong.",
+    "reference": "https://learn.microsoft.com/azure/foundry/openai/reference"
+  },
+  {
+    "id": 18,
+    "question_type": "STANDARD",
+    "module": "Operationalize Generative AI: Observability and Orchestration",
+    "question": "What does tracing capture for a generative AI or agentic application?",
+    "options": [
+      "Only the final text shown to the user",
+      "The execution path, including model calls, tool invocations, and agent decisions",
+      "Only the Azure subscription ID",
+      "Only the size of the model deployment"
+    ],
+    "correct": 1,
+    "explanation": "Tracing captures the execution path of an application, including model calls, tool invocations, and agent decisions, so you can diagnose behavior. It records far more than just the final text, the subscription ID, or the deployment size.",
+    "reference": "https://learn.microsoft.com/azure/foundry/observability/concepts/trace-agent-concept"
+  },
+  {
+    "id": 19,
+    "question_type": "STANDARD",
+    "module": "Image and Video Generation Solutions",
+    "question": "A designer using a GPT-image-1 series model wants the highest-fidelity output and is willing to accept higher latency. Which value of the quality parameter should they choose?",
+    "options": [
+      "low",
+      "There is no quality option for GPT-image models",
+      "high",
+      "monochrome"
+    ],
+    "correct": 2,
+    "explanation": "GPT-image-1 series models support quality values of low, medium, and high; high produces the highest-fidelity images at the cost of higher latency, while low is optimized for latency-sensitive scenarios. There is no monochrome value, and a quality parameter does exist, so the other choices are wrong.",
+    "reference": "https://learn.microsoft.com/azure/foundry/openai/how-to/dall-e"
+  },
+  {
+    "id": 20,
+    "question_type": "STANDARD",
+    "module": "Multimodal Understanding Workflows",
+    "question": "A workflow needs to summarize an audio conversation and create scene descriptions from video. Which field extraction method generates these values?",
+    "options": [
+      "The Extract method",
+      "The Classify method",
+      "No method can produce generated values",
+      "The Generate method, which freely generates values from the input"
+    ],
+    "correct": 3,
+    "explanation": "The Generate method freely generates values from the input, such as summarizing an audio conversation or creating scene descriptions from video. Extract pulls values as they appear (documents only) and Classify assigns predefined categories, so neither produces these generated summaries.",
+    "reference": "https://learn.microsoft.com/azure/ai-services/content-understanding/overview#key-components-of-content-understanding"
+  },
+  {
+    "id": 21,
+    "question_type": "STANDARD",
+    "module": "Responsible AI for Multimodal Content",
+    "question": "When Azure AI Content Safety moderates an image, what does it return?",
+    "options": [
+      "A severity level for each detected category, such as 0, 2, 4, or 6, plus an Accepted or Rejected result based on your configured filters",
+      "Only the file size of the image",
+      "A translated caption of the image",
+      "The image's storage location only"
+    ],
+    "correct": 0,
+    "explanation": "Content Safety image moderation returns the detected categories with a severity level for each (such as 0-Safe, 2-Low, 4-Medium, 6-High) and a binary Accepted or Rejected result based on the filters you configure. It does not return only file size, a translated caption, or a storage location.",
+    "reference": "https://learn.microsoft.com/azure/ai-services/content-safety/quickstart-image"
+  },
+  {
+    "id": 22,
+    "question_type": "STANDARD",
+    "module": "Language Model Text Analysis",
+    "question": "A team needs to identify and categorize people, organizations, locations, and dates mentioned in text. Which feature provides this?",
+    "options": [
+      "Key phrase extraction",
+      "Named entity recognition (NER)",
+      "Language detection",
+      "Summarization"
+    ],
+    "correct": 1,
+    "explanation": "Named entity recognition identifies and categorizes entities in text into predefined types such as people, organizations, locations, and dates. Key phrase extraction surfaces main concepts, language detection identifies the language, and summarization condenses text, so none of those categorize entities.",
+    "reference": "https://learn.microsoft.com/azure/ai-services/language-service/named-entity-recognition/overview"
+  },
+  {
+    "id": 23,
+    "question_type": "STANDARD",
+    "module": "Speech Solutions for Agents",
+    "question": "A developer wants to fine-tune the pitch, pronunciation, speaking rate, and volume of synthesized speech. Which mechanism should they use?",
+    "options": [
+      "A custom speech model",
+      "Speech translation",
+      "Speech Synthesis Markup Language (SSML)",
+      "Batch transcription"
+    ],
+    "correct": 2,
+    "explanation": "SSML lets you fine-tune text to speech output, including pitch, pronunciation, speaking rate, and volume. A custom speech model improves recognition accuracy, speech translation translates audio, and batch transcription processes recorded audio, so none of those control synthesis characteristics.",
+    "reference": "https://learn.microsoft.com/azure/ai-services/speech-service/speech-synthesis-markup"
+  },
+  {
+    "id": 24,
+    "question_type": "STANDARD",
+    "module": "Retrieval and Grounding Pipelines",
+    "question": "In an Azure AI Search enrichment pipeline, what does an indexer do?",
+    "options": [
+      "It only stores chat transcripts",
+      "It trains custom embedding models",
+      "It synthesizes speech from text",
+      "It drives the pipeline from data retrieval through skillset execution to indexing"
+    ],
+    "correct": 3,
+    "explanation": "An indexer drives the entire pipeline, from retrieving data to executing the skillset to writing results into the index. It does not store chat transcripts, train embedding models, or synthesize speech.",
+    "reference": "https://learn.microsoft.com/azure/search/search-indexer-overview"
+  },
+  {
+    "id": 25,
+    "question_type": "STANDARD",
+    "module": "Extract Content from Documents",
+    "question": "A team needs to extract the text lines, words, their locations, and detected languages from scanned documents. Which Document Intelligence model should they use?",
+    "options": [
+      "The Read model",
+      "A custom neural voice",
+      "The prebuilt invoice model",
+      "A knowledge store"
+    ],
+    "correct": 0,
+    "explanation": "The Read model detects and extracts lines, words, their locations, and languages from images and documents. A custom neural voice is a Speech feature, the prebuilt invoice model targets invoice fields, and a knowledge store is an Azure AI Search feature.",
+    "reference": "https://learn.microsoft.com/azure/ai-services/document-intelligence/prebuilt/read?view=doc-intel-4.0.0"
+  }
+]

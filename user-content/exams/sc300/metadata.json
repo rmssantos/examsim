@@ -1,0 +1,189 @@
+{
+  "id": "sc300",
+  "name": "SC-300",
+  "fullName": "Microsoft Identity and Access Administrator",
+  "description": "Free 25-question preview of the SC-300 pack. Original scenario questions written from public Microsoft Learn docs; not real exam questions. Unlock the full pack for the complete set, detailed explanations, and study mode.",
+  "duration": 50,
+  "questionCount": 25,
+  "totalQuestions": 25,
+  "passScore": 70,
+  "language": "en",
+  "schemaVersion": "1.1",
+  "badge": "Associate",
+  "icon": "fas fa-user-shield",
+  "vendor": "Microsoft",
+  "certificationCode": "SC-300",
+  "domains": [
+    "Implement and manage user identities",
+    "Implement authentication and access management",
+    "Plan and implement workload identities",
+    "Plan and automate identity governance"
+  ],
+  "level": "Associate",
+  "productFamily": "Security, Compliance, and Identity",
+  "contentType": "preview",
+  "commercialStatus": "pro-preview",
+  "preview": true,
+  "contentOrigin": "original",
+  "contentReview": {
+    "lastReviewed": "2026-06-12",
+    "sourceOfTruth": "Microsoft Learn SC-300 study guide and Microsoft Entra documentation",
+    "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/sc-300",
+    "objectiveVersion": "Skills measured as of April 27, 2026"
+  },
+  "objectiveDomains": [
+    {
+      "code": "SC300-1",
+      "name": "Implement and manage user identities",
+      "weightRange": "20-25%",
+      "source": "SC-300 skills measured (as of April 27, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/sc-300",
+      "mappedModules": [
+        "Configure and Manage a Microsoft Entra Tenant",
+        "Create, Configure, and Manage Microsoft Entra Identities",
+        "Manage External Identities and Cross-Tenant Access",
+        "Implement and Manage Hybrid Identity"
+      ]
+    },
+    {
+      "code": "SC300-2",
+      "name": "Implement authentication and access management",
+      "weightRange": "25-30%",
+      "source": "SC-300 skills measured (as of April 27, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/sc-300",
+      "mappedModules": [
+        "Plan and Manage Microsoft Entra User Authentication",
+        "Plan and Manage Microsoft Entra Conditional Access",
+        "Manage Risk with Microsoft Entra ID Protection",
+        "Implement Global Secure Access"
+      ]
+    },
+    {
+      "code": "SC300-3",
+      "name": "Plan and implement workload identities",
+      "weightRange": "20-25%",
+      "source": "SC-300 skills measured (as of April 27, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/sc-300",
+      "mappedModules": [
+        "Plan and Implement Identities for Apps and Azure Workloads",
+        "Integrate and Manage Enterprise Applications",
+        "Plan and Implement App Registrations",
+        "Manage App Access with Defender for Cloud Apps"
+      ]
+    },
+    {
+      "code": "SC300-4",
+      "name": "Plan and automate identity governance",
+      "weightRange": "20-25%",
+      "source": "SC-300 skills measured (as of April 27, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/sc-300",
+      "mappedModules": [
+        "Plan and Implement Entitlement Management",
+        "Plan and Implement Access Reviews",
+        "Plan and Implement Privileged Access with PIM",
+        "Monitor Identity Activity with Logs and Workbooks"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "icon": "fas fa-building-shield",
+      "name": "Configure and Manage a Microsoft Entra Tenant"
+    },
+    {
+      "icon": "fas fa-users",
+      "name": "Create, Configure, and Manage Microsoft Entra Identities"
+    },
+    {
+      "icon": "fas fa-handshake",
+      "name": "Manage External Identities and Cross-Tenant Access"
+    },
+    {
+      "icon": "fas fa-arrows-rotate",
+      "name": "Implement and Manage Hybrid Identity"
+    },
+    {
+      "icon": "fas fa-key",
+      "name": "Plan and Manage Microsoft Entra User Authentication"
+    },
+    {
+      "icon": "fas fa-shield-halved",
+      "name": "Plan and Manage Microsoft Entra Conditional Access"
+    },
+    {
+      "icon": "fas fa-triangle-exclamation",
+      "name": "Manage Risk with Microsoft Entra ID Protection"
+    },
+    {
+      "icon": "fas fa-globe",
+      "name": "Implement Global Secure Access"
+    },
+    {
+      "icon": "fas fa-microchip",
+      "name": "Plan and Implement Identities for Apps and Azure Workloads"
+    },
+    {
+      "icon": "fas fa-puzzle-piece",
+      "name": "Integrate and Manage Enterprise Applications"
+    },
+    {
+      "icon": "fas fa-id-card",
+      "name": "Plan and Implement App Registrations"
+    },
+    {
+      "icon": "fas fa-cloud",
+      "name": "Manage App Access with Defender for Cloud Apps"
+    },
+    {
+      "icon": "fas fa-box-open",
+      "name": "Plan and Implement Entitlement Management"
+    },
+    {
+      "icon": "fas fa-list-check",
+      "name": "Plan and Implement Access Reviews"
+    },
+    {
+      "icon": "fas fa-user-lock",
+      "name": "Plan and Implement Privileged Access with PIM"
+    },
+    {
+      "icon": "fas fa-chart-line",
+      "name": "Monitor Identity Activity with Logs and Workbooks"
+    }
+  ],
+  "resources": [
+    {
+      "icon": "fas fa-book",
+      "name": "Microsoft Learn SC-300 Study Guide",
+      "url": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/sc-300"
+    },
+    {
+      "icon": "fas fa-certificate",
+      "name": "Microsoft Identity and Access Administrator certification",
+      "url": "https://learn.microsoft.com/credentials/certifications/identity-and-access-administrator/"
+    },
+    {
+      "icon": "fas fa-id-badge",
+      "name": "Microsoft Entra documentation",
+      "url": "https://learn.microsoft.com/entra/"
+    },
+    {
+      "icon": "fas fa-scale-balanced",
+      "name": "Microsoft Entra ID Governance documentation",
+      "url": "https://learn.microsoft.com/entra/id-governance/"
+    }
+  ],
+  "pro": {
+    "title": "SC-300 Complete",
+    "questions": 280,
+    "price": "17 EUR",
+    "url": "https://examplar.gumroad.com/l/sc300-complete",
+    "highlights": [
+      "280 original scenario questions across every exam objective",
+      "Detailed explanation for the correct answer and every distractor",
+      "Study mode with spaced repetition and weak-area focus",
+      "Coverage map so you see nothing is missing",
+      "Free updates when the exam changes"
+    ]
+  }
+}

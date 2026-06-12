@@ -1,0 +1,199 @@
+{
+  "id": "ai103",
+  "name": "AI-103",
+  "fullName": "Azure AI Apps and Agents Developer Associate",
+  "description": "Free 25-question preview of the AI-103 pack. Original scenario questions written from public Microsoft Learn docs; not real exam questions. Unlock the full pack for the complete set, detailed explanations, and study mode.",
+  "duration": 50,
+  "questionCount": 25,
+  "totalQuestions": 25,
+  "passScore": 70,
+  "language": "en",
+  "schemaVersion": "1.1",
+  "badge": "Associate",
+  "icon": "fas fa-robot",
+  "vendor": "Microsoft",
+  "certificationCode": "AI-103",
+  "domains": [
+    "Plan and manage an Azure AI solution",
+    "Implement generative AI and agentic solutions",
+    "Implement computer vision solutions",
+    "Implement text analysis solutions",
+    "Implement information extraction solutions"
+  ],
+  "level": "Associate",
+  "productFamily": "Azure",
+  "contentType": "preview",
+  "commercialStatus": "pro-preview",
+  "preview": true,
+  "contentOrigin": "original",
+  "contentReview": {
+    "lastReviewed": "2026-06-12",
+    "sourceOfTruth": "Microsoft Learn AI-103 study guide and Azure AI Foundry documentation",
+    "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103",
+    "objectiveVersion": "Skills measured as of April 16, 2026"
+  },
+  "objectiveDomains": [
+    {
+      "code": "AI103-1",
+      "name": "Plan and manage an Azure AI solution",
+      "weightRange": "25-30%",
+      "source": "AI-103 skills measured (as of April 16, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103",
+      "mappedModules": [
+        "Choose Foundry Services for Generative AI and Agents",
+        "Set Up AI Solutions in Foundry",
+        "Manage, Monitor, and Secure AI Systems",
+        "Responsible AI for Generative and Agentic Systems"
+      ]
+    },
+    {
+      "code": "AI103-2",
+      "name": "Implement generative AI and agentic solutions",
+      "weightRange": "30-35%",
+      "source": "AI-103 skills measured (as of April 16, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103",
+      "mappedModules": [
+        "Build Generative Applications: Models and RAG",
+        "Build Generative Applications: Workflows, Evaluation, and SDKs",
+        "Build Agents: Roles, Tools, and Memory",
+        "Build Agents: Multi-Agent, Autonomy, and Monitoring",
+        "Optimize Generative AI: Prompting and Parameters",
+        "Operationalize Generative AI: Observability and Orchestration"
+      ]
+    },
+    {
+      "code": "AI103-3",
+      "name": "Implement computer vision solutions",
+      "weightRange": "10-15%",
+      "source": "AI-103 skills measured (as of April 16, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103",
+      "mappedModules": [
+        "Image and Video Generation Solutions",
+        "Multimodal Understanding Workflows",
+        "Responsible AI for Multimodal Content"
+      ]
+    },
+    {
+      "code": "AI103-4",
+      "name": "Implement text analysis solutions",
+      "weightRange": "10-15%",
+      "source": "AI-103 skills measured (as of April 16, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103",
+      "mappedModules": [
+        "Language Model Text Analysis",
+        "Speech Solutions for Agents"
+      ]
+    },
+    {
+      "code": "AI103-5",
+      "name": "Implement information extraction solutions",
+      "weightRange": "10-15%",
+      "source": "AI-103 skills measured (as of April 16, 2026)",
+      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103",
+      "mappedModules": [
+        "Retrieval and Grounding Pipelines",
+        "Extract Content from Documents"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "icon": "fas fa-diagram-project",
+      "name": "Choose Foundry Services for Generative AI and Agents"
+    },
+    {
+      "icon": "fas fa-screwdriver-wrench",
+      "name": "Set Up AI Solutions in Foundry"
+    },
+    {
+      "icon": "fas fa-gauge-high",
+      "name": "Manage, Monitor, and Secure AI Systems"
+    },
+    {
+      "icon": "fas fa-shield-halved",
+      "name": "Responsible AI for Generative and Agentic Systems"
+    },
+    {
+      "icon": "fas fa-magnifying-glass",
+      "name": "Build Generative Applications: Models and RAG"
+    },
+    {
+      "icon": "fas fa-code-branch",
+      "name": "Build Generative Applications: Workflows, Evaluation, and SDKs"
+    },
+    {
+      "icon": "fas fa-robot",
+      "name": "Build Agents: Roles, Tools, and Memory"
+    },
+    {
+      "icon": "fas fa-people-arrows",
+      "name": "Build Agents: Multi-Agent, Autonomy, and Monitoring"
+    },
+    {
+      "icon": "fas fa-sliders",
+      "name": "Optimize Generative AI: Prompting and Parameters"
+    },
+    {
+      "icon": "fas fa-binoculars",
+      "name": "Operationalize Generative AI: Observability and Orchestration"
+    },
+    {
+      "icon": "fas fa-image",
+      "name": "Image and Video Generation Solutions"
+    },
+    {
+      "icon": "fas fa-eye",
+      "name": "Multimodal Understanding Workflows"
+    },
+    {
+      "icon": "fas fa-user-shield",
+      "name": "Responsible AI for Multimodal Content"
+    },
+    {
+      "icon": "fas fa-language",
+      "name": "Language Model Text Analysis"
+    },
+    {
+      "icon": "fas fa-microphone-lines",
+      "name": "Speech Solutions for Agents"
+    },
+    {
+      "icon": "fas fa-layer-group",
+      "name": "Retrieval and Grounding Pipelines"
+    },
+    {
+      "icon": "fas fa-file-lines",
+      "name": "Extract Content from Documents"
+    }
+  ],
+  "resources": [
+    {
+      "icon": "fas fa-book",
+      "name": "Microsoft Learn AI-103 Study Guide",
+      "url": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103"
+    },
+    {
+      "icon": "fas fa-robot",
+      "name": "Azure AI Foundry documentation",
+      "url": "https://learn.microsoft.com/azure/ai-foundry/"
+    },
+    {
+      "icon": "fas fa-file-lines",
+      "name": "Azure AI services documentation",
+      "url": "https://learn.microsoft.com/azure/ai-services/"
+    }
+  ],
+  "pro": {
+    "title": "AI-103 Complete",
+    "questions": 280,
+    "price": "17 EUR",
+    "url": "https://examplar.gumroad.com/l/ai103-complete",
+    "highlights": [
+      "280 original scenario questions across every exam objective",
+      "Detailed explanation for the correct answer and every distractor",
+      "Study mode with spaced repetition and weak-area focus",
+      "Coverage map so you see nothing is missing",
+      "Free updates when the exam changes"
+    ]
+  }
+}
