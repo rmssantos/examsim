@@ -2,9 +2,9 @@
   "format": "examsim-manifest",
   "version": 1,
   "algorithm": "SHA-256",
-  "generated": "2026-06-09T13:57:47Z",
+  "generated": "2026-06-12T10:16:00Z",
   "files": {
     "dump.json": "91bf3cc681ca023fe3f4c4cb4930373b1cede651d0e13a21714eaa0e4abec873",
-    "metadata.json": "f86c8eb6269155c406f451ea2869548eeca9aa71548c17ee0eba3611dd270b06"
+    "metadata.json": "1f9e0bebde4985d0a1b5b588c533bc60e80b26f293cd2262f6d614e0e4cc1e3f"
   }
 }

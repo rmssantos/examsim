@@ -1,0 +1,419 @@
+[
+  {
+    "id": 1,
+    "question_type": "STANDARD",
+    "module": "Configure and Manage a Microsoft Entra Tenant",
+    "question": "A retailer wants a team to manage only the basic properties and credentials of app registrations. No built-in Microsoft Entra role grants exactly that narrow set of permissions without also granting more. What should the identity administrator do to follow least privilege?",
+    "options": [
+      "Create a custom Microsoft Entra role containing only the required app registration permissions and assign it to the team.",
+      "Assign the Application Administrator built-in role to the team.",
+      "Assign the Global Administrator role and rely on the team to self-restrict their actions.",
+      "Edit the Application Developer built-in role to remove the permissions the team does not need."
+    ],
+    "correct": 0,
+    "explanation": "Built-in role definitions in Microsoft Entra ID have a fixed set of permissions and can't be modified, so editing Application Developer isn't possible. Application Administrator grants broad management over all applications, which is more than the team needs, and Global Administrator is the most privileged role and can't be narrowed to only credential management. Creating a custom role lets you pick exactly the required app registration permissions from the preset list and assign it, satisfying least privilege.",
+    "reference": "https://learn.microsoft.com/entra/identity/role-based-access-control/custom-overview#understand-microsoft-entra-role-based-access-control"
+  },
+  {
+    "id": 2,
+    "question_type": "MULTI",
+    "module": "Configure and Manage a Microsoft Entra Tenant",
+    "question": "Which of these can an administrator configure on the Device settings page in Microsoft Entra ID? (Choose all that apply.)",
+    "options": [
+      "Whether users may join devices to Microsoft Entra ID",
+      "The maximum number of devices a single user can join or register",
+      "Whether multifactor authentication is required to register or join devices",
+      "The synchronization schedule for Microsoft Entra Connect password hash synchronization",
+      "The list of cloud apps targeted by a Conditional Access policy"
+    ],
+    "correct": [
+      0,
+      1,
+      2
+    ],
+    "explanation": "The Device settings page lets administrators control whether users may join devices to Microsoft Entra ID, the maximum number of devices a user can join or register, and whether multifactor authentication is required to register or join devices. The password hash synchronization schedule is managed by Microsoft Entra Connect, and the cloud apps targeted by a policy are configured in Conditional Access, so neither appears on the Device settings page.",
+    "reference": "https://learn.microsoft.com/entra/identity/devices/manage-device-identities#configure-device-settings"
+  },
+  {
+    "id": 3,
+    "question_type": "MULTI",
+    "module": "Configure and Manage a Microsoft Entra Tenant",
+    "question": "Which statements about Microsoft Entra administrative units are correct? (Choose all that apply.)",
+    "options": [
+      "An administrative unit can contain users, groups, or devices.",
+      "An administrator whose role is scoped to an administrative unit can manage only the members of that unit, not the entire tenant.",
+      "Adding a group to an administrative unit automatically brings the group's individual members into the unit's scope.",
+      "A single administrative unit that uses a dynamic membership rule can contain both users and devices.",
+      "Administrative units prevent their members from browsing users outside the unit through default user permissions."
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "An administrative unit can contain users, groups, or devices, and a role scoped to an administrative unit lets an administrator manage only members of that unit rather than the whole tenant. Adding a group to an administrative unit brings only the group object into scope, not its members; a dynamic membership administrative unit can target users or devices but not both in one unit; and administrative units scope management permissions only, so they don't stop members from browsing other directory objects through default user permissions.",
+    "reference": "https://learn.microsoft.com/entra/identity/role-based-access-control/administrative-units"
+  },
+  {
+    "id": 4,
+    "question_type": "YES_NO_MATRIX",
+    "module": "Configure and Manage a Microsoft Entra Tenant",
+    "question": "A new identity administrator is learning how role-based access control works in Microsoft Entra ID. Evaluate each statement as Yes (true) or No (false).",
+    "statements": [
+      "Microsoft Entra built-in role definitions can be edited to add or remove permissions.",
+      "A Microsoft Entra role can be assigned at tenant scope, administrative unit scope, or the scope of a single Microsoft Entra resource such as an app registration.",
+      "Using built-in Microsoft Entra roles requires a Microsoft Entra ID P1 license for each assigned user.",
+      "Microsoft Entra role permissions can be used directly inside Azure custom roles to manage Azure resources."
+    ],
+    "correct": [
+      1,
+      0,
+      1,
+      1
+    ],
+    "explanation": "Built-in role definitions have a fixed permission set and can't be edited, so the first statement is No. Roles can be assigned at tenant, administrative unit, or single Microsoft Entra resource scope, so the second is Yes. Built-in roles are free to use at the default directory-wide scope, so the blanket claim that they require a P1 license for every assigned user is No; note that a Microsoft Entra ID P1 license per administrator is required to assign a custom role at any scope and to assign any role over the scope of an administrative unit. Microsoft Entra roles and Azure roles are separate systems whose permissions can't be used in each other's custom roles, so the fourth is No.",
+    "reference": "https://learn.microsoft.com/entra/identity/role-based-access-control/custom-overview"
+  },
+  {
+    "id": 5,
+    "question_type": "YES_NO_MATRIX",
+    "module": "Configure and Manage a Microsoft Entra Tenant",
+    "question": "An administrator is reviewing default user permissions and related tenant settings in Microsoft Entra ID. Evaluate each statement as Yes (true) or No (false).",
+    "statements": [
+      "By default, member users in Microsoft Entra ID can register applications.",
+      "After 'Users can register applications' is set to No, users assigned the Application Developer role can still create app registrations.",
+      "The 'Restrict access to the Microsoft Entra admin center' setting is a security boundary that blocks all directory data access for non-administrators.",
+      "By default, guest users can enumerate the full list of all users and groups in the tenant."
+    ],
+    "correct": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "explanation": "By default member users can register applications, so the first statement is Yes. When app registration is restricted, users in the Application Developer role can still create app registrations, so the second is Yes. The setting that restricts admin-center access only hides commonly visited pages and is explicitly not a security measure, so the third is No. Guest users have restricted default permissions and can't enumerate the full list of all users and groups, so the fourth is No.",
+    "reference": "https://learn.microsoft.com/entra/fundamentals/users-default-permissions"
+  },
+  {
+    "id": 6,
+    "question_type": "SEQUENCE",
+    "module": "Configure and Manage a Microsoft Entra Tenant",
+    "question": "A Domain Name Administrator must add the custom domain contoso.com to Microsoft Entra ID and have Microsoft Entra ID confirm that the organization owns it. Put the steps in the required order.",
+    "options": [
+      "In Microsoft Entra ID, select Verify so that Microsoft Entra ID confirms ownership of the domain.",
+      "Add the custom domain name in Microsoft Entra ID, which generates the DNS record value to use.",
+      "At the domain registrar, create the DNS TXT or MX record using the value provided by Microsoft Entra ID."
+    ],
+    "correct": [
+      1,
+      2,
+      0
+    ],
+    "explanation": "Each step depends on the previous one. You first add the custom domain in Microsoft Entra ID, which generates the DNS record value to use. You then create that TXT or MX record at your domain registrar using the generated value. Only after the record exists can Microsoft Entra ID confirm that you own the domain when you select Verify.",
+    "reference": "https://learn.microsoft.com/entra/fundamentals/add-custom-domain#verify-your-custom-domain-name"
+  },
+  {
+    "id": 7,
+    "question_type": "STANDARD",
+    "module": "Create, Configure, and Manage Microsoft Entra Identities",
+    "question": "An identity engineer drafts a single dynamic membership rule that tries to include both user objects and device objects in the same group, and the configuration is rejected. What is the underlying reason?",
+    "options": [
+      "Dynamic membership rules can reference only the manager attribute",
+      "A dynamic membership group can target users or devices, but a single group cannot contain both",
+      "Dynamic membership is supported only for Microsoft 365 groups",
+      "Devices can never be members of any Microsoft Entra group"
+    ],
+    "correct": 1,
+    "explanation": "You can create a dynamic membership group for users or for devices, but you cannot author a rule that contains both users and devices in one group, and device rules can reference only device attributes. Rules are not restricted to the manager attribute. Dynamic membership is not limited to Microsoft 365 groups, and devices can be members of security groups, so those explanations are incorrect.",
+    "reference": "https://learn.microsoft.com/entra/identity/users/groups-dynamic-membership#considerations-for-dynamic-membership-groups"
+  },
+  {
+    "id": 8,
+    "question_type": "MULTI",
+    "module": "Create, Configure, and Manage Microsoft Entra Identities",
+    "question": "An identity team is documenting how custom security attributes behave in Microsoft Entra ID. Select the statements that are accurate.",
+    "options": [
+      "Custom security attributes can be assigned to users and to enterprise applications (service principals)",
+      "The supported data types for a custom security attribute are Boolean, integer, and string",
+      "By default, every Global Administrator can read and assign custom security attributes",
+      "Custom security attributes are available in all editions of Microsoft Entra ID",
+      "A custom security attribute can exist on its own without belonging to any attribute set"
+    ],
+    "correct": [
+      0,
+      1,
+      3
+    ],
+    "explanation": "Custom security attributes can be assigned to users and enterprise applications (service principals), support the Boolean, integer, and string data types, and are available in all editions of Microsoft Entra ID. The statement that Global Administrator can read and assign them by default is wrong, because that role has no custom security attribute permissions by default. The statement that an attribute can exist without an attribute set is wrong, because every custom security attribute must belong to an attribute set.",
+    "reference": "https://learn.microsoft.com/entra/fundamentals/custom-security-attributes-overview"
+  },
+  {
+    "id": 9,
+    "question_type": "YES_NO_MATRIX",
+    "module": "Create, Configure, and Manage Microsoft Entra Identities",
+    "question": "An administrator is reconciling how group-based and direct license assignments interact for individual users. For each statement, indicate whether it is correct.",
+    "statements": [
+      "License options for a group-based license assignment are changed at the group level rather than on individual members.",
+      "When a user inherits a license from a group, an administrator can remove that specific license directly on the user's properties.",
+      "A directly assigned license can be removed from a user without affecting a license the user inherits from a group.",
+      "To give one group member extra services beyond what the group assigns, you edit the inherited license directly on that user."
+    ],
+    "correct": [
+      0,
+      1,
+      0,
+      1
+    ],
+    "explanation": "License options for a group-based assignment are managed at the group level and then propagate to members, and a directly assigned license can be removed without affecting an inherited one, so those statements are correct. A license inherited from a group cannot be removed directly on the user, because that change is made only at the group, so that statement is incorrect. Granting extra services to one member is done by creating another group and adding the user to it rather than by editing the inherited license, so that statement is also incorrect.",
+    "reference": "https://learn.microsoft.com/entra/identity/users/licensing-group-advanced#direct-licenses-coexist-with-group-licenses"
+  },
+  {
+    "id": 10,
+    "question_type": "SEQUENCE",
+    "module": "Create, Configure, and Manage Microsoft Entra Identities",
+    "question": "Arrange the steps to make a new custom security attribute available so that directory objects can be filtered by it, in order from earliest to latest.",
+    "options": [
+      "Assign the attribute's value to the target objects",
+      "Add an attribute set to hold the attribute",
+      "Filter the directory objects by the attribute and its value",
+      "Define the custom security attribute inside the attribute set"
+    ],
+    "correct": [
+      1,
+      3,
+      0,
+      2
+    ],
+    "explanation": "You add an attribute set first, because every custom security attribute must belong to an attribute set. You then define the attribute inside that set, since an attribute cannot be assigned until it exists. Next you assign the attribute's value to the target objects, and only after values are assigned can you filter objects by that attribute and value. This matches the documented order of adding a set, defining the attribute, assigning it, and then using it to filter.",
+    "reference": "https://learn.microsoft.com/entra/fundamentals/custom-security-attributes-overview#steps-to-use-custom-security-attributes"
+  },
+  {
+    "id": 11,
+    "question_type": "STANDARD",
+    "module": "Manage External Identities and Cross-Tenant Access",
+    "question": "Fabrikam wants only its help-desk staff to invite B2B guests and has selected 'Only users assigned to specific admin roles can invite guest users' under Guest invite settings. Which role lets the help-desk staff send invitations under this configuration without granting a broad administrator role?",
+    "options": [
+      "Global Administrator",
+      "Reports Reader",
+      "Guest Inviter",
+      "Directory Readers"
+    ],
+    "correct": 2,
+    "explanation": "The Guest Inviter role gives specific users the ability to invite guests even when 'Only users assigned to specific admin roles can invite guest users' is selected, without assigning a higher-privilege administrator role. Global Administrator would work but grants far more access than needed and conflicts with least privilege, while Reports Reader and Directory Readers don't include permission to invite external guests.",
+    "reference": "https://learn.microsoft.com/entra/external-id/external-collaboration-settings-configure#assign-the-guest-inviter-role-to-a-user"
+  },
+  {
+    "id": 12,
+    "question_type": "STANDARD",
+    "module": "Implement and Manage Hybrid Identity",
+    "question": "A company wants the lowest-effort cloud authentication option for Microsoft 365 sign-in and also plans to use the leaked-credentials detection in Microsoft Entra ID Protection. Which sign-in method meets both needs with the least on-premises infrastructure?",
+    "options": [
+      "Federation with AD FS",
+      "Pass-through authentication deployed with multiple agents",
+      "Federation with AD FS plus password hash synchronization as a backup",
+      "Password hash synchronization"
+    ],
+    "correct": 3,
+    "explanation": "Password hash synchronization is the simplest method and requires no infrastructure beyond Microsoft Entra Connect, and premium features such as Microsoft Entra ID Protection require password hash synchronization regardless of the chosen sign-in method, so it satisfies both goals with the smallest footprint. Federation and pass-through authentication require more on-premises infrastructure, and the leaked-credentials feature still depends on password hash synchronization being enabled. Adding federation alongside password hash synchronization introduces unnecessary infrastructure for a minimal-effort goal.",
+    "reference": "https://learn.microsoft.com/entra/identity/hybrid/connect/choose-ad-authn#authentication-methods"
+  },
+  {
+    "id": 13,
+    "question_type": "STANDARD",
+    "module": "Plan and Manage Microsoft Entra User Authentication",
+    "question": "A new employee starts Monday with no previously registered credentials, and the security team wants them to bootstrap a phishing-resistant passkey during onboarding without ever being issued a reusable password. Which Microsoft Entra authentication method is designed to provide this time-limited onboarding credential?",
+    "options": [
+      "Temporary Access Pass, a time-limited passcode that lets the user sign in to register stronger methods such as a passkey",
+      "Security questions configured in the self-service password reset policy",
+      "A voice call placed to the employee's mobile phone used as the primary sign-in method",
+      "Email one-time passcode sent to a personal mailbox and used for primary sign-in"
+    ],
+    "correct": 0,
+    "explanation": "A Temporary Access Pass is a time-limited passcode (single-use or usable for multiple sign-ins) that lets a user sign in to register stronger passwordless methods such as a passkey, and it also eases recovery, which fits a passwordless onboarding flow. Security questions are limited to self-service password reset and account recovery, so they can't bootstrap a passkey. A voice call can serve only as a secondary or SSPR method, and email one-time passcode isn't a primary authentication method for an organization's own members (it's available for SSPR and can be configured for B2B guest sign-in), so neither can act as the primary sign-in needed to register passwordless methods.",
+    "reference": "https://learn.microsoft.com/entra/identity/authentication/howto-authentication-temporary-access-pass"
+  },
+  {
+    "id": 14,
+    "question_type": "STANDARD",
+    "module": "Plan and Manage Microsoft Entra Conditional Access",
+    "question": "An organization requires that administrators sign in to the Azure management portal using only phishing-resistant methods such as FIDO2 security keys, Windows Hello for Business, or Microsoft Entra certificate-based authentication. Which grant control enforces exactly that requirement?",
+    "options": [
+      "Require multifactor authentication.",
+      "Require authentication strength set to the built-in Phishing-resistant MFA strength.",
+      "Require approved client app.",
+      "Require app protection policy."
+    ],
+    "correct": 1,
+    "explanation": "Require authentication strength specifies which combinations of authentication methods are acceptable, and the built-in Phishing-resistant MFA strength allows only Windows Hello for Business or platform credential, FIDO2 security keys, and Microsoft Entra certificate-based authentication (multifactor). Require multifactor authentication accepts any MFA combination, including less secure ones like a text message, so it doesn't enforce phishing resistance. Require approved client app and Require app protection policy govern the client application used rather than the strength of the authentication method.",
+    "reference": "https://learn.microsoft.com/entra/identity/authentication/concept-authentication-strengths#built-in-authentication-strengths"
+  },
+  {
+    "id": 15,
+    "question_type": "SEQUENCE",
+    "module": "Plan and Manage Microsoft Entra Conditional Access",
+    "question": "Arrange the steps to configure and verify a protected action in Microsoft Entra ID, in order from earliest to latest.",
+    "options": [
+      "Add the protected action by assigning the authentication context to the selected Microsoft Entra permission",
+      "Confirm you're assigned the Conditional Access Administrator or Security Administrator role",
+      "Sign in as a target user and perform the action to confirm the policy prompt appears",
+      "Create a Conditional Access authentication context and an associated Conditional Access policy"
+    ],
+    "correct": [
+      1,
+      3,
+      0,
+      2
+    ],
+    "explanation": "You first confirm you hold the Conditional Access Administrator or Security Administrator role, because configuring authentication contexts and policies requires that permission. Next you create the authentication context and its associated Conditional Access policy, because the context must exist before it can be referenced. Then you add the protected action by assigning that authentication context to the sensitive permission, since assigning a context that no policy enforces leads to the policy never being satisfied. Finally you sign in as a target user and perform the action to verify the policy prompt appears, which matches the documented configuration order.",
+    "reference": "https://learn.microsoft.com/entra/identity/role-based-access-control/protected-actions-overview#steps-to-use-protected-actions"
+  },
+  {
+    "id": 16,
+    "question_type": "STANDARD",
+    "module": "Manage Risk with Microsoft Entra ID Protection",
+    "question": "At Contoso, a user's leaked credentials pushed their user risk to high. The security team wants a Conditional Access policy that lets the user bring the account back to a safe state by replacing the compromised secret. Which grant control should the user risk-based policy require?",
+    "options": [
+      "Require a Microsoft Entra hybrid joined device",
+      "Require reauthentication every hour through sign-in frequency",
+      "Require an app protection policy",
+      "Require password change"
+    ],
+    "correct": 3,
+    "explanation": "User risk reflects the probability that the account is compromised; a user risk-based Conditional Access policy that requires a password change forces a secure password change so the user self-remediates and the account returns to a safe state. Sign-in frequency drives reauthentication for sign-in risk, while hybrid join and app protection policies are device and app controls that don't remediate compromised credentials.",
+    "reference": "https://learn.microsoft.com/entra/id-protection/concept-identity-protection-policies#user-risk-based-conditional-access-policy"
+  },
+  {
+    "id": 17,
+    "question_type": "STANDARD",
+    "module": "Implement Global Secure Access",
+    "question": "A consultant uses a personal laptop that is Microsoft Entra registered (not joined) to the customer's tenant and installs the Global Secure Access client. Which traffic can the client forward from this Microsoft Entra registered device?",
+    "options": [
+      "All three profiles: Microsoft, Internet Access, and Private Access traffic",
+      "Microsoft and Internet Access traffic, but not Private Access traffic",
+      "Only Private Access traffic",
+      "No traffic, because the client can't run on Microsoft Entra registered devices"
+    ],
+    "correct": 2,
+    "explanation": "On Microsoft Entra registered devices, only Private Access traffic is supported by the Global Secure Access client. The client does run on registered devices, so the claim that it can't run there is wrong, and Microsoft and Internet Access traffic forwarding isn't available from a registered device, which rules out the choices that include those profiles.",
+    "reference": "https://learn.microsoft.com/entra/global-secure-access/how-to-install-windows-client#prerequisites"
+  },
+  {
+    "id": 18,
+    "question_type": "STANDARD",
+    "module": "Plan and Implement Identities for Apps and Azure Workloads",
+    "question": "Contoso runs a web API on Azure App Service that must read connection strings from Azure Key Vault. The security team wants the workload to authenticate to Key Vault with no credential that anyone has to store, rotate, or could leak. Which identity should the API use?",
+    "options": [
+      "A managed identity assigned to the App Service",
+      "A user account with a strong password kept in the application settings",
+      "An app registration that signs in with a client secret",
+      "An app registration that signs in with an uploaded certificate"
+    ],
+    "correct": 0,
+    "explanation": "For a workload running in Azure, the recommended approach is a managed identity, which removes the need to manage credentials because there are no accessible credentials for anyone to store, rotate, or leak. A user account is a human identity that isn't appropriate for an unattended workload, and an app registration that signs in with a client secret or a certificate still relies on a credential that must be protected and rotated, which is exactly what the team wants to avoid.",
+    "reference": "https://learn.microsoft.com/entra/architecture/authorize-applications-resources-workloads#authorization-in-workloads"
+  },
+  {
+    "id": 19,
+    "question_type": "STANDARD",
+    "module": "Integrate and Manage Enterprise Applications",
+    "question": "An administrator is configuring single sign-on for a cloud HR application from the Microsoft Entra gallery. The vendor supports SAML 2.0, and the team wants Microsoft Entra ID to authenticate users to the application with their Microsoft Entra accounts so that Conditional Access can apply. Which single sign-on method should they choose?",
+    "options": [
+      "Password-based single sign-on",
+      "SAML-based federated single sign-on",
+      "Linked single sign-on",
+      "Disabled single sign-on"
+    ],
+    "correct": 1,
+    "explanation": "Federated single sign-on using SAML 2.0 is the richest mode and has Microsoft Entra ID authenticate the user to the application with their Microsoft Entra account, which is what allows Conditional Access and multifactor authentication to apply. Password-based single sign-on replays a stored username and password into the application's own form and is used when the app lacks federation, linked single sign-on only publishes a tile and provides no Microsoft Entra single sign-on, and disabling single sign-on provides no single sign-on at all.",
+    "reference": "https://learn.microsoft.com/entra/identity/enterprise-apps/what-is-single-sign-on#single-sign-on-options"
+  },
+  {
+    "id": 20,
+    "question_type": "STANDARD",
+    "module": "Plan and Implement App Registrations",
+    "question": "Tailwind Traders is registering a SaaS application that it will sell to other businesses. Any user with a work or school account from any Microsoft Entra organization should be able to sign in, but personal Microsoft accounts should not. Which supported account types setting meets this requirement?",
+    "options": [
+      "Accounts in this organizational directory only",
+      "Personal Microsoft accounts only",
+      "Accounts in any Microsoft Entra directory",
+      "Accounts in any Microsoft Entra directory and personal Microsoft accounts"
+    ],
+    "correct": 2,
+    "explanation": "Choosing 'Accounts in any Microsoft Entra directory' makes the app multitenant so users with a work or school account from any organization can sign in, which fits a SaaS app sold to businesses, while still excluding personal Microsoft accounts. 'Accounts in this organizational directory only' is single-tenant and limits sign-in to Tailwind Traders, 'Personal Microsoft accounts only' excludes the business customers entirely, and the setting that adds personal Microsoft accounts would allow the consumer accounts the requirement says to exclude.",
+    "reference": "https://learn.microsoft.com/entra/identity-platform/single-and-multi-tenant-apps#who-can-sign-in-to-your-app"
+  },
+  {
+    "id": 21,
+    "question_type": "STANDARD",
+    "module": "Manage App Access with Defender for Cloud Apps",
+    "question": "An administrator wants deep visibility into user activity in a sanctioned Microsoft 365 environment and the ability to apply governance actions such as suspending a user or quarantining a file. Which connection method provides this?",
+    "options": [
+      "A Cloud Discovery continuous report.",
+      "A Conditional Access App Control session policy.",
+      "An app-enforced restrictions policy.",
+      "An app connector that uses the app provider's APIs."
+    ],
+    "correct": 3,
+    "explanation": "App connectors use the cloud provider's APIs to deliver visibility (account information and the activity audit trail) and governance actions such as suspending users and quarantining files. Cloud Discovery only reports on traffic logs, session policies act on live browser sessions, and app-enforced restrictions delegate control to the app itself without API governance.",
+    "reference": "https://learn.microsoft.com/defender-cloud-apps/enable-instant-visibility-protection-and-governance-actions-for-your-apps#how-it-works"
+  },
+  {
+    "id": 22,
+    "question_type": "STANDARD",
+    "module": "Plan and Implement Entitlement Management",
+    "question": "An identity architect at Contoso is planning to adopt entitlement management to automate access request workflows and time-limited assignments at scale. Before enabling it, the architect must confirm which subscription covers the feature for the users who will be governed. Which licensing requirement should be planned for?",
+    "options": [
+      "Microsoft Entra ID Governance or Microsoft Entra Suite licensing for the users who will be governed.",
+      "Microsoft Entra ID Free, because entitlement management is available in every tenant by default.",
+      "Microsoft Intune Plan 2 for each approver and requestor.",
+      "A Microsoft 365 E3 subscription only, with no identity governance add-on."
+    ],
+    "correct": 0,
+    "explanation": "Entitlement management requires Microsoft Entra ID Governance or Microsoft Entra Suite for the users who are governed, although a few capabilities can operate with a Microsoft Entra ID P2 subscription. It is not part of the free tier of every tenant, Microsoft Intune Plan 2 licenses device and app management rather than identity governance, and Microsoft 365 E3 alone does not include the ID Governance entitlement that this feature needs.",
+    "reference": "https://learn.microsoft.com/entra/id-governance/entitlement-management-overview#license-requirements"
+  },
+  {
+    "id": 23,
+    "question_type": "STANDARD",
+    "module": "Plan and Implement Access Reviews",
+    "question": "A compliance team must periodically recertify which administrators still need the Global Administrator and Security Administrator roles in Microsoft Entra ID. Where should you create this access review?",
+    "options": [
+      "In ID Governance, create a Teams + Groups access review of a group that contains the administrators.",
+      "In Microsoft Entra enterprise applications, create an access review of each administrative application.",
+      "In Microsoft Entra Privileged Identity Management, create an access review of the Microsoft Entra roles.",
+      "In entitlement management, create an access review of an access package that bundles the roles."
+    ],
+    "correct": 2,
+    "explanation": "Access reviews of Microsoft Entra roles and Azure resource roles are created and run in Privileged Identity Management, where the reviewer experience lives in the Microsoft Entra admin center. Reviewing a group only recertifies group membership, an enterprise application review recertifies application assignment, and an access package review recertifies entitlement-management assignments, so none of those attest to privileged role membership.",
+    "reference": "https://learn.microsoft.com/entra/id-governance/access-reviews-overview#where-do-you-create-reviews"
+  },
+  {
+    "id": 24,
+    "question_type": "STANDARD",
+    "module": "Plan and Implement Privileged Access with PIM",
+    "question": "Fabrikam's change-management process asks administrators to record a change-ticket number whenever they elevate privilege, though the security team accepts that Privileged Identity Management can't check the number against their IT service management system. Which activation setting should they enable, and how does it behave?",
+    "options": [
+      "Require justification on activation, which records the ticket number as a free-text business justification",
+      "Require ticket information on activation, which is an information-only field that isn't validated against any ticketing system",
+      "On activation, require approval, so that an approver verifies the ticket before granting access",
+      "Require ticket information on activation, which automatically validates the number through an IT service management connector"
+    ],
+    "correct": 1,
+    "explanation": "Require ticket information on activation prompts the user for a support ticket number when they activate, but it is an information-only field and Privileged Identity Management doesn't correlate or validate it against any ticketing system, which matches the team's expectation. Require justification on activation captures a business reason rather than a dedicated ticket field, requiring approval routes the request to an approver instead of recording a ticket, and there is no built-in connector that validates the ticket number.",
+    "reference": "https://learn.microsoft.com/entra/id-governance/privileged-identity-management/pim-how-to-change-default-settings#require-ticket-information-on-activation"
+  },
+  {
+    "id": 25,
+    "question_type": "STANDARD",
+    "module": "Monitor Identity Activity with Logs and Workbooks",
+    "question": "After a privileged group unexpectedly gained a new member, an administrator needs to determine who made the change and when it happened. Which Microsoft Entra activity log should they review?",
+    "options": [
+      "The sign-in logs.",
+      "The provisioning logs.",
+      "The Identity Secure Score history.",
+      "The audit logs."
+    ],
+    "correct": 3,
+    "explanation": "The audit logs provide a record of every task performed in the tenant, including group membership and ownership changes, so they show who changed the group and when. The sign-in logs record authentication attempts rather than directory changes, the provisioning logs track identities synchronized to and from non-Microsoft systems, and the Identity Secure Score history tracks posture changes rather than directory operations.",
+    "reference": "https://learn.microsoft.com/entra/identity/monitoring-health/concept-audit-logs#what-can-you-do-with-audit-logs"
+  }
+]

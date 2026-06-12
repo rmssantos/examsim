@@ -102,5 +102,11 @@
       "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-azure-ai-foundry"
     }
   ],
-  "totalQuestions": 130
+  "totalQuestions": 130,
+  "recommendedPro": {
+    "examId": "ai103",
+    "title": "AI-103 Complete",
+    "url": "https://examplar.gumroad.com/l/ai103-complete",
+    "blurb": "Passed the AI fundamentals? Level up to Azure AI Apps and Agents Developer with the AI-103 Complete pack."
+  }
 }

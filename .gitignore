@@ -53,6 +53,10 @@ user-content/exams/*
 !user-content/exams/dp900/**
 !user-content/exams/dp700/
 !user-content/exams/dp700/**
+!user-content/exams/ai103/
+!user-content/exams/ai103/**
+!user-content/exams/sc300/
+!user-content/exams/sc300/**
 
 # Private exam backups/zips (keep local only)
 user-content/*.zip
