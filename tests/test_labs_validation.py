@@ -122,6 +122,10 @@ class OfficialDocUrlTests(unittest.TestCase):
     def test_non_https_is_rejected(self):
         self.assertFalse(vep.is_official_doc_url("ftp://learn.microsoft.com/x"))
 
+    def test_http_is_rejected(self):
+        # https is required; a plain-HTTP official host must not pass the gate.
+        self.assertFalse(vep.is_official_doc_url("http://learn.microsoft.com/azure/x"))
+
     def test_empty_is_rejected(self):
         self.assertFalse(vep.is_official_doc_url(""))
 

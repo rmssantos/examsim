@@ -24,7 +24,14 @@
       icon.classList.toggle('fa-moon', !isDark);
     }
   }
-  applyTheme(localStorage.getItem('theme') || 'light');
+  // Match the rest of the UI (editor-init.js / legal-page.js): honor a saved choice,
+  // otherwise follow the OS via prefers-color-scheme.
+  function preferredTheme() {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || saved === 'light') return saved;
+    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  applyTheme(preferredTheme());
   document.getElementById('labs-theme-toggle')?.addEventListener('click', () => {
     const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
     localStorage.setItem('theme', next);
@@ -50,13 +57,14 @@
 
   const SAFE_IMAGE_RE = /^[A-Za-z0-9_. -]{1,128}\.(?:jpg|jpeg|png|gif|webp)$/i;
 
-  // Only allow http(s) in hrefs. escapeHtml stops HTML injection but not a
-  // javascript:/data: scheme, and imported packs are not re-validated at runtime,
-  // so a crafted lab reference or pro URL could otherwise execute on click.
+  // Only allow https in hrefs (matches the validator's official-doc gate). escapeHtml
+  // stops HTML injection but not a javascript:/data: scheme, and imported packs are not
+  // re-validated at runtime, so a crafted lab reference or pro URL could otherwise
+  // execute on click or downgrade the link to plain HTTP.
   function safeHref(url) {
     try {
       const parsed = new URL(String(url), window.location.origin);
-      return (parsed.protocol === 'https:' || parsed.protocol === 'http:') ? parsed.href : '#';
+      return parsed.protocol === 'https:' ? parsed.href : '#';
     } catch (_) {
       return '#';
     }

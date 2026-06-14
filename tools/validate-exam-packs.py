@@ -182,7 +182,7 @@ class PackValidator:
         self.validate_questions(exam_id, questions, dump_path)
 
         if isinstance(questions_raw, dict) and "labs" in questions_raw:
-            self.validate_labs(exam_id, questions_raw.get("labs"), dump_path)
+            self.validate_labs(exam_id, questions_raw.get("labs"), dump_path, metadata)
 
     def validate_metadata(self, exam_id: str, metadata: Any, path: Path, questions: Any) -> None:
         if not isinstance(metadata, dict):
@@ -328,11 +328,20 @@ class PackValidator:
                 if not image_path.is_file():
                     self.add_issue(path, f"{label}: missing image file images/{filename}")
 
-    def validate_labs(self, exam_id: str, labs: Any, path: Path) -> None:
+    def validate_labs(self, exam_id: str, labs: Any, path: Path, metadata: Any = None) -> None:
         for message in lab_validation_messages(labs):
             self.add_issue(path, message)
         if not isinstance(labs, list):
             return
+        # metadata.labCount drives the homepage CTA + the SEO landing section, so a drift
+        # between it and the real number of labs would advertise the wrong thing.
+        if isinstance(metadata, dict) and metadata.get("labCount") is not None:
+            lab_count = metadata.get("labCount")
+            if not is_plain_int(lab_count) or lab_count != len(labs):
+                self.add_issue(
+                    path,
+                    f"metadata labCount {lab_count!r} must match the number of labs in dump.json ({len(labs)})",
+                )
         for lab in labs:
             if not isinstance(lab, dict):
                 continue
@@ -394,14 +403,18 @@ def is_safe_image_name(value: str) -> bool:
 
 
 def is_official_doc_url(url: Any) -> bool:
-    """True only for https(s) URLs on an allowlisted official documentation host."""
+    """True only for https URLs on an allowlisted official documentation host.
+
+    https is required (not http): lab references are external links a learner clicks,
+    and an imported pack must not be able to point them at a plain-HTTP doc URL.
+    """
     if not has_text(url):
         return False
     try:
         parsed = urllib.parse.urlparse(url.strip())
     except ValueError:
         return False
-    if parsed.scheme not in ("http", "https"):
+    if parsed.scheme != "https":
         return False
     host = (parsed.hostname or "").lower()
     return any(
