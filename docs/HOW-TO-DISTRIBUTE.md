@@ -39,6 +39,10 @@ Do not publish copied certification questions or proprietary material.
 }
 ```
 
+A pack may also carry an optional `labs` array of hands-on lab guides next to
+`questions`. See [Pack-Format.md](Pack-Format.md#hands-on-labs-labs-array) for the
+lab schema and the `metadata.labCount` rule.
+
 ### ZIP Pack
 
 ```text

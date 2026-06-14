@@ -141,6 +141,107 @@ Click on specific areas of an image.
 
 ---
 
+## Hands-on Labs (`labs` array)
+
+A pack can ship hands-on **lab guides** alongside its questions. Labs are
+non-graded, step-by-step exercises the learner runs in their own cloud account.
+They are independent of the exam engine (scoring is untouched) and render in a
+standalone reader at `labs.html?exam=<exam-id>`.
+
+When labs are present, the pack's content file holds an object with both
+`questions` and `labs` (rather than a bare array of questions):
+
+```json
+{
+  "questions": [ ... ],
+  "labs": [
+    {
+      "id": "lab-az104-rbac-rg-reader",
+      "domain": "AZ104-1",
+      "title": "Grant least-privilege access with an RBAC role at resource-group scope",
+      "objective": "Assign the built-in Reader role to a user at a single resource group's scope.",
+      "prerequisites": [
+        "An Azure free account with an active subscription",
+        "Azure CLI installed and signed in with az login"
+      ],
+      "freeTierOnly": true,
+      "estCost": "Expected cost: ~0 EUR. Role assignments are free; delete the group at the end.",
+      "steps": [
+        {
+          "n": 1,
+          "instruction": "Create a sandbox resource group.\n\n`az group create --name rg-lab-rbac --location westeurope`",
+          "expected": "JSON output where \"provisioningState\" is \"Succeeded\"."
+        }
+      ],
+      "expectedResult": "The test user has Reader on exactly one resource group.",
+      "cleanup": [
+        "`az group delete --name rg-lab-rbac --yes --no-wait`"
+      ],
+      "references": [
+        {
+          "label": "Assign Azure roles using Azure CLI (Microsoft Learn)",
+          "url": "https://learn.microsoft.com/azure/role-based-access-control/role-assignments-cli"
+        }
+      ],
+      "sourceVerifiedOn": "2026-06-14",
+      "objectiveVersion": "AZ-104 skills measured as of April 17, 2026"
+    }
+  ]
+}
+```
+
+### Lab Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | string | ✅ Yes | Unique lab identifier (must be unique within the `labs` array) |
+| `domain` | string | ✅ Yes | Objective-domain code the lab maps to (e.g. `AZ104-1`) |
+| `title` | string | ✅ Yes | Short lab title |
+| `objective` | string | ✅ Yes | What the learner accomplishes and why it maps to the exam |
+| `prerequisites` | string[] | ✅ Yes | Non-empty list of non-empty strings (accounts, tools, permissions, shell) |
+| `freeTierOnly` | boolean | ✅ Yes | Must be a real boolean. `true` if the lab stays within free-tier/no-cost resources |
+| `estCost` | string | ✅ Yes | Plain-language cost callout (hard gate: a paid lab can never ship without one) |
+| `steps` | object[] | ✅ Yes | Non-empty ordered list (see step shape below) |
+| `expectedResult` | string | ✅ Yes | The end state after all steps succeed |
+| `cleanup` | string[] | ✅ Yes | Non-empty teardown list (hard gate: every lab must tell the learner how to tear down) |
+| `references` | object[] | ✅ Yes | Non-empty list of `{label, url}`; every `url` must be an official-documentation HTTPS link (see below) |
+| `sourceVerifiedOn` | string | ✅ Yes | ISO date (`YYYY-MM-DD`) the steps were last verified against the docs |
+| `objectiveVersion` | string | ✅ Yes | The skills-measured/objective version the lab was authored against |
+
+**Step shape** (each entry in `steps`):
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `n` | number | ✅ Yes | Step number (integer) |
+| `instruction` | string | ✅ Yes | What to do (markdown supported, including inline command blocks) |
+| `expected` | string | ✅ Yes | What the learner should observe if the step worked |
+| `image` | object | ⚠️ Optional | `{ "filename": "..." }`, resolved against the exam's `images/` folder like question images |
+
+### Reference URL gate
+
+Lab references are external links the learner clicks, so they are restricted to
+official documentation hosts over HTTPS. The validator (`is_official_doc_url`)
+accepts `learn.microsoft.com`, `docs.microsoft.com`, `azure.microsoft.com`,
+`microsoft.com`, `docs.aws.amazon.com`, `aws.amazon.com`, `cloud.google.com`,
+and their subdomains. Plain HTTP and any other host are rejected.
+
+### Labs and metadata
+
+When a pack ships labs, its `metadata.json` declares them:
+
+- `labCount` (number) is **required** when the pack ships labs, and it must equal
+  the actual number of labs. A non-zero `labCount` with no labs present is also
+  rejected, since the count must match the labs that are there. The homepage entry
+  point and the SEO landing section key off `labCount`.
+- `labTopics` (string[], optional) is a teaser list of lab topics for the landing
+  copy. It is independent of `labCount`: a free preview can list the full pack's
+  lab topics (e.g. eight) while shipping a single free sample lab (`labCount: 1`).
+
+See [Hands-on Labs metadata](#metadata-fields) for the metadata field entries and
+[Data Validation](#data-validation) for how labs are checked.
+
+---
+
 ## Image Handling
 
 ### Image Paths
@@ -277,6 +378,8 @@ Optional `metadata.json` provides rich exam information:
 | `commercialStatus` | string | Publication/licensing status, e.g., free, preview, pro-preview, pro. This is controlled during publication, not by the normal browser editor. |
 | `modules` | object[] | List of exam modules |
 | `hasImages` | boolean | Whether exam includes images |
+| `labCount` | number | Number of hands-on labs in the pack. Required when the pack ships labs; must equal the actual lab count (see [Hands-on Labs](#hands-on-labs-labs-array)) |
+| `labTopics` | string[] | Optional teaser list of lab topics for landing copy; independent of `labCount` |
 
 Public packs should include the library taxonomy fields (`vendor`, `certificationCode`, `domains`, `level`, `productFamily`, `contentType`, and publication-controlled `commercialStatus`) so search, sort, filters, cards, and health reports keep working as the catalog grows across vendors. Imported/private packs can omit them; the simulator falls back to generic metadata.
 
@@ -332,6 +435,18 @@ python tools/validate-exam-packs.py --root user-content/exams --health-report
 ```
 
 The health report assigns each pack a `score:/100` and a `Ready`, `Review`, or `Needs work` label. The score combines metadata completeness, schema validity, manifest integrity, image-reference health, and suspicious duplicate question text. It also prints question counts and the question-type mix for quick catalog review.
+
+### Lab validation
+
+When a pack includes a `labs` array, the validator also checks each lab
+(see [Hands-on Labs](#hands-on-labs-labs-array)): unique `id`; the required text
+fields (`domain`, `title`, `objective`, `expectedResult`, `estCost`,
+`objectiveVersion`); a boolean `freeTierOnly`; an ISO `sourceVerifiedOn`;
+non-empty `prerequisites`, `cleanup`, and `steps` (each step with integer `n`,
+`instruction`, and `expected`); and non-empty `references` whose URLs all point
+to official documentation over HTTPS. A lab step's optional `image` must resolve
+inside the exam's `images/` folder. `metadata.labCount` must be present and equal
+the number of labs.
 
 ### Required Validation
 
