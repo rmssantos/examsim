@@ -1,319 +1,376 @@
-[
-  {
-    "id": 1,
-    "module": "Microsoft Entra Users & Groups",
-    "question": "Which Microsoft Entra group type automatically adds or removes members based on user or device attributes such as department or job title?",
-    "options": [
-      "Assigned group",
-      "Dynamic group",
-      "Distribution list",
-      "Administrative unit"
-    ],
-    "correct": 1,
-    "explanation": "A dynamic group uses membership rules based on attributes (for example department equals Sales) to automatically add or remove users or devices. An assigned group requires administrators to add members manually.",
-    "reference": "https://learn.microsoft.com/en-us/entra/identity/users/groups-create-rule",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 2,
-    "module": "Microsoft Entra Users & Groups",
-    "question": "Which Microsoft Entra feature allows users to reset their own passwords without contacting the help desk?",
-    "options": [
-      "Conditional Access",
-      "Self-service password reset (SSPR)",
-      "Privileged Identity Management (PIM)",
-      "Multifactor authentication (MFA)"
-    ],
-    "correct": 1,
-    "explanation": "Self-service password reset (SSPR) lets users reset or unlock their accounts on their own after verifying their identity, reducing help desk load. Conditional Access and MFA control access but do not provide self-service reset.",
-    "reference": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-sspr-howitworks",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 3,
-    "module": "Access to Azure Resources (RBAC)",
-    "question": "An administrator must allow a user to fully manage all resources in a resource group but must NOT allow that user to grant access to other people. Which built-in role is most appropriate?",
-    "options": [
-      "Owner",
-      "Contributor",
-      "Reader",
-      "User Access Administrator"
-    ],
-    "correct": 1,
-    "explanation": "The Contributor role can create and manage all types of resources but cannot grant access to others (it cannot manage role assignments). Owner can manage resources and assign roles, while User Access Administrator only manages access.",
-    "reference": "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 4,
-    "module": "Access to Azure Resources (RBAC)",
-    "question": "For each statement about Azure RBAC, indicate whether it is correct.",
-    "statements": [
-      "A role assigned at the subscription scope is inherited by its resource groups and resources.",
-      "Permissions from multiple RBAC assignments are cumulative (additive).",
-      "A deny assignment is overridden by a role assignment that grants the same action."
-    ],
-    "correct": [
-      0,
-      0,
-      1
-    ],
-    "explanation": "RBAC assignments are inherited downward, so a subscription-scope role applies to its resource groups and resources (Yes). Permissions are additive across assignments (Yes). Deny assignments take precedence over role assignments, so they are not overridden (No). Note: Yes maps to 0 and No maps to 1.",
-    "reference": "https://learn.microsoft.com/en-us/azure/role-based-access-control/overview",
-    "question_type": "YES_NO_MATRIX"
-  },
-  {
-    "id": 5,
-    "module": "Subscriptions & Governance",
-    "question": "Which feature prevents a resource from being accidentally deleted while still allowing it to be modified?",
-    "options": [
-      "A CanNotDelete lock",
-      "A ReadOnly lock",
-      "A resource tag",
-      "An Azure Policy audit effect"
-    ],
-    "correct": 0,
-    "explanation": "A CanNotDelete lock allows authorized users to read and modify a resource but blocks deletion. A ReadOnly lock would also prevent modifications, which is more restrictive than required here.",
-    "reference": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 6,
-    "module": "Subscriptions & Governance",
-    "question": "What is the primary purpose of a management group in Azure?",
-    "options": [
-      "To store virtual machine disks",
-      "To organize multiple subscriptions and apply governance such as policy and access across them",
-      "To provide a private network connection between regions",
-      "To collect and analyze application logs"
-    ],
-    "correct": 1,
-    "explanation": "Management groups are containers that let you organize multiple subscriptions and apply governance conditions like Azure Policy and RBAC at scale. Policies and role assignments applied to a management group are inherited by the subscriptions beneath it.",
-    "reference": "https://learn.microsoft.com/en-us/azure/governance/management-groups/overview",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 7,
-    "module": "Storage Access & Security",
-    "question": "Which mechanism grants time-limited, scoped access to specific Azure Storage resources without sharing the storage account keys?",
-    "options": [
-      "A shared access signature (SAS) token",
-      "The storage account access key",
-      "A network security group rule",
-      "A managed disk snapshot"
-    ],
-    "correct": 0,
-    "explanation": "A shared access signature (SAS) grants limited, time-bound access to specific storage resources and operations without exposing the account keys. Sharing the account key grants full, unrestricted access and should be avoided.",
-    "reference": "https://learn.microsoft.com/en-us/azure/storage/common/storage-sas-overview",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 8,
-    "module": "Storage Accounts",
-    "question": "Which storage redundancy option combines zone redundancy within the primary region and geo-replication to a secondary region?",
-    "options": [
-      "Locally redundant storage (LRS)",
-      "Zone-redundant storage (ZRS)",
-      "Geo-redundant storage (GRS)",
-      "Geo-zone-redundant storage (GZRS)"
-    ],
-    "correct": 3,
-    "explanation": "Geo-zone-redundant storage (GZRS) writes data synchronously across availability zones in the primary region and also replicates asynchronously to a secondary region, combining the benefits of ZRS and geo-replication.",
-    "reference": "https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 9,
-    "module": "Azure Files & Blob Storage",
-    "question": "Which Azure Blob Storage feature can automatically transition blobs to cooler access tiers or delete them based on rules such as age?",
-    "options": [
-      "Blob versioning",
-      "Lifecycle management policy",
-      "Object replication",
-      "Soft delete"
-    ],
-    "correct": 1,
-    "explanation": "A lifecycle management policy uses rules to automatically move blobs to cooler tiers (cool, cold, archive) or delete them after a defined period, helping optimize storage costs without manual intervention.",
-    "reference": "https://learn.microsoft.com/en-us/azure/storage/blobs/lifecycle-management-overview",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 10,
-    "module": "Azure Files & Blob Storage",
-    "question": "An administrator wants to be able to recover blobs that are accidentally deleted, for a configurable retention period. Which feature should be enabled?",
-    "options": [
-      "Soft delete for blobs",
-      "Storage account encryption",
-      "Storage firewall rules",
-      "Premium performance tier"
-    ],
-    "correct": 0,
-    "explanation": "Soft delete retains deleted blobs (and optionally containers) for a configurable retention period, allowing recovery before they are permanently removed. Encryption and firewalls protect data but do not aid recovery from deletion.",
-    "reference": "https://learn.microsoft.com/en-us/azure/storage/blobs/soft-delete-blob-overview",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 11,
-    "module": "ARM Templates & Bicep",
-    "question": "What is a key characteristic of deploying infrastructure with ARM templates or Bicep files?",
-    "options": [
-      "Each deployment always creates duplicate resources",
-      "Deployments are declarative and idempotent, producing the same result if run repeatedly",
-      "They can only be executed from the Azure portal",
-      "They cannot express dependencies between resources"
-    ],
-    "correct": 1,
-    "explanation": "ARM templates and Bicep are declarative: you describe the desired end state, and deployments are idempotent, so re-running the same template produces the same result rather than creating duplicates. They can also express dependencies between resources.",
-    "reference": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/overview",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 12,
-    "module": "Virtual Machines",
-    "question": "Which option protects virtual machines against rack-level hardware failures within a single datacenter by distributing them across fault and update domains?",
-    "options": [
-      "Availability zones",
-      "Availability sets",
-      "Region pairs",
-      "Proximity placement groups"
-    ],
-    "correct": 1,
-    "explanation": "An availability set distributes VMs across multiple fault domains and update domains within a datacenter, protecting against localized hardware failures and host updates. Availability zones protect against datacenter-level failures across a region.",
-    "reference": "https://learn.microsoft.com/en-us/azure/virtual-machines/availability-set-overview",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 13,
-    "module": "Virtual Machines",
-    "question": "What is an advantage of using Azure managed disks instead of unmanaged disks?",
-    "options": [
-      "Azure handles the underlying storage account management and improves reliability",
-      "Managed disks are always provided at no cost",
-      "Managed disks cannot be encrypted",
-      "They require you to manually create and manage storage accounts"
-    ],
-    "correct": 0,
-    "explanation": "With managed disks, Azure manages the underlying storage accounts for you, improving reliability and simplifying scaling and management. Unmanaged disks require you to create and manage storage accounts yourself.",
-    "reference": "https://learn.microsoft.com/en-us/azure/virtual-machines/managed-disks-overview",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 14,
-    "module": "Containers",
-    "question": "An administrator needs to run a single, short-lived container quickly without managing any orchestration infrastructure. Which service is the simplest fit?",
-    "options": [
-      "Azure Kubernetes Service (AKS)",
-      "Azure Container Instances (ACI)",
-      "Azure Virtual Machines",
-      "Azure App Service plan"
-    ],
-    "correct": 1,
-    "explanation": "Azure Container Instances (ACI) runs containers on demand without requiring you to provision or manage virtual machines or orchestrators, making it ideal for simple, short-lived, or burst workloads. AKS is suited to complex, orchestrated workloads.",
-    "reference": "https://learn.microsoft.com/en-us/azure/container-instances/container-instances-overview",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 15,
-    "module": "Azure App Service",
-    "question": "Which of the following are benefits of using deployment slots in Azure App Service? (Select all that apply.)",
-    "options": [
-      "Deploy and test a new version in a staging slot before production",
-      "Swap slots to minimize downtime when releasing",
-      "Quickly roll back by swapping the slots again",
-      "Automatically reduce the App Service plan cost to zero"
-    ],
-    "correct": [
-      0,
-      1,
-      2
-    ],
-    "explanation": "Deployment slots let you deploy to a staging slot, warm it up, and swap into production with minimal downtime, and you can roll back by swapping again. They do not reduce the App Service plan cost; slots run within the same plan.",
-    "reference": "https://learn.microsoft.com/en-us/azure/app-service/deploy-staging-slots",
-    "question_type": "MULTI"
-  },
-  {
-    "id": 16,
-    "module": "Virtual Networking",
-    "question": "What does Azure virtual network peering enable?",
-    "options": [
-      "Encrypting data stored in a storage account",
-      "Connecting two virtual networks so resources can communicate privately over the Azure backbone",
-      "Creating a public IP address for a virtual machine",
-      "Resolving custom DNS names on the public internet"
-    ],
-    "correct": 1,
-    "explanation": "Virtual network peering connects two virtual networks, allowing resources in each to communicate privately using the Microsoft backbone network, as if they were in the same network. It does not provide encryption at rest or public DNS resolution.",
-    "reference": "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-peering-overview",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 17,
-    "module": "Network Security",
-    "question": "Which Azure resource filters inbound and outbound network traffic to subnets or network interfaces using allow and deny rules?",
-    "options": [
-      "Network security group (NSG)",
-      "Azure Bastion",
-      "Azure DNS",
-      "Recovery Services vault"
-    ],
-    "correct": 0,
-    "explanation": "A network security group (NSG) contains security rules that allow or deny inbound and outbound traffic based on source, destination, port, and protocol, and can be associated with subnets or network interfaces.",
-    "reference": "https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 18,
-    "module": "Network Security",
-    "question": "Select the two ways an administrator can connect to a VM for management without giving the VM a public IP address.",
-    "options": [
-      "Azure Bastion",
-      "A private IP over a site-to-site VPN or ExpressRoute connection",
-      "RDP directly to a public IP on the VM",
-      "An NSG deny rule",
-      "A resource lock"
-    ],
-    "correct": [
-      0,
-      1
-    ],
-    "drag_select_required": 2,
-    "explanation": "Azure Bastion brokers RDP/SSH through the portal without a public IP, and connecting over a private IP through a VPN or ExpressRoute also avoids exposing the VM publicly. Using a public IP defeats the goal, and NSG rules or locks are not connectivity methods.",
-    "reference": "https://learn.microsoft.com/en-us/azure/bastion/bastion-overview",
-    "question_type": "DRAG_DROP_SELECT"
-  },
-  {
-    "id": 19,
-    "module": "Name Resolution & Load Balancing",
-    "question": "An administrator needs URL-based routing and TLS termination for HTTP/HTTPS web traffic. Which service operates at layer 7 and provides these features?",
-    "options": [
-      "Azure Load Balancer",
-      "Azure Application Gateway",
-      "Azure DNS",
-      "Network security group"
-    ],
-    "correct": 1,
-    "explanation": "Azure Application Gateway is a layer 7 (application layer) load balancer that supports URL-based routing, TLS/SSL termination, and a web application firewall. Azure Load Balancer operates at layer 4 and distributes traffic based on IP and port.",
-    "reference": "https://learn.microsoft.com/en-us/azure/application-gateway/overview",
-    "question_type": "STANDARD"
-  },
-  {
-    "id": 20,
-    "module": "Backup & Recovery",
-    "question": "Arrange the steps to protect an Azure VM with Azure Site Recovery, from first to last.",
-    "options": [
-      "Create a Recovery Services vault",
-      "Enable replication for the VM to a secondary region",
-      "Run a test failover to validate the recovery plan",
-      "Perform a failover to the secondary region during an outage"
-    ],
-    "correct": [
-      0,
-      1,
-      2,
-      3
-    ],
-    "explanation": "Azure Site Recovery orchestrates regional failover. You create a Recovery Services vault, enable replication of the VM to a secondary region, run a non-disruptive test failover to validate the plan, and finally perform an actual failover during an outage.",
-    "reference": "https://learn.microsoft.com/en-us/azure/site-recovery/site-recovery-overview",
-    "question_type": "SEQUENCE"
-  }
-]
+{
+  "questions": [
+    {
+      "id": 1,
+      "module": "Microsoft Entra Users & Groups",
+      "question": "Which Microsoft Entra group type automatically adds or removes members based on user or device attributes such as department or job title?",
+      "options": [
+        "Assigned group",
+        "Dynamic group",
+        "Distribution list",
+        "Administrative unit"
+      ],
+      "correct": 1,
+      "explanation": "A dynamic group uses membership rules based on attributes (for example department equals Sales) to automatically add or remove users or devices. An assigned group requires administrators to add members manually.",
+      "reference": "https://learn.microsoft.com/en-us/entra/identity/users/groups-create-rule",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 2,
+      "module": "Microsoft Entra Users & Groups",
+      "question": "Which Microsoft Entra feature allows users to reset their own passwords without contacting the help desk?",
+      "options": [
+        "Conditional Access",
+        "Self-service password reset (SSPR)",
+        "Privileged Identity Management (PIM)",
+        "Multifactor authentication (MFA)"
+      ],
+      "correct": 1,
+      "explanation": "Self-service password reset (SSPR) lets users reset or unlock their accounts on their own after verifying their identity, reducing help desk load. Conditional Access and MFA control access but do not provide self-service reset.",
+      "reference": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-sspr-howitworks",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 3,
+      "module": "Access to Azure Resources (RBAC)",
+      "question": "An administrator must allow a user to fully manage all resources in a resource group but must NOT allow that user to grant access to other people. Which built-in role is most appropriate?",
+      "options": [
+        "Owner",
+        "Contributor",
+        "Reader",
+        "User Access Administrator"
+      ],
+      "correct": 1,
+      "explanation": "The Contributor role can create and manage all types of resources but cannot grant access to others (it cannot manage role assignments). Owner can manage resources and assign roles, while User Access Administrator only manages access.",
+      "reference": "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 4,
+      "module": "Access to Azure Resources (RBAC)",
+      "question": "For each statement about Azure RBAC, indicate whether it is correct.",
+      "statements": [
+        "A role assigned at the subscription scope is inherited by its resource groups and resources.",
+        "Permissions from multiple RBAC assignments are cumulative (additive).",
+        "A deny assignment is overridden by a role assignment that grants the same action."
+      ],
+      "correct": [
+        0,
+        0,
+        1
+      ],
+      "explanation": "RBAC assignments are inherited downward, so a subscription-scope role applies to its resource groups and resources (Yes). Permissions are additive across assignments (Yes). Deny assignments take precedence over role assignments, so they are not overridden (No). Note: Yes maps to 0 and No maps to 1.",
+      "reference": "https://learn.microsoft.com/en-us/azure/role-based-access-control/overview",
+      "question_type": "YES_NO_MATRIX"
+    },
+    {
+      "id": 5,
+      "module": "Subscriptions & Governance",
+      "question": "Which feature prevents a resource from being accidentally deleted while still allowing it to be modified?",
+      "options": [
+        "A CanNotDelete lock",
+        "A ReadOnly lock",
+        "A resource tag",
+        "An Azure Policy audit effect"
+      ],
+      "correct": 0,
+      "explanation": "A CanNotDelete lock allows authorized users to read and modify a resource but blocks deletion. A ReadOnly lock would also prevent modifications, which is more restrictive than required here.",
+      "reference": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 6,
+      "module": "Subscriptions & Governance",
+      "question": "What is the primary purpose of a management group in Azure?",
+      "options": [
+        "To store virtual machine disks",
+        "To organize multiple subscriptions and apply governance such as policy and access across them",
+        "To provide a private network connection between regions",
+        "To collect and analyze application logs"
+      ],
+      "correct": 1,
+      "explanation": "Management groups are containers that let you organize multiple subscriptions and apply governance conditions like Azure Policy and RBAC at scale. Policies and role assignments applied to a management group are inherited by the subscriptions beneath it.",
+      "reference": "https://learn.microsoft.com/en-us/azure/governance/management-groups/overview",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 7,
+      "module": "Storage Access & Security",
+      "question": "Which mechanism grants time-limited, scoped access to specific Azure Storage resources without sharing the storage account keys?",
+      "options": [
+        "A shared access signature (SAS) token",
+        "The storage account access key",
+        "A network security group rule",
+        "A managed disk snapshot"
+      ],
+      "correct": 0,
+      "explanation": "A shared access signature (SAS) grants limited, time-bound access to specific storage resources and operations without exposing the account keys. Sharing the account key grants full, unrestricted access and should be avoided.",
+      "reference": "https://learn.microsoft.com/en-us/azure/storage/common/storage-sas-overview",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 8,
+      "module": "Storage Accounts",
+      "question": "Which storage redundancy option combines zone redundancy within the primary region and geo-replication to a secondary region?",
+      "options": [
+        "Locally redundant storage (LRS)",
+        "Zone-redundant storage (ZRS)",
+        "Geo-redundant storage (GRS)",
+        "Geo-zone-redundant storage (GZRS)"
+      ],
+      "correct": 3,
+      "explanation": "Geo-zone-redundant storage (GZRS) writes data synchronously across availability zones in the primary region and also replicates asynchronously to a secondary region, combining the benefits of ZRS and geo-replication.",
+      "reference": "https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 9,
+      "module": "Azure Files & Blob Storage",
+      "question": "Which Azure Blob Storage feature can automatically transition blobs to cooler access tiers or delete them based on rules such as age?",
+      "options": [
+        "Blob versioning",
+        "Lifecycle management policy",
+        "Object replication",
+        "Soft delete"
+      ],
+      "correct": 1,
+      "explanation": "A lifecycle management policy uses rules to automatically move blobs to cooler tiers (cool, cold, archive) or delete them after a defined period, helping optimize storage costs without manual intervention.",
+      "reference": "https://learn.microsoft.com/en-us/azure/storage/blobs/lifecycle-management-overview",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 10,
+      "module": "Azure Files & Blob Storage",
+      "question": "An administrator wants to be able to recover blobs that are accidentally deleted, for a configurable retention period. Which feature should be enabled?",
+      "options": [
+        "Soft delete for blobs",
+        "Storage account encryption",
+        "Storage firewall rules",
+        "Premium performance tier"
+      ],
+      "correct": 0,
+      "explanation": "Soft delete retains deleted blobs (and optionally containers) for a configurable retention period, allowing recovery before they are permanently removed. Encryption and firewalls protect data but do not aid recovery from deletion.",
+      "reference": "https://learn.microsoft.com/en-us/azure/storage/blobs/soft-delete-blob-overview",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 11,
+      "module": "ARM Templates & Bicep",
+      "question": "What is a key characteristic of deploying infrastructure with ARM templates or Bicep files?",
+      "options": [
+        "Each deployment always creates duplicate resources",
+        "Deployments are declarative and idempotent, producing the same result if run repeatedly",
+        "They can only be executed from the Azure portal",
+        "They cannot express dependencies between resources"
+      ],
+      "correct": 1,
+      "explanation": "ARM templates and Bicep are declarative: you describe the desired end state, and deployments are idempotent, so re-running the same template produces the same result rather than creating duplicates. They can also express dependencies between resources.",
+      "reference": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/overview",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 12,
+      "module": "Virtual Machines",
+      "question": "Which option protects virtual machines against rack-level hardware failures within a single datacenter by distributing them across fault and update domains?",
+      "options": [
+        "Availability zones",
+        "Availability sets",
+        "Region pairs",
+        "Proximity placement groups"
+      ],
+      "correct": 1,
+      "explanation": "An availability set distributes VMs across multiple fault domains and update domains within a datacenter, protecting against localized hardware failures and host updates. Availability zones protect against datacenter-level failures across a region.",
+      "reference": "https://learn.microsoft.com/en-us/azure/virtual-machines/availability-set-overview",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 13,
+      "module": "Virtual Machines",
+      "question": "What is an advantage of using Azure managed disks instead of unmanaged disks?",
+      "options": [
+        "Azure handles the underlying storage account management and improves reliability",
+        "Managed disks are always provided at no cost",
+        "Managed disks cannot be encrypted",
+        "They require you to manually create and manage storage accounts"
+      ],
+      "correct": 0,
+      "explanation": "With managed disks, Azure manages the underlying storage accounts for you, improving reliability and simplifying scaling and management. Unmanaged disks require you to create and manage storage accounts yourself.",
+      "reference": "https://learn.microsoft.com/en-us/azure/virtual-machines/managed-disks-overview",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 14,
+      "module": "Containers",
+      "question": "An administrator needs to run a single, short-lived container quickly without managing any orchestration infrastructure. Which service is the simplest fit?",
+      "options": [
+        "Azure Kubernetes Service (AKS)",
+        "Azure Container Instances (ACI)",
+        "Azure Virtual Machines",
+        "Azure App Service plan"
+      ],
+      "correct": 1,
+      "explanation": "Azure Container Instances (ACI) runs containers on demand without requiring you to provision or manage virtual machines or orchestrators, making it ideal for simple, short-lived, or burst workloads. AKS is suited to complex, orchestrated workloads.",
+      "reference": "https://learn.microsoft.com/en-us/azure/container-instances/container-instances-overview",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 15,
+      "module": "Azure App Service",
+      "question": "Which of the following are benefits of using deployment slots in Azure App Service? (Select all that apply.)",
+      "options": [
+        "Deploy and test a new version in a staging slot before production",
+        "Swap slots to minimize downtime when releasing",
+        "Quickly roll back by swapping the slots again",
+        "Automatically reduce the App Service plan cost to zero"
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Deployment slots let you deploy to a staging slot, warm it up, and swap into production with minimal downtime, and you can roll back by swapping again. They do not reduce the App Service plan cost; slots run within the same plan.",
+      "reference": "https://learn.microsoft.com/en-us/azure/app-service/deploy-staging-slots",
+      "question_type": "MULTI"
+    },
+    {
+      "id": 16,
+      "module": "Virtual Networking",
+      "question": "What does Azure virtual network peering enable?",
+      "options": [
+        "Encrypting data stored in a storage account",
+        "Connecting two virtual networks so resources can communicate privately over the Azure backbone",
+        "Creating a public IP address for a virtual machine",
+        "Resolving custom DNS names on the public internet"
+      ],
+      "correct": 1,
+      "explanation": "Virtual network peering connects two virtual networks, allowing resources in each to communicate privately using the Microsoft backbone network, as if they were in the same network. It does not provide encryption at rest or public DNS resolution.",
+      "reference": "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-peering-overview",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 17,
+      "module": "Network Security",
+      "question": "Which Azure resource filters inbound and outbound network traffic to subnets or network interfaces using allow and deny rules?",
+      "options": [
+        "Network security group (NSG)",
+        "Azure Bastion",
+        "Azure DNS",
+        "Recovery Services vault"
+      ],
+      "correct": 0,
+      "explanation": "A network security group (NSG) contains security rules that allow or deny inbound and outbound traffic based on source, destination, port, and protocol, and can be associated with subnets or network interfaces.",
+      "reference": "https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 18,
+      "module": "Network Security",
+      "question": "Select the two ways an administrator can connect to a VM for management without giving the VM a public IP address.",
+      "options": [
+        "Azure Bastion",
+        "A private IP over a site-to-site VPN or ExpressRoute connection",
+        "RDP directly to a public IP on the VM",
+        "An NSG deny rule",
+        "A resource lock"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "drag_select_required": 2,
+      "explanation": "Azure Bastion brokers RDP/SSH through the portal without a public IP, and connecting over a private IP through a VPN or ExpressRoute also avoids exposing the VM publicly. Using a public IP defeats the goal, and NSG rules or locks are not connectivity methods.",
+      "reference": "https://learn.microsoft.com/en-us/azure/bastion/bastion-overview",
+      "question_type": "DRAG_DROP_SELECT"
+    },
+    {
+      "id": 19,
+      "module": "Name Resolution & Load Balancing",
+      "question": "An administrator needs URL-based routing and TLS termination for HTTP/HTTPS web traffic. Which service operates at layer 7 and provides these features?",
+      "options": [
+        "Azure Load Balancer",
+        "Azure Application Gateway",
+        "Azure DNS",
+        "Network security group"
+      ],
+      "correct": 1,
+      "explanation": "Azure Application Gateway is a layer 7 (application layer) load balancer that supports URL-based routing, TLS/SSL termination, and a web application firewall. Azure Load Balancer operates at layer 4 and distributes traffic based on IP and port.",
+      "reference": "https://learn.microsoft.com/en-us/azure/application-gateway/overview",
+      "question_type": "STANDARD"
+    },
+    {
+      "id": 20,
+      "module": "Backup & Recovery",
+      "question": "Arrange the steps to protect an Azure VM with Azure Site Recovery, from first to last.",
+      "options": [
+        "Create a Recovery Services vault",
+        "Enable replication for the VM to a secondary region",
+        "Run a test failover to validate the recovery plan",
+        "Perform a failover to the secondary region during an outage"
+      ],
+      "correct": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "explanation": "Azure Site Recovery orchestrates regional failover. You create a Recovery Services vault, enable replication of the VM to a secondary region, run a non-disruptive test failover to validate the plan, and finally perform an actual failover during an outage.",
+      "reference": "https://learn.microsoft.com/en-us/azure/site-recovery/site-recovery-overview",
+      "question_type": "SEQUENCE"
+    }
+  ],
+  "labs": [
+    {
+      "id": "lab-az104-rbac-rg-reader",
+      "domain": "AZ104-1",
+      "title": "Grant least-privilege access with an RBAC role at resource-group scope",
+      "objective": "Assign the built-in Reader role to a user at the scope of a single resource group, so they can view that group's resources and nothing else. This mirrors the identity and governance tasks AZ-104 measures, where a role-based exam may also ask you to perform this in a live lab.",
+      "prerequisites": [
+        "An Azure free account with an active subscription",
+        "Azure CLI installed and signed in with `az login` (or use Azure Cloud Shell)",
+        "The sign-in email (UPN) or object ID of a test user in your tenant to grant access to",
+        "Permission to create role assignments at the target scope: your signed-in account needs Microsoft.Authorization/roleAssignments/write, which comes with Owner, User Access Administrator, or Role Based Access Control Administrator. Contributor alone cannot create role assignments.",
+        "A Bash shell: the commands are written for Bash, so use Azure Cloud Shell (Bash) or Git Bash / WSL on Windows. The `scope=$(...)` capture and `$scope` expansion are Bash syntax and would need adapting in PowerShell or cmd.exe."
+      ],
+      "freeTierOnly": true,
+      "estCost": "Expected cost: ~0 EUR. Resource groups and role assignments are free; nothing billable is created. Delete the resource group at the end to be certain.",
+      "steps": [
+        {
+          "n": 1,
+          "instruction": "Create a sandbox resource group to scope the access to.\n\n`az group create --name rg-lab-rbac --location westeurope`",
+          "expected": "JSON output where \"provisioningState\" is \"Succeeded\"."
+        },
+        {
+          "n": 2,
+          "instruction": "Capture the resource group's resource ID, which you will use as the assignment scope.\n\n`scope=$(az group show --name rg-lab-rbac --query id --output tsv)`",
+          "expected": "The variable holds a value like /subscriptions/<sub-id>/resourceGroups/rg-lab-rbac."
+        },
+        {
+          "n": 3,
+          "instruction": "Assign the built-in Reader role to your test user at the resource-group scope. Replace <user> with their sign-in email or object ID.\n\n`az role assignment create --assignee \"<user>\" --role \"Reader\" --scope \"$scope\"`",
+          "expected": "JSON describing the new role assignment. The create response identifies the role by roleDefinitionId (a path ending in acdd72a7-3385-48ef-bd42-f606fba81ae7, the built-in Reader role) rather than by a friendly name, along with principalType \"User\" and the scope set to the resource group. The human-readable roleDefinitionName \"Reader\" is surfaced by the list command in the next step, not by create."
+        },
+        {
+          "n": 4,
+          "instruction": "Confirm the assignment exists only at this scope.\n\n`az role assignment list --scope \"$scope\" --query \"[].{principal:principalName, role:roleDefinitionName}\" --output table`",
+          "expected": "A row showing the test user with the Reader role. This assignment grants read access scoped to this resource group; assuming the user holds no other role assignments elsewhere, they cannot read other resource groups or the subscription. A user's effective access is always the union of all their role assignments across every scope."
+        }
+      ],
+      "expectedResult": "The test user has the Reader role at the rg-lab-rbac resource-group scope, demonstrating least-privilege access. Through this assignment they can view resources in that group; assuming they hold no other role assignments, they have no access elsewhere (a user's effective access is the union of all their assignments across every scope).",
+      "cleanup": [
+        "Delete the resource group to remove the scope and its role assignment and stop any chance of billing:\n`az group delete --name rg-lab-rbac --yes --no-wait`"
+      ],
+      "references": [
+        {
+          "label": "Assign Azure roles using Azure CLI (Microsoft Learn)",
+          "url": "https://learn.microsoft.com/azure/role-based-access-control/role-assignments-cli"
+        },
+        {
+          "label": "Azure built-in roles: Reader (Microsoft Learn)",
+          "url": "https://learn.microsoft.com/azure/role-based-access-control/built-in-roles"
+        }
+      ],
+      "sourceVerifiedOn": "2026-06-14",
+      "objectiveVersion": "AZ-104 skills measured as of April 17, 2026"
+    }
+  ]
+}

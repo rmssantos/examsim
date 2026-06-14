@@ -665,6 +665,17 @@ actions.appendChild(studyButton);
 }
 card.appendChild(actions);
 
+const labCount = Number(metadata.labCount) || 0;
+if (labCount > 0) {
+const labsLink = document.createElement('a');
+labsLink.className = 'exam-card-labs';
+labsLink.href = `labs.html?exam=${encodeURIComponent(examId)}`;
+labsLink.appendChild(this.createIcon('fas fa-flask'));
+labsLink.appendChild(document.createTextNode(` Hands-on labs (${labCount})`));
+labsLink.addEventListener('click', (e) => e.stopPropagation());
+card.appendChild(labsLink);
+}
+
 if (examData.hasImages) {
 const feature = document.createElement('div');
 feature.className = 'exam-feature';
@@ -984,7 +995,7 @@ const resourcesList = document.getElementById('details-resources-list');
 const moduleNames = this.getModuleNames(metadata.modules);
 
 if (moduleNames.length > 0) {
-modulesSection.style.display = 'block';
+modulesSection.classList.remove('is-hidden'); // is-hidden is display:none !important; toggle the class, not inline style
 modulesList.innerHTML = '';
 modulesList.className = 'modules-list selectable-list';
 modulesList.dataset.exam = examId;
@@ -1118,7 +1129,7 @@ if (metadata.resources && metadata.resources.length > 0) {
 	this.appendTextElement(resourcesList, 'p', 'muted', 'No resources available');
 }
 } else {
-modulesSection.style.display = 'none';
+modulesSection.classList.add('is-hidden');
 delete modulesList.dataset.exam;
 // Clear controls if hidden
 const existingControls = modulesSection.querySelector('.modules-select-controls');
@@ -1145,6 +1156,21 @@ if (reviewBtn) {
 reviewBtn.onclick = () => {
 this.openAttemptHistory(examId);
 };
+}
+
+// Hands-on labs: only when the pack advertises labs (metadata.labCount).
+const labsLink = document.getElementById('details-hands-on-labs');
+if (labsLink) {
+const labCount = Number(metadata.labCount) || 0;
+if (labCount > 0) {
+labsLink.href = `labs.html?exam=${encodeURIComponent(examId)}`;
+labsLink.classList.remove('is-hidden');
+const labsLabel = labsLink.querySelector('span');
+if (labsLabel) labsLabel.textContent = `Hands-on labs (${labCount})`;
+} else {
+labsLink.classList.add('is-hidden');
+labsLink.removeAttribute('href');
+}
 }
 
 // Setup close button

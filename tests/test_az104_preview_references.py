@@ -8,9 +8,11 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class Az104PreviewReferenceTests(unittest.TestCase):
     def test_preview_questions_cite_microsoft_learn(self):
-        dump = json.loads(
+        raw = json.loads(
             (ROOT / "user-content" / "exams" / "az104" / "dump.json").read_text(encoding="utf-8")
         )
+        # The pack may be a bare array or an object with a `questions` array (labs added a sibling).
+        dump = raw["questions"] if isinstance(raw, dict) else raw
         self.assertEqual(len(dump), 20, "AZ-104 preview should have 20 questions")
         for question in dump:
             ref = question.get("reference", "")

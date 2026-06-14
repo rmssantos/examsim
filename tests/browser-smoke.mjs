@@ -81,6 +81,20 @@ try {
   );
   assert.equal(await page.locator('#exam-details-placeholder.visible').count(), 1);
 
+  // Regression guard: the expanded "Exam coverage" section was populated but hidden by
+  // `is-hidden` (display:none !important) while JS only toggled inline style.display.
+  // Assert it actually renders Covered Modules + Study Resources for a pack that lists them.
+  const coverage = await page.evaluate(() => {
+    const section = document.getElementById('details-modules-section');
+    const resources = document.getElementById('details-resources-list');
+    return {
+      display: section ? getComputedStyle(section).display : 'missing',
+      resourceLinks: resources ? resources.querySelectorAll('a').length : 0,
+    };
+  });
+  assert.notEqual(coverage.display, 'none', 'Expanded exam coverage (modules + study resources) must be visible.');
+  assert.ok(coverage.resourceLinks >= 1, 'Study Resources must render links when the exam metadata lists resources.');
+
   await page.goto(`${baseUrl}/editor.html`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => {
     const select = document.querySelector('#examSelect');

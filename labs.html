@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1d232f">
+  <meta name="robots" content="noindex, follow">
+  <meta name="description" content="Hands-on lab guides: practice real cloud tasks in your own free-tier account, step by step.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.applicationinsights.azure.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/media/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="assets/media/favicon-64.png">
+  <title>Hands-on labs | Examplar</title>
+  <link rel="stylesheet" href="assets/css/exam-v2.css" />
+  <link rel="stylesheet" href="assets/css/labs.css" />
+  <link href="assets/vendor/fontawesome/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" class="container" tabindex="-1">
+    <div id="labs-screen" class="screen active">
+      <div class="cr-layout">
+        <aside class="cr-rail" aria-label="Labs overview">
+          <div class="cr-brand-row">
+            <a class="cr-brand" href="index.html"><span class="cr-brand-mark" aria-hidden="true">E</span> Examplar</a>
+            <div class="theme-controls">
+              <button type="button" class="theme-toggle" id="labs-theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+                <i aria-hidden="true" class="fas fa-moon theme-icon"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="cr-pack">
+            <span id="labs-pack-badge" class="exam-badge">Hands-on labs</span>
+            <span id="labs-pack-sub" class="cr-pack-sub"></span>
+          </div>
+
+          <nav id="labs-nav" class="labs-nav" aria-label="Lab list">
+            <span class="cr-palette-label">Labs</span>
+          </nav>
+
+          <div class="exam-bottom-actions">
+            <a id="labs-back" class="btn btn-outline" href="index.html">
+              <i aria-hidden="true" class="fas fa-arrow-left"></i> <span>Back to home</span>
+            </a>
+          </div>
+        </aside>
+
+        <div class="cr-main">
+          <div class="cr-workspace" id="labs-workspace" aria-live="polite">
+            <div class="labs-empty">Loading labs&hellip;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="assets/js/router.js"></script>
+  <script src="assets/js/pwa.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/analytics.js"></script>
+  <script src="assets/js/exam-storage.js"></script>
+  <script src="assets/js/exam-loader.js"></script>
+  <script src="assets/js/labs.js"></script>
+</body>
+</html>

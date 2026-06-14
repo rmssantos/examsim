@@ -17,8 +17,10 @@ class ProPackTests(unittest.TestCase):
         self.assertIn("url", meta["pro"])
         self.assertTrue(meta["pro"].get("highlights"), "pro upsell should list highlights")
 
-        dump = json.loads((ROOT / "user-content/exams/az104/dump.json").read_text(encoding="utf-8"))
-        self.assertLessEqual(len(dump), 20, "preview should ship at most 20 questions")
+        raw = json.loads((ROOT / "user-content/exams/az104/dump.json").read_text(encoding="utf-8"))
+        # The pack may be a bare array or an object with a `questions` array (labs added a sibling).
+        questions = raw["questions"] if isinstance(raw, dict) else raw
+        self.assertLessEqual(len(questions), 20, "preview should ship at most 20 questions")
 
     def test_homepage_renders_preview_flag_and_pro_modal(self):
         js = (ROOT / "assets/js/homepage.js").read_text(encoding="utf-8")

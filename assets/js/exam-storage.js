@@ -230,6 +230,7 @@
             const record = {
                 examId,
                 questions,
+                labs: Array.isArray(options.labs) ? options.labs : [],
                 metadata: metadata || null,
                 source: options.source || 'imported',
                 updatedAt: Date.now()

@@ -183,6 +183,39 @@ def build_resources(meta: dict) -> str:
     )
 
 
+def build_labs(meta: dict, root: str = "../../") -> str:
+    """Hands-on labs section; rendered only for packs that advertise labs.
+
+    Wording is vendor-neutral on purpose: it markets the skills practice without
+    claiming the exam itself contains labs (true for Microsoft role-based exams,
+    not for AWS), so it stays honest as the catalog grows.
+    """
+    if not meta.get("labCount"):
+        return ""
+    code = exam_code(meta)
+    topics = [t for t in (meta.get("labTopics") or []) if isinstance(t, str) and t.strip()]
+    topics_html = ""
+    if topics:
+        items = "\n".join(f"      <li>{esc(t)}</li>" for t in topics)
+        topics_html = '      <ul class="exam-modules">\n' + items + "\n      </ul>\n"
+    labs_url = f"{root}labs.html?exam={esc(meta['id'])}"
+    return (
+        '    <section class="exam-section" aria-labelledby="labs-h">\n'
+        '      <h2 id="labs-h">Hands-on labs</h2>\n'
+        f"      <p>Reading about the {esc(code)} topics is not the same as doing them. These guided "
+        "labs walk you through real tasks in your own free cloud account, step by step, so you build "
+        "the hands-on skills the exam measures. Each lab is CLI-first, scoped to the free tier, and "
+        "ends with a clean-up step so nothing is left running.</p>\n"
+        "      <p><strong>One lab is free to try now.</strong> The full pack includes the complete "
+        "set across every objective.</p>\n"
+        f"{topics_html}"
+        f'      <a class="landing-cta" href="{labs_url}"><i aria-hidden="true" class="fas fa-flask"></i> Open the free hands-on lab</a>\n'
+        "      <p>Labs run in your own cloud account. Stay within the free tier and run the clean-up "
+        "step. Your account, your cost: Examplar is not responsible for any cloud charges.</p>\n"
+        "    </section>"
+    )
+
+
 def faq_pairs(meta: dict) -> list:
     """Return (question, answer) pairs as plain text. Callers must HTML-escape before markup."""
     code = exam_code(meta)
@@ -459,6 +492,7 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
         "domains": build_domains(meta),
         "modules": build_modules(meta),
         "resources": build_resources(meta),
+        "labs": build_labs(meta, root),
         "pro": build_pro(meta),
         "faq": build_faq(meta),
         "crosslinks": build_crosslinks(meta, all_exams, root),

@@ -797,6 +797,27 @@ body.dragging-file .exam-library-section::after {
 .exam-card-study:hover { border-color: var(--h-accent); color: var(--h-accent); }
 .exam-card-unlock { background: var(--h-flag-tint); border-color: var(--h-flag-line); color: var(--h-flag); }
 .exam-card-unlock:hover { border-color: var(--h-flag); }
+.exam-card-labs {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  margin-top: 0.45rem;
+  font: inherit;
+  font-size: 0.8438rem;
+  font-weight: 600;
+  border-radius: var(--h-radius);
+  padding: 0.45rem 0.6rem;
+  min-height: 36px;
+  text-decoration: none;
+  background: var(--h-surface);
+  border: 1px solid var(--h-line-strong);
+  color: var(--h-text-soft);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.exam-card-labs:hover { border-color: var(--h-accent); color: var(--h-accent); }
+.exam-card-labs:focus-visible { outline: 2px solid var(--h-accent); outline-offset: 2px; }
 .exam-card-start:focus-visible, .exam-card-study:focus-visible, .exam-card-unlock:focus-visible {
   outline: 2px solid var(--h-accent);
   outline-offset: 2px;
@@ -950,13 +971,16 @@ body.dragging-file .exam-library-section::after {
 }
 .btn-start-exam-inline:active { transform: none !important; }
 .btn-start-exam-inline.btn-study-inline,
-.btn-start-exam-inline.btn-review-inline {
+.btn-start-exam-inline.btn-review-inline,
+.btn-start-exam-inline.btn-labs-inline {
   background: var(--h-surface) !important;
   border-color: var(--h-line-strong) !important;
   color: var(--h-text-soft) !important;
 }
+.btn-start-exam-inline.btn-labs-inline { text-decoration: none !important; }
 .btn-start-exam-inline.btn-study-inline:hover,
-.btn-start-exam-inline.btn-review-inline:hover {
+.btn-start-exam-inline.btn-review-inline:hover,
+.btn-start-exam-inline.btn-labs-inline:hover {
   border-color: var(--h-accent) !important;
   color: var(--h-accent) !important;
 }
