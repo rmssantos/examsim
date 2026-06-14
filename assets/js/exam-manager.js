@@ -266,16 +266,18 @@ class ExamManager {
             examId = safeExamId;
 
             // Normalize data format
-            let questions, metadata;
+            let questions, metadata, labs;
 
             if (Array.isArray(examData)) {
                 // Direct array format (dump.json is just an array)
                 questions = examData;
                 metadata = null;
+                labs = [];
             } else if (examData.questions) {
                 // Object format with questions property
                 questions = examData.questions;
                 metadata = examData.metadata;
+                labs = Array.isArray(examData.labs) ? examData.labs : [];
             } else {
                 throw new Error('Invalid exam data format');
             }
@@ -292,7 +294,7 @@ class ExamManager {
             let savedToIndexedDB = false;
             if (window.ExamApp.examStorage) {
                 try {
-                    savedToIndexedDB = await window.ExamApp.examStorage.putExam(examId, questions, finalMetadata, { source: 'imported' });
+                    savedToIndexedDB = await window.ExamApp.examStorage.putExam(examId, questions, finalMetadata, { source: 'imported', labs });
                 } catch (error) {
                     window.ExamApp.warn(`IndexedDB save failed for ${examId}, trying legacy storage:`, error);
                 }
@@ -300,10 +302,13 @@ class ExamManager {
 
             try {
                 if (window.ExamApp.examStorage) {
-                    window.ExamApp.examStorage.putLegacyExam(examId, questions, finalMetadata);
+                    window.ExamApp.examStorage.putLegacyExam(examId, questions, finalMetadata, labs);
                 } else {
                     localStorage.setItem(`custom_${examId}_questions`, JSON.stringify(questions));
                     localStorage.setItem(`exam_metadata_${examId}`, JSON.stringify(finalMetadata));
+                    if (Array.isArray(labs) && labs.length) {
+                        localStorage.setItem(`custom_${examId}_labs`, JSON.stringify(labs));
+                    }
                 }
             } catch (error) {
                 if (!savedToIndexedDB) throw error;
@@ -316,6 +321,7 @@ class ExamManager {
             if (!window.userExams) window.userExams = {};
             window.userExams[examId] = {
                 questions: questions,
+                labs: labs,
                 metadata: finalMetadata
             };
 

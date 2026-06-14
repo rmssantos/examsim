@@ -92,6 +92,7 @@ window.userExams = window.ExamApp.userExams;
                     }
                     window.userExams[examId] = {
                         questions: storedExam.questions,
+                        labs: Array.isArray(storedExam.labs) ? storedExam.labs : [],
                         metadata: storedExam.metadata,
                         source: storedExam.source || 'imported',
                         storage: storedExam.storage || 'browser',
@@ -154,9 +155,10 @@ window.userExams = window.ExamApp.userExams;
             }
 
             existing.questions = questions;
+            existing.labs = (rawDump && !Array.isArray(rawDump) && Array.isArray(rawDump.labs)) ? rawDump.labs : [];
             existing.loaded = true;
             existing.hasImages = hasImages(questions) || Boolean(existing.metadata?.hasImages);
-            window.ExamApp.log(`Loaded ${examId}: ${questions.length} questions`);
+            window.ExamApp.log(`Loaded ${examId}: ${questions.length} questions, ${existing.labs.length} lab(s)`);
             return existing;
         })();
 

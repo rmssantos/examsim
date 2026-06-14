@@ -6,6 +6,17 @@
   "duration": 60,
   "questionCount": 20,
   "totalQuestions": 20,
+  "labCount": 1,
+  "labTopics": [
+    "Grant least-privilege access with an RBAC role (free sample)",
+    "Create Microsoft Entra users and a group",
+    "Create and network-restrict a storage account",
+    "Work with blob containers and access tiers",
+    "Deploy and connect to a virtual machine",
+    "Deploy resources with a Bicep template",
+    "Build a virtual network with a network security group rule",
+    "Create a monitoring alert"
+  ],
   "passScore": 70,
   "language": "en",
   "schemaVersion": "1.1",

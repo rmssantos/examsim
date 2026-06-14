@@ -80,6 +80,10 @@
             return `exam_metadata_${examId}`;
         }
 
+        legacyLabsKey(examId) {
+            return `custom_${examId}_labs`;
+        }
+
         legacyProgressKey(examId) {
             return `${examId}_progress`;
         }
@@ -93,20 +97,31 @@
                 const metadataRaw = localStorage.getItem(this.legacyMetadataKey(examId));
                 const metadata = metadataRaw ? JSON.parse(metadataRaw) : null;
                 if (!Array.isArray(questions)) return null;
-                return { examId, questions, metadata, source: 'legacy-localStorage', storage: 'localStorage' };
+                let labs = [];
+                try {
+                    const labsRaw = localStorage.getItem(this.legacyLabsKey(examId));
+                    const parsedLabs = labsRaw ? JSON.parse(labsRaw) : [];
+                    if (Array.isArray(parsedLabs)) labs = parsedLabs;
+                } catch (_) { /* malformed legacy labs - ignore, leave empty */ }
+                return { examId, questions, metadata, labs, source: 'legacy-localStorage', storage: 'localStorage' };
             } catch (error) {
                 window.ExamApp.warn(`Failed to read legacy exam ${examId}:`, error);
                 return null;
             }
         }
 
-        putLegacyExam(examId, questions, metadata) {
+        putLegacyExam(examId, questions, metadata, labs) {
             if (!window.ExamApp.isSafeExamId(examId) || !Array.isArray(questions)) return false;
             localStorage.setItem(this.legacyQuestionKey(examId), JSON.stringify(questions));
             if (metadata) {
                 localStorage.setItem(this.legacyMetadataKey(examId), JSON.stringify(metadata));
             } else {
                 localStorage.removeItem(this.legacyMetadataKey(examId));
+            }
+            if (Array.isArray(labs) && labs.length) {
+                localStorage.setItem(this.legacyLabsKey(examId), JSON.stringify(labs));
+            } else {
+                localStorage.removeItem(this.legacyLabsKey(examId));
             }
             return true;
         }
@@ -115,6 +130,7 @@
             if (!window.ExamApp.isSafeExamId(examId)) return;
             localStorage.removeItem(this.legacyQuestionKey(examId));
             localStorage.removeItem(this.legacyMetadataKey(examId));
+            localStorage.removeItem(this.legacyLabsKey(examId));
         }
 
         listLegacyExamIds() {
@@ -230,6 +246,7 @@
             const record = {
                 examId,
                 questions,
+                labs: Array.isArray(options.labs) ? options.labs : [],
                 metadata: metadata || null,
                 source: options.source || 'imported',
                 updatedAt: Date.now()
@@ -249,7 +266,7 @@
             const legacy = this.getLegacyExam(examId);
             if (legacy && options.migrateLegacy !== false) {
                 try {
-                    await this.putExam(examId, legacy.questions, legacy.metadata, { source: 'migrated-localStorage' });
+                    await this.putExam(examId, legacy.questions, legacy.metadata, { source: 'migrated-localStorage', labs: legacy.labs });
                     window.ExamApp.analytics?.trackStorageMigration?.('exam', 'success');
                     return { ...legacy, source: 'migrated-localStorage', storage: 'indexedDB' };
                 } catch (error) {

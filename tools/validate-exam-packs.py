@@ -8,6 +8,7 @@ import hashlib
 import json
 import re
 import sys
+import urllib.parse
 from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -18,6 +19,28 @@ from typing import Any
 EXAM_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 IMAGE_NAME_RE = re.compile(r"^[A-Za-z0-9_. -]{1,128}$")
 SUPPORTED_TYPES = {"STANDARD", "MULTI", "YES_NO_MATRIX", "SEQUENCE", "DRAG_DROP_SELECT"}
+
+# Lab guides (the `labs` array in a pack's dump.json) are non-graded hands-on content.
+# References must point at official documentation; the safety fields below are hard gates
+# so a paid lab can never ship without a cost callout and a teardown step.
+ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+OFFICIAL_DOC_HOST_SUFFIXES = (
+    "learn.microsoft.com",
+    "docs.microsoft.com",
+    "azure.microsoft.com",
+    "microsoft.com",
+    "docs.aws.amazon.com",
+    "aws.amazon.com",
+    "cloud.google.com",
+)
+LAB_REQUIRED_TEXT_FIELDS = (
+    "domain",
+    "title",
+    "objective",
+    "expectedResult",
+    "estCost",
+    "objectiveVersion",
+)
 CONTENT_ORIGINS = {"original", "derived-from-public", "imported"}
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 MANIFEST_NAME = "manifest.json"
@@ -157,6 +180,25 @@ class PackValidator:
         self.pack_count += 1
         self.question_count += len(questions)
         self.validate_questions(exam_id, questions, dump_path)
+
+        # labs <-> metadata.labCount reconciliation. The homepage entry point and the SEO
+        # landing section key off metadata.labCount, so it must exist and equal the real lab
+        # count whenever labs ship, and it must not advertise labs that the dump does not have.
+        labs_present = isinstance(questions_raw, dict) and "labs" in questions_raw
+        if labs_present:
+            self.validate_labs(exam_id, questions_raw.get("labs"), dump_path)
+        labs_value = questions_raw.get("labs") if labs_present else None
+        actual_labs = len(labs_value) if isinstance(labs_value, list) else 0
+        declared_lab_count = metadata.get("labCount") if isinstance(metadata, dict) else None
+        if labs_present and declared_lab_count is None:
+            self.add_issue(metadata_path, "metadata.labCount is required when dump.json contains labs")
+        elif declared_lab_count is not None and (
+            not is_plain_int(declared_lab_count) or declared_lab_count != actual_labs
+        ):
+            self.add_issue(
+                metadata_path,
+                f"metadata labCount {declared_lab_count!r} must equal the number of labs in dump.json ({actual_labs})",
+            )
 
     def validate_metadata(self, exam_id: str, metadata: Any, path: Path, questions: Any) -> None:
         if not isinstance(metadata, dict):
@@ -302,6 +344,32 @@ class PackValidator:
                 if not image_path.is_file():
                     self.add_issue(path, f"{label}: missing image file images/{filename}")
 
+    def validate_labs(self, exam_id: str, labs: Any, path: Path) -> None:
+        for message in lab_validation_messages(labs):
+            self.add_issue(path, message)
+        if not isinstance(labs, list):
+            return
+        for lab in labs:
+            if not isinstance(lab, dict):
+                continue
+            lab_label = f"lab {str(lab.get('id') or 'unknown')!r}"
+            steps = lab.get("steps")
+            if not isinstance(steps, list):
+                continue
+            for step in steps:
+                if not isinstance(step, dict) or "image" not in step:
+                    continue
+                image = step.get("image")
+                if not isinstance(image, dict) or not isinstance(image.get("filename"), str):
+                    self.add_issue(path, f"{lab_label}: step image must contain filename")
+                    continue
+                filename = image["filename"].strip()
+                if not is_safe_image_name(filename):
+                    self.add_issue(path, f"{lab_label}: invalid image filename {filename!r}")
+                    continue
+                if not (self.root / exam_id / "images" / filename).is_file():
+                    self.add_issue(path, f"{lab_label}: missing image file images/{filename}")
+
 
 def normalize_question_type(question: dict[str, Any]) -> str:
     raw = str(question.get("question_type") or "").strip().upper()
@@ -339,6 +407,105 @@ def is_safe_image_name(value: str) -> bool:
         and IMAGE_NAME_RE.fullmatch(value) is not None
         and path.suffix.lower() in IMAGE_EXTENSIONS
     )
+
+
+def is_official_doc_url(url: Any) -> bool:
+    """True only for https URLs on an allowlisted official documentation host.
+
+    https is required (not http): lab references are external links a learner clicks,
+    and an imported pack must not be able to point them at a plain-HTTP doc URL.
+    """
+    if not has_text(url):
+        return False
+    try:
+        parsed = urllib.parse.urlparse(url.strip())
+    except ValueError:
+        return False
+    if parsed.scheme != "https":
+        return False
+    host = (parsed.hostname or "").lower()
+    return any(
+        host == suffix or host.endswith("." + suffix)
+        for suffix in OFFICIAL_DOC_HOST_SUFFIXES
+    )
+
+
+def lab_validation_messages(labs: Any) -> list[str]:
+    """Pure structural validation of a pack's `labs` array (no filesystem access).
+
+    Returns a list of human-readable error strings; an empty list means valid.
+    Hard gates: every lab needs a non-empty `cleanup` (teardown) and an `estCost`
+    callout, `freeTierOnly` must be a real boolean, and every reference must be an
+    official documentation URL.
+    """
+    if not isinstance(labs, list):
+        return ["labs must be an array"]
+
+    messages: list[str] = []
+    seen: set[str] = set()
+    for index, lab in enumerate(labs, start=1):
+        label = f"lab {index}"
+        if not isinstance(lab, dict):
+            messages.append(f"{label}: item must be an object")
+            continue
+
+        lab_id = str(lab.get("id", "")).strip()
+        if not lab_id:
+            messages.append(f"{label}: missing id")
+        elif lab_id in seen:
+            messages.append(f"{label}: duplicate id {lab_id!r}")
+        else:
+            seen.add(lab_id)
+            label = f"lab {lab_id!r}"
+
+        for field in LAB_REQUIRED_TEXT_FIELDS:
+            if not has_text(lab.get(field)):
+                messages.append(f"{label}: {field} is required")
+
+        if not isinstance(lab.get("freeTierOnly"), bool):
+            messages.append(f"{label}: freeTierOnly must be true or false")
+
+        source_verified = lab.get("sourceVerifiedOn")
+        if not (isinstance(source_verified, str) and ISO_DATE_RE.fullmatch(source_verified.strip())):
+            messages.append(f"{label}: sourceVerifiedOn must be an ISO date (YYYY-MM-DD)")
+
+        prerequisites = lab.get("prerequisites")
+        if not isinstance(prerequisites, list) or not prerequisites or any(
+            not has_text(item) for item in prerequisites
+        ):
+            messages.append(f"{label}: prerequisites must be a non-empty array of strings")
+
+        cleanup = lab.get("cleanup")
+        if not isinstance(cleanup, list) or not cleanup or any(not has_text(item) for item in cleanup):
+            messages.append(f"{label}: cleanup must be a non-empty array of strings")
+
+        steps = lab.get("steps")
+        if not isinstance(steps, list) or not steps:
+            messages.append(f"{label}: steps must be a non-empty array")
+        else:
+            for step_index, step in enumerate(steps, start=1):
+                if not isinstance(step, dict):
+                    messages.append(f"{label}: step {step_index} must be an object")
+                    continue
+                if not is_plain_int(step.get("n")):
+                    messages.append(f"{label}: step {step_index} n must be an integer")
+                if not has_text(step.get("instruction")):
+                    messages.append(f"{label}: step {step_index} instruction is required")
+                if not has_text(step.get("expected")):
+                    messages.append(f"{label}: step {step_index} expected is required")
+
+        references = lab.get("references")
+        if not isinstance(references, list) or not references:
+            messages.append(f"{label}: references must be a non-empty array")
+        else:
+            for ref_index, ref in enumerate(references, start=1):
+                if not isinstance(ref, dict) or not has_text(ref.get("label")) or not has_text(ref.get("url")):
+                    messages.append(f"{label}: reference {ref_index} must have label and url")
+                    continue
+                if not is_official_doc_url(ref.get("url")):
+                    messages.append(f"{label}: reference {ref_index} url must be an official documentation URL")
+
+    return messages
 
 
 def sha256_file(path: Path) -> str:
@@ -653,6 +820,8 @@ def print_health_report(root: Path, exam_ids: list[str]) -> int:
         questions = raw_questions.get("questions") if isinstance(raw_questions, dict) else raw_questions
         if not isinstance(questions, list):
             questions = []
+        labs = raw_questions.get("labs") if isinstance(raw_questions, dict) else None
+        lab_count = len(labs) if isinstance(labs, list) else 0
         present, total = metadata_health_score(metadata)
         percentage = round((present / total) * 100) if total else 0
         duplicate_texts = duplicate_question_text_count(questions)
@@ -688,7 +857,8 @@ def print_health_report(root: Path, exam_ids: list[str]) -> int:
             f"metadata:{percentage}% ({present}/{total}), schema:{schema_status}, "
             f"manifest:{manifest_status}, images:{image_status} ({image_count}), "
             f"duplicates:{duplicate_texts}, quality:{quality_status}, "
-            f"questions:{len(questions)}, types:{question_type_summary(questions)}"
+            f"questions:{len(questions)}, types:{question_type_summary(questions)}, "
+            f"labs:{lab_count}"
         )
     return 0
 

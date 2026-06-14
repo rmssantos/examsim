@@ -2,7 +2,7 @@
 // Public release history is recorded in CHANGELOG.md. Bump the vX.Y below on any
 // deploy that changes cached assets;
 // tests/test_sprint1_readiness.py enforces the examsim-pwa-vX.Y format.
-const CACHE_VERSION = 'examsim-pwa-v5.3';
+const CACHE_VERSION = 'examsim-pwa-v5.4';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -10,6 +10,7 @@ const CORE_ASSETS = [
   './',
   './index.html',
   './exam.html',
+  './labs.html',
   './editor.html',
   './404.html',
   './privacy-and-storage.html',
@@ -23,6 +24,7 @@ const CORE_ASSETS = [
   './assets/js/secure-transfer.js',
   './assets/js/exam-loader.js',
   './assets/js/exam-manager.js',
+  './assets/js/labs.js',
   './assets/js/homepage.js',
   './assets/js/script-multi-exam.js',
   './assets/js/exam-init.js',
@@ -45,6 +47,7 @@ const CORE_ASSETS = [
   './assets/css/legal-page.css',
   './assets/css/editor-styles.css',
   './assets/css/exam-landing.css',
+  './assets/css/labs.css',
   './assets/media/favicon-64.png',
   './assets/media/apple-touch-icon.png',
   './assets/media/icon-192.png',
@@ -62,6 +65,7 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './',
   './index.html',
   './exam.html',
+  './labs.html',
   './editor.html',
   './404.html',
   './privacy-and-storage.html',
@@ -75,6 +79,7 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/js/secure-transfer.js',
   './assets/js/exam-loader.js',
   './assets/js/exam-manager.js',
+  './assets/js/labs.js',
   './assets/js/homepage.js',
   './assets/js/script-multi-exam.js',
   './assets/js/exam-init.js',
@@ -91,7 +96,8 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/css/app-footer.css',
   './assets/css/legal-page.css',
   './assets/css/editor-styles.css',
-  './assets/css/exam-landing.css'
+  './assets/css/exam-landing.css',
+  './assets/css/labs.css'
 ];
 
 function sameOrigin(url) {
