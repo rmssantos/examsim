@@ -148,8 +148,8 @@ non-graded, step-by-step exercises the learner runs in their own cloud account.
 They are independent of the exam engine (scoring is untouched) and render in a
 standalone reader at `labs.html?exam=<exam-id>`.
 
-When labs are present, `dump.json` is an object with both `questions` and `labs`
-(rather than a bare array of questions):
+When labs are present, the pack's content file holds an object with both
+`questions` and `labs` (rather than a bare array of questions):
 
 ```json
 {
@@ -215,7 +215,7 @@ When labs are present, `dump.json` is an object with both `questions` and `labs`
 | `n` | number | ✅ Yes | Step number (integer) |
 | `instruction` | string | ✅ Yes | What to do (markdown supported, including inline command blocks) |
 | `expected` | string | ✅ Yes | What the learner should observe if the step worked |
-| `images` | object[] | ⚠️ Optional | `[{ "filename": "..." }]`, resolved against the exam's `images/` folder like question images |
+| `image` | object | ⚠️ Optional | `{ "filename": "..." }`, resolved against the exam's `images/` folder like question images |
 
 ### Reference URL gate
 
@@ -229,10 +229,10 @@ and their subdomains. Plain HTTP and any other host are rejected.
 
 When a pack ships labs, its `metadata.json` declares them:
 
-- `labCount` (number) is **required** when `dump.json` contains labs, and it must
-  equal the actual number of labs in the array. Conversely, declaring `labCount`
-  with no labs present is rejected. The homepage entry point and the SEO landing
-  section key off `labCount`.
+- `labCount` (number) is **required** when the pack ships labs, and it must equal
+  the actual number of labs. A non-zero `labCount` with no labs present is also
+  rejected, since the count must match the labs that are there. The homepage entry
+  point and the SEO landing section key off `labCount`.
 - `labTopics` (string[], optional) is a teaser list of lab topics for the landing
   copy. It is independent of `labCount`: a free preview can list the full pack's
   lab topics (e.g. eight) while shipping a single free sample lab (`labCount: 1`).
@@ -378,7 +378,7 @@ Optional `metadata.json` provides rich exam information:
 | `commercialStatus` | string | Publication/licensing status, e.g., free, preview, pro-preview, pro. This is controlled during publication, not by the normal browser editor. |
 | `modules` | object[] | List of exam modules |
 | `hasImages` | boolean | Whether exam includes images |
-| `labCount` | number | Number of hands-on labs in `dump.json`. Required when the pack ships labs; must equal the actual lab count (see [Hands-on Labs](#hands-on-labs-labs-array)) |
+| `labCount` | number | Number of hands-on labs in the pack. Required when the pack ships labs; must equal the actual lab count (see [Hands-on Labs](#hands-on-labs-labs-array)) |
 | `labTopics` | string[] | Optional teaser list of lab topics for landing copy; independent of `labCount` |
 
 Public packs should include the library taxonomy fields (`vendor`, `certificationCode`, `domains`, `level`, `productFamily`, `contentType`, and publication-controlled `commercialStatus`) so search, sort, filters, cards, and health reports keep working as the catalog grows across vendors. Imported/private packs can omit them; the simulator falls back to generic metadata.
@@ -438,13 +438,13 @@ The health report assigns each pack a `score:/100` and a `Ready`, `Review`, or `
 
 ### Lab validation
 
-When `dump.json` contains a `labs` array, the validator also checks each lab
+When a pack includes a `labs` array, the validator also checks each lab
 (see [Hands-on Labs](#hands-on-labs-labs-array)): unique `id`; the required text
 fields (`domain`, `title`, `objective`, `expectedResult`, `estCost`,
 `objectiveVersion`); a boolean `freeTierOnly`; an ISO `sourceVerifiedOn`;
 non-empty `prerequisites`, `cleanup`, and `steps` (each step with integer `n`,
 `instruction`, and `expected`); and non-empty `references` whose URLs all point
-to official documentation over HTTPS. Lab step images, if any, must resolve
+to official documentation over HTTPS. A lab step's optional `image` must resolve
 inside the exam's `images/` folder. `metadata.labCount` must be present and equal
 the number of labs.
 
