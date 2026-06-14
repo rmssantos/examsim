@@ -1821,6 +1821,7 @@ class MultiExamSimulator {
         const isMulti = Array.isArray(correctAnswer) && !isSequence && !isYesNoMatrix && !isDragSelect;
 
         const isCorrect = this.isAnswerCorrect(question, userAnswer);
+        const wasAnswered = this.isAnswerProvided(userAnswer);
 
         // Show feedback
         const feedback = document.getElementById('answer-feedback');
@@ -1828,9 +1829,11 @@ class MultiExamSimulator {
         const correctAnswerDiv = feedback.querySelector('.correct-answer');
         const explanationDiv = feedback.querySelector('.explanation');
 
-        status.innerHTML = isCorrect
-            ? '<i class="fas fa-check-circle" style="color: #28a745;"></i> Correct!'
-            : '<i class="fas fa-times-circle" style="color: #dc3545;"></i> Incorrect';
+        status.innerHTML = !wasAnswered
+            ? '<i class="fas fa-lightbulb" style="color: #f59e0b;"></i> Answer revealed'
+            : (isCorrect
+                ? '<i class="fas fa-check-circle" style="color: #28a745;"></i> Correct!'
+                : '<i class="fas fa-times-circle" style="color: #dc3545;"></i> Incorrect');
 
         if (isSequence) {
             const letters = (correctAnswer || []).map(i => `${String.fromCharCode(65 + i)}. ${this.escapeHtml(question.options[i])}`);
@@ -1894,7 +1897,12 @@ class MultiExamSimulator {
             });
         }
 
-        this.recordStudyAnswer(question, isCorrect, userAnswer);
+        // Revealing the answer without attempting it is not a graded miss; only
+        // record a study result when the user actually answered, so study
+        // accuracy and spaced-repetition scheduling are not skewed by reveals.
+        if (wasAnswered) {
+            this.recordStudyAnswer(question, isCorrect, userAnswer);
+        }
     }
 
     handleAnswerChanged() {
@@ -2466,7 +2474,17 @@ class MultiExamSimulator {
         if (missedText) missedText.textContent = `${Math.round(incorrectPercentage)}%`;
 
         const totalQuestionsEl = document.getElementById('total-questions-result');
-        if (totalQuestionsEl) totalQuestionsEl.textContent = total;
+        if (totalQuestionsEl) {
+            // "Questions answered" must reflect what the user actually answered,
+            // not the total question count. Mirror the study path's "X/Y" format
+            // so it reconciles with the answered-only Correct/Incorrect counts.
+            const examQuestions = this.getCurrentQuestions();
+            const answered = examQuestions.reduce(
+                (count, _question, index) => count + (this.isAnswerProvided(this.selectedAnswers[index]) ? 1 : 0),
+                0
+            );
+            totalQuestionsEl.textContent = `${answered}/${total}`;
+        }
         const passTargetEl = document.getElementById('pass-score-target');
         if (passTargetEl) passTargetEl.textContent = `${this.examData[this.currentExam].passScore}%`;
         const scoreVsPass = document.getElementById('score-vs-pass');

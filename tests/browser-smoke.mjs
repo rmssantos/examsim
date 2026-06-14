@@ -101,6 +101,49 @@ try {
   assert.notEqual(coverage.display, 'none', 'Expanded exam coverage (modules + study resources) must be visible.');
   assert.ok(coverage.resourceLinks >= 1, 'Study Resources must render links when the exam metadata lists resources.');
 
+  // Exam runtime regressions:
+  //  - the results "Questions answered" stat must report answered/total, not the bank size;
+  //  - "Show Answer" before attempting a question must read as a neutral reveal, not "Incorrect".
+  await page.goto(`${baseUrl}/exam.html?exam=az900`, { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    return sim && typeof sim.getCurrentQuestions === 'function'
+      && sim.getCurrentQuestions().length > 0
+      && document.querySelectorAll('.option').length > 0;
+  }, null, { timeout: 15000 });
+  const examTotal = await page.evaluate(() => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    return sim.getCurrentQuestions().length;
+  });
+
+  // Answer one question (the label is the visible control; the native input is hidden).
+  await page.locator('.option label').first().click();
+  await page.locator('#show-answer-btn').click();
+  await page.waitForSelector('#answer-feedback:not([hidden])', { timeout: 5000 });
+  const gradedStatus = (await page.locator('#answer-feedback .feedback-status').innerText()).trim();
+  assert.ok(/correct!?|incorrect/i.test(gradedStatus), 'Revealing an answered question must show a graded result.');
+
+  // Reveal a fresh question without answering -> neutral state, not "Incorrect".
+  await page.locator('#next-btn').click();
+  await page.waitForTimeout(200);
+  await page.locator('#show-answer-btn').click();
+  await page.waitForSelector('#answer-feedback:not([hidden])', { timeout: 5000 });
+  const revealedStatus = (await page.locator('#answer-feedback .feedback-status').innerText()).trim();
+  assert.ok(/revealed/i.test(revealedStatus), 'Show Answer before attempting must read as a neutral reveal.');
+  assert.ok(!/incorrect/i.test(revealedStatus), 'Show Answer before attempting must not be labelled Incorrect.');
+
+  // Finish with exactly one answered -> "Questions answered" reads answered/total.
+  await page.evaluate(() => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    sim.finishExam(true);
+  });
+  await page.waitForFunction(() => {
+    const s = document.getElementById('results-screen');
+    return s && !s.hidden;
+  }, null, { timeout: 8000 });
+  const answeredText = await page.evaluate(() => document.getElementById('total-questions-result')?.textContent);
+  assert.equal(answeredText, `1/${examTotal}`, 'Results "Questions answered" must show answered/total, not the bank size.');
+
   await page.goto(`${baseUrl}/editor.html`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => {
     const select = document.querySelector('#examSelect');
@@ -114,6 +157,31 @@ try {
   await editorSkipLink.focus();
   const focusedSkipBox = await editorSkipLink.boundingBox();
   assert.ok(focusedSkipBox && focusedSkipBox.y >= 0, 'Focused skip link must be visible.');
+
+  // Built-in pack edits must not contradict the read-only banner: viewing is clean,
+  // and editing reports an "unsaved (saves as a copy)" state, not a plain warning.
+  const builtinId = await page.evaluate(() => {
+    const select = document.querySelector('#examSelect');
+    const values = Array.from(select.options).map((o) => o.value);
+    return values.includes('az900') ? 'az900' : values.find((v) => v && v !== 'custom');
+  });
+  await page.selectOption('#examSelect', builtinId);
+  await page.waitForFunction(() => {
+    const banner = document.getElementById('builtin-readonly-banner');
+    return banner && getComputedStyle(banner).display !== 'none';
+  }, null, { timeout: 5000 });
+  assert.match(
+    (await page.locator('#editorSaveState span').innerText()).trim(),
+    /no unsaved/i,
+    'Viewing a built-in pack must not report unsaved edits.'
+  );
+  await page.locator('#qText').click();
+  await page.locator('#qText').type(' (edit)');
+  await page.waitForFunction(
+    () => /saves as a copy/i.test(document.querySelector('#editorSaveState span')?.textContent || ''),
+    null,
+    { timeout: 5000 }
+  );
 
   console.log('Browser smoke passed.');
 } finally {
