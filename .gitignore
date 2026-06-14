@@ -86,6 +86,9 @@ build/
 coverage/
 .nyc_output/
 
+# Playwright CLI/MCP screenshot cache (generated during browser testing)
+.playwright-cli/
+
 # Local configuration, private development notes, and heavy demo media
 config.local.js
 settings.local.json
