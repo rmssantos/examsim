@@ -143,7 +143,7 @@
   border-radius: 6px;
   padding: 0.05rem 0.4rem;
   font-size: 0.85em;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .lab-cleanup {
