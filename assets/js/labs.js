@@ -232,7 +232,10 @@
 
     const exam = (window.userExams && window.userExams[examId]) || {};
     const metadata = exam.metadata || null;
-    const labs = Array.isArray(exam.labs) ? exam.labs : [];
+    // Imported packs are not re-validated at runtime, so drop any malformed lab entry
+    // (null/non-object or missing a usable id) before rendering instead of crashing on it.
+    const labs = (Array.isArray(exam.labs) ? exam.labs : [])
+      .filter((lab) => lab && typeof lab === 'object' && typeof lab.id === 'string' && lab.id);
     const isBundled = exam.source === 'bundled';
 
     const name = (metadata && (metadata.fullName || metadata.name)) || examId.toUpperCase();

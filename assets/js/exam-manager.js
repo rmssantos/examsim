@@ -302,10 +302,13 @@ class ExamManager {
 
             try {
                 if (window.ExamApp.examStorage) {
-                    window.ExamApp.examStorage.putLegacyExam(examId, questions, finalMetadata);
+                    window.ExamApp.examStorage.putLegacyExam(examId, questions, finalMetadata, labs);
                 } else {
                     localStorage.setItem(`custom_${examId}_questions`, JSON.stringify(questions));
                     localStorage.setItem(`exam_metadata_${examId}`, JSON.stringify(finalMetadata));
+                    if (Array.isArray(labs) && labs.length) {
+                        localStorage.setItem(`custom_${examId}_labs`, JSON.stringify(labs));
+                    }
                 }
             } catch (error) {
                 if (!savedToIndexedDB) throw error;
