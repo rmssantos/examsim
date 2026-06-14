@@ -19,6 +19,8 @@
   --h-bg: #dde1e9;
   --h-surface: #ffffff;
   --h-surface-soft: #f7f8fa;
+  --h-panel: #e7ebf2;        /* recessed library panel so the white cards pop */
+  --card-hover-mix: 14%;     /* exam-card hover tint strength */
   --h-text: #1f2733;
   --h-text-soft: #5b6573;
   --h-text-faint: #8d95a3;
@@ -56,6 +58,8 @@
   --h-bg: #10141b;
   --h-surface: #1a212c;
   --h-surface-soft: #1f2733;
+  --h-panel: var(--h-surface);  /* dark: panel sits flush with the surface */
+  --card-hover-mix: 11%;
   --h-text: #e2e7ee;
   --h-text-soft: #a8b1bf;
   --h-text-faint: #79828f;
@@ -383,17 +387,17 @@ body:not(.dark-mode) .home-step { background: var(--h-surface); border-color: va
 .main-content { display: flex; flex-direction: column; gap: 1.4rem; width: 100%; }
 
 /* ===== Exam library ===== */
+/* Light: --h-panel is a soft recessed gray so the white cards pop; dark: it tracks
+   --h-surface. Theme-token driven, so it is correct for both .dark-mode and
+   [data-theme="dark"] without a fragile :not() guard. */
 .exam-library-section {
-  background: var(--h-surface);
+  background: var(--h-panel);
   border: 1px solid var(--h-line);
   border-radius: var(--h-radius-lg);
   padding: 1.25rem 1.4rem 1.4rem;
   box-shadow: var(--h-card-shadow);
   position: relative;
 }
-/* Light mode: recess the library panel to a soft gray so the white exam cards
-   inside it clearly stand out (page < panel < white cards). */
-body:not(.dark-mode) .exam-library-section { background: #e7ebf2; border: 1px solid var(--h-line); }
 .section-header {
   display: flex;
   align-items: center;
@@ -655,15 +659,12 @@ body.dragging-file .exam-library-section::after {
 }
 .exam-card[class*="exam-c"] .exam-icon { color: var(--card-accent); }
 /* hover tints the whole card with its own palette hue, not just the border */
+/* Hover tint uses the per-theme --card-hover-mix (14% light, 11% dark) so the
+   wash is strong enough over near-white in light mode. Flat, no glow/shadow. */
 .exam-card:hover {
   border-color: color-mix(in srgb, var(--card-accent, var(--h-accent)) 70%, transparent);
-  background: color-mix(in srgb, var(--card-accent, var(--h-accent)) 11%, var(--h-surface));
+  background: color-mix(in srgb, var(--card-accent, var(--h-accent)) var(--card-hover-mix), var(--h-surface));
   transform: translateY(-1px);
-}
-/* Light mode is near-white, so a faint tint vanished against the white card;
-   push the hover wash so the hovered card stands out. Flat, no glow/shadow. */
-body:not(.dark-mode) .exam-card:hover {
-  background: color-mix(in srgb, var(--card-accent, var(--h-accent)) 14%, var(--h-surface));
 }
 .exam-card:focus-visible { outline: 2px solid var(--h-accent); outline-offset: 2px; }
 .exam-card.selected { border-color: var(--h-accent); box-shadow: 0 0 0 1px var(--h-accent); }
