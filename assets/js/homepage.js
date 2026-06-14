@@ -2222,6 +2222,11 @@ let questions = Array.isArray(parsedDump) ? parsedDump : parsedDump.questions;
 if (!Array.isArray(questions)) {
 throw new Error('dump.json must contain an array of questions.');
 }
+// Carry hands-on labs through the ZIP import too, otherwise a pack that advertises
+// labs (metadata.labCount > 0) would open the labs page empty.
+const labs = (parsedDump && !Array.isArray(parsedDump) && Array.isArray(parsedDump.labs))
+? parsedDump.labs
+: [];
 
 let metadata = null;
 if (metadataEntry) {
@@ -2238,7 +2243,7 @@ if (!examId) {
 throw new Error('Invalid exam id. Use letters, numbers, hyphens or underscores.');
 }
 
-await window.examManager.importExam(examId, { questions, metadata });
+await window.examManager.importExam(examId, { questions, metadata, labs });
 
 // Extract images from ZIP to local directory
 window.ExamApp.log(`🔍 Scanning ZIP for images in exam: ${examId}`);

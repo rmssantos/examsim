@@ -27,14 +27,16 @@
   // Match the rest of the UI (editor-init.js / legal-page.js): honor a saved choice,
   // otherwise follow the OS via prefers-color-scheme.
   function preferredTheme() {
-    const saved = localStorage.getItem('theme');
+    let saved = null;
+    try { saved = localStorage.getItem('theme'); } catch (_) { saved = null; }
     if (saved === 'dark' || saved === 'light') return saved;
-    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    // matchMedia can be absent and can return null (e.g. file://), so guard the deref.
+    return window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ? 'dark' : 'light';
   }
   applyTheme(preferredTheme());
   document.getElementById('labs-theme-toggle')?.addEventListener('click', () => {
     const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
-    localStorage.setItem('theme', next);
+    try { localStorage.setItem('theme', next); } catch (_) { /* storage blocked - non-fatal */ }
     applyTheme(next);
   });
 
@@ -111,6 +113,8 @@
       if (!byDomain.has(key)) byDomain.set(key, []);
       byDomain.get(key).push(lab);
     });
+    // Read the done list once per render instead of re-parsing localStorage per lab.
+    const doneSet = new Set(getDone(examId));
     let html = '<span class="cr-palette-label">Labs</span>';
     let index = 0;
     for (const [domain, group] of byDomain) {
@@ -118,7 +122,7 @@
       group.forEach((lab) => {
         index += 1;
         const active = lab.id === selectedId ? ' active' : '';
-        const tick = isDone(examId, lab.id)
+        const tick = doneSet.has(lab.id)
           ? '<i class="fas fa-circle-check labs-nav-tick" aria-hidden="true"></i>' : '';
         html += `<button type="button" class="labs-nav-item${active}" data-lab-id="${escapeHtml(lab.id)}">`
           + `<span class="labs-nav-index">${index}</span>`

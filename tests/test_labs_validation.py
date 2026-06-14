@@ -1,5 +1,7 @@
 import importlib.util
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -128,6 +130,45 @@ class OfficialDocUrlTests(unittest.TestCase):
 
     def test_empty_is_rejected(self):
         self.assertFalse(vep.is_official_doc_url(""))
+
+
+class LabCountReconciliationTests(unittest.TestCase):
+    QUESTION = {
+        "question": "Which service?",
+        "options": ["a", "b", "c", "d"],
+        "correct": 0,
+        "explanation": "Because a.",
+        "reference": "https://learn.microsoft.com/azure/x",
+    }
+
+    def _labcount_issues(self, dump, metadata):
+        root = Path(tempfile.mkdtemp())
+        exam_dir = root / "x"
+        exam_dir.mkdir()
+        (exam_dir / "dump.json").write_text(json.dumps(dump), encoding="utf-8")
+        if metadata is not None:
+            (exam_dir / "metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
+        validator = vep.PackValidator(root)
+        validator.validate_pack("x")
+        return [m for m in (getattr(i, "message", str(i)) for i in validator.issues) if "labCount" in m]
+
+    def test_labs_without_labcount_is_flagged(self):
+        issues = self._labcount_issues({"questions": [self.QUESTION], "labs": [_valid_lab()]}, {"id": "x"})
+        self.assertTrue(any("required" in m for m in issues), issues)
+
+    def test_labcount_without_labs_is_flagged(self):
+        issues = self._labcount_issues({"questions": [self.QUESTION]}, {"id": "x", "labCount": 5})
+        self.assertTrue(any("must equal" in m for m in issues), issues)
+
+    def test_matching_labcount_is_clean(self):
+        issues = self._labcount_issues(
+            {"questions": [self.QUESTION], "labs": [_valid_lab()]}, {"id": "x", "labCount": 1}
+        )
+        self.assertEqual(issues, [])
+
+    def test_no_labs_no_labcount_is_clean(self):
+        issues = self._labcount_issues({"questions": [self.QUESTION]}, {"id": "x"})
+        self.assertEqual(issues, [])
 
 
 if __name__ == "__main__":

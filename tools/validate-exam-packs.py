@@ -181,8 +181,24 @@ class PackValidator:
         self.question_count += len(questions)
         self.validate_questions(exam_id, questions, dump_path)
 
-        if isinstance(questions_raw, dict) and "labs" in questions_raw:
-            self.validate_labs(exam_id, questions_raw.get("labs"), dump_path, metadata)
+        # labs <-> metadata.labCount reconciliation. The homepage entry point and the SEO
+        # landing section key off metadata.labCount, so it must exist and equal the real lab
+        # count whenever labs ship, and it must not advertise labs that the dump does not have.
+        labs_present = isinstance(questions_raw, dict) and "labs" in questions_raw
+        if labs_present:
+            self.validate_labs(exam_id, questions_raw.get("labs"), dump_path)
+        labs_value = questions_raw.get("labs") if labs_present else None
+        actual_labs = len(labs_value) if isinstance(labs_value, list) else 0
+        declared_lab_count = metadata.get("labCount") if isinstance(metadata, dict) else None
+        if labs_present and declared_lab_count is None:
+            self.add_issue(metadata_path, "metadata.labCount is required when dump.json contains labs")
+        elif declared_lab_count is not None and (
+            not is_plain_int(declared_lab_count) or declared_lab_count != actual_labs
+        ):
+            self.add_issue(
+                metadata_path,
+                f"metadata labCount {declared_lab_count!r} must equal the number of labs in dump.json ({actual_labs})",
+            )
 
     def validate_metadata(self, exam_id: str, metadata: Any, path: Path, questions: Any) -> None:
         if not isinstance(metadata, dict):
@@ -328,20 +344,11 @@ class PackValidator:
                 if not image_path.is_file():
                     self.add_issue(path, f"{label}: missing image file images/{filename}")
 
-    def validate_labs(self, exam_id: str, labs: Any, path: Path, metadata: Any = None) -> None:
+    def validate_labs(self, exam_id: str, labs: Any, path: Path) -> None:
         for message in lab_validation_messages(labs):
             self.add_issue(path, message)
         if not isinstance(labs, list):
             return
-        # metadata.labCount drives the homepage CTA + the SEO landing section, so a drift
-        # between it and the real number of labs would advertise the wrong thing.
-        if isinstance(metadata, dict) and metadata.get("labCount") is not None:
-            lab_count = metadata.get("labCount")
-            if not is_plain_int(lab_count) or lab_count != len(labs):
-                self.add_issue(
-                    path,
-                    f"metadata labCount {lab_count!r} must match the number of labs in dump.json ({len(labs)})",
-                )
         for lab in labs:
             if not isinstance(lab, dict):
                 continue
