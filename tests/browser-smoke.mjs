@@ -116,21 +116,64 @@ try {
     return sim.getCurrentQuestions().length;
   });
 
-  // Answer one question (the label is the visible control; the native input is hidden).
+  // Drive a STANDARD/MULTI question so the visible option label exists regardless
+  // of the randomized question order.
+  const idx = await page.evaluate(() => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    const qs = sim.getCurrentQuestions();
+    const gradeIdx = qs.findIndex((q) => {
+      const t = window.ExamApp.normalizeQuestionType(q);
+      return t === 'STANDARD' || t === 'MULTI';
+    });
+    const revealIdx = qs.findIndex((_, i) => i !== gradeIdx);
+    sim.showQuestion(gradeIdx);
+    return { gradeIdx, revealIdx };
+  });
+  assert.ok(idx.gradeIdx >= 0, 'Expected at least one STANDARD/MULTI question to drive.');
+
+  // Answer it (the label is the visible control; the native input is hidden).
   await page.locator('.option label').first().click();
   await page.locator('#show-answer-btn').click();
   await page.waitForSelector('#answer-feedback:not([hidden])', { timeout: 5000 });
   const gradedStatus = (await page.locator('#answer-feedback .feedback-status').innerText()).trim();
   assert.ok(/correct!?|incorrect/i.test(gradedStatus), 'Revealing an answered question must show a graded result.');
 
-  // Reveal a fresh question without answering -> neutral state, not "Incorrect".
-  await page.locator('#next-btn').click();
-  await page.waitForTimeout(200);
+  // Reveal a different, untouched question -> neutral state, not "Incorrect".
+  await page.evaluate((i) => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    sim.showQuestion(i);
+  }, idx.revealIdx);
+  await page.waitForTimeout(150);
   await page.locator('#show-answer-btn').click();
   await page.waitForSelector('#answer-feedback:not([hidden])', { timeout: 5000 });
   const revealedStatus = (await page.locator('#answer-feedback .feedback-status').innerText()).trim();
   assert.ok(/revealed/i.test(revealedStatus), 'Show Answer before attempting must read as a neutral reveal.');
   assert.ok(!/incorrect/i.test(revealedStatus), 'Show Answer before attempting must not be labelled Incorrect.');
+
+  // SEQUENCE answers auto-initialize on render, so a non-empty array alone is not
+  // an attempt: an untouched sequence must not count, a touched one must.
+  const seq = await page.evaluate(() => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    const qs = sim.getCurrentQuestions();
+    const i = qs.findIndex((q) => window.ExamApp.normalizeQuestionType(q) === 'SEQUENCE');
+    if (i < 0) return { found: false };
+    const priorAnswer = sim.selectedAnswers[i];
+    const priorTouched = sim.touchedQuestions.has(i);
+    sim.selectedAnswers[i] = qs[i].options.map((_, k) => k); // simulate the auto-init order
+    sim.touchedQuestions.delete(i);
+    const untouched = sim.wasAttempted(i);
+    sim.touchedQuestions.add(i);
+    const touched = sim.wasAttempted(i);
+    if (priorAnswer === undefined) delete sim.selectedAnswers[i];
+    else sim.selectedAnswers[i] = priorAnswer;
+    if (priorTouched) sim.touchedQuestions.add(i);
+    else sim.touchedQuestions.delete(i);
+    return { found: true, untouched, touched };
+  });
+  if (seq.found) {
+    assert.equal(seq.untouched, false, 'An untouched SEQUENCE question must not count as attempted.');
+    assert.equal(seq.touched, true, 'A touched SEQUENCE question must count as attempted.');
+  }
 
   // Finish with exactly one answered -> "Questions answered" reads answered/total.
   await page.evaluate(() => {

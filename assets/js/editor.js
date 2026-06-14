@@ -679,6 +679,10 @@
         ? 'Built-in pack is read-only. Save will create your own editable copy.'
         : '';
     }
+    // builtinExamIds loads asynchronously; once the read-only status is known,
+    // refresh the save-state label so a pending edit shows "saves as a copy"
+    // immediately instead of waiting for the next edit.
+    updateUnsavedIndicator();
   }
 
   function uniqueCopyId(base){
