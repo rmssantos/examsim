@@ -142,15 +142,16 @@ class LabCountReconciliationTests(unittest.TestCase):
     }
 
     def _labcount_issues(self, dump, metadata):
-        root = Path(tempfile.mkdtemp())
-        exam_dir = root / "x"
-        exam_dir.mkdir()
-        (exam_dir / "dump.json").write_text(json.dumps(dump), encoding="utf-8")
-        if metadata is not None:
-            (exam_dir / "metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
-        validator = vep.PackValidator(root)
-        validator.validate_pack("x")
-        return [m for m in (getattr(i, "message", str(i)) for i in validator.issues) if "labCount" in m]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            exam_dir = root / "x"
+            exam_dir.mkdir()
+            (exam_dir / "dump.json").write_text(json.dumps(dump), encoding="utf-8")
+            if metadata is not None:
+                (exam_dir / "metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
+            validator = vep.PackValidator(root)
+            validator.validate_pack("x")
+            return [m for m in (getattr(i, "message", str(i)) for i in validator.issues) if "labCount" in m]
 
     def test_labs_without_labcount_is_flagged(self):
         issues = self._labcount_issues({"questions": [self.QUESTION], "labs": [_valid_lab()]}, {"id": "x"})
