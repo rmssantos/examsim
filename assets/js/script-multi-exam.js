@@ -123,6 +123,7 @@ class MultiExamSimulator {
         this.currentQuestionIndex = 0;
         this.selectedAnswers = {};
         this.markedForReview = new Set();
+        this.touchedQuestions = new Set();
         this.startTime = null;
         this.timer = null;
         this.timerManager = new TimerManager();
@@ -978,6 +979,7 @@ class MultiExamSimulator {
         this.currentQuestionIndex = 0;
         this.selectedAnswers = {};
         this.markedForReview = new Set();
+        this.touchedQuestions = new Set();
         this.startTime = new Date();
         this.studyQueueSummary = null;
         this.studySessionResults = new Map();
@@ -1032,6 +1034,7 @@ class MultiExamSimulator {
         this.currentQuestionIndex = 0;
         this.selectedAnswers = {};
         this.markedForReview = new Set();
+        this.touchedQuestions = new Set();
         this.startTime = new Date();
         this.studySessionId = this.generateLocalId('study_session');
         this.studySessionResults = new Map();
@@ -1821,6 +1824,7 @@ class MultiExamSimulator {
         const isMulti = Array.isArray(correctAnswer) && !isSequence && !isYesNoMatrix && !isDragSelect;
 
         const isCorrect = this.isAnswerCorrect(question, userAnswer);
+        const wasAnswered = this.wasAttempted(this.currentQuestionIndex, question);
 
         // Show feedback
         const feedback = document.getElementById('answer-feedback');
@@ -1828,9 +1832,11 @@ class MultiExamSimulator {
         const correctAnswerDiv = feedback.querySelector('.correct-answer');
         const explanationDiv = feedback.querySelector('.explanation');
 
-        status.innerHTML = isCorrect
-            ? '<i class="fas fa-check-circle" style="color: #28a745;"></i> Correct!'
-            : '<i class="fas fa-times-circle" style="color: #dc3545;"></i> Incorrect';
+        status.innerHTML = !wasAnswered
+            ? '<i class="fas fa-lightbulb" style="color: #f59e0b;"></i> Answer revealed'
+            : (isCorrect
+                ? '<i class="fas fa-check-circle" style="color: #28a745;"></i> Correct!'
+                : '<i class="fas fa-times-circle" style="color: #dc3545;"></i> Incorrect');
 
         if (isSequence) {
             const letters = (correctAnswer || []).map(i => `${String.fromCharCode(65 + i)}. ${this.escapeHtml(question.options[i])}`);
@@ -1894,10 +1900,18 @@ class MultiExamSimulator {
             });
         }
 
-        this.recordStudyAnswer(question, isCorrect, userAnswer);
+        // Revealing the answer without attempting it is not a graded miss; only
+        // record a study result when the user actually answered, so study
+        // accuracy and spaced-repetition scheduling are not skewed by reveals.
+        if (wasAnswered) {
+            this.recordStudyAnswer(question, isCorrect, userAnswer);
+        }
     }
 
     handleAnswerChanged() {
+        // Any real interaction marks the current question as touched, so an
+        // auto-initialized SEQUENCE order is not mistaken for a user attempt.
+        this.touchedQuestions.add(this.currentQuestionIndex);
         this.updateNavigator();
         const feedback = document.getElementById('answer-feedback');
         if (this.isStudyMode() && feedback && !feedback.hidden) {
@@ -1954,7 +1968,7 @@ class MultiExamSimulator {
         if (!this.isStudyMode()) return;
         const { questionId, answerKey } = this.getStudyAnswerKey(question, index);
 
-        const wasAnswered = this.isAnswerProvided(userAnswer);
+        const wasAnswered = this.wasAttempted(index, question);
         this.studySessionResults.set(answerKey, { questionId, isCorrect, wasAnswered });
 
         try {
@@ -1981,7 +1995,7 @@ class MultiExamSimulator {
         const summary = { reviewedCount: 0, correctCount: 0, incorrectCount: 0, skippedCount: 0 };
         questions.forEach((question, index) => {
             const userAnswer = this.selectedAnswers[index];
-            if (!this.isAnswerProvided(userAnswer)) {
+            if (!this.wasAttempted(index, question)) {
                 summary.skippedCount++;
                 return;
             }
@@ -2000,7 +2014,7 @@ class MultiExamSimulator {
         const saves = [];
         questions.forEach((question, index) => {
             const userAnswer = this.selectedAnswers[index];
-            if (!this.isAnswerProvided(userAnswer)) return;
+            if (!this.wasAttempted(index, question)) return;
 
             const isCorrect = this.isAnswerCorrect(question, userAnswer);
             const { answerKey } = this.getStudyAnswerKey(question, index);
@@ -2066,10 +2080,33 @@ class MultiExamSimulator {
             return isExamAnswerProvided(answer);
         }
 
+        // A non-empty answer normally proves an attempt, but SEQUENCE questions
+        // auto-initialize a shuffled order on first render. For those, require a
+        // real interaction (tracked in touchedQuestions) before treating the
+        // question as attempted; every other type only becomes non-empty through
+        // a user action, so a provided answer is enough.
+        wasAttempted(index, question = this.getCurrentQuestions()[index]) {
+            const answer = this.selectedAnswers[index];
+            if (!question) return this.isAnswerProvided(answer);
+            const type = window.ExamApp.normalizeQuestionType(question);
+            if (type === 'SEQUENCE') {
+                // Auto-initialized to a shuffled order on render, so a non-empty
+                // array is not proof of an attempt; require a real interaction.
+                return Array.isArray(answer) && answer.length > 0 && this.touchedQuestions.has(index);
+            }
+            if (type === 'YES_NO_MATRIX') {
+                // Rows start undefined and can be answered partially; a single
+                // filled row is a real (if incomplete) attempt that
+                // isAnswerProvided's "every slot filled" rule would miss.
+                return Array.isArray(answer) && answer.some(value => value !== undefined && value !== null && value !== '');
+            }
+            return this.isAnswerProvided(answer);
+        }
+
         getUnansweredQuestionIndexes(questions) {
             const unanswered = [];
             questions.forEach((_, index) => {
-                if (!this.isAnswerProvided(this.selectedAnswers[index])) {
+                if (!this.wasAttempted(index)) {
                     unanswered.push(index);
                 }
             });
@@ -2269,8 +2306,8 @@ class MultiExamSimulator {
 
         questions.forEach((question, index) => {
             const ua = this.selectedAnswers[index];
-            const wasAnswered = this.isAnswerProvided(ua);
-            if (this.isAnswerCorrect(question, ua)) {
+            const wasAnswered = this.wasAttempted(index, question);
+            if (wasAnswered && this.isAnswerCorrect(question, ua)) {
                 correct++;
             } else if (wasAnswered) {
                 incorrect++;
@@ -2466,7 +2503,17 @@ class MultiExamSimulator {
         if (missedText) missedText.textContent = `${Math.round(incorrectPercentage)}%`;
 
         const totalQuestionsEl = document.getElementById('total-questions-result');
-        if (totalQuestionsEl) totalQuestionsEl.textContent = total;
+        if (totalQuestionsEl) {
+            // "Questions answered" must reflect what the user actually answered,
+            // not the total question count. Mirror the study path's "X/Y" format
+            // so it reconciles with the answered-only Correct/Incorrect counts.
+            const examQuestions = this.getCurrentQuestions();
+            const answered = examQuestions.reduce(
+                (count, question, index) => count + (this.wasAttempted(index, question) ? 1 : 0),
+                0
+            );
+            totalQuestionsEl.textContent = `${answered}/${total}`;
+        }
         const passTargetEl = document.getElementById('pass-score-target');
         if (passTargetEl) passTargetEl.textContent = `${this.examData[this.currentExam].passScore}%`;
         const scoreVsPass = document.getElementById('score-vs-pass');
@@ -2543,7 +2590,7 @@ class MultiExamSimulator {
             const isYesNoMatrix = (questionType === 'YES_NO_MATRIX');
 
             const isCorrect = this.isAnswerCorrect(question, userAnswer);
-            const wasAnswered = this.isAnswerProvided(userAnswer);
+            const wasAnswered = this.wasAttempted(index, question);
             const statusClass = !wasAnswered ? 'skipped' : (isCorrect ? 'correct' : 'incorrect');
             const statusIcon = !wasAnswered ? 'fa-minus-circle' : (isCorrect ? 'fa-check-circle' : 'fa-times-circle');
             const statusText = !wasAnswered ? 'Skipped' : (isCorrect ? 'Correct' : 'Incorrect');
@@ -2679,7 +2726,7 @@ class MultiExamSimulator {
     buildAttemptQuestionResults(questions) {
         return questions.map((question, index) => {
             const userAnswer = this.selectedAnswers[index];
-            const skipped = !this.isAnswerProvided(userAnswer);
+            const skipped = !this.wasAttempted(index, question);
             return {
                 questionId: this.getQuestionStableId(question, index),
                 order: index + 1,

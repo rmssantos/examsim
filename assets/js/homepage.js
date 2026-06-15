@@ -191,7 +191,14 @@ return {
 loadLibraryState() {
 try {
 	const parsed = JSON.parse(localStorage.getItem('exam_library_filters') || '{}');
-	return { ...this.defaultLibraryState(), ...parsed };
+	const state = { ...this.defaultLibraryState(), ...parsed };
+	// A persisted filter silently narrows the library ("1 of 14") with no visible
+	// cause when the panel is collapsed. Reveal the panel on load whenever a
+	// filter is active so the pre-filled search term and Clear button are shown.
+	if (['query', 'vendor', 'domain', 'level', 'status'].some((key) => state[key])) {
+		state.filtersCollapsed = false;
+	}
+	return state;
 } catch (_) {
 	return this.defaultLibraryState();
 }
@@ -632,7 +639,7 @@ startButton.appendChild(this.createIcon('fas fa-play'));
 startButton.appendChild(document.createTextNode(' Start'));
 startButton.addEventListener('click', async (e) => {
 	e.stopPropagation();
-	const selectionPromise = this.selectExam(examId);
+	const selectionPromise = this.selectExam(examId, { revealDetails: false });
 	await this.startSelectedExam('exam', selectionPromise);
 });
 actions.appendChild(startButton);
@@ -644,7 +651,7 @@ studyButton.appendChild(this.createIcon('fas fa-brain'));
 studyButton.appendChild(document.createTextNode(' Study'));
 studyButton.addEventListener('click', async (e) => {
 	e.stopPropagation();
-	const selectionPromise = this.selectExam(examId);
+	const selectionPromise = this.selectExam(examId, { revealDetails: false });
 	await this.startSelectedExam('study', selectionPromise);
 });
 
@@ -852,13 +859,18 @@ h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995); h ^= h >>> 15;
 return h >>> 0;
 }
 
-async selectExam(examId) {
+async selectExam(examId, { revealDetails = true } = {}) {
 const initialExamData = window.userExams[examId];
 if (!initialExamData) return false;
 this.selectedExamId = examId;
 this.highlightSelectedCard(examId);
-this.showExamDetailsPlaceholder(examId);
-this.refreshHeroPreview();
+// Launch buttons (Start/Study) reuse selectExam only to preload and sync the
+// exam data; they pass { revealDetails: false } so a single click opens the
+// exam without also revealing and scrolling to the in-page details panel.
+if (revealDetails) {
+	this.showExamDetailsPlaceholder(examId);
+	this.refreshHeroPreview();
+}
 
 try {
 	const examData = await window.ExamApp.ensureExamLoaded(examId);
@@ -876,7 +888,7 @@ try {
 			resources: metadata.resources || []
 		};
 	}
-	if (this.selectedExamId === examId) {
+	if (this.selectedExamId === examId && revealDetails) {
 		this.showExamDetailsPlaceholder(examId);
 		await this.updateDetailsStudySummary(examId);
 	}

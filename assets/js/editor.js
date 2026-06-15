@@ -679,6 +679,10 @@
         ? 'Built-in pack is read-only. Save will create your own editable copy.'
         : '';
     }
+    // builtinExamIds loads asynchronously; once the read-only status is known,
+    // refresh the save-state label so a pending edit shows "saves as a copy"
+    // immediately instead of waiting for the next edit.
+    updateUnsavedIndicator();
   }
 
   function uniqueCopyId(base){
@@ -1372,10 +1376,18 @@
   function updateUnsavedIndicator(){
     const headerStatus = document.getElementById('editorSaveState');
     const footerStatus = document.getElementById('saveStatus');
+    // On a built-in (read-only) pack the edits are real and saveable, but Save
+    // forks them into your own copy rather than touching the protected pack.
+    // Say so, so the "unsaved" state does not contradict the read-only banner.
+    const builtinDirty = state.hasUnsavedChanges && isBuiltinExam(currentExamId());
     const icon = state.hasUnsavedChanges ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
-    const label = state.hasUnsavedChanges ? 'Unsaved edits' : 'No unsaved edits';
+    const label = state.hasUnsavedChanges
+      ? (builtinDirty ? 'Unsaved (saves as a copy)' : 'Unsaved edits')
+      : 'No unsaved edits';
     const title = state.hasUnsavedChanges
-      ? 'This question has edits that are not saved in browser storage'
+      ? (builtinDirty
+          ? 'Built-in packs stay read-only. Saving keeps these edits in your own editable copy.'
+          : 'This question has edits that are not saved in browser storage')
       : 'Current question has no unsaved edits';
 
     [headerStatus, footerStatus].forEach(status => {

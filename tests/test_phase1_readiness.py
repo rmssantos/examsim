@@ -238,7 +238,7 @@ class MetadataFirstLoaderTests(unittest.TestCase):
         homepage = (ROOT / "assets" / "js" / "homepage.js").read_text(encoding="utf-8")
         exam_init = (ROOT / "assets" / "js" / "exam-init.js").read_text(encoding="utf-8")
         editor = (ROOT / "assets" / "js" / "editor.js").read_text(encoding="utf-8")
-        self.assertIn("async selectExam(examId)", homepage)
+        self.assertIn("async selectExam(examId", homepage)
         self.assertIn("await window.ExamApp.ensureExamLoaded(examId)", homepage)
         self.assertIn("await window.ExamApp.ensureExamLoaded(examId)", exam_init)
         self.assertIn("await window.ExamApp.ensureExamLoaded(newExamId)", editor)

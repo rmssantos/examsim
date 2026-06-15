@@ -101,6 +101,118 @@ try {
   assert.notEqual(coverage.display, 'none', 'Expanded exam coverage (modules + study resources) must be visible.');
   assert.ok(coverage.resourceLinks >= 1, 'Study Resources must render links when the exam metadata lists resources.');
 
+  // Exam runtime regressions:
+  //  - the results "Questions answered" stat must report answered/total, not the bank size;
+  //  - "Show Answer" before attempting a question must read as a neutral reveal, not "Incorrect".
+  await page.goto(`${baseUrl}/exam.html?exam=az900`, { waitUntil: 'domcontentloaded' });
+  // The first question may be any schema (the order is randomized), so wait on
+  // the loaded question set rather than on `.option`, which only STANDARD/MULTI
+  // render. We navigate to a STANDARD/MULTI question explicitly below.
+  await page.waitForFunction(() => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    return Boolean(sim) && typeof sim.getCurrentQuestions === 'function'
+      && sim.getCurrentQuestions().length > 0;
+  }, null, { timeout: 15000 });
+  const examTotal = await page.evaluate(() => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    return sim.getCurrentQuestions().length;
+  });
+
+  // Drive a STANDARD/MULTI question so the visible option label exists regardless
+  // of the randomized question order.
+  const idx = await page.evaluate(() => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    const qs = sim.getCurrentQuestions();
+    const gradeIdx = qs.findIndex((q) => {
+      const t = window.ExamApp.normalizeQuestionType(q);
+      return t === 'STANDARD' || t === 'MULTI';
+    });
+    const revealIdx = qs.findIndex((_, i) => i !== gradeIdx);
+    sim.showQuestion(gradeIdx);
+    return { gradeIdx, revealIdx };
+  });
+  assert.ok(idx.gradeIdx >= 0, 'Expected at least one STANDARD/MULTI question to drive.');
+
+  // Answer it (the label is the visible control; the native input is hidden).
+  await page.locator('.option label').first().click();
+  await page.locator('#show-answer-btn').click();
+  await page.waitForSelector('#answer-feedback:not([hidden])', { timeout: 5000 });
+  const gradedStatus = (await page.locator('#answer-feedback .feedback-status').innerText()).trim();
+  assert.ok(/correct!?|incorrect/i.test(gradedStatus), 'Revealing an answered question must show a graded result.');
+
+  // Reveal a different, untouched question -> neutral state, not "Incorrect".
+  await page.evaluate((i) => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    sim.showQuestion(i);
+  }, idx.revealIdx);
+  await page.waitForTimeout(150);
+  await page.locator('#show-answer-btn').click();
+  await page.waitForSelector('#answer-feedback:not([hidden])', { timeout: 5000 });
+  const revealedStatus = (await page.locator('#answer-feedback .feedback-status').innerText()).trim();
+  assert.ok(/revealed/i.test(revealedStatus), 'Show Answer before attempting must read as a neutral reveal.');
+  assert.ok(!/incorrect/i.test(revealedStatus), 'Show Answer before attempting must not be labelled Incorrect.');
+
+  // SEQUENCE answers auto-initialize on render, so a non-empty array alone is not
+  // an attempt: an untouched sequence must not count, a touched one must.
+  const seq = await page.evaluate(() => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    const qs = sim.getCurrentQuestions();
+    const i = qs.findIndex((q) => window.ExamApp.normalizeQuestionType(q) === 'SEQUENCE');
+    if (i < 0) return { found: false };
+    const priorAnswer = sim.selectedAnswers[i];
+    const priorTouched = sim.touchedQuestions.has(i);
+    sim.selectedAnswers[i] = qs[i].options.map((_, k) => k); // simulate the auto-init order
+    sim.touchedQuestions.delete(i);
+    const untouched = sim.wasAttempted(i);
+    sim.touchedQuestions.add(i);
+    const touched = sim.wasAttempted(i);
+    if (priorAnswer === undefined) delete sim.selectedAnswers[i];
+    else sim.selectedAnswers[i] = priorAnswer;
+    if (priorTouched) sim.touchedQuestions.add(i);
+    else sim.touchedQuestions.delete(i);
+    return { found: true, untouched, touched };
+  });
+  if (seq.found) {
+    assert.equal(seq.untouched, false, 'An untouched SEQUENCE question must not count as attempted.');
+    assert.equal(seq.touched, true, 'A touched SEQUENCE question must count as attempted.');
+  }
+
+  // YES_NO_MATRIX rows start undefined: an empty matrix is skipped, but a
+  // partially answered one is a real (incorrect) attempt, not skipped.
+  const matrix = await page.evaluate(() => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    const qs = sim.getCurrentQuestions();
+    const i = qs.findIndex((q) => window.ExamApp.normalizeQuestionType(q) === 'YES_NO_MATRIX');
+    if (i < 0) return { found: false };
+    const rows = Array.isArray(qs[i].statements) ? qs[i].statements.length : 2;
+    const prior = sim.selectedAnswers[i];
+    sim.selectedAnswers[i] = new Array(rows).fill(undefined);
+    const empty = sim.wasAttempted(i);
+    const partial = new Array(rows).fill(undefined);
+    partial[0] = 0;
+    sim.selectedAnswers[i] = partial;
+    const partialAttempted = sim.wasAttempted(i);
+    if (prior === undefined) delete sim.selectedAnswers[i];
+    else sim.selectedAnswers[i] = prior;
+    return { found: true, empty, partialAttempted };
+  });
+  if (matrix.found) {
+    assert.equal(matrix.empty, false, 'An unanswered YES/NO matrix must not count as attempted.');
+    assert.equal(matrix.partialAttempted, true, 'A partially answered YES/NO matrix must count as attempted.');
+  }
+
+  // Finish with exactly one answered -> "Questions answered" reads answered/total.
+  await page.evaluate(() => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    sim.finishExam(true);
+  });
+  await page.waitForFunction(() => {
+    const s = document.getElementById('results-screen');
+    return s && !s.hidden;
+  }, null, { timeout: 8000 });
+  const answeredText = await page.evaluate(() => document.getElementById('total-questions-result')?.textContent);
+  assert.equal(answeredText, `1/${examTotal}`, 'Results "Questions answered" must show answered/total, not the bank size.');
+
   await page.goto(`${baseUrl}/editor.html`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => {
     const select = document.querySelector('#examSelect');
@@ -114,6 +226,31 @@ try {
   await editorSkipLink.focus();
   const focusedSkipBox = await editorSkipLink.boundingBox();
   assert.ok(focusedSkipBox && focusedSkipBox.y >= 0, 'Focused skip link must be visible.');
+
+  // Built-in pack edits must not contradict the read-only banner: viewing is clean,
+  // and editing reports an "unsaved (saves as a copy)" state, not a plain warning.
+  const builtinId = await page.evaluate(() => {
+    const select = document.querySelector('#examSelect');
+    const values = Array.from(select.options).map((o) => o.value);
+    return values.includes('az900') ? 'az900' : values.find((v) => v && v !== 'custom');
+  });
+  await page.selectOption('#examSelect', builtinId);
+  await page.waitForFunction(() => {
+    const banner = document.getElementById('builtin-readonly-banner');
+    return banner && getComputedStyle(banner).display !== 'none';
+  }, null, { timeout: 5000 });
+  assert.match(
+    (await page.locator('#editorSaveState span').innerText()).trim(),
+    /no unsaved/i,
+    'Viewing a built-in pack must not report unsaved edits.'
+  );
+  await page.locator('#qText').click();
+  await page.locator('#qText').type(' (edit)');
+  await page.waitForFunction(
+    () => /saves as a copy/i.test(document.querySelector('#editorSaveState span')?.textContent || ''),
+    null,
+    { timeout: 5000 }
+  );
 
   console.log('Browser smoke passed.');
 } finally {
