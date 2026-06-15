@@ -105,11 +105,13 @@ try {
   //  - the results "Questions answered" stat must report answered/total, not the bank size;
   //  - "Show Answer" before attempting a question must read as a neutral reveal, not "Incorrect".
   await page.goto(`${baseUrl}/exam.html?exam=az900`, { waitUntil: 'domcontentloaded' });
+  // The first question may be any schema (the order is randomized), so wait on
+  // the loaded question set rather than on `.option`, which only STANDARD/MULTI
+  // render. We navigate to a STANDARD/MULTI question explicitly below.
   await page.waitForFunction(() => {
     const sim = window.ExamApp?.examSimulator || window.examSimulator;
-    return sim && typeof sim.getCurrentQuestions === 'function'
-      && sim.getCurrentQuestions().length > 0
-      && document.querySelectorAll('.option').length > 0;
+    return Boolean(sim) && typeof sim.getCurrentQuestions === 'function'
+      && sim.getCurrentQuestions().length > 0;
   }, null, { timeout: 15000 });
   const examTotal = await page.evaluate(() => {
     const sim = window.ExamApp?.examSimulator || window.examSimulator;
@@ -173,6 +175,30 @@ try {
   if (seq.found) {
     assert.equal(seq.untouched, false, 'An untouched SEQUENCE question must not count as attempted.');
     assert.equal(seq.touched, true, 'A touched SEQUENCE question must count as attempted.');
+  }
+
+  // YES_NO_MATRIX rows start undefined: an empty matrix is skipped, but a
+  // partially answered one is a real (incorrect) attempt, not skipped.
+  const matrix = await page.evaluate(() => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    const qs = sim.getCurrentQuestions();
+    const i = qs.findIndex((q) => window.ExamApp.normalizeQuestionType(q) === 'YES_NO_MATRIX');
+    if (i < 0) return { found: false };
+    const rows = Array.isArray(qs[i].statements) ? qs[i].statements.length : 2;
+    const prior = sim.selectedAnswers[i];
+    sim.selectedAnswers[i] = new Array(rows).fill(undefined);
+    const empty = sim.wasAttempted(i);
+    const partial = new Array(rows).fill(undefined);
+    partial[0] = 0;
+    sim.selectedAnswers[i] = partial;
+    const partialAttempted = sim.wasAttempted(i);
+    if (prior === undefined) delete sim.selectedAnswers[i];
+    else sim.selectedAnswers[i] = prior;
+    return { found: true, empty, partialAttempted };
+  });
+  if (matrix.found) {
+    assert.equal(matrix.empty, false, 'An unanswered YES/NO matrix must not count as attempted.');
+    assert.equal(matrix.partialAttempted, true, 'A partially answered YES/NO matrix must count as attempted.');
   }
 
   // Finish with exactly one answered -> "Questions answered" reads answered/total.

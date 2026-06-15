@@ -2086,11 +2086,21 @@ class MultiExamSimulator {
         // question as attempted; every other type only becomes non-empty through
         // a user action, so a provided answer is enough.
         wasAttempted(index, question = this.getCurrentQuestions()[index]) {
-            if (!this.isAnswerProvided(this.selectedAnswers[index])) return false;
-            if (question && window.ExamApp.normalizeQuestionType(question) === 'SEQUENCE') {
-                return this.touchedQuestions.has(index);
+            const answer = this.selectedAnswers[index];
+            if (!question) return this.isAnswerProvided(answer);
+            const type = window.ExamApp.normalizeQuestionType(question);
+            if (type === 'SEQUENCE') {
+                // Auto-initialized to a shuffled order on render, so a non-empty
+                // array is not proof of an attempt; require a real interaction.
+                return Array.isArray(answer) && answer.length > 0 && this.touchedQuestions.has(index);
             }
-            return true;
+            if (type === 'YES_NO_MATRIX') {
+                // Rows start undefined and can be answered partially; a single
+                // filled row is a real (if incomplete) attempt that
+                // isAnswerProvided's "every slot filled" rule would miss.
+                return Array.isArray(answer) && answer.some(value => value !== undefined && value !== null && value !== '');
+            }
+            return this.isAnswerProvided(answer);
         }
 
         getUnansweredQuestionIndexes(questions) {
