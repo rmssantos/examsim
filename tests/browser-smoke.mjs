@@ -24,14 +24,14 @@ try {
     'Homepage startup must not download question dumps.'
   );
 
-  // Regression: the router must NOT rewrite the roadmap entry links back to the home page.
-  // These links use a literal href (no data-route), so router.init leaves them at roadmaps.html.
+  // Regression: the roadmap entry links must resolve to the roadmaps page, never the home page.
+  // The router maps the 'roadmaps' route to /roadmaps (clean URL) or roadmaps.html (file mode).
   const roadmapNavHref = await page.locator('.cr-topnav-links a', { hasText: 'Roadmaps' }).getAttribute('href');
-  assert.ok(roadmapNavHref && /roadmaps\.html$/.test(roadmapNavHref),
-    `Topnav Roadmaps link must resolve to roadmaps.html, got "${roadmapNavHref}".`);
+  assert.ok(roadmapNavHref && /roadmaps(\.html)?$/.test(roadmapNavHref),
+    `Topnav Roadmaps link must resolve to the roadmaps page, got "${roadmapNavHref}".`);
   const roadmapCardHref = await page.locator('a.roadmap-entry-card').getAttribute('href');
-  assert.ok(roadmapCardHref && /roadmaps\.html$/.test(roadmapCardHref),
-    `Career roadmaps card must resolve to roadmaps.html, got "${roadmapCardHref}".`);
+  assert.ok(roadmapCardHref && /roadmaps(\.html)?$/.test(roadmapCardHref),
+    `Career roadmaps card must resolve to the roadmaps page, got "${roadmapCardHref}".`);
 
   await page.evaluate(() => {
     const ensureExamLoaded = window.ExamApp.ensureExamLoaded.bind(window.ExamApp);
@@ -290,8 +290,34 @@ try {
     await page.locator('.roadmap-node[data-pack="az104"] .rn-pill.is-prereq').count(), 1,
     'AZ-104 must show the Prerequisite pill in the DevOps track.'
   );
-  const proUnlock = await page.locator('.roadmap-node[data-pack="az400"] a.rn-cta[target="_blank"]').getAttribute('href');
-  assert.ok(proUnlock && proUnlock.includes('gumroad'), 'Pro node must link to the Gumroad unlock url.');
+
+  // Expanding a node reveals the exam details panel (mirrors the home exam-details content).
+  await page.locator('.roadmap-node[data-pack="az104"] .rn-expand').click();
+  await page.waitForSelector('.roadmap-node[data-pack="az104"] .rn-details:not([hidden])', { timeout: 2000 });
+  assert.match(
+    await page.locator('.roadmap-node[data-pack="az104"] .rn-details').innerText(),
+    /Exam information/i, 'Expanding a node must reveal the exam details panel.'
+  );
+
+  // Pro node: "Unlock full" opens the pro modal (highlights + Gumroad + import/license
+  // instruction), instead of jumping straight to Gumroad.
+  await page.locator('.roadmap-node[data-pack="az400"] .rn-unlock').click();
+  await page.waitForSelector('#pro-modal-overlay', { timeout: 2000 });
+  const proBuyHref = await page.locator('#pro-modal-overlay .pro-modal-buy').getAttribute('href');
+  assert.ok(proBuyHref && proBuyHref.includes('gumroad'), `Pro modal must link to Gumroad, got "${proBuyHref}".`);
+  assert.equal(
+    await page.locator('#pro-modal-overlay .pro-modal-activate-text').count(), 1,
+    'Pro modal must include the import/license-key instruction (not a bare Gumroad jump).'
+  );
+  await page.locator('#pro-modal-overlay .pro-modal-close').click();
+
+  // Dark mode toggle works on the roadmaps page.
+  const wasDark = await page.evaluate(() => document.body.classList.contains('dark-mode'));
+  await page.locator('#theme-toggle').click();
+  assert.notEqual(
+    await page.evaluate(() => document.body.classList.contains('dark-mode')), wasDark,
+    'Theme toggle must flip dark mode on the roadmaps page.'
+  );
 
   // Pure-function contract: deriveNodeState uses a flat 70% on bestScore (matches the app).
   const states = await page.evaluate(() => [

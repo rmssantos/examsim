@@ -15,7 +15,7 @@
 
         if (segments.length > 0 && knownFiles.includes(segments[segments.length - 1])) {
             segments.pop();
-        } else if (segments.length > 0 && ['editor', 'exam', 'study', 'privacy-and-storage'].includes(segments[segments.length - 1])) {
+        } else if (segments.length > 0 && ['editor', 'exam', 'study', 'privacy-and-storage', 'roadmaps'].includes(segments[segments.length - 1])) {
             segments.pop();
         }
 
@@ -50,7 +50,8 @@
                 editor: 'editor.html',
                 exam: 'exam.html',
                 study: 'exam.html',
-                'privacy-and-storage': 'privacy-and-storage.html'
+                'privacy-and-storage': 'privacy-and-storage.html',
+                roadmaps: 'roadmaps.html'
             };
             const fileName = fileMap[page] || 'index.html';
             return queryString ? `${fileName}?${queryString}` : fileName;
@@ -58,6 +59,7 @@
 
         if (page === 'home') return withBase('');
         if (page === 'editor') return withBase('editor');
+        if (page === 'roadmaps') return withBase('roadmaps');
         if (page === 'privacy-and-storage') return withBase('privacy-and-storage');
         if (page === 'study') return `${withBase('study')}${queryString ? `?${queryString}` : ''}`;
         if (page === 'exam') return `${withBase('exam')}${queryString ? `?${queryString}` : ''}`;
@@ -74,7 +76,7 @@
         const firstSegment = routePath.split('/')[0] || 'home';
         return {
             page: firstSegment === 'home' || firstSegment === 'index.html' ? 'home' : firstSegment,
-            isClean: ['editor', 'exam', 'study', 'privacy-and-storage'].includes(firstSegment)
+            isClean: ['editor', 'exam', 'study', 'privacy-and-storage', 'roadmaps'].includes(firstSegment)
         };
     }
 
