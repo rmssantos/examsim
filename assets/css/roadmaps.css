@@ -1,4 +1,4 @@
-/* Career roadmaps — stepper-only styles. Everything else inherits v2 tokens. */
+/* Career roadmaps stepper styles. Everything else inherits v2 tokens. */
 .roadmap-board { display: flex; flex-direction: column; gap: 1.5rem; }
 
 .roadmap-global-progress { font-family: "Cascadia Mono", ui-monospace, monospace; opacity: 0.85; margin-top: 0.5rem; }
