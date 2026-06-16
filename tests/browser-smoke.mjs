@@ -252,6 +252,46 @@ try {
     { timeout: 5000 }
   );
 
+  // Career roadmaps: seed local progress, then verify node states + up-next + structure.
+  await page.goto(`${baseUrl}/roadmaps.html`, { waitUntil: 'domcontentloaded' });
+  await page.evaluate(() => {
+    localStorage.setItem('az900_progress', JSON.stringify({ attempts: [{ score: 92, passed: true }], bestScore: 92, totalPassed: 1 }));
+    localStorage.setItem('az104_progress', JSON.stringify({ attempts: [{ score: 40, passed: false }], bestScore: 40, totalPassed: 0 }));
+  });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => window.Roadmaps && window.Roadmaps.ready === true, null, { timeout: 8000 });
+
+  assert.equal(await page.locator('.roadmap-track-card').count(), 6, 'Six career tracks must render.');
+
+  // Cloud Administrator is first: az900 passed (92%), az104 started (40%), az305 not started.
+  // Up-next is the FIRST non-passed node in track order, which is az104 (started), not az305.
+  assert.equal(await page.locator('.roadmap-node[data-pack="az900"].is-passed').count(), 1, 'az900 must render as passed.');
+  assert.match(
+    await page.locator('.roadmap-node[data-pack="az900"] .rn-best').innerText(),
+    /92%/, 'Passed node must show the same Best% the home reads from the shared progress record.'
+  );
+  assert.equal(await page.locator('.roadmap-node[data-pack="az104"].is-started').count(), 1, 'az104 must render as started.');
+  assert.equal(await page.locator('.roadmap-node[data-pack="az104"].is-next').count(), 1, 'First non-passed node (az104) must be marked up-next.');
+  assert.equal(await page.locator('.roadmap-node[data-pack="az305"].is-next').count(), 0, 'A node after the first non-passed must not be up-next.');
+
+  // DevOps track: az104 carries the prerequisite pill before az400.
+  await page.locator('.roadmap-track-card[data-track="devops"]').click();
+  await page.waitForFunction(() => document.querySelector('.roadmap-node[data-pack="az400"]'));
+  assert.equal(
+    await page.locator('.roadmap-node[data-pack="az104"] .rn-pill.is-prereq').count(), 1,
+    'AZ-104 must show the Prerequisite pill in the DevOps track.'
+  );
+  const proUnlock = await page.locator('.roadmap-node[data-pack="az400"] a.rn-cta[target="_blank"]').getAttribute('href');
+  assert.ok(proUnlock && proUnlock.includes('gumroad'), 'Pro node must link to the Gumroad unlock url.');
+
+  // Pure-function contract: deriveNodeState uses a flat 70% on bestScore (matches the app).
+  const states = await page.evaluate(() => [
+    window.Roadmaps.deriveNodeState({ attempts: [], bestScore: 0 }),
+    window.Roadmaps.deriveNodeState({ attempts: [{}], bestScore: 55 }),
+    window.Roadmaps.deriveNodeState({ attempts: [{}], bestScore: 80 })
+  ]);
+  assert.deepEqual(states, ['not-started', 'started', 'passed'], 'deriveNodeState must map progress to state.');
+
   console.log('Browser smoke passed.');
 } finally {
   await browser.close();
