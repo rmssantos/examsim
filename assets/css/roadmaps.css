@@ -1,0 +1,66 @@
+/* Career roadmaps — stepper-only styles. Everything else inherits v2 tokens. */
+.roadmap-board { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.roadmap-global-progress { font-family: "Cascadia Mono", ui-monospace, monospace; opacity: 0.85; margin-top: 0.5rem; }
+
+.roadmap-track-index {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 0.75rem;
+}
+.roadmap-track-card {
+	display: flex; align-items: center; gap: 0.75rem;
+	padding: 0.85rem 1rem;
+	background: var(--h-panel, var(--h-surface));
+	border: 1px solid var(--border, rgba(127,127,127,0.25));
+	border-radius: 12px;
+	cursor: pointer; text-align: left; color: inherit; width: 100%;
+}
+.roadmap-track-card[aria-current="true"] { border-color: var(--accent, #0f766e); }
+.roadmap-track-card .rt-icon { font-size: 1.25rem; color: var(--accent, #0f766e); }
+.roadmap-track-card .rt-name { font-weight: 600; display: block; }
+.roadmap-track-card .rt-count { font-family: "Cascadia Mono", ui-monospace, monospace; opacity: 0.75; font-size: 0.85rem; }
+
+.roadmap-track-title { margin: 0.5rem 0 0.25rem; }
+.roadmap-track-tagline { opacity: 0.8; margin: 0 0 1rem; }
+
+.roadmap-path { list-style: none; margin: 0; padding: 0; position: relative; }
+.roadmap-node {
+	position: relative;
+	padding: 0 0 1.25rem 2.25rem;
+	border-left: 2px solid var(--border, rgba(127,127,127,0.3));
+	margin-left: 0.75rem;
+}
+.roadmap-node:last-child { border-left-color: transparent; }
+.roadmap-node .rn-dot {
+	position: absolute; left: -0.72rem; top: 0.1rem;
+	width: 1.25rem; height: 1.25rem; border-radius: 50%;
+	display: grid; place-items: center; font-size: 0.7rem;
+	background: var(--h-surface); border: 2px solid var(--border, rgba(127,127,127,0.5));
+}
+.roadmap-node.is-passed .rn-dot { background: var(--accent, #0f766e); color: #fff; border-color: var(--accent, #0f766e); }
+.roadmap-node.is-started .rn-dot { border-color: var(--accent, #0f766e); }
+.roadmap-node.is-next .rn-row { outline: 2px solid var(--accent, #2bb3a3); outline-offset: 2px; border-radius: 10px; }
+
+.roadmap-node .rn-row {
+	display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+	background: var(--h-panel, var(--h-surface));
+	border: 1px solid var(--border, rgba(127,127,127,0.25));
+	border-radius: 10px; padding: 0.7rem 0.9rem;
+}
+.roadmap-node .rn-code { font-family: "Cascadia Mono", ui-monospace, monospace; font-weight: 700; }
+.roadmap-node .rn-name { opacity: 0.85; }
+.roadmap-node .rn-pill {
+	font-size: 0.7rem; padding: 0.1rem 0.5rem; border-radius: 999px;
+	border: 1px solid var(--border, rgba(127,127,127,0.4));
+}
+.roadmap-node .rn-pill.is-pro { border-color: var(--accent, #0f766e); color: var(--accent, #0f766e); }
+.roadmap-node .rn-pill.is-prereq { font-weight: 600; }
+.roadmap-node .rn-best { font-family: "Cascadia Mono", ui-monospace, monospace; font-size: 0.8rem; opacity: 0.85; }
+.roadmap-node.is-passed .rn-best { color: var(--accent, #0f766e); }
+.roadmap-node .rn-spacer { flex: 1 1 auto; }
+.roadmap-node .rn-cta { white-space: nowrap; }
+
+@media (max-width: 640px) {
+	.roadmap-node .rn-row { flex-direction: column; align-items: flex-start; }
+}

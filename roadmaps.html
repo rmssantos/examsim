@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#1d232f">
+	<meta name="description" content="Career roadmaps for certification practice: ordered exam paths from Fundamentals to Expert, with your local progress.">
+	<link rel="canonical" href="https://examplar.app/roadmaps.html">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.applicationinsights.azure.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+	<link rel="manifest" href="manifest.webmanifest">
+	<link rel="icon" type="image/png" sizes="64x64" href="assets/media/favicon-64.png">
+	<title>Career roadmaps | Examplar</title>
+	<link rel="stylesheet" href="assets/css/exam-v2.css">
+	<link rel="stylesheet" href="assets/css/app-footer.css">
+	<link href="assets/vendor/fontawesome/css/all.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/home-v2.css">
+	<link rel="stylesheet" href="assets/css/roadmaps.css">
+</head>
+<body>
+	<a class="skip-link" href="#main-content">Skip to main content</a>
+	<main id="main-content" class="container" tabindex="-1">
+		<div class="cr-hero-zone">
+			<div class="cr-topnav">
+				<div class="logo cr-topnav-brand">
+					<img class="logo-img" src="assets/media/examplar-mark.png" alt="Examplar logo" width="64" height="64" decoding="async">
+					<h1>Exampl<span class="logo-accent">a</span>r</h1>
+				</div>
+				<nav class="cr-topnav-links" aria-label="Site links">
+					<a href="index.html" data-route="home">Home</a>
+					<a href="editor.html" data-route="editor">Editor</a>
+					<a href="https://github.com/rmssantos/examsim" target="_blank" rel="noopener noreferrer">GitHub</a>
+					<div class="theme-controls">
+						<button id="theme-toggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+							<i aria-hidden="true" class="fas fa-moon theme-icon"></i>
+						</button>
+					</div>
+				</nav>
+			</div>
+			<header class="hero-header hero-banner">
+				<div class="hero-banner__inner">
+					<div class="hero-branding">
+						<p class="hero-headline">Career <span class="hero-headline-accent">roadmaps</span>.</p>
+						<p class="hero-subtitle">Ordered exam paths from Fundamentals to Expert. Your progress is read from this browser.</p>
+						<p class="roadmap-global-progress" id="roadmap-global-progress" aria-live="polite"></p>
+					</div>
+				</div>
+			</header>
+		</div>
+		<section class="home-board roadmap-board">
+			<nav class="roadmap-track-index" id="roadmap-track-index" aria-label="Career tracks"></nav>
+			<section class="roadmap-track-path" id="roadmap-track-path" aria-live="polite"></section>
+		</section>
+		<footer class="app-footer" aria-label="Project and privacy links">
+			<div class="app-footer-inner">
+				<p class="app-footer-note"><strong>Examplar</strong><span>Offline-ready. Browser edits stay local unless exported.</span></p>
+				<nav class="app-footer-links" aria-label="Project links">
+					<a href="index.html" data-route="home"><i aria-hidden="true" class="fas fa-house"></i><span>Home</span></a>
+					<a href="privacy-and-storage.html" data-route="privacy-and-storage"><i aria-hidden="true" class="fas fa-shield-alt"></i><span>Privacy &amp; storage</span></a>
+				</nav>
+			</div>
+		</footer>
+	</main>
+	<script src="assets/js/router.js"></script>
+	<script src="assets/js/pwa.js"></script>
+	<script src="assets/js/utils.js"></script>
+	<script src="assets/js/analytics.js"></script>
+	<script src="assets/js/exam-storage.js"></script>
+	<script src="assets/js/roadmaps.js"></script>
+</body>
+</html>
