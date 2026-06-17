@@ -15,6 +15,23 @@ class EditorUiReadinessTests(unittest.TestCase):
         self.assertIn("#searchInput", css)
         self.assertIn("min-width: 0", css)
 
+    def test_editor_uses_control_room_sticky_topbar(self):
+        html = (ROOT / "editor.html").read_text(encoding="utf-8")
+        css = (ROOT / "assets/css/editor-styles.css").read_text(encoding="utf-8")
+
+        # The editor shares the control-room top bar (sticky) with the same nav links,
+        # replacing the old bespoke editor-header.
+        self.assertIn("cr-topbar", html)
+        self.assertIn("cr-topnav-links", html)
+        self.assertIn('data-route="roadmaps"', html)
+        # The theme toggle is preserved; editor-init.js drives it by id.
+        self.assertIn('id="editorThemeToggle"', html)
+        self.assertIn('id="editorThemeIcon"', html)
+        # The bar is sticky and self-contained; the old bespoke header CSS is gone.
+        self.assertRegex(css, r"\.cr-topbar\s*\{[^}]*position:\s*sticky;")
+        self.assertNotIn(".editor-theme-toggle", css)
+        self.assertNotIn(".editor-header", css)
+
     def test_editor_save_state_copy_is_explicit(self):
         html = (ROOT / "editor.html").read_text(encoding="utf-8")
         js = (ROOT / "assets/js/editor.js").read_text(encoding="utf-8")

@@ -221,6 +221,9 @@ button { font-family: inherit; }
   font-size: 0.75rem;
   font-weight: 800;
 }
+/* Logo-image brand variant (matches the home/roadmaps/editor top bars). */
+.cr-brand-img { width: 22px; height: auto; border-radius: 6px; }
+.cr-brand .logo-accent { color: var(--accent-bright); }
 
 /* theme toggle lives in the rail; JS binds .theme-toggle */
 .theme-controls { display: contents; }

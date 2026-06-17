@@ -31,39 +31,91 @@ body.exam-landing.dark-mode {
   --page-bg: #10141b;
 }
 
-/* Topbar */
-.exam-landing .landing-topbar {
+/* Topbar — shared control-room sticky bar (full-bleed graphite, dark in both themes),
+   matching the home, roadmaps, editor and privacy pages. Self-contained: the landing
+   pages load only this stylesheet, so the rail tokens are scoped to the bar here. */
+.exam-landing .cr-topbar {
+  --rail-bg: #1d232f;
+  --rail-text: #aab2c0;
+  --rail-text-strong: #e8ebf0;
+  --rail-line: #313947;
+  --accent-bright: #2dd4bf;
+  --h-radius: 10px;
+
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-bottom: 18px;
+  background: var(--rail-bg);
+  color: var(--rail-text);
+  border-bottom: 1px solid var(--rail-line);
+}
+.exam-landing.dark-mode .cr-topbar {
+  --rail-bg: #161b24;
+  --rail-line: #2b3340;
+}
+.exam-landing .cr-topnav {
   width: min(960px, calc(100% - 32px));
   margin: 0 auto;
+  padding: 0.6rem 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 0;
+  gap: 1rem;
 }
-.exam-landing .landing-brand {
+.exam-landing .cr-topnav-brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  color: var(--ink);
-  font-weight: 800;
-  font-size: 1.1rem;
+  gap: 0.55rem;
   text-decoration: none;
 }
-.exam-landing .landing-theme-toggle {
-  width: 40px;
-  height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--ink);
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: 10px;
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  font-size: 1rem;
+.exam-landing .cr-topnav-brand .logo-img { width: 26px; height: auto; }
+.exam-landing .cr-topnav-brand .cr-wordmark {
+  color: var(--rail-text-strong);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
-.exam-landing .landing-theme-toggle:hover { color: var(--primary); }
+.exam-landing .cr-topnav-brand .logo-accent { color: var(--accent-bright); }
+.exam-landing .cr-topnav-brand:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 3px; border-radius: 6px; }
+.exam-landing .cr-topnav-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.1rem;
+}
+.exam-landing .cr-topnav-links > a {
+  color: var(--rail-text);
+  text-decoration: none;
+  font-size: 0.8438rem;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+.exam-landing .cr-topnav-links > a:hover { color: var(--rail-text-strong); }
+.exam-landing .cr-topnav-links > a:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
+.exam-landing .cr-topnav .theme-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.exam-landing .cr-topnav .theme-toggle {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: var(--h-radius);
+  background: transparent;
+  border: 1px solid var(--rail-line);
+  color: var(--rail-text);
+  box-shadow: none;
+  font-size: 1rem;
+  transition: color 0.15s, border-color 0.15s;
+}
+.exam-landing .cr-topnav .theme-toggle:hover { color: var(--accent-bright); border-color: var(--accent-bright); }
+.exam-landing .cr-topnav .theme-toggle:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
 
 /* Main column */
 .exam-landing .landing-main {

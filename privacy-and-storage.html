@@ -17,19 +17,23 @@
 </head>
 <body class="legal-shell">
   <main class="legal-page">
-    <header class="legal-topbar">
-      <a class="legal-brand" href="index.html" data-route="home">
-        <i aria-hidden="true" class="fas fa-graduation-cap"></i>
-        <span>Examplar</span>
-      </a>
-      <div class="legal-actions">
-        <a class="app-nav-action" href="index.html" data-route="home">
-          <i aria-hidden="true" class="fas fa-arrow-left"></i>
-          <span>Back</span>
+    <header class="cr-topbar">
+      <div class="cr-topnav">
+        <a class="logo cr-topnav-brand" href="index.html" data-route="home" aria-label="Examplar home">
+          <img class="logo-img" src="assets/media/examplar-mark.png" alt="Examplar logo" width="64" height="64" decoding="async">
+          <span class="cr-wordmark">Exampl<span class="logo-accent">a</span>r</span>
         </a>
-        <button class="legal-action legal-theme-toggle" id="legalThemeToggle" type="button" title="Toggle theme" aria-label="Toggle theme">
-          <i aria-hidden="true" class="fas fa-moon" id="legalThemeIcon"></i>
-        </button>
+        <nav class="cr-topnav-links" aria-label="Site links">
+          <a href="index.html" data-route="home">Home</a>
+          <a href="roadmaps.html" data-route="roadmaps">Roadmaps</a>
+          <a href="editor.html" data-route="editor">Editor</a>
+          <a href="https://github.com/rmssantos/examsim" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <div class="theme-controls">
+            <button id="legalThemeToggle" class="theme-toggle" type="button" title="Toggle theme" aria-label="Toggle theme">
+              <i aria-hidden="true" class="fas fa-moon theme-icon" id="legalThemeIcon"></i>
+            </button>
+          </div>
+        </nav>
       </div>
     </header>
 

@@ -13,6 +13,9 @@
 	const PASS_THRESHOLD = 70;
 	const STATE_LABEL = { 'passed': 'Review', 'started': 'Continue', 'not-started': 'Start' };
 	const PRO_LABEL = { 'passed': 'Review', 'started': 'Continue', 'not-started': 'Open preview' };
+	// Roadmap-local "I completed this" markers, kept separate from the exam engine so a
+	// learner can tick off a cert they passed elsewhere without faking an in-app attempt.
+	const DONE_KEY = 'examplar_roadmap_done';
 
 	// --- theme (mirrors labs.js / the rest of the UI: body.dark-mode + localStorage) ---
 	function applyTheme(theme) {
@@ -68,6 +71,18 @@
 		catch (_) { return null; }
 	}
 
+	function readDoneSet() {
+		try {
+			const raw = JSON.parse(localStorage.getItem(DONE_KEY));
+			return new Set(Array.isArray(raw) ? raw.filter(x => typeof x === 'string') : []);
+		} catch (_) { return new Set(); }
+	}
+	function setManualDone(id, done) {
+		const set = readDoneSet();
+		if (done) set.add(id); else set.delete(id);
+		try { localStorage.setItem(DONE_KEY, JSON.stringify([...set])); } catch (_) { /* storage blocked - non-fatal */ }
+	}
+
 	function deriveNodeState(progress) {
 		const attempts = progress && Array.isArray(progress.attempts) ? progress.attempts : [];
 		if (!attempts.length) return 'not-started';
@@ -90,7 +105,9 @@
 		return res.json();
 	}
 
-	const state = { tracks: [], metaById: {}, selectedTrackId: null };
+	// doneSet is the manual-complete set, read once per render pass (see renderIndex /
+	// renderPath) so node models do not reparse localStorage for every node.
+	const state = { tracks: [], metaById: {}, ownedById: {}, doneSet: new Set(), selectedTrackId: null };
 
 	function examHref(id) {
 		const built = window.ExamApp?.router?.buildUrl?.('exam', { exam: id });
@@ -101,32 +118,41 @@
 		const { id, role } = resolveEntry(entry);
 		const meta = state.metaById[id] || {};
 		const progress = readProgress(id);
-		const isPro = meta.commercialStatus === 'pro-preview';
+		// Owned = the full pack is imported on this device (its metadata is no longer the
+		// preview), mirroring how the home decides ownership. An owned pack is never "pro".
+		const owned = !!state.ownedById[id];
+		const isPro = meta.commercialStatus === 'pro-preview' && !owned;
 		const attemptCount = progress && Array.isArray(progress.attempts) ? progress.attempts.length : 0;
 		const best = attemptCount ? (Number(progress.bestScore) || 0) : null;
+		const nodeState = deriveNodeState(progress);
+		const manualDone = state.doneSet.has(id);
 		return {
-			id, role, isPro, best, meta, progress,
+			id, role, isPro, owned, best, meta, progress, manualDone,
 			code: meta.certificationCode || meta.name || id.toUpperCase(),
 			name: meta.fullName || meta.name || id,
 			level: meta.level || meta.badge || '',
-			nodeState: deriveNodeState(progress)
+			nodeState,
+			// Done = passed in-app OR ticked off manually. Drives the check, the counts and
+			// the up-next pointer so a marked cert advances the track like a real pass.
+			isDone: nodeState === 'passed' || manualDone
 		};
 	}
 
 	function trackModels(track) {
 		const nodes = track.packs.map(nodeModel);
-		const nextIndex = nodes.findIndex(n => n.nodeState !== 'passed');
-		const passedCount = nodes.filter(n => n.nodeState === 'passed').length;
-		return { nodes, nextIndex, passedCount, total: nodes.length };
+		const nextIndex = nodes.findIndex(n => !n.isDone);
+		const doneCount = nodes.filter(n => n.isDone).length;
+		return { nodes, nextIndex, doneCount, total: nodes.length };
 	}
 
 	function renderIndex() {
+		state.doneSet = readDoneSet();
 		const host = document.getElementById('roadmap-track-index');
 		host.innerHTML = '';
-		let totalPassed = 0, totalNodes = 0;
+		let totalDone = 0, totalNodes = 0;
 		state.tracks.forEach(track => {
 			const m = trackModels(track);
-			totalPassed += m.passedCount; totalNodes += m.total;
+			totalDone += m.doneCount; totalNodes += m.total;
 			const btn = document.createElement('button');
 			btn.type = 'button';
 			btn.className = 'roadmap-track-card';
@@ -135,12 +161,12 @@
 			btn.innerHTML =
 				'<i aria-hidden="true" class="rt-icon ' + safeIconClass(track.icon, 'fas fa-list-check') + '"></i>' +
 				'<span><span class="rt-name">' + escapeHtml(track.name) + '</span>' +
-				'<span class="rt-count">' + m.passedCount + '/' + m.total + ' done</span></span>';
+				'<span class="rt-count">' + m.doneCount + '/' + m.total + ' done</span></span>';
 			btn.addEventListener('click', () => selectTrack(track.id));
 			host.appendChild(btn);
 		});
 		const gp = document.getElementById('roadmap-global-progress');
-		if (gp) gp.textContent = totalPassed + ' of ' + totalNodes + ' packs passed';
+		if (gp) gp.textContent = totalDone + ' of ' + totalNodes + ' packs done';
 	}
 
 	function detailsMarkup(node) {
@@ -184,17 +210,28 @@
 
 	function renderNode(node, isNext) {
 		const li = document.createElement('li');
-		li.className = 'roadmap-node is-' + node.nodeState + (isNext ? ' is-next' : '');
+		li.className = 'roadmap-node is-' + node.nodeState + (node.isDone ? ' is-done' : '') + (isNext ? ' is-next' : '');
 		li.setAttribute('data-pack', node.id);
-		const dotIcon = node.nodeState === 'passed' ? '<i class="fas fa-check" aria-hidden="true"></i>' : '';
+		const dotIcon = node.isDone ? '<i class="fas fa-check" aria-hidden="true"></i>' : '';
 		const best = node.best != null ? '<span class="rn-best">Best: ' + node.best + '%</span>' : '';
+		const statusPill = node.isPro
+			? '<span class="rn-pill is-pro">PRO</span>'
+			: (node.owned ? '<span class="rn-pill is-owned">Unlocked</span>' : '<span class="rn-pill is-free">Free</span>');
 		const pills =
 			(node.level ? '<span class="rn-pill is-level">' + escapeHtml(node.level) + '</span>' : '') +
-			'<span class="rn-pill ' + (node.isPro ? 'is-pro">PRO' : 'is-free">Free') + '</span>' +
+			statusPill +
 			(node.role === 'prerequisite' ? '<span class="rn-pill is-prereq">Prerequisite</span>' : '');
 		const primaryLabel = node.isPro ? PRO_LABEL[node.nodeState] : STATE_LABEL[node.nodeState];
 		const unlock = node.isPro
 			? '<button type="button" class="rn-cta action-btn ghost rn-unlock">Unlock full</button>'
+			: '';
+		// A passed-in-app node is done by achievement; only offer a manual tick when there is
+		// no passing attempt yet, so the control never contradicts a real result.
+		const doneToggle = node.nodeState !== 'passed'
+			? '<button type="button" class="rn-done-toggle" aria-pressed="' + (node.manualDone ? 'true' : 'false') + '" title="Mark this exam complete">' +
+					'<i class="fas fa-circle-check" aria-hidden="true"></i>' +
+					'<span class="rn-done-label">' + (node.manualDone ? 'Completed' : 'Mark complete') + '</span>' +
+				'</button>'
 			: '';
 		li.innerHTML =
 			'<span class="rn-dot" aria-hidden="true">' + dotIcon + '</span>' +
@@ -203,6 +240,7 @@
 				'<span class="rn-name">' + escapeHtml(node.name) + '</span>' +
 				pills + best +
 				'<span class="rn-spacer"></span>' +
+				doneToggle +
 				'<a class="rn-cta action-btn secondary" href="' + escapeHtml(examHref(node.id)) + '">' + primaryLabel + '</a>' +
 				unlock +
 				'<button type="button" class="rn-expand" aria-expanded="false" aria-label="Show exam details"><i class="fas fa-chevron-down rn-caret" aria-hidden="true"></i></button>' +
@@ -223,18 +261,28 @@
 			details.hidden = !open;
 		}
 		row.addEventListener('click', (e) => {
-			if (e.target.closest('a')) return;            // let the primary CTA navigate
-			if (e.target.closest('.rn-unlock')) return;   // unlock has its own handler
+			if (e.target.closest('a')) return;               // let the primary CTA navigate
+			if (e.target.closest('.rn-unlock')) return;      // unlock has its own handler
+			if (e.target.closest('.rn-done-toggle')) return; // mark-complete has its own handler
 			toggle();
 		});
 		li.querySelector('.rn-unlock')?.addEventListener('click', (e) => {
 			e.stopPropagation();
 			openProModal(node);
 		});
+		li.querySelector('.rn-done-toggle')?.addEventListener('click', (e) => {
+			e.stopPropagation();
+			const next = !node.manualDone;
+			setManualDone(node.id, next);
+			window.ExamApp?.analytics?.trackEvent?.('roadmap_mark_complete', { exam: node.id, done: next });
+			renderIndex();
+			renderPath();
+		});
 		return li;
 	}
 
 	function renderPath() {
+		state.doneSet = readDoneSet();
 		const host = document.getElementById('roadmap-track-path');
 		host.innerHTML = '';
 		const track = state.tracks.find(t => t.id === state.selectedTrackId);
@@ -305,6 +353,19 @@
 		const metas = await Promise.all(ids.map(id =>
 			fetchJson('user-content/exams/' + id + '/metadata.json').catch(() => ({ id }))));
 		ids.forEach((id, i) => { state.metaById[id] = metas[i]; });
+		// Detect which packs the learner already owns. When the full pack is imported its
+		// metadata no longer carries the preview flag, exactly as the home reads it, so we
+		// take the stored metadata as the source of truth over the bundled preview file.
+		await Promise.all(ids.map(async (id) => {
+			try {
+				const rec = await window.ExamApp?.examStorage?.getExam?.(id);
+				const stored = rec && rec.metadata;
+				if (stored && !stored.preview) {
+					state.ownedById[id] = true;
+					state.metaById[id] = { ...state.metaById[id], ...stored };
+				}
+			} catch (_) { /* storage unavailable - keep the bundled preview */ }
+		}));
 		state.selectedTrackId = state.tracks[0] && state.tracks[0].id;
 		renderIndex();
 		renderPath();

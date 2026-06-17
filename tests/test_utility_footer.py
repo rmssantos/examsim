@@ -36,7 +36,8 @@ class UtilityFooterTests(unittest.TestCase):
             self.assertIn("assets/css/app-footer.css", html, page)
             self.assertIn('href="index.html"', html, page)
             self.assertIn('data-route="home"', html, page)
-            self.assertIn('class="app-nav-action"', html, page)
+            # The back-to-home affordance now lives in the shared control-room top bar.
+            self.assertIn('cr-topnav-links', html, page)
             for text in expected_text:
                 self.assertIn(text, html, page)
 

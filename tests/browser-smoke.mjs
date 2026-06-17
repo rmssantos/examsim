@@ -33,6 +33,12 @@ try {
   assert.ok(roadmapCardHref && /roadmaps(\.html)?$/.test(roadmapCardHref),
     `Career roadmaps card must resolve to the roadmaps page, got "${roadmapCardHref}".`);
 
+  // The home top bar is sticky too (same treatment as the roadmaps page).
+  assert.equal(
+    await page.locator('#welcome-screen .cr-topbar').evaluate(el => getComputedStyle(el).position), 'sticky',
+    'The home top bar must be sticky.'
+  );
+
   await page.evaluate(() => {
     const ensureExamLoaded = window.ExamApp.ensureExamLoaded.bind(window.ExamApp);
     let releaseLoad;
@@ -236,6 +242,23 @@ try {
   const focusedSkipBox = await editorSkipLink.boundingBox();
   assert.ok(focusedSkipBox && focusedSkipBox.y >= 0, 'Focused skip link must be visible.');
 
+  // The editor shares the control-room sticky top bar: logo links home, theme toggle works.
+  assert.equal(
+    await page.locator('.cr-topbar').evaluate(el => getComputedStyle(el).position), 'sticky',
+    'The editor top bar must be sticky.'
+  );
+  const editorBrandHref = await page.locator('a.cr-topnav-brand').getAttribute('href');
+  const editorHomeNavHref = await page.locator('.cr-topnav-links a', { hasText: 'Home' }).getAttribute('href');
+  assert.ok(editorBrandHref, 'The editor logo must be a link to home.');
+  assert.equal(editorBrandHref, editorHomeNavHref, 'Editor logo must link to the same home target as the Home nav link.');
+  const editorWasDark = await page.evaluate(() => document.body.classList.contains('dark-mode'));
+  await page.locator('#editorThemeToggle').click();
+  assert.notEqual(
+    await page.evaluate(() => document.body.classList.contains('dark-mode')), editorWasDark,
+    'Editor theme toggle must flip dark mode.'
+  );
+  await page.locator('#editorThemeToggle').click(); // restore
+
   // Built-in pack edits must not contradict the read-only banner: viewing is clean,
   // and editing reports an "unsaved (saves as a copy)" state, not a plain warning.
   const builtinId = await page.evaluate(() => {
@@ -272,6 +295,17 @@ try {
 
   assert.equal(await page.locator('.roadmap-track-card').count(), 6, 'Six career tracks must render.');
 
+  // The Examplar logo links to the home (same target as the Home nav link), and the
+  // top bar is sticky so the nav stays put while the stepper scrolls.
+  const brandHref = await page.locator('a.cr-topnav-brand').getAttribute('href');
+  const homeNavHref = await page.locator('.cr-topnav-links a', { hasText: 'Home' }).getAttribute('href');
+  assert.ok(brandHref, 'The Examplar logo must be a link.');
+  assert.equal(brandHref, homeNavHref, 'Logo must link to the same home target as the Home nav link.');
+  assert.equal(
+    await page.locator('.cr-topbar').evaluate(el => getComputedStyle(el).position), 'sticky',
+    'The roadmaps top bar must be sticky.'
+  );
+
   // Cloud Administrator is first: az900 passed (92%), az104 started (40%), az305 not started.
   // Up-next is the FIRST non-passed node in track order, which is az104 (started), not az305.
   assert.equal(await page.locator('.roadmap-node[data-pack="az900"].is-passed').count(), 1, 'az900 must render as passed.');
@@ -282,6 +316,45 @@ try {
   assert.equal(await page.locator('.roadmap-node[data-pack="az104"].is-started').count(), 1, 'az104 must render as started.');
   assert.equal(await page.locator('.roadmap-node[data-pack="az104"].is-next').count(), 1, 'First non-passed node (az104) must be marked up-next.');
   assert.equal(await page.locator('.roadmap-node[data-pack="az305"].is-next').count(), 0, 'A node after the first non-passed must not be up-next.');
+
+  // Manual completion: a learner can tick off a cert they passed elsewhere. A node passed
+  // in-app has no toggle; a not-passed node does, and ticking it fills the checkpoint.
+  assert.equal(
+    await page.locator('.roadmap-node[data-pack="az900"] .rn-done-toggle').count(), 0,
+    'A node passed in-app must not offer the manual mark-complete toggle.'
+  );
+  assert.equal(
+    await page.locator('.roadmap-node[data-pack="az305"] .rn-done-toggle').count(), 1,
+    'A not-passed node must offer the manual mark-complete toggle.'
+  );
+  await page.locator('.roadmap-node[data-pack="az305"] .rn-done-toggle').click();
+  await page.waitForSelector('.roadmap-node[data-pack="az305"].is-done', { timeout: 2000 });
+  assert.equal(
+    await page.locator('.roadmap-node[data-pack="az305"].is-done .rn-dot .fa-check').count(), 1,
+    'Marking a node complete must fill its checkpoint with a check.'
+  );
+  // Toggling off clears it again (roadmap-local; never touches the exam engine).
+  await page.locator('.roadmap-node[data-pack="az305"] .rn-done-toggle').click();
+  await page.waitForFunction(
+    () => !document.querySelector('.roadmap-node[data-pack="az305"].is-done'), null, { timeout: 2000 }
+  );
+
+  // Owned pack: when the full pack is imported its stored metadata drops the preview flag,
+  // so the roadmap shows it Unlocked with no "Unlock full", mirroring the home.
+  await page.evaluate(async () => {
+    await window.ExamApp.examStorage.putExam('saac03', [{ id: 'q1' }],
+      { name: 'SAA-C03', preview: false, commercialStatus: 'pro' });
+  });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => window.Roadmaps && window.Roadmaps.ready === true, null, { timeout: 8000 });
+  assert.equal(
+    await page.locator('.roadmap-node[data-pack="saac03"] .rn-pill.is-owned').count(), 1,
+    'An imported full pack must show the Unlocked pill on the roadmap.'
+  );
+  assert.equal(
+    await page.locator('.roadmap-node[data-pack="saac03"] .rn-unlock').count(), 0,
+    'An owned pack must not show the "Unlock full" button.'
+  );
 
   // DevOps track: az104 carries the prerequisite pill before az400.
   await page.locator('.roadmap-track-card[data-track="devops"]').click();
@@ -326,6 +399,34 @@ try {
     window.Roadmaps.deriveNodeState({ attempts: [{}], bestScore: 80 })
   ]);
   assert.deepEqual(states, ['not-started', 'started', 'passed'], 'deriveNodeState must map progress to state.');
+
+  // Privacy page wears the same control-room sticky top bar (logo links home, nav links present).
+  await page.goto(`${baseUrl}/privacy-and-storage.html`, { waitUntil: 'domcontentloaded' });
+  assert.equal(
+    await page.locator('.cr-topbar').evaluate(el => getComputedStyle(el).position), 'sticky',
+    'The privacy page top bar must be sticky.'
+  );
+  assert.equal(
+    await page.locator('.cr-topnav-links a', { hasText: 'Roadmaps' }).count(), 1,
+    'Privacy top bar must include the control-room nav links.'
+  );
+  const privacyBrandHref = await page.locator('a.cr-topnav-brand').getAttribute('href');
+  const privacyHomeNavHref = await page.locator('.cr-topnav-links a', { hasText: 'Home' }).getAttribute('href');
+  assert.ok(privacyBrandHref, 'The privacy logo must be a link to home.');
+  assert.equal(privacyBrandHref, privacyHomeNavHref, 'Privacy logo must link to the same home target as the Home nav link.');
+
+  // SEO landing pages (hub + a generated exam page) wear the same control-room sticky bar.
+  for (const path of ['/exams/index.html', '/exams/az900/index.html']) {
+    await page.goto(`${baseUrl}${path}`, { waitUntil: 'domcontentloaded' });
+    assert.equal(
+      await page.locator('.cr-topbar').evaluate(el => getComputedStyle(el).position), 'sticky',
+      `The ${path} top bar must be sticky.`
+    );
+    assert.equal(
+      await page.locator('.cr-topnav-links a', { hasText: 'Roadmaps' }).count(), 1,
+      `${path} top bar must include the control-room nav links.`
+    );
+  }
 
   console.log('Browser smoke passed.');
 } finally {
