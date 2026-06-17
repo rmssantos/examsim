@@ -28,21 +28,39 @@
    sits at the top of the rail, aligned with the node's row, so the checks form a
    clean vertical column in line with each exam. */
 .roadmap-path { list-style: none; margin: 0; padding: 0; }
-.roadmap-node { display: grid; grid-template-columns: 1.75rem 1fr; column-gap: 0.85rem; }
-.roadmap-node .rn-rail { grid-column: 1; grid-row: 1 / -1; display: flex; flex-direction: column; align-items: center; }
+/* Two columns: a dot/connector rail and the content. The dot is vertically centred
+   on its card (grid-row 1), so the checkpoints line up with the middle of each exam. */
+.roadmap-node {
+	position: relative;
+	display: grid;
+	grid-template-columns: 1.75rem 1fr;
+	grid-template-rows: auto auto;
+	column-gap: 0.85rem;
+	padding-bottom: 0.9rem;
+}
+.roadmap-node:last-child { padding-bottom: 0; }
+/* Connector line, centred in the rail column, behind the dots. Trim it to the first
+   and last dot so it does not protrude past the ends of the track. */
+.roadmap-node::before {
+	content: ''; position: absolute; left: 0.875rem; transform: translateX(-50%);
+	top: 0; bottom: 0; width: 2px; background: var(--border, rgba(127,127,127,0.3)); z-index: 0;
+}
+.roadmap-node:first-child::before { top: 1.7rem; }
+.roadmap-node:last-child::before { bottom: auto; height: 1.7rem; }
 .roadmap-node .rn-dot {
-	flex: 0 0 auto;
-	width: 1.5rem; height: 1.5rem; margin-top: 0.55rem;
-	border-radius: 50%; display: grid; place-items: center; font-size: 0.7rem;
+	grid-column: 1; grid-row: 1;
+	align-self: center; justify-self: center;
+	position: relative; z-index: 1;
+	width: 1.5rem; height: 1.5rem; border-radius: 50%;
+	display: grid; place-items: center; font-size: 0.7rem;
 	background: var(--h-surface); border: 2px solid var(--border, rgba(127,127,127,0.5));
 }
-.roadmap-node .rn-line { flex: 1 1 auto; width: 2px; min-height: 0.5rem; margin: 4px 0; background: var(--border, rgba(127,127,127,0.3)); }
-.roadmap-node:last-child .rn-line { display: none; }
 .roadmap-node.is-passed .rn-dot { background: var(--accent, #0f766e); color: #fff; border-color: var(--accent, #0f766e); }
 .roadmap-node.is-started .rn-dot { border-color: var(--accent, #0f766e); }
 
-.roadmap-node .rn-content { grid-column: 2; padding-bottom: 1rem; min-width: 0; }
+.roadmap-node .rn-details { grid-column: 2; grid-row: 2; }
 .roadmap-node .rn-row {
+	grid-column: 2; grid-row: 1; min-width: 0;
 	display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
 	background: var(--h-panel, var(--h-surface));
 	border: 1px solid var(--border, rgba(127,127,127,0.25));

@@ -191,19 +191,17 @@
 			? '<button type="button" class="rn-cta action-btn ghost rn-unlock">Unlock full</button>'
 			: '';
 		li.innerHTML =
-			'<div class="rn-rail" aria-hidden="true"><span class="rn-dot">' + dotIcon + '</span><span class="rn-line"></span></div>' +
-			'<div class="rn-content">' +
-				'<div class="rn-row">' +
-					'<span class="rn-code">' + escapeHtml(node.code) + '</span>' +
-					'<span class="rn-name">' + escapeHtml(node.name) + '</span>' +
-					pills + best +
-					'<span class="rn-spacer"></span>' +
-					'<a class="rn-cta action-btn secondary" href="' + escapeHtml(examHref(node.id)) + '">' + primaryLabel + '</a>' +
-					unlock +
-					'<button type="button" class="rn-expand" aria-expanded="false" aria-label="Show exam details"><i class="fas fa-chevron-down rn-caret" aria-hidden="true"></i></button>' +
-				'</div>' +
-				'<div class="rn-details" hidden></div>' +
-			'</div>';
+			'<span class="rn-dot" aria-hidden="true">' + dotIcon + '</span>' +
+			'<div class="rn-row">' +
+				'<span class="rn-code">' + escapeHtml(node.code) + '</span>' +
+				'<span class="rn-name">' + escapeHtml(node.name) + '</span>' +
+				pills + best +
+				'<span class="rn-spacer"></span>' +
+				'<a class="rn-cta action-btn secondary" href="' + escapeHtml(examHref(node.id)) + '">' + primaryLabel + '</a>' +
+				unlock +
+				'<button type="button" class="rn-expand" aria-expanded="false" aria-label="Show exam details"><i class="fas fa-chevron-down rn-caret" aria-hidden="true"></i></button>' +
+			'</div>' +
+			'<div class="rn-details" hidden></div>';
 
 		const row = li.querySelector('.rn-row');
 		const details = li.querySelector('.rn-details');
