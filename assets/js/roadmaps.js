@@ -51,6 +51,12 @@
 			return parsed.protocol === 'https:' ? parsed.href : '#';
 		} catch (_) { return '#'; }
 	}
+	// Allowlist icon class strings (Font Awesome tokens only) before injecting them
+	// into a class attribute, per the repo guideline for JSON-derived class names.
+	function safeIconClass(raw, fallback) {
+		const normalized = String(raw == null ? '' : raw).trim().replace(/\s+/g, ' ');
+		return /^[a-z0-9 -]{1,64}$/.test(normalized) ? normalized : fallback;
+	}
 
 	function resolveEntry(entry) {
 		if (typeof entry === 'string') return { id: entry, role: 'core' };
@@ -127,7 +133,7 @@
 			btn.setAttribute('data-track', track.id);
 			btn.setAttribute('aria-current', String(track.id === state.selectedTrackId));
 			btn.innerHTML =
-				'<i aria-hidden="true" class="rt-icon ' + escapeHtml(track.icon) + '"></i>' +
+				'<i aria-hidden="true" class="rt-icon ' + safeIconClass(track.icon, 'fas fa-list-check') + '"></i>' +
 				'<span><span class="rt-name">' + escapeHtml(track.name) + '</span>' +
 				'<span class="rt-count">' + m.passedCount + '/' + m.total + ' done</span></span>';
 			btn.addEventListener('click', () => selectTrack(track.id));
@@ -160,13 +166,13 @@
 				modules.map(mod => {
 					const icon = typeof mod === 'string' ? 'fas fa-check-circle' : (mod.icon || 'fas fa-check-circle');
 					const name = typeof mod === 'string' ? mod : (mod.name || '');
-					return '<li><i class="' + escapeHtml(icon) + '" aria-hidden="true"></i> ' + escapeHtml(name) + '</li>';
+					return '<li><i class="' + safeIconClass(icon, 'fas fa-check-circle') + '" aria-hidden="true"></i> ' + escapeHtml(name) + '</li>';
 				}).join('') + '</ul></div>'
 			: '';
 		const resourcesHtml = resources.length
 			? '<div class="rn-d-block"><h4>Study resources</h4><div class="rn-d-resources">' +
 				resources.map(r => '<a href="' + escapeHtml(safeHref(r.url)) + '" target="_blank" rel="noopener noreferrer">' +
-					'<i class="' + escapeHtml(r.icon || 'fas fa-link') + '" aria-hidden="true"></i> ' + escapeHtml(r.name || 'Reference') + '</a>').join('') +
+					'<i class="' + safeIconClass(r.icon, 'fas fa-link') + '" aria-hidden="true"></i> ' + escapeHtml(r.name || 'Reference') + '</a>').join('') +
 				'</div></div>'
 			: '';
 		return '<div class="rn-d-block"><h4>Exam information</h4><div class="rn-d-grid">' +
@@ -209,6 +215,7 @@
 		function toggle() {
 			const open = li.classList.toggle('is-open');
 			expandBtn.setAttribute('aria-expanded', String(open));
+			expandBtn.setAttribute('aria-label', open ? 'Hide exam details' : 'Show exam details');
 			if (open && !details.dataset.filled) {
 				details.innerHTML = detailsMarkup(node);
 				details.dataset.filled = '1';
