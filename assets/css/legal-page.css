@@ -14,64 +14,85 @@
   padding: 20px 0 0;
 }
 
-.legal-topbar {
+/* Header — shared control-room top bar (sticky), self-contained so the legal page does
+   not pull in home-v2/exam-v2. Its rail tokens are scoped to the bar; the bar is dark in
+   both themes, matching the home, roadmaps and editor. */
+.cr-topbar {
+  --rail-bg: #1d232f;
+  --rail-text: #aab2c0;
+  --rail-text-strong: #e8ebf0;
+  --rail-line: #313947;
+  --accent-bright: #2dd4bf;
+  --h-radius: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-top: -20px;          /* cancel .legal-page's 20px top padding so the bar meets the top */
+  margin-bottom: 18px;
+  background: var(--rail-bg);
+  color: var(--rail-text);
+  border-bottom: 1px solid var(--rail-line);
+}
+.cr-topnav {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0.6rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 16px;
+  gap: 1rem;
 }
-
-.legal-brand {
+.cr-topnav-brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  color: #1e293b;
-  font-weight: 800;
+  gap: 0.55rem;
   text-decoration: none;
 }
-
-.legal-brand i {
-  color: #0f766e;
-  font-size: 1.35rem;
+.cr-topnav-brand .logo-img { width: 26px; height: auto; }
+.cr-topnav-brand .cr-wordmark {
+  color: var(--rail-text-strong);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
-
-.legal-actions {
+.cr-topnav-brand .logo-accent { color: var(--accent-bright); }
+.cr-topnav-brand:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 3px; border-radius: 6px; }
+.cr-topnav-links {
   display: flex;
   align-items: center;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 1.1rem;
 }
-
-.legal-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  min-height: 36px;
-  padding: 8px 11px;
-  color: #334155;
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(148, 163, 184, 0.32);
-  border-radius: 10px;
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
-  font-weight: 700;
+.cr-topnav-links > a {
+  color: var(--rail-text);
   text-decoration: none;
+  font-size: 0.8438rem;
+  font-weight: 600;
+  transition: color 0.15s;
 }
-
-.legal-theme-toggle {
+.cr-topnav-links > a:hover { color: var(--rail-text-strong); }
+.cr-topnav-links > a:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
+.cr-topnav .theme-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.cr-topnav .theme-toggle {
   width: 36px;
-  min-width: 36px;
-  justify-content: center;
-  padding: 8px;
+  height: 36px;
+  display: grid;
+  place-items: center;
   cursor: pointer;
+  border-radius: var(--h-radius);
+  background: transparent;
+  border: 1px solid var(--rail-line);
+  color: var(--rail-text);
+  transition: color 0.15s, border-color 0.15s;
 }
-
-.legal-action:hover,
-.legal-action:focus-visible {
-  color: #0b5d57;
-  background: #ffffff;
-  border-color: rgba(15, 118, 110, 0.28);
-  outline: none;
-}
+.cr-topnav .theme-toggle:hover { color: var(--accent-bright); border-color: var(--accent-bright); }
+.cr-topnav .theme-toggle:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
 
 .legal-hero {
   padding: 24px;
@@ -210,26 +231,10 @@
   background: #10141b;
 }
 
-.legal-shell.dark-mode .legal-brand {
-  color: #f8fafc;
-}
-
-.legal-shell.dark-mode .legal-brand i {
-  color: #2dd4bf;
-}
-
-.legal-shell.dark-mode .legal-action {
-  color: #cbd5e1;
-  background: #1f2733;
-  border-color: rgba(148, 163, 184, 0.22);
-  box-shadow: none;
-}
-
-.legal-shell.dark-mode .legal-action:hover,
-.legal-shell.dark-mode .legal-action:focus-visible {
-  color: #f8fafc;
-  background: rgba(51, 65, 85, 0.92);
-  border-color: rgba(94, 234, 212, 0.24);
+/* The control-room top bar is dark in both themes; only its graphite deepens. */
+.legal-shell.dark-mode .cr-topbar {
+  --rail-bg: #161b24;
+  --rail-line: #2b3340;
 }
 
 .legal-shell.dark-mode .legal-hero {
@@ -289,19 +294,8 @@
     padding-top: 18px;
   }
 
-  .legal-topbar {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .legal-actions {
-    width: 100%;
-  }
-
-  .legal-actions .app-nav-action,
-  .legal-action:not(.legal-theme-toggle) {
-    flex: 1;
-    justify-content: center;
+  .cr-topnav {
+    padding: 0.55rem 1rem;
   }
 
   .legal-hero,

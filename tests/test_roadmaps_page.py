@@ -22,6 +22,18 @@ class RoadmapsPageTests(unittest.TestCase):
         self.assertIn("cr-hero-zone", HTML)
         self.assertIn("cr-topnav", HTML)
 
+    def test_topnav_is_in_a_sticky_topbar(self):
+        self.assertIn("cr-topbar", HTML)
+        # The nav must live inside the sticky bar wrapper, not the (tall) hero-zone.
+        topbar = HTML[HTML.index("cr-topbar"):HTML.index("cr-hero-zone")]
+        self.assertIn("cr-topnav", topbar, "Top nav must sit inside the sticky cr-topbar")
+
+    def test_logo_links_to_home(self):
+        brand = re.search(r'<a[^>]*class="[^"]*cr-topnav-brand[^"]*"[^>]*>', HTML)
+        self.assertIsNotNone(brand, "The Examplar logo must be an anchor")
+        self.assertIn('data-route="home"', brand.group(0))
+        self.assertIn('href="index.html"', brand.group(0))
+
     def test_containers_present(self):
         self.assertIn('id="roadmap-track-index"', HTML)
         self.assertIn('id="roadmap-track-path"', HTML)

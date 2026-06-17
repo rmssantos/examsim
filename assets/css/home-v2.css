@@ -241,6 +241,22 @@ body:not(.dark-mode) .home-board { border-color: transparent; }
 }
 .cr-topnav .theme-controls .theme-public-link:hover { color: var(--accent-bright); border-color: var(--accent-bright); }
 
+/* Sticky control-room top bar: the nav stays pinned while the page scrolls. It lives
+   OUTSIDE the (tall) hero-zone so it can pin to the viewport instead of scrolling away
+   with the hero; it keeps the intentional dark-header look as a full-bleed graphite
+   bar. Shared by the home and the roadmaps page. */
+.cr-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background: var(--rail-bg);
+  color: var(--rail-text);
+  border-bottom: 1px solid var(--rail-line);
+}
+.cr-topbar .cr-topnav { border-bottom: none; }
+
 .hero-header.hero-banner {
   background: transparent;
   border: none;

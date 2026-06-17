@@ -32,56 +32,92 @@ body {
 
 .editor-preview-explanation { margin-top: 12px; }
 
-/* Header */
-.editor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* Header — shared control-room top bar (sticky). Self-contained so the editor does not
+   pull in home-v2/exam-v2 (which would collide with these styles). Its rail tokens are
+   scoped to the bar; the bar is dark in both themes, matching the home and roadmaps. */
+.cr-topbar {
+  --rail-bg: #1d232f;
+  --rail-text: #aab2c0;
+  --rail-text-strong: #e8ebf0;
+  --rail-line: #313947;
+  --accent-bright: #2dd4bf;
+  --h-radius: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-top: -20px;          /* cancel the body's 20px top padding so the bar meets the top */
   margin-bottom: 16px;
+  background: var(--rail-bg);
+  color: var(--rail-text);
+  border-bottom: 1px solid var(--rail-line);
 }
-
-.editor-header h1 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #0f172a;
+.cr-topnav {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0.6rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.cr-topnav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
   margin: 0;
+  text-decoration: none;
+}
+.cr-topnav-brand .logo-img { width: 26px; height: auto; }
+.cr-topnav-brand h1 {
+  color: var(--rail-text-strong);
+  -webkit-text-fill-color: currentcolor;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+.cr-topnav-brand .logo-accent { color: var(--accent-bright); }
+.cr-topnav-brand:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 3px; border-radius: 6px; }
+.cr-topnav-links {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 1.1rem;
 }
-
-.editor-header h1 i { color: #0f766e; }
-
-.editor-header-actions {
+.cr-topnav-links > a {
+  color: var(--rail-text);
+  text-decoration: none;
+  font-size: 0.8438rem;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+.cr-topnav-links > a:hover { color: var(--rail-text-strong); }
+.cr-topnav-links > a:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
+.cr-topnav .theme-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
+.cr-topnav .theme-toggle {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: var(--h-radius);
+  background: transparent;
+  border: 1px solid var(--rail-line);
+  color: var(--rail-text);
+  transition: color 0.15s, border-color 0.15s;
+}
+.cr-topnav .theme-toggle:hover { color: var(--accent-bright); border-color: var(--accent-bright); }
+.cr-topnav .theme-toggle:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
 
 .editor-muted {
   font-size: 0.8125rem;
   color: #64748b;
   margin: 0 0 16px 0;
-}
-
-/* Theme Toggle */
-.editor-theme-toggle {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid #e2e8f0;
-  background: #fff;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  font-size: 1rem;
-  color: #64748b;
-  transition: all 0.2s;
-}
-.editor-theme-toggle:hover {
-  border-color: #0f766e;
-  color: #0f766e;
-  transform: scale(1.1);
 }
 
 /* Exam Selection Bar */
@@ -812,16 +848,10 @@ body.dark-mode {
   color: #e2e8f0;
 }
 
-.dark-mode .editor-header h1 { color: #f1f5f9; }
-
-.dark-mode .editor-theme-toggle {
-  background: rgba(30, 41, 59, 0.9);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #e2e8f0;
-}
-.dark-mode .editor-theme-toggle:hover {
-  border-color: rgba(15, 118, 110, 0.4);
-  color: #4ecdbd;
+/* The control-room top bar is dark in both themes; only its graphite deepens. */
+body.dark-mode .cr-topbar {
+  --rail-bg: #161b24;
+  --rail-line: #2b3340;
 }
 
 .dark-mode .exam-selection-bar,

@@ -25,6 +25,16 @@ class HomeHeaderLayoutTests(unittest.TestCase):
                 for classes in icons:
                     self.assertIn("theme-icon", classes)
 
+    def test_topnav_is_in_a_sticky_topbar(self):
+        html = (ROOT / "index.html").read_text(encoding="utf-8")
+        css = (ROOT / "assets/css/home-v2.css").read_text(encoding="utf-8")
+        # The nav must sit inside the sticky bar wrapper, not the (tall) hero-zone, so it
+        # can pin to the viewport while the page scrolls.
+        self.assertIn("cr-topbar", html)
+        topbar = html[html.index("cr-topbar"):html.index("cr-hero-zone")]
+        self.assertIn("cr-topnav", topbar, "Home top nav must sit inside the sticky cr-topbar")
+        self.assertRegex(css, r"\.cr-topbar\s*\{[^}]*position:\s*sticky;")
+
     def test_home_hero_uses_full_bleed_band_layout(self):
         css = (ROOT / "assets/css/home-v2.css").read_text(encoding="utf-8")
 
