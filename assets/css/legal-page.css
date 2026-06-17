@@ -24,6 +24,7 @@
   --rail-line: #313947;
   --accent-bright: #2dd4bf;
   --h-radius: 10px;
+
   position: sticky;
   top: 0;
   z-index: 50;

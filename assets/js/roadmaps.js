@@ -77,7 +77,6 @@
 			return new Set(Array.isArray(raw) ? raw.filter(x => typeof x === 'string') : []);
 		} catch (_) { return new Set(); }
 	}
-	function isManualDone(id) { return readDoneSet().has(id); }
 	function setManualDone(id, done) {
 		const set = readDoneSet();
 		if (done) set.add(id); else set.delete(id);
@@ -106,7 +105,9 @@
 		return res.json();
 	}
 
-	const state = { tracks: [], metaById: {}, ownedById: {}, selectedTrackId: null };
+	// doneSet is the manual-complete set, read once per render pass (see renderIndex /
+	// renderPath) so node models do not reparse localStorage for every node.
+	const state = { tracks: [], metaById: {}, ownedById: {}, doneSet: new Set(), selectedTrackId: null };
 
 	function examHref(id) {
 		const built = window.ExamApp?.router?.buildUrl?.('exam', { exam: id });
@@ -124,7 +125,7 @@
 		const attemptCount = progress && Array.isArray(progress.attempts) ? progress.attempts.length : 0;
 		const best = attemptCount ? (Number(progress.bestScore) || 0) : null;
 		const nodeState = deriveNodeState(progress);
-		const manualDone = isManualDone(id);
+		const manualDone = state.doneSet.has(id);
 		return {
 			id, role, isPro, owned, best, meta, progress, manualDone,
 			code: meta.certificationCode || meta.name || id.toUpperCase(),
@@ -145,6 +146,7 @@
 	}
 
 	function renderIndex() {
+		state.doneSet = readDoneSet();
 		const host = document.getElementById('roadmap-track-index');
 		host.innerHTML = '';
 		let totalDone = 0, totalNodes = 0;
@@ -280,6 +282,7 @@
 	}
 
 	function renderPath() {
+		state.doneSet = readDoneSet();
 		const host = document.getElementById('roadmap-track-path');
 		host.innerHTML = '';
 		const track = state.tracks.find(t => t.id === state.selectedTrackId);
