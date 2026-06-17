@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0",
+  "tracks": [
+    {
+      "id": "cloud-admin",
+      "name": "Cloud Administrator",
+      "tagline": "Administer and architect cloud platforms.",
+      "icon": "fas fa-cloud",
+      "packs": ["az900", "az104", "az305", "clfc02", "saac03"]
+    },
+    {
+      "id": "devops",
+      "name": "DevOps Engineer",
+      "tagline": "Automate and deliver cloud infrastructure.",
+      "icon": "fas fa-infinity",
+      "packs": [{ "id": "az104", "role": "prerequisite" }, "az400"]
+    },
+    {
+      "id": "data",
+      "name": "Data Engineer",
+      "tagline": "Build and run data platforms.",
+      "icon": "fas fa-database",
+      "packs": ["dp900", "dp700"]
+    },
+    {
+      "id": "ai",
+      "name": "AI Engineer",
+      "tagline": "Build AI and GenAI solutions.",
+      "icon": "fas fa-robot",
+      "packs": ["ai901", "ai103"]
+    },
+    {
+      "id": "security",
+      "name": "Security & Identity",
+      "tagline": "Secure identities and cloud workloads.",
+      "icon": "fas fa-shield-halved",
+      "packs": ["sc900", "sc300"]
+    },
+    {
+      "id": "ai-business",
+      "name": "AI for Business",
+      "tagline": "Lead and apply AI without writing code.",
+      "icon": "fas fa-briefcase",
+      "packs": ["ab730", "ab731"]
+    }
+  ]
+}

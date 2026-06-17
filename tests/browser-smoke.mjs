@@ -24,6 +24,15 @@ try {
     'Homepage startup must not download question dumps.'
   );
 
+  // Regression: the roadmap entry links must resolve to the roadmaps page, never the home page.
+  // The router maps the 'roadmaps' route to /roadmaps (clean URL) or roadmaps.html (file mode).
+  const roadmapNavHref = await page.locator('.cr-topnav-links a', { hasText: 'Roadmaps' }).getAttribute('href');
+  assert.ok(roadmapNavHref && /roadmaps(\.html)?$/.test(roadmapNavHref),
+    `Topnav Roadmaps link must resolve to the roadmaps page, got "${roadmapNavHref}".`);
+  const roadmapCardHref = await page.locator('a.roadmap-entry-card').getAttribute('href');
+  assert.ok(roadmapCardHref && /roadmaps(\.html)?$/.test(roadmapCardHref),
+    `Career roadmaps card must resolve to the roadmaps page, got "${roadmapCardHref}".`);
+
   await page.evaluate(() => {
     const ensureExamLoaded = window.ExamApp.ensureExamLoaded.bind(window.ExamApp);
     let releaseLoad;
@@ -251,6 +260,72 @@ try {
     null,
     { timeout: 5000 }
   );
+
+  // Career roadmaps: seed local progress, then verify node states + up-next + structure.
+  await page.goto(`${baseUrl}/roadmaps.html`, { waitUntil: 'domcontentloaded' });
+  await page.evaluate(() => {
+    localStorage.setItem('az900_progress', JSON.stringify({ attempts: [{ score: 92, passed: true }], bestScore: 92, totalPassed: 1 }));
+    localStorage.setItem('az104_progress', JSON.stringify({ attempts: [{ score: 40, passed: false }], bestScore: 40, totalPassed: 0 }));
+  });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => window.Roadmaps && window.Roadmaps.ready === true, null, { timeout: 8000 });
+
+  assert.equal(await page.locator('.roadmap-track-card').count(), 6, 'Six career tracks must render.');
+
+  // Cloud Administrator is first: az900 passed (92%), az104 started (40%), az305 not started.
+  // Up-next is the FIRST non-passed node in track order, which is az104 (started), not az305.
+  assert.equal(await page.locator('.roadmap-node[data-pack="az900"].is-passed').count(), 1, 'az900 must render as passed.');
+  assert.match(
+    await page.locator('.roadmap-node[data-pack="az900"] .rn-best').innerText(),
+    /92%/, 'Passed node must show the same Best% the home reads from the shared progress record.'
+  );
+  assert.equal(await page.locator('.roadmap-node[data-pack="az104"].is-started').count(), 1, 'az104 must render as started.');
+  assert.equal(await page.locator('.roadmap-node[data-pack="az104"].is-next').count(), 1, 'First non-passed node (az104) must be marked up-next.');
+  assert.equal(await page.locator('.roadmap-node[data-pack="az305"].is-next').count(), 0, 'A node after the first non-passed must not be up-next.');
+
+  // DevOps track: az104 carries the prerequisite pill before az400.
+  await page.locator('.roadmap-track-card[data-track="devops"]').click();
+  await page.waitForFunction(() => document.querySelector('.roadmap-node[data-pack="az400"]'));
+  assert.equal(
+    await page.locator('.roadmap-node[data-pack="az104"] .rn-pill.is-prereq').count(), 1,
+    'AZ-104 must show the Prerequisite pill in the DevOps track.'
+  );
+
+  // Expanding a node reveals the exam details panel (mirrors the home exam-details content).
+  await page.locator('.roadmap-node[data-pack="az104"] .rn-expand').click();
+  await page.waitForSelector('.roadmap-node[data-pack="az104"] .rn-details:not([hidden])', { timeout: 2000 });
+  assert.match(
+    await page.locator('.roadmap-node[data-pack="az104"] .rn-details').innerText(),
+    /Exam information/i, 'Expanding a node must reveal the exam details panel.'
+  );
+
+  // Pro node: "Unlock full" opens the pro modal (highlights + Gumroad + import/license
+  // instruction), instead of jumping straight to Gumroad.
+  await page.locator('.roadmap-node[data-pack="az400"] .rn-unlock').click();
+  await page.waitForSelector('#pro-modal-overlay', { timeout: 2000 });
+  const proBuyHref = await page.locator('#pro-modal-overlay .pro-modal-buy').getAttribute('href');
+  assert.ok(proBuyHref && proBuyHref.includes('gumroad'), `Pro modal must link to Gumroad, got "${proBuyHref}".`);
+  assert.equal(
+    await page.locator('#pro-modal-overlay .pro-modal-activate-text').count(), 1,
+    'Pro modal must include the import/license-key instruction (not a bare Gumroad jump).'
+  );
+  await page.locator('#pro-modal-overlay .pro-modal-close').click();
+
+  // Dark mode toggle works on the roadmaps page.
+  const wasDark = await page.evaluate(() => document.body.classList.contains('dark-mode'));
+  await page.locator('#theme-toggle').click();
+  assert.notEqual(
+    await page.evaluate(() => document.body.classList.contains('dark-mode')), wasDark,
+    'Theme toggle must flip dark mode on the roadmaps page.'
+  );
+
+  // Pure-function contract: deriveNodeState uses a flat 70% on bestScore (matches the app).
+  const states = await page.evaluate(() => [
+    window.Roadmaps.deriveNodeState({ attempts: [], bestScore: 0 }),
+    window.Roadmaps.deriveNodeState({ attempts: [{}], bestScore: 55 }),
+    window.Roadmaps.deriveNodeState({ attempts: [{}], bestScore: 80 })
+  ]);
+  assert.deepEqual(states, ['not-started', 'started', 'passed'], 'deriveNodeState must map progress to state.');
 
   console.log('Browser smoke passed.');
 } finally {

@@ -2,7 +2,7 @@
 // Public release history is recorded in CHANGELOG.md. Bump the vX.Y below on any
 // deploy that changes cached assets;
 // tests/test_sprint1_readiness.py enforces the examsim-pwa-vX.Y format.
-const CACHE_VERSION = 'examsim-pwa-v5.4';
+const CACHE_VERSION = 'examsim-pwa-v5.7';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -11,6 +11,7 @@ const CORE_ASSETS = [
   './index.html',
   './exam.html',
   './labs.html',
+  './roadmaps.html',
   './editor.html',
   './404.html',
   './privacy-and-storage.html',
@@ -25,6 +26,7 @@ const CORE_ASSETS = [
   './assets/js/exam-loader.js',
   './assets/js/exam-manager.js',
   './assets/js/labs.js',
+  './assets/js/roadmaps.js',
   './assets/js/homepage.js',
   './assets/js/script-multi-exam.js',
   './assets/js/exam-init.js',
@@ -48,6 +50,8 @@ const CORE_ASSETS = [
   './assets/css/editor-styles.css',
   './assets/css/exam-landing.css',
   './assets/css/labs.css',
+  './assets/css/roadmaps.css',
+  './user-content/roadmaps.json',
   './assets/media/favicon-64.png',
   './assets/media/apple-touch-icon.png',
   './assets/media/icon-192.png',
@@ -66,6 +70,7 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './index.html',
   './exam.html',
   './labs.html',
+  './roadmaps.html',
   './editor.html',
   './404.html',
   './privacy-and-storage.html',
@@ -80,6 +85,7 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/js/exam-loader.js',
   './assets/js/exam-manager.js',
   './assets/js/labs.js',
+  './assets/js/roadmaps.js',
   './assets/js/homepage.js',
   './assets/js/script-multi-exam.js',
   './assets/js/exam-init.js',
@@ -97,7 +103,8 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/css/legal-page.css',
   './assets/css/editor-styles.css',
   './assets/css/exam-landing.css',
-  './assets/css/labs.css'
+  './assets/css/labs.css',
+  './assets/css/roadmaps.css'
 ];
 
 function sameOrigin(url) {
@@ -120,6 +127,7 @@ function cleanRouteShell(pathname) {
   if (lastSegment === 'editor') return './editor.html';
   if (lastSegment === 'exam' || lastSegment === 'study') return './exam.html';
   if (lastSegment === 'privacy-and-storage') return './privacy-and-storage.html';
+  if (lastSegment === 'roadmaps') return './roadmaps.html';
   return './index.html';
 }
 
@@ -127,7 +135,7 @@ function cleanRouteRedirect(url) {
   if (!url.pathname.endsWith('/')) return null;
   const normalized = url.pathname.replace(/\/+/g, '/').replace(/\/$/, '');
   const lastSegment = normalized.split('/').filter(Boolean).pop() || '';
-  if (!['editor', 'exam', 'study', 'privacy-and-storage'].includes(lastSegment)) return null;
+  if (!['editor', 'exam', 'study', 'privacy-and-storage', 'roadmaps'].includes(lastSegment)) return null;
   return new URL(`${normalized}${url.search}`, url.origin).href;
 }
 

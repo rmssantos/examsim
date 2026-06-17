@@ -1,0 +1,116 @@
+/* Career roadmaps stepper styles. Everything else inherits v2 tokens. */
+.roadmap-board { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.roadmap-global-progress { font-family: "Cascadia Mono", ui-monospace, monospace; opacity: 0.85; margin-top: 0.5rem; }
+
+.roadmap-track-index {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 0.75rem;
+}
+.roadmap-track-card {
+	display: flex; align-items: center; gap: 0.75rem;
+	padding: 0.85rem 1rem;
+	background: var(--h-panel, var(--h-surface));
+	border: 1px solid var(--border, rgba(127,127,127,0.25));
+	border-radius: 12px;
+	cursor: pointer; text-align: left; color: inherit; width: 100%; font: inherit;
+}
+.roadmap-track-card[aria-current="true"] { border-color: var(--accent, #0f766e); }
+.roadmap-track-card .rt-icon { font-size: 1.25rem; color: var(--accent, #0f766e); }
+.roadmap-track-card .rt-name { font-weight: 600; display: block; }
+.roadmap-track-card .rt-count { font-family: "Cascadia Mono", ui-monospace, monospace; opacity: 0.75; font-size: 0.85rem; }
+
+.roadmap-track-title { margin: 0.5rem 0 0.25rem; }
+.roadmap-track-tagline { opacity: 0.8; margin: 0 0 1rem; }
+
+/* Each node is a two-column grid: a fixed dot/line rail, and the content. The dot
+   sits at the top of the rail, aligned with the node's row, so the checks form a
+   clean vertical column in line with each exam. */
+.roadmap-path { list-style: none; margin: 0; padding: 0; }
+/* Two columns: a dot/connector rail and the content. The dot is vertically centred
+   on its card (grid-row 1), so the checkpoints line up with the middle of each exam. */
+.roadmap-node {
+	position: relative;
+	display: grid;
+	grid-template-columns: 1.75rem 1fr;
+	grid-template-rows: auto auto;
+	column-gap: 0.85rem;
+	padding-bottom: 1.1rem;
+}
+.roadmap-node:last-child { padding-bottom: 0; }
+/* Connector line, centred in the rail column, behind the dots. Trim it to the first
+   and last dot so it does not protrude past the ends of the track. */
+.roadmap-node::before {
+	content: ''; position: absolute; left: 0.875rem; transform: translateX(-50%);
+	top: 0; bottom: 0; width: 2px; background: var(--border, rgba(127,127,127,0.3)); z-index: 0;
+}
+.roadmap-node:first-child::before { top: 1.7rem; }
+.roadmap-node:last-child::before { bottom: auto; height: 1.7rem; }
+.roadmap-node .rn-dot {
+	grid-column: 1; grid-row: 1;
+	align-self: center; justify-self: center;
+	position: relative; z-index: 1;
+	width: 1.5rem; height: 1.5rem; border-radius: 50%;
+	display: grid; place-items: center; font-size: 0.7rem;
+	background: var(--h-surface); border: 2px solid var(--border, rgba(127,127,127,0.5));
+}
+.roadmap-node.is-passed .rn-dot { background: var(--accent, #0f766e); color: #fff; border-color: var(--accent, #0f766e); }
+.roadmap-node.is-started .rn-dot { border-color: var(--accent, #0f766e); }
+
+.roadmap-node .rn-details { grid-column: 2; grid-row: 2; }
+.roadmap-node .rn-row {
+	grid-column: 2; grid-row: 1; min-width: 0;
+	display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+	background: var(--h-panel, var(--h-surface));
+	border: 1px solid var(--border, rgba(127,127,127,0.25));
+	border-radius: 10px; padding: 0.7rem 0.9rem; cursor: pointer;
+}
+.roadmap-node.is-next .rn-row { outline: 2px solid var(--accent, #2bb3a3); outline-offset: 2px; }
+.roadmap-node .rn-code { font-family: "Cascadia Mono", ui-monospace, monospace; font-weight: 700; }
+.roadmap-node .rn-name { opacity: 0.85; min-width: 0; }
+.roadmap-node .rn-pill {
+	font-size: 0.7rem; padding: 0.1rem 0.5rem; border-radius: 999px;
+	border: 1px solid var(--border, rgba(127,127,127,0.4));
+}
+.roadmap-node .rn-pill.is-pro { border-color: var(--accent, #0f766e); color: var(--accent, #0f766e); }
+.roadmap-node .rn-pill.is-prereq { font-weight: 600; }
+.roadmap-node .rn-best { font-family: "Cascadia Mono", ui-monospace, monospace; font-size: 0.8rem; opacity: 0.85; }
+.roadmap-node.is-passed .rn-best { color: var(--accent, #0f766e); }
+.roadmap-node .rn-spacer { flex: 1 1 auto; }
+.roadmap-node .rn-cta { white-space: nowrap; }
+.roadmap-node .rn-expand {
+	background: none; border: none; cursor: pointer; color: inherit; padding: 0.2rem 0.35rem;
+}
+.roadmap-node .rn-caret { transition: transform 0.15s ease; opacity: 0.6; }
+.roadmap-node.is-open .rn-caret { transform: rotate(180deg); }
+
+/* Expanded exam details (mirrors the home exam-details content, in roadmap format) */
+.roadmap-node .rn-details {
+	margin-top: 0.6rem; padding: 0.85rem 0.95rem;
+	background: var(--h-surface);
+	border: 1px solid var(--border, rgba(127,127,127,0.2));
+	border-radius: 10px; display: grid; gap: 0.95rem;
+}
+.roadmap-node .rn-d-block h4 {
+	margin: 0 0 0.45rem; font-size: 0.78rem; text-transform: uppercase;
+	letter-spacing: 0.04em; opacity: 0.7;
+}
+.roadmap-node .rn-d-grid { display: flex; flex-wrap: wrap; gap: 1.2rem; }
+.roadmap-node .rn-d-grid > div { display: flex; flex-direction: column; }
+.roadmap-node .rn-d-grid span { font-size: 0.72rem; opacity: 0.7; }
+.roadmap-node .rn-d-grid strong { font-family: "Cascadia Mono", ui-monospace, monospace; }
+.roadmap-node .rn-d-muted { opacity: 0.7; margin: 0; }
+.roadmap-node .rn-d-modules {
+	list-style: none; margin: 0; padding: 0;
+	display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0.35rem 1rem;
+}
+.roadmap-node .rn-d-modules li { font-size: 0.9rem; }
+.roadmap-node .rn-d-modules i { color: var(--accent, #0f766e); margin-right: 0.35rem; }
+.roadmap-node .rn-d-resources { display: flex; flex-direction: column; gap: 0.35rem; }
+.roadmap-node .rn-d-resources a { color: var(--accent, #0f766e); text-decoration: none; }
+.roadmap-node .rn-d-resources a:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+	.roadmap-node .rn-row { align-items: flex-start; }
+}
