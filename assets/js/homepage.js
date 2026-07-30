@@ -1,4 +1,94 @@
 ﻿// Dynamic Home Page Management
+window.ExamApp.extractZipArchiveInWorker = async function extractZipArchiveInWorker(file) {
+const limits = window.ExamApp.EXAM_LIMITS;
+if (window.location?.protocol === 'file:') {
+	const error = new Error(
+		'ZIP import requires a local HTTP server. Run "python server.py" and open http://localhost:8000.'
+	);
+	error.code = 'ZIP_SERVER_REQUIRED';
+	throw error;
+}
+if (
+	!file
+	|| typeof file.arrayBuffer !== 'function'
+	|| !Number.isSafeInteger(file.size)
+	|| file.size < 0
+) {
+	const error = new Error('ZIP import requires a valid local file.');
+	error.code = 'ZIP_INVALID_ARCHIVE';
+	throw error;
+}
+if (file.size > limits.maxZipBytes) {
+	const error = new Error(
+		`ZIP file is too large. Maximum size is ${Math.round(limits.maxZipBytes / 1024 / 1024)} MB.`
+	);
+	error.code = 'ZIP_LIMIT_EXCEEDED';
+	throw error;
+}
+const archiveBuffer = await file.arrayBuffer();
+const workerUrl = new URL('assets/js/zip-import-worker.js', document.baseURI);
+const worker = new Worker(workerUrl);
+
+return new Promise((resolve, reject) => {
+let settled = false;
+const finish = (callback, value) => {
+	if (settled) return;
+	settled = true;
+	clearTimeout(timeout);
+	worker.terminate();
+	callback(value);
+};
+const fail = (code, message) => {
+	const error = new Error(message);
+	error.code = code;
+	finish(reject, error);
+};
+const timeout = setTimeout(() => {
+	fail('ZIP_WORKER_TIMEOUT', 'ZIP extraction took too long and was cancelled.');
+}, limits.zipWorkerTimeoutMs);
+
+worker.onmessage = (event) => {
+	const payload = event?.data;
+	if (!payload?.ok) {
+		fail(
+			payload?.error?.code || 'ZIP_EXTRACTION_FAILED',
+			payload?.error?.message || 'ZIP extraction failed.'
+		);
+		return;
+	}
+	finish(resolve, payload);
+};
+worker.onerror = () => {
+	fail('ZIP_WORKER_FAILED', 'ZIP extraction worker failed.');
+};
+worker.onmessageerror = () => {
+	fail('ZIP_WORKER_FAILED', 'ZIP extraction worker returned an invalid response.');
+};
+try {
+	worker.postMessage(
+		{
+			archiveBuffer,
+			limits: {
+				maxZipBytes: limits.maxZipBytes,
+				maxZipEntries: limits.maxZipEntries,
+				maxZipUncompressedBytes: limits.maxZipUncompressedBytes,
+				maxJsonBytes: limits.maxJsonBytes,
+				maxImages: limits.maxImages,
+				maxImageBytes: limits.maxImageBytes,
+				maxTotalImageBytes: limits.maxTotalImageBytes
+			}
+		},
+		[archiveBuffer]
+	);
+} catch (error) {
+	fail(
+		'ZIP_WORKER_FAILED',
+		error?.message || 'ZIP extraction worker could not be started.'
+	);
+}
+});
+};
+
 class HomePage {
 constructor() {
 this.examSelection = document.getElementById('exam-selection');
@@ -317,14 +407,19 @@ this.setSelectOptions(this.libraryStatusFilter, 'status', sortValues(statuses));
 getExamTaxonomy(examId, examData) {
 const metadata = examData?.metadata || {};
 const domains = Array.isArray(metadata.domains) ? metadata.domains : [];
-const status = metadata.commercialStatus || (metadata.preview && metadata.pro ? 'pro-preview' : metadata.preview ? 'preview' : metadata.pro ? 'pro' : 'free');
+const isBundledTrusted = this.isBundledTrustedExam(examData);
+const status = isBundledTrusted
+	? (metadata.commercialStatus || (metadata.preview && metadata.pro ? 'pro-preview' : metadata.preview ? 'preview' : metadata.pro ? 'pro' : 'free'))
+	: 'free';
 return {
 	vendor: String(metadata.vendor || 'Custom').trim(),
 	certificationCode: String(metadata.certificationCode || metadata.name || examId).trim(),
 	domains: domains.map(domain => String(domain || '').trim()).filter(Boolean),
-	level: String(metadata.level || metadata.badge || 'Custom').trim(),
+	level: String(metadata.level || (isBundledTrusted ? metadata.badge : '') || 'Custom').trim(),
 	productFamily: String(metadata.productFamily || '').trim(),
-	contentType: String(metadata.contentType || (metadata.preview ? 'preview' : 'practice-exam')).trim(),
+	contentType: String(isBundledTrusted
+		? (metadata.contentType || (metadata.preview ? 'preview' : 'practice-exam'))
+		: 'practice-exam').trim(),
 	status: String(status || 'free').trim()
 };
 }
@@ -480,6 +575,19 @@ return '#';
 }
 }
 
+isBundledTrustedExam(examData) {
+return window.ExamApp?.isBundledTrustedExam?.(examData) === true;
+}
+
+resourceUrlForExam(url, examData) {
+const safeUrl = this.safeExternalUrl(url);
+if (safeUrl === '#') return null;
+if (this.isBundledTrustedExam(examData)) return safeUrl;
+return window.ExamApp?.isOfficialDocumentationUrl?.(safeUrl) === true
+	? safeUrl
+	: null;
+}
+
 createIcon(iconClass, extraClass = '') {
 const icon = document.createElement('i');
 icon.setAttribute('aria-hidden', 'true');
@@ -569,6 +677,7 @@ return stat;
 
 createExamCard(examId, examData) {
 const metadata = examData.metadata || {};
+const isBundledTrusted = this.isBundledTrustedExam(examData);
 const questionCount = metadata.questionCount || 45;
 const declaredTotalQuestions = Number(metadata.totalQuestions);
 const hasDeclaredTotalQuestions = Number.isFinite(declaredTotalQuestions) && Number.isInteger(declaredTotalQuestions) && declaredTotalQuestions > 0;
@@ -595,8 +704,13 @@ deleteBtn.setAttribute('aria-label', 'Hide exam');
 deleteBtn.appendChild(this.createIcon('fas fa-eye-slash'));
 card.appendChild(deleteBtn);
 
-this.appendTextElement(card, 'div', 'exam-badge', metadata.badge || 'Custom');
-if (metadata.preview) {
+this.appendTextElement(
+	card,
+	'div',
+	'exam-badge',
+	isBundledTrusted ? (metadata.badge || 'Custom') : 'Imported · unverified'
+);
+if (isBundledTrusted && metadata.preview) {
 card.classList.add('exam-card--preview');
 const previewFlag = document.createElement('div');
 previewFlag.className = 'exam-preview-flag';
@@ -655,7 +769,7 @@ studyButton.addEventListener('click', async (e) => {
 	await this.startSelectedExam('study', selectionPromise);
 });
 
-if (metadata.pro) {
+if (isBundledTrusted && metadata.pro) {
 const unlockButton = document.createElement('button');
 unlockButton.type = 'button';
 unlockButton.className = 'exam-card-unlock';
@@ -664,7 +778,7 @@ unlockButton.appendChild(document.createTextNode(' Unlock'));
 unlockButton.addEventListener('click', (e) => {
 e.stopPropagation();
 window.ExamApp?.analytics?.trackProUnlockClicked?.(examId);
-this.showProModal(examId, metadata);
+this.showProModal(examId, examData);
 });
 actions.appendChild(unlockButton);
 } else {
@@ -708,7 +822,11 @@ if (!e.target.closest('.exam-delete')) {
 return card;
 }
 
-showProModal(examId, metadata) {
+showProModal(examId, examData) {
+if (!this.isBundledTrustedExam(examData)) {
+	return false;
+}
+const metadata = examData.metadata || {};
 const pro = (metadata && metadata.pro) || {};
 const returnFocus = (document.activeElement instanceof HTMLElement) ? document.activeElement : null;
 this.closeProModal();
@@ -817,6 +935,7 @@ document.addEventListener('keydown', this._proModalKeyHandler);
 document.body.appendChild(overlay);
 this._proModalReturnFocus = returnFocus;
 closeBtn.focus();
+return true;
 }
 
 closeProModal() {
@@ -876,6 +995,7 @@ try {
 	const examData = await window.ExamApp.ensureExamLoaded(examId);
 	if (window.examSimulator) {
 		const metadata = examData.metadata || {};
+		const isBundledTrusted = this.isBundledTrustedExam(examData);
 		window.examSimulator.currentExam = examId;
 		window.examSimulator.examData[examId] = {
 			name: metadata.name || examId.toUpperCase(),
@@ -885,7 +1005,11 @@ try {
 			passScore: metadata.passScore || 70,
 			questions: examData.questions,
 			modules: metadata.modules || [],
-			resources: metadata.resources || []
+			resources: metadata.resources || [],
+			recommendedPro: isBundledTrusted ? (metadata.recommendedPro || null) : null,
+			pro: isBundledTrusted ? (metadata.pro || null) : null,
+			source: examData.source,
+			trust: examData.trust
 		};
 	}
 	if (this.selectedExamId === examId && revealDetails) {
@@ -926,7 +1050,7 @@ if (this.currentExamInfo) this.currentExamInfo.style.display = 'block';
 if (this.startExamCta) this.startExamCta.style.display = 'block';
 
 this.renderModules(metadata.modules);
-this.renderResources(metadata.resources);
+this.renderResources(metadata.resources, examData);
 }
 
 renderModules(modules) {
@@ -948,13 +1072,15 @@ this.modulesList.innerHTML = '';
 }
 }
 
-renderResources(resources) {
+renderResources(resources, examData) {
 if (!this.resourcesList) return;
 if (Array.isArray(resources) && resources.length > 0) {
 this.resourcesList.innerHTML = '';
 resources.forEach(resource => {
+const safeHref = this.resourceUrlForExam(resource.url, examData);
+if (!safeHref) return;
 const link = document.createElement('a');
-link.href = this.safeExternalUrl(resource.url);
+link.href = safeHref;
 link.target = '_blank';
 link.rel = 'noopener noreferrer';
 link.className = 'resource-link';
@@ -1128,8 +1254,10 @@ this.updateSelectedQuestionsCount(examId);
 if (metadata.resources && metadata.resources.length > 0) {
 	resourcesList.innerHTML = '';
 	metadata.resources.forEach(resource => {
+	const safeHref = this.resourceUrlForExam(resource.url, examData);
+	if (!safeHref) return;
 	const link = document.createElement('a');
-	link.href = this.safeExternalUrl(resource.url);
+	link.href = safeHref;
 	link.target = '_blank';
 	link.rel = 'noopener noreferrer';
 	link.appendChild(this.createIcon(resource.icon || 'fas fa-link'));
@@ -1491,10 +1619,17 @@ if (reviewBtn) {
 
 getReadinessLabel(stats, studySummary = null) {
 if (!stats?.attempts && !studySummary?.seenCount) return 'Not enough data';
+const diagnosticScore = stats?.lastDiagnosticScore ?? stats?.lastScore;
+if (stats?.completionAttempts === 0 && diagnosticScore != null) {
+	return diagnosticScore >= 70
+		? 'Diagnostic suggests on track'
+		: 'Diagnostic suggests review';
+}
 const weak = Number(studySummary?.weakCount || 0);
-if (stats?.lastScore != null && stats.lastScore < 70) return 'Needs work';
+const completionScore = stats?.lastCompletionScore ?? stats?.lastScore;
+if (completionScore != null && completionScore < 70) return 'Needs work';
 if (weak > 0) return 'Review weak spots';
-if (stats?.passRate >= 70 || stats?.lastScore >= 70) return 'On track';
+if (stats?.passRate >= 70 || completionScore >= 70) return 'On track';
 return 'Building';
 }
 
@@ -1543,23 +1678,44 @@ if (!raw) return null;
 const progress = JSON.parse(raw);
 if (!progress?.attempts?.length) return null;
 const attempts = progress.attempts;
+const summary = window.ExamApp.getProgressSummary(progress);
 const lastAttempt = attempts[attempts.length - 1];
-const previousAttempt = attempts.length > 1 ? attempts[attempts.length - 2] : null;
+const completionAttempts = attempts.filter(
+	attempt => attempt?.sessionType !== 'diagnostic'
+);
+const diagnosticAttempts = attempts.filter(
+	attempt => attempt?.sessionType === 'diagnostic'
+);
+const lastCompletionAttempt = completionAttempts.length > 0
+	? completionAttempts[completionAttempts.length - 1]
+	: null;
+const previousCompletionAttempt = completionAttempts.length > 1
+	? completionAttempts[completionAttempts.length - 2]
+	: null;
+const lastDiagnosticAttempt = diagnosticAttempts.length > 0
+	? diagnosticAttempts[diagnosticAttempts.length - 1]
+	: null;
 const avgTime = attempts.reduce((sum, attempt) => sum + (attempt.timeSpent || 0), 0) / attempts.length;
-const passRate = attempts.length ? Math.round(((progress.totalPassed || 0) / attempts.length) * 100) : null;
-const trendDelta = previousAttempt ? Number(lastAttempt.score || 0) - Number(previousAttempt.score || 0) : null;
+const trendDelta = previousCompletionAttempt
+	? Number(lastCompletionAttempt.score || 0) - Number(previousCompletionAttempt.score || 0)
+	: null;
 const detailedAttempts = attempts.filter(attempt => Array.isArray(attempt.questionResults) && attempt.questionResults.length > 0).length;
 return {
 	attempts: attempts.length,
+	completionAttempts: summary.completionAttempts,
 	lastScore: lastAttempt.score,
 	lastDate: lastAttempt.date,
-	bestScore: progress.bestScore ?? lastAttempt.score,
+	lastCompletionScore: lastCompletionAttempt?.score ?? null,
+	lastDiagnosticScore: lastDiagnosticAttempt?.score ?? null,
+	bestScore: summary.completionAttempts > 0 ? summary.bestScore : null,
 	avgTime,
-	passRate,
+	passRate: summary.passRate,
 	trendDelta,
 	trendLabel: trendDelta == null ? '—' : `${trendDelta >= 0 ? '+' : ''}${trendDelta} pts`,
 	detailedAttempts,
-	lastAttempt
+	lastAttempt,
+	lastCompletionAttempt,
+	lastDiagnosticAttempt
 };
 } catch (error) {
 window.ExamApp.warn('Failed to parse progress stats for', examId, error);
@@ -2075,8 +2231,10 @@ async handleFiles(files) {
 for (const file of files) {
 window.ExamApp?.analytics?.trackImportStarted(file);
 try {
-	await this.importFile(file);
-	window.ExamApp?.analytics?.trackImportCompleted(file);
+	const imported = await this.importFile(file);
+	if (imported !== false) {
+		window.ExamApp?.analytics?.trackImportCompleted(file);
+	}
 } catch (error) {
 	this.hideImportProgress();
 	console.error(`Failed to import ${file.name}:`, error);
@@ -2097,40 +2255,43 @@ if (fileName.endsWith('.json')) {
 if (file.size > limits.maxJsonBytes) {
 throw new Error(`JSON file is too large. Maximum size is ${Math.round(limits.maxJsonBytes / 1024 / 1024)} MB.`);
 }
-await this.importJsonFile(file);
+return this.importJsonFile(file);
 } else if (fileName.endsWith('.zip')) {
 if (file.size > limits.maxZipBytes) {
 throw new Error(`ZIP file is too large. Maximum size is ${Math.round(limits.maxZipBytes / 1024 / 1024)} MB.`);
 }
-await this.importZipFile(file);
+return this.importZipFile(file);
 } else {
 throw new Error('Unsupported file type. Please use .json or .zip files.');
 }
 }
 
-async ensureJsZipLoaded() {
-if (window.JSZip) return window.JSZip;
-if (this.jsZipLoadPromise) return this.jsZipLoadPromise;
+async importExamWithConflictConfirmation(examId, examData, imageFiles = null) {
+try {
+	await window.examManager.importExam(examId, examData, imageFiles);
+	return true;
+} catch (error) {
+	if (error?.code !== 'EXAM_ID_CONFLICT') {
+		throw error;
+	}
 
-this.jsZipLoadPromise = new Promise((resolve, reject) => {
-	const script = document.createElement('script');
-	script.src = 'assets/vendor/jszip/jszip.min.js';
-	script.async = true;
-	script.onload = () => {
-		if (window.JSZip) {
-			resolve(window.JSZip);
-		} else {
-			reject(new Error('ZIP support failed to initialize.'));
-		}
-	};
-	script.onerror = () => reject(new Error('ZIP support could not be loaded.'));
-	document.head.appendChild(script);
-}).catch((error) => {
-	this.jsZipLoadPromise = null;
-	throw error;
-});
+	const shouldOverwrite = await window.showCustomConfirm(
+		'Replace existing exam?',
+		`An exam with id "${examId}" already exists. Replace its question pack? Your progress will be preserved.`,
+		{ confirmLabel: 'Replace pack', cancelLabel: 'Keep existing' }
+	);
+	if (!shouldOverwrite) {
+		return false;
+	}
 
-return this.jsZipLoadPromise;
+	await window.examManager.importExam(
+		examId,
+		examData,
+		imageFiles,
+		{ overwrite: true }
+	);
+	return true;
+}
 }
 
 async importJsonFile(file) {
@@ -2146,7 +2307,7 @@ const passphrase = await secureTransfer.promptPassphrase({
 	confirmLabel: 'Decrypt & import'
 });
 if (passphrase === null) {
-	return; // user cancelled
+	return false; // user cancelled
 }
 data = await secureTransfer.decrypt(data, passphrase);
 }
@@ -2154,7 +2315,7 @@ data = await secureTransfer.decrypt(data, passphrase);
 // A progress backup carries an `exams` map alongside export metadata.
 if (data && typeof data === 'object' && data.exams && typeof data.exams === 'object' && !Array.isArray(data.exams)) {
 await this.restoreProgressBackup(data);
-return;
+return true;
 }
 
 // Determine exam ID from filename or data
@@ -2167,11 +2328,14 @@ if (!examId) {
 throw new Error('Invalid exam id. Use letters, numbers, hyphens or underscores.');
 }
 
-// Import the exam
-await window.examManager.importExam(examId, data);
+// Import the exam. A collision can only be overridden through the explicit
+// fourth argument after one clear user confirmation.
+const imported = await this.importExamWithConflictConfirmation(examId, data, null);
+if (!imported) return false;
 
 window.ExamApp.log(`Successfully imported exam: ${examId}`);
 this.showNotification(`✅ Exam "${examId}" imported successfully!`);
+return true;
 }
 
 async restoreProgressBackup(backup) {
@@ -2215,20 +2379,10 @@ this.showNotification(`✅ Restored progress for ${restored} exam(s)${suffix}.`)
 }
 
 async importZipFile(file) {
-await this.ensureJsZipLoaded();
-if (!window.JSZip) {
-throw new Error('ZIP support is unavailable (JSZip not loaded).');
-}
-
 this.showImportProgress();
-const zip = await JSZip.loadAsync(file);
-const inspected = window.ExamApp.inspectZipEntries(zip);
-const { dumpEntry, metadataEntry, imageFiles } = inspected;
-if (!dumpEntry) {
-throw new Error('ZIP file missing dump.json.');
-}
-
-const dumpText = await dumpEntry.async('string');
+const extracted = await window.ExamApp.extractZipArchiveInWorker(file);
+const decoder = new TextDecoder('utf-8', { fatal: true });
+const dumpText = decoder.decode(new Uint8Array(extracted.dumpBuffer));
 const parsedDump = JSON.parse(dumpText);
 let questions = Array.isArray(parsedDump) ? parsedDump : parsedDump.questions;
 if (!Array.isArray(questions)) {
@@ -2236,17 +2390,21 @@ throw new Error('dump.json must contain an array of questions.');
 }
 // Carry hands-on labs through the ZIP import too, otherwise a pack that advertises
 // labs (metadata.labCount > 0) would open the labs page empty.
-const labs = (parsedDump && !Array.isArray(parsedDump) && Array.isArray(parsedDump.labs))
-? parsedDump.labs
-: [];
+const labs = (
+	parsedDump
+	&& !Array.isArray(parsedDump)
+	&& Object.prototype.hasOwnProperty.call(parsedDump, 'labs')
+)
+	? parsedDump.labs
+	: undefined;
 
 let metadata = null;
-if (metadataEntry) {
-const metadataText = await metadataEntry.async('string');
+if (extracted.metadataBuffer) {
+const metadataText = decoder.decode(new Uint8Array(extracted.metadataBuffer));
 metadata = JSON.parse(metadataText);
 }
 
-let examId = (metadata && metadata.id) || this.deriveExamIdFromZip(zip, file.name);
+let examId = (metadata && metadata.id) || extracted.derivedExamId;
 if (!examId) {
 examId = file.name.replace(/\.zip$/i, '');
 }
@@ -2255,80 +2413,31 @@ if (!examId) {
 throw new Error('Invalid exam id. Use letters, numbers, hyphens or underscores.');
 }
 
-await window.examManager.importExam(examId, { questions, metadata, labs });
-
-// Extract images from ZIP to local directory
-window.ExamApp.log(`🔍 Scanning ZIP for images in exam: ${examId}`);
-window.ExamApp.log(`📊 Found ${imageFiles.length} images in ZIP`);
-
-if (imageFiles.length > 0 && window.imageStorage) {
-window.ExamApp.log(`⏳ Storing ${imageFiles.length} images in IndexedDB...`);
-this.updateImportProgress(0, imageFiles.length, 0);
-
-let storedCount = 0;
-for (const { fileName, entry } of imageFiles) {
-try {
-	const extension = fileName.split('.').pop().toLowerCase();
-	const mimeType = window.ExamApp.getImageMimeType(fileName);
-	if (!mimeType) throw new Error(`Unsupported image type: ${extension}`);
-	const blob = await entry.async('blob');
-
-	await window.imageStorage.storeImageBlob(examId, fileName, blob, mimeType);
-	storedCount++;
-	const percentage = (storedCount / imageFiles.length) * 100;
-	this.updateImportProgress(storedCount, imageFiles.length, percentage);
-	window.ExamApp.log(`Stored ${fileName} (${(blob.size / 1024).toFixed(1)} KB)`);
-} catch (err) {
-	console.error(`❌ Failed to store ${fileName}:`, err);
-}
-}
-
-window.ExamApp.log(`Successfully stored ${storedCount}/${imageFiles.length} images in IndexedDB for ${examId}`);
-
-// Keep progress modal visible for a moment to show completion
-await new Promise(resolve => setTimeout(resolve, 800));
-this.hideImportProgress();
-
-this.showNotification(
-`✅ Exam "${examId}" imported with ${storedCount} image(s) stored!`,
-3000
+const imageFiles = Array.isArray(extracted.imageFiles) ? extracted.imageFiles : [];
+const imported = await this.importExamWithConflictConfirmation(
+	examId,
+	{ questions, metadata, labs },
+	imageFiles
 );
-} else if (imageFiles.length > 0) {
-window.ExamApp.warn('⚠️ ImageStorage not available, images will not be stored');
-this.hideImportProgress();
-this.showNotification(`✅ Exam "${examId}" imported (images not stored)`);
-} else {
-this.hideImportProgress();
-this.showNotification(`✅ Exam "${examId}" imported successfully!`);
-}
-}				findZipEntry(zip, pattern) {
-let match = null;
-zip.forEach((relativePath, entry) => {
-// Normalize backslashes to forward slashes (Windows ZIP compatibility)
-const normalized = relativePath.replace(/\\/g, '/');
-if (!entry.dir && pattern.test(normalized)) {
-	if (!match || normalized.length < (match._normalizedPath || match.name).length) {
-		match = entry;
-		match._normalizedPath = normalized;
-	}
-}
-});
-return match;
+if (!imported) {
+	this.hideImportProgress();
+	return false;
 }
 
-deriveExamIdFromZip(zip, fallbackName) {
-const rootFolders = new Set();
-zip.forEach((relativePath) => {
-const normalized = relativePath.replace(/\\/g, '/').replace(/^\/+/, '');
-const [root] = normalized.split('/');
-if (root) {
-	rootFolders.add(root);
+// The manager commits the complete image set as one IndexedDB transaction
+// before committing the pack. Reaching this point means both succeeded.
+if (imageFiles.length > 0) {
+this.updateImportProgress(imageFiles.length, imageFiles.length, 100);
+window.ExamApp.log(
+	`Successfully stored ${imageFiles.length} image(s) atomically for ${examId}`
+);
 }
-});
-if (rootFolders.size === 1) {
-return Array.from(rootFolders)[0];
-}
-return fallbackName ? fallbackName.replace(/\.zip$/i, '') : null;
+this.hideImportProgress();
+const imageSuffix = imageFiles.length > 0
+	? ` with ${imageFiles.length} image(s) stored`
+	: '';
+this.showNotification(`✅ Exam "${examId}" imported${imageSuffix}!`, 3000);
+return true;
 }
 
 async deleteExam(examId) {

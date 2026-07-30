@@ -88,6 +88,21 @@
             return `${examId}_progress`;
         }
 
+        sanitizeLocalMetadata(metadata) {
+            if (typeof window.ExamApp.sanitizeExamMetadata === 'function') {
+                return window.ExamApp.sanitizeExamMetadata(metadata, { allowCommercial: false });
+            }
+            if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
+                return metadata || null;
+            }
+            const sanitized = { ...metadata };
+            delete sanitized.source;
+            delete sanitized.trust;
+            delete sanitized.pro;
+            delete sanitized.recommendedPro;
+            return sanitized;
+        }
+
         getLegacyExam(examId) {
             if (!window.ExamApp.isSafeExamId(examId)) return null;
             try {
@@ -95,15 +110,28 @@
                 if (!raw) return null;
                 const questions = JSON.parse(raw);
                 const metadataRaw = localStorage.getItem(this.legacyMetadataKey(examId));
-                const metadata = metadataRaw ? JSON.parse(metadataRaw) : null;
+                const metadata = this.sanitizeLocalMetadata(metadataRaw ? JSON.parse(metadataRaw) : null);
                 if (!Array.isArray(questions)) return null;
-                let labs = [];
-                try {
-                    const labsRaw = localStorage.getItem(this.legacyLabsKey(examId));
-                    const parsedLabs = labsRaw ? JSON.parse(labsRaw) : [];
-                    if (Array.isArray(parsedLabs)) labs = parsedLabs;
-                } catch (_) { /* malformed legacy labs - ignore, leave empty */ }
-                return { examId, questions, metadata, labs, source: 'legacy-localStorage', storage: 'localStorage' };
+                let labs;
+                const labsRaw = localStorage.getItem(this.legacyLabsKey(examId));
+                if (labsRaw !== null) {
+                    try {
+                        labs = JSON.parse(labsRaw);
+                    } catch (_) {
+                        // Preserve the invalid value so the schema boundary rejects
+                        // it instead of silently converting a present field to [].
+                        labs = labsRaw;
+                    }
+                }
+                return {
+                    examId,
+                    questions,
+                    metadata,
+                    labs,
+                    source: 'imported',
+                    trust: 'local-unverified',
+                    storage: 'localStorage'
+                };
             } catch (error) {
                 window.ExamApp.warn(`Failed to read legacy exam ${examId}:`, error);
                 return null;
@@ -112,9 +140,11 @@
 
         putLegacyExam(examId, questions, metadata, labs) {
             if (!window.ExamApp.isSafeExamId(examId) || !Array.isArray(questions)) return false;
+            if (labs !== undefined && !Array.isArray(labs)) return false;
             localStorage.setItem(this.legacyQuestionKey(examId), JSON.stringify(questions));
-            if (metadata) {
-                localStorage.setItem(this.legacyMetadataKey(examId), JSON.stringify(metadata));
+            const safeMetadata = this.sanitizeLocalMetadata(metadata);
+            if (safeMetadata) {
+                localStorage.setItem(this.legacyMetadataKey(examId), JSON.stringify(safeMetadata));
             } else {
                 localStorage.removeItem(this.legacyMetadataKey(examId));
             }
@@ -246,13 +276,24 @@
             const record = {
                 examId,
                 questions,
-                labs: Array.isArray(options.labs) ? options.labs : [],
-                metadata: metadata || null,
-                source: options.source || 'imported',
+                labs: Object.prototype.hasOwnProperty.call(options, 'labs')
+                    ? options.labs
+                    : undefined,
+                metadata: this.sanitizeLocalMetadata(metadata),
+                source: 'imported',
+                trust: 'local-unverified',
                 updatedAt: Date.now()
             };
             const saved = await this.putRecord(this.examStore, record);
-            if (saved) window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.exams, examId);
+            if (saved) {
+                try {
+                    window.ExamApp.addToRegistry(window.ExamApp.STORAGE_KEYS.exams, examId);
+                } catch (error) {
+                    // IndexedDB is authoritative; this index can be rebuilt by
+                    // listExamIds(), so never report a durable save as failed.
+                    window.ExamApp.warn(`Failed to update exam registry for ${examId}:`, error);
+                }
+            }
             return saved;
         }
 
@@ -260,15 +301,26 @@
             if (!window.ExamApp.isSafeExamId(examId)) return null;
             const record = await this.getRecord(this.examStore, examId);
             if (record && Array.isArray(record.questions)) {
-                return { ...record, storage: 'indexedDB' };
+                return {
+                    ...record,
+                    metadata: this.sanitizeLocalMetadata(record.metadata),
+                    source: 'imported',
+                    trust: 'local-unverified',
+                    storage: 'indexedDB'
+                };
             }
 
             const legacy = this.getLegacyExam(examId);
             if (legacy && options.migrateLegacy !== false) {
                 try {
-                    await this.putExam(examId, legacy.questions, legacy.metadata, { source: 'migrated-localStorage', labs: legacy.labs });
+                    await this.putExam(examId, legacy.questions, legacy.metadata, { labs: legacy.labs });
                     window.ExamApp.analytics?.trackStorageMigration?.('exam', 'success');
-                    return { ...legacy, source: 'migrated-localStorage', storage: 'indexedDB' };
+                    return {
+                        ...legacy,
+                        source: 'imported',
+                        trust: 'local-unverified',
+                        storage: 'indexedDB'
+                    };
                 } catch (error) {
                     window.ExamApp.warn(`Failed to migrate ${examId} to IndexedDB:`, error);
                     window.ExamApp.analytics?.trackStorageMigration?.('exam', this.isQuotaError(error) ? 'quota_error' : 'failed');

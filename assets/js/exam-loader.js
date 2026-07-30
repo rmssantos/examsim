@@ -13,6 +13,25 @@ window.userExams = window.ExamApp.userExams;
 (function configureExamLoader() {
     const inFlightLoads = new Map();
 
+    function sanitizeMetadata(metadata, allowCommercial) {
+        if (typeof window.ExamApp.sanitizeExamMetadata === 'function') {
+            return window.ExamApp.sanitizeExamMetadata(metadata, {
+                allowCommercial: allowCommercial === true
+            });
+        }
+        if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
+            return metadata || null;
+        }
+        const sanitized = { ...metadata };
+        delete sanitized.source;
+        delete sanitized.trust;
+        if (allowCommercial !== true) {
+            delete sanitized.pro;
+            delete sanitized.recommendedPro;
+        }
+        return sanitized;
+    }
+
     function hasImages(questions) {
         return Array.isArray(questions) && questions.some((question) => (
             (Array.isArray(question.question_images) && question.question_images.length > 0)
@@ -57,11 +76,22 @@ window.userExams = window.ExamApp.userExams;
                 window.ExamApp.warn(`Skipping ${examId}: metadata.json not found`);
                 return;
             }
-            const metadata = await metadataResponse.json();
+            const metadata = sanitizeMetadata(await metadataResponse.json(), true);
+            const metadataValidation = typeof window.ExamApp.validateExamMetadata === 'function'
+                ? window.ExamApp.validateExamMetadata(metadata, null, undefined)
+                : { valid: true, errors: [] };
+            if (!metadataValidation.valid) {
+                window.ExamApp.warn(
+                    `Skipping ${examId}: invalid metadata`,
+                    metadataValidation.errors.slice(0, 10)
+                );
+                return;
+            }
             window.userExams[examId] = {
                 questions: null,
                 metadata,
                 source: 'bundled',
+                trust: 'bundled',
                 storage: 'network',
                 loaded: false,
                 hasImages: Boolean(metadata?.hasImages)
@@ -85,17 +115,26 @@ window.userExams = window.ExamApp.userExams;
                 try {
                     const storedExam = await window.ExamApp.examStorage.getExam(examId);
                     if (!storedExam || !Array.isArray(storedExam.questions)) continue;
-                    const validation = window.ExamApp.validateExamData(storedExam.questions, storedExam.metadata);
+                    const metadata = sanitizeMetadata(storedExam.metadata, false);
+                    const labs = Object.prototype.hasOwnProperty.call(storedExam, 'labs')
+                        ? storedExam.labs
+                        : undefined;
+                    const validation = window.ExamApp.validateExamData(
+                        storedExam.questions,
+                        metadata,
+                        labs
+                    );
                     if (!validation.valid) {
                         console.error(`Failed to load ${examId} from browser storage: invalid data`, validation.errors.slice(0, 10));
                         continue;
                     }
                     window.userExams[examId] = {
                         questions: storedExam.questions,
-                        labs: Array.isArray(storedExam.labs) ? storedExam.labs : [],
-                        metadata: storedExam.metadata,
-                        source: storedExam.source || 'imported',
-                        storage: storedExam.storage || 'browser',
+                        labs: labs === undefined ? [] : labs,
+                        metadata,
+                        source: 'imported',
+                        trust: 'local-unverified',
+                        storage: storedExam.storage === 'localStorage' ? 'localStorage' : 'indexedDB',
                         loaded: true,
                         hasImages: hasImages(storedExam.questions)
                     };
@@ -137,7 +176,10 @@ window.userExams = window.ExamApp.userExams;
             existing.loaded = true;
             return existing;
         }
-        if (existing.source !== 'bundled') {
+        const isBundledTrusted = typeof window.ExamApp.isBundledTrustedExam === 'function'
+            ? window.ExamApp.isBundledTrustedExam(existing)
+            : existing.source === 'bundled' && existing.trust === 'bundled';
+        if (!isBundledTrusted) {
             throw new Error(`Exam ${examId} has no question data.`);
         }
         if (inFlightLoads.has(examId)) return inFlightLoads.get(examId);
@@ -149,13 +191,24 @@ window.userExams = window.ExamApp.userExams;
             }
             const rawDump = await dumpResponse.json();
             const questions = Array.isArray(rawDump) ? rawDump : rawDump?.questions;
-            const validation = window.ExamApp.validateExamData(questions, existing.metadata);
+            const labs = (
+                rawDump
+                && !Array.isArray(rawDump)
+                && Object.prototype.hasOwnProperty.call(rawDump, 'labs')
+            )
+                ? rawDump.labs
+                : undefined;
+            const validation = window.ExamApp.validateExamData(
+                questions,
+                existing.metadata,
+                labs
+            );
             if (!validation.valid) {
                 throw new Error(`Invalid questions for ${examId}: ${validation.errors.slice(0, 3).join('; ')}`);
             }
 
             existing.questions = questions;
-            existing.labs = (rawDump && !Array.isArray(rawDump) && Array.isArray(rawDump.labs)) ? rawDump.labs : [];
+            existing.labs = labs === undefined ? [] : labs;
             existing.loaded = true;
             existing.hasImages = hasImages(questions) || Boolean(existing.metadata?.hasImages);
             window.ExamApp.log(`Loaded ${examId}: ${questions.length} questions, ${existing.labs.length} lab(s)`);

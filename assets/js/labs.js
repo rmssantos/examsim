@@ -59,16 +59,19 @@
 
   const SAFE_IMAGE_RE = /^[A-Za-z0-9_. -]{1,128}\.(?:jpg|jpeg|png|gif|webp)$/i;
 
-  // Only allow https in hrefs (matches the validator's official-doc gate). escapeHtml
-  // stops HTML injection but not a javascript:/data: scheme, and imported packs are not
-  // re-validated at runtime, so a crafted lab reference or pro URL could otherwise
-  // execute on click or downgrade the link to plain HTTP.
-  function safeHref(url) {
+  // Bundled metadata retains its existing HTTPS behavior. Local packs have a
+  // narrower capability: only centrally allowlisted official documentation is
+  // clickable, regardless of any source/trust fields embedded in their metadata.
+  function safeHref(url, officialOnly = false) {
     try {
       const parsed = new URL(String(url), window.location.origin);
-      return parsed.protocol === 'https:' ? parsed.href : '#';
+      if (parsed.protocol !== 'https:') return null;
+      if (officialOnly && window.ExamApp?.isOfficialDocumentationUrl?.(parsed.href) !== true) {
+        return null;
+      }
+      return parsed.href;
     } catch (_) {
-      return '#';
+      return null;
     }
   }
 
@@ -96,12 +99,15 @@
     return next.includes(labId);
   }
 
-  function emptyState(message, metadata) {
+  function emptyState(message, exam) {
     if (nav) nav.innerHTML = '<span class="cr-palette-label">Labs</span>';
     if (packSub) packSub.textContent = '';
+    const trustedBundled = window.ExamApp?.isBundledTrustedExam?.(exam) === true;
+    const metadata = exam && exam.metadata;
     const proUrl = metadata && metadata.pro && metadata.pro.url;
-    const upsell = proUrl
-      ? `<a class="btn btn-primary" href="${escapeHtml(safeHref(proUrl))}" target="_blank" rel="noopener noreferrer">Get the full pack</a>`
+    const safeProUrl = trustedBundled && proUrl ? safeHref(proUrl) : null;
+    const upsell = safeProUrl
+      ? `<a class="btn btn-primary" href="${escapeHtml(safeProUrl)}" target="_blank" rel="noopener noreferrer">Get the full pack</a>`
       : '';
     workspace.innerHTML = `<div class="labs-empty"><p>${escapeHtml(message)}</p>${upsell}</div>`;
   }
@@ -157,6 +163,13 @@
     const refs = Array.isArray(lab.references) ? lab.references : [];
     const done = isDone(examId, lab.id);
     const costLine = `${lab.estCost ? formatInline(lab.estCost) + ' ' : ''}Your account, your cost: Examplar is not responsible for any cloud charges.`;
+    const referencesMarkup = refs.map((reference) => {
+      const label = escapeHtml(reference && (reference.label || reference.url));
+      const href = safeHref(reference && reference.url, !isBundled);
+      return href
+        ? `<li><a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${label}</a></li>`
+        : '';
+    }).join('');
 
     return `
       <article class="lab-detail">
@@ -178,7 +191,7 @@
 
         ${cleanup.length ? `<section class="lab-section lab-cleanup"><h2 class="lab-section-title"><i class="fas fa-broom" aria-hidden="true"></i> Clean up (avoid charges)</h2><ul class="lab-list">${cleanup.map((c) => `<li>${formatInline(c)}</li>`).join('')}</ul></section>` : ''}
 
-        ${refs.length ? `<section class="lab-section lab-refs"><h2 class="lab-section-title">Official references</h2><ul class="lab-list">${refs.map((r) => `<li><a href="${escapeHtml(safeHref(r.url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.label || r.url)}</a></li>`).join('')}</ul></section>` : ''}
+        ${referencesMarkup ? `<section class="lab-section lab-refs"><h2 class="lab-section-title">Official references</h2><ul class="lab-list">${referencesMarkup}</ul></section>` : ''}
 
         <div class="lab-actions">
           <button type="button" class="btn btn-primary" id="lab-done-btn" data-lab-id="${escapeHtml(lab.id)}">
@@ -236,13 +249,13 @@
     // (null/non-object or missing a usable id) before rendering instead of crashing on it.
     const labs = (Array.isArray(exam.labs) ? exam.labs : [])
       .filter((lab) => lab && typeof lab === 'object' && typeof lab.id === 'string' && lab.id);
-    const isBundled = exam.source === 'bundled';
+    const isBundled = window.ExamApp?.isBundledTrustedExam?.(exam) === true;
 
     const name = (metadata && (metadata.fullName || metadata.name)) || examId.toUpperCase();
     document.title = `${name} labs | Examplar`;
 
     if (!labs.length) {
-      emptyState('This pack does not include hands-on labs yet.', metadata);
+      emptyState('This pack does not include hands-on labs yet.', exam);
       return;
     }
     render(examId, metadata, labs, labs[0].id, isBundled);

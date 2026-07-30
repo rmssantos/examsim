@@ -457,6 +457,53 @@ When importing questions, ensure:
 - ✅ Image filenames exist in `images/` folder
 - ✅ Question types are valid
 
+### Cardinality and import safety limits
+
+The browser and repository validator apply the same generous structural ceilings.
+They are above every bundled pack, but keep an imported JSON document from creating
+unbounded render or storage work:
+
+- A question can contain at most 50 options, 50 statements, and 50 entries in a
+  `correct` array.
+- `MULTI` and `DRAG_DROP_SELECT` answers must use unique option indices.
+  `DRAG_DROP_SELECT` must declare `drag_select_required`, and it must equal the
+  number of correct selections.
+- A question can contain at most 20 image references across `question_images` and
+  `explanation_images`, plus 20 source `references`.
+- A pack can contain at most 50 labs.
+- Each lab can contain at most 100 steps, including at most 20 step image
+  references.
+- Each lab can contain at most 25 prerequisites, 25 cleanup entries, and 25 official-documentation references.
+- Every metadata list can contain at most 100 items, including nested lists such
+  as mapped modules or feature highlights.
+
+ZIP imports are decompressed in a dedicated Web Worker using the self-hosted JSZip
+copy. The worker counts actual decompressed bytes emitted by every non-directory
+entry, including files the importer otherwise ignores. Declared ZIP sizes are only
+an early preflight hint. Per-file and shared package/image byte limits are enforced
+while streaming, and the page terminates an extraction that exceeds its timeout.
+Only bounded JSON and image buffers return to the main thread for decoding and Blob
+creation.
+
+Before JSZip parses the archive, the worker validates the raw end-of-directory
+and central-directory records, accepts printable ASCII entry names only, rejects
+duplicate or ambiguous paths, enforces the entry and compressed-file ceilings,
+and rejects malformed, multi-disk, or ZIP64 archives. ZIP import therefore
+requires an HTTP(S) origin: use the public site or run `python server.py`; direct
+`file://` mode continues to support JSON import but not ZIP extraction.
+
+Images and pack records use separate browser databases. A detected write failure
+restores the previous image set before returning an error, but this is a
+compensating transaction rather than a single crash-atomic commit across both
+databases. If the browser is forcibly terminated during import, re-import the ZIP
+to reconcile its pack and image set.
+
+When multiple `dump.json` or `metadata.json` files exist, the shortest normalized
+path wins; equal-length paths use lexical order. Image paths are flattened to a
+validated safe basename. If multiple safe paths have the same basename, the
+shortest path (then lexical order) wins, while every duplicate is still decompressed
+and charged to the package and image budgets.
+
 ### Common Validation Errors
 
 **Invalid JSON**:

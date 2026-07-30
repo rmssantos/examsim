@@ -1,7 +1,7 @@
 {
   "name": "Examplar",
   "short_name": "Examplar",
-  "description": "Private, offline certification exam practice. Study the built-in packs or build your own.",
+  "description": "Local-first, offline-capable certification exam practice. Study the built-in packs or build your own.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

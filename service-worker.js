@@ -2,7 +2,7 @@
 // Public release history is recorded in CHANGELOG.md. Bump the vX.Y below on any
 // deploy that changes cached assets;
 // tests/test_sprint1_readiness.py enforces the examsim-pwa-vX.Y format.
-const CACHE_VERSION = 'examsim-pwa-v6.2';
+const CACHE_VERSION = 'examsim-pwa-v6.3';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -25,6 +25,7 @@ const CORE_ASSETS = [
   './assets/js/secure-transfer.js',
   './assets/js/exam-loader.js',
   './assets/js/exam-manager.js',
+  './assets/js/zip-import-worker.js',
   './assets/js/labs.js',
   './assets/js/roadmaps.js',
   './assets/js/homepage.js',
@@ -84,6 +85,7 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/js/secure-transfer.js',
   './assets/js/exam-loader.js',
   './assets/js/exam-manager.js',
+  './assets/js/zip-import-worker.js',
   './assets/js/labs.js',
   './assets/js/roadmaps.js',
   './assets/js/homepage.js',
@@ -217,6 +219,9 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(request.url);
   if (!sameOrigin(url) || isAnalyticsRequest(url)) return;
+  // Upload-session tokens are per local server process. Let the browser perform
+  // a direct no-store fetch so Cache API entries can never outlive that process.
+  if (url.pathname === '/__upload_session') return;
 
   if (request.mode === 'navigate') {
     event.respondWith((async () => {

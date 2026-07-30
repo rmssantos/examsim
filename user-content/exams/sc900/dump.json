@@ -409,23 +409,17 @@
   {
     "id": 25,
     "module": "Microsoft Entra",
-    "question": "Which of the following are valid identity types in Microsoft Entra ID? (Select all that apply.)",
+    "question": "Which statement correctly describes an agent identity in Microsoft Entra Agent ID?",
     "options": [
-      "User identity",
-      "Workload identity",
-      "Managed identity",
-      "Network identity",
-      "Device identity"
+      "It is a human user account that must authenticate with a password or passkey.",
+      "It is a device registration record that represents the computer running an AI agent.",
+      "It is a special service principal created from an agent identity blueprint and has no credentials of its own.",
+      "It is a network security object that grants an AI agent access to every tenant."
     ],
-    "correct": [
-      0,
-      1,
-      2,
-      4
-    ],
-    "explanation": "Microsoft Entra ID supports multiple identity types: User identities (internal members and guests), Workload identities (applications and service principals), Managed identities (system-assigned and user-assigned for Azure resources), and Device identities (registered, joined, or hybrid joined devices). 'Network identity' is not a recognized identity type in Microsoft Entra ID.",
-    "question_type": "MULTI",
-    "reference": "https://learn.microsoft.com/en-us/entra/fundamentals/whatis"
+    "correct": 2,
+    "explanation": "An agent identity is a special service principal in Microsoft Entra ID. An agent identity blueprint creates it and acquires tokens on its behalf, so the agent identity does not hold credentials of its own. Human authentication methods, device registrations, and network security objects do not describe this identity type.",
+    "question_type": "STANDARD",
+    "reference": "https://learn.microsoft.com/en-us/entra/agent-id/agent-identities"
   },
   {
     "id": 26,
@@ -2462,26 +2456,27 @@
   {
     "id": 147,
     "module": "Risk & Compliance Solutions",
-    "question": "Select the TWO capabilities that are exclusive to eDiscovery (Premium) and NOT available in eDiscovery (Standard).",
+    "question": "A legal team adds relevant case content to a review set in Microsoft Purview eDiscovery. Which THREE actions can the team perform in the review set?",
     "options": [
-      "Content search across mailboxes and sites",
-      "Custodian management with legal hold notifications",
-      "Review sets with advanced analytics and near-duplicate detection",
-      "Exporting search results",
-      "Searching Teams messages"
+      "Search, filter, and tag the collected content",
+      "Run analytics to identify near-duplicate documents, email threads, and themes",
+      "Export review set items to a download package",
+      "Modify the original source items automatically",
+      "Apply retention labels to every source location automatically"
     ],
     "correct": [
+      0,
       1,
       2
     ],
-    "explanation": "Custodian management (including legal hold notifications and custodian communications) and review sets with advanced analytics (near-duplicate detection, email threading, themes, and predictive coding) are exclusive to eDiscovery (Premium). Content search, exporting results, and searching Teams messages are available in eDiscovery (Standard) or basic Content Search.",
+    "explanation": "A review set in Microsoft Purview eDiscovery provides a static collection that reviewers can search, filter, tag, analyze, and export. Review set analytics can identify near-duplicates, email threads, and themes. These actions work on collected review content; they do not automatically modify source items or apply retention labels to source locations.",
     "question_type": "MULTI",
-    "reference": "https://learn.microsoft.com/en-us/purview/ediscovery-overview"
+    "reference": "https://learn.microsoft.com/en-us/purview/edisc-features-components"
   },
   {
     "id": 148,
     "module": "Risk & Compliance Solutions",
-    "question": "In Microsoft Purview eDiscovery (Premium), what is the purpose of a review set?",
+    "question": "In Microsoft Purview eDiscovery, what is the purpose of a review set?",
     "options": [
       "To define the scope of a Content Search query",
       "To collect, review, and analyze content relevant to a legal case with advanced analytics",
@@ -2489,9 +2484,9 @@
       "To generate compliance scores based on discovered data"
     ],
     "correct": 1,
-    "explanation": "A review set in eDiscovery (Premium) is a static collection of content where legal teams can review, tag, annotate, and analyze documents relevant to a case. Review sets support advanced analytics including near-duplicate detection, email threading, themes analysis, and predictive coding to help legal teams efficiently review large volumes of content.",
+    "explanation": "A review set in Microsoft Purview eDiscovery is a static, known collection of case content that reviewers can search, filter, tag, analyze, and assess for relevance. Review set analytics can identify near-duplicate documents, email threads, and themes to reduce the volume of content requiring review.",
     "question_type": "STANDARD",
-    "reference": "https://learn.microsoft.com/en-us/purview/ediscovery-overview"
+    "reference": "https://learn.microsoft.com/en-us/purview/edisc-features-components"
   },
   {
     "id": 149,

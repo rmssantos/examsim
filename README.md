@@ -60,8 +60,10 @@ upload endpoint. It binds to the loopback interface by default.
 ### Direct File Use
 
 Opening `index.html` directly can work for basic use, but browser security rules
-limit automatic folder discovery and some image workflows. Use `python server.py`
-for the supported local development experience.
+limit automatic folder discovery and some image workflows. ZIP import is
+intentionally unavailable under `file://` because extraction runs in an isolated
+Web Worker; run `python server.py` and open `http://localhost:8000` for ZIP packs.
+JSON import and basic practice can still work in direct-file mode.
 
 ## Exam Packs
 
@@ -80,6 +82,9 @@ Users can also import:
 - a JSON question array;
 - a combined JSON object containing `id`, `metadata`, and `questions`;
 - a ZIP containing `dump.json`, optional `metadata.json`, and optional images.
+
+ZIP import requires the public HTTPS site or the supported local HTTP server. It
+does not run when `index.html` is opened directly as a `file://` URL.
 
 Imported packs and their progress are stored in that browser profile. They are
 not uploaded to the public repository or server.

@@ -46,59 +46,52 @@ def utils_bootstrap(assertions: str) -> str:
 
 
 class ZipBoundaryTests(unittest.TestCase):
-    def test_zip_inspection_rejects_oversized_dump_before_extraction(self):
-        script = utils_bootstrap(
-            """
-            const limits = window.ExamApp.EXAM_LIMITS;
-            const zip = {
-              forEach(callback) {
-                callback('pack/dump.json', {
-                  dir: false,
-                  name: 'pack/dump.json',
-                  _data: { uncompressedSize: limits.maxJsonBytes + 1 }
-                });
-              }
-            };
-            try {
-              window.ExamApp.inspectZipEntries(zip);
-              process.exitCode = 2;
-            } catch (error) {
-              if (!/dump\\.json is too large/i.test(error.message)) throw error;
-              console.log('rejected oversized dump');
-            }
-            """
+    def test_zip_worker_preflights_oversized_json_before_streaming(self):
+        worker = (ROOT / "assets" / "js" / "zip-import-worker.js").read_text(
+            encoding="utf-8"
         )
-        result = run_node(script)
-        self.assertEqual(result.returncode, 0, result.stdout)
-        self.assertIn("rejected oversized dump", result.stdout)
+        self.assertIn("preflight(entries, limits)", worker)
+        self.assertIn("declared > limits.maxJsonBytes", worker)
+        self.assertLess(
+            worker.index("preflight(entries, limits)"),
+            worker.index("await streamEntry("),
+        )
 
-    def test_zip_inspection_rejects_excessive_entry_count(self):
+    def test_zip_worker_rejects_excessive_entry_count(self):
+        worker = (ROOT / "assets" / "js" / "zip-import-worker.js").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("if (entries.length > limits.maxZipEntries)", worker)
+        self.assertIn("throw limitError(`ZIP contains too many entries.", worker)
+
+
+class RegistryBoundaryTests(unittest.TestCase):
+    def test_registry_write_failure_is_best_effort(self):
         script = utils_bootstrap(
             """
-            const limits = window.ExamApp.EXAM_LIMITS;
-            const zip = {
-              forEach(callback) {
-                for (let i = 0; i <= limits.maxZipEntries; i++) {
-                  callback(`pack/file-${i}.txt`, {
-                    dir: false,
-                    name: `pack/file-${i}.txt`,
-                    _data: { uncompressedSize: 1 }
-                  });
-                }
-              }
+            const warnings = [];
+            window.ExamApp.warn = (...args) => warnings.push(args.map(String).join(' '));
+            global.localStorage = {
+              getItem() { return '[]'; },
+              setItem() { throw new Error('simulated quota failure'); },
+              removeItem() {}
             };
-            try {
-              window.ExamApp.inspectZipEntries(zip);
-              process.exitCode = 2;
-            } catch (error) {
-              if (!/too many entries/i.test(error.message)) throw error;
-              console.log('rejected entry count');
+            const values = window.ExamApp.addToRegistry(
+              window.ExamApp.STORAGE_KEYS.exams,
+              'ai103'
+            );
+            if (values.length !== 1 || values[0] !== 'ai103') {
+              throw new Error('registry normalization changed');
             }
+            if (!warnings.some(message => /registry/i.test(message))) {
+              throw new Error('registry failure was not reported');
+            }
+            console.log('registry failure stayed non-fatal');
             """
         )
         result = run_node(script)
         self.assertEqual(result.returncode, 0, result.stdout)
-        self.assertIn("rejected entry count", result.stdout)
+        self.assertIn("registry failure stayed non-fatal", result.stdout)
 
 
 class ProgressBoundaryTests(unittest.TestCase):
@@ -134,6 +127,156 @@ class ProgressBoundaryTests(unittest.TestCase):
         normalized = json.loads(result.stdout.strip())
         self.assertEqual(normalized["bestScore"], 80)
         self.assertEqual(normalized["totalPassed"], 1)
+
+    def test_progress_normalizer_preserves_legacy_aggregates_without_diagnostics(self):
+        script = utils_bootstrap(
+            """
+            const normalized = window.ExamApp.normalizeProgressRecord({
+              attempts: [{ score: 80 }],
+              bestScore: 80,
+              totalPassed: 1
+            });
+            console.log(JSON.stringify(normalized));
+            """
+        )
+        result = run_node(script)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        normalized = json.loads(result.stdout.strip())
+        self.assertEqual(normalized["bestScore"], 80)
+        self.assertEqual(normalized["totalPassed"], 1)
+        self.assertNotIn("passed", normalized["attempts"][0])
+
+    def test_progress_normalizer_preserves_only_known_session_types(self):
+        script = utils_bootstrap(
+            """
+            for (const sessionType of ['full', 'diagnostic', 'study']) {
+              const normalized = window.ExamApp.normalizeProgressRecord({
+                attempts: [{ score: 80, sessionType }]
+              });
+              if (normalized?.attempts?.[0]?.sessionType !== sessionType) {
+                throw new Error(`session type not preserved: ${sessionType}`);
+              }
+            }
+            const legacy = window.ExamApp.normalizeProgressRecord({
+              attempts: [{ score: 80 }]
+            });
+            if (!legacy || legacy.attempts[0].sessionType !== undefined) {
+              throw new Error('legacy attempt without a session type was rejected');
+            }
+            for (const sessionType of ['unknown', 'DIAGNOSTIC', 10]) {
+              const normalized = window.ExamApp.normalizeProgressRecord({
+                attempts: [{ score: 80, sessionType }]
+              });
+              if (normalized !== null) {
+                throw new Error(`invalid session type accepted: ${sessionType}`);
+              }
+            }
+            console.log('validated session types');
+            """
+        )
+        result = run_node(script)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("validated session types", result.stdout)
+
+    def test_progress_summary_excludes_diagnostics_from_completion_metrics(self):
+        script = utils_bootstrap(
+            """
+            const summary = window.ExamApp.getProgressSummary({
+              attempts: [
+                { score: 100, passed: true, sessionType: 'diagnostic' },
+                { score: 60, passed: false, sessionType: 'full' },
+                { score: 80, passed: true, sessionType: 'study' },
+                { score: 75, passed: true }
+              ]
+            });
+            console.log(JSON.stringify(summary));
+            """
+        )
+        result = run_node(script)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        summary = json.loads(result.stdout.strip())
+        self.assertEqual(
+            summary,
+            {
+                "totalAttempts": 4,
+                "completionAttempts": 3,
+                "bestScore": 80,
+                "totalPassed": 2,
+                "passRate": 67,
+            },
+        )
+
+    def test_progress_summary_preserves_legacy_pass_after_diagnostic(self):
+        script = utils_bootstrap(
+            """
+            const summary = window.ExamApp.getProgressSummary({
+              attempts: [
+                { score: 80 },
+                { score: 100, passed: true, sessionType: 'diagnostic' }
+              ],
+              bestScore: 80,
+              totalPassed: 1
+            });
+            console.log(JSON.stringify(summary));
+            """
+        )
+        result = run_node(script)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertEqual(
+            json.loads(result.stdout.strip()),
+            {
+                "totalAttempts": 2,
+                "completionAttempts": 1,
+                "bestScore": 80,
+                "totalPassed": 1,
+                "passRate": 100,
+            },
+        )
+
+    def test_progress_summary_clamps_malformed_pass_aggregates(self):
+        script = utils_bootstrap(
+            """
+            const tooHigh = window.ExamApp.getProgressSummary({
+              attempts: [{ score: 80, passed: true }],
+              bestScore: 80,
+              totalPassed: 999
+            });
+            const negative = window.ExamApp.getProgressSummary({
+              attempts: [{ score: 20, passed: false }],
+              bestScore: 20,
+              totalPassed: -4
+            });
+            console.log(JSON.stringify({ tooHigh, negative }));
+            """
+        )
+        result = run_node(script)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        payload = json.loads(result.stdout.strip())
+        self.assertEqual(payload["tooHigh"]["totalPassed"], 1)
+        self.assertEqual(payload["tooHigh"]["passRate"], 100)
+        self.assertEqual(payload["negative"]["totalPassed"], 0)
+        self.assertEqual(payload["negative"]["passRate"], 0)
+
+    def test_progress_normalizer_repairs_diagnostic_inflated_legacy_aggregates(self):
+        script = utils_bootstrap(
+            """
+            const normalized = window.ExamApp.normalizeProgressRecord({
+              attempts: [
+                { score: 100, passed: true, sessionType: 'diagnostic' },
+                { score: 65, passed: false }
+              ],
+              bestScore: 100,
+              totalPassed: 1
+            });
+            console.log(JSON.stringify(normalized));
+            """
+        )
+        result = run_node(script)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        normalized = json.loads(result.stdout.strip())
+        self.assertEqual(len(normalized["attempts"]), 2)
+        self.assertEqual(normalized["bestScore"], 65)
+        self.assertEqual(normalized["totalPassed"], 0)
 
     def test_progress_normalizer_rejects_oversized_or_invalid_records(self):
         script = utils_bootstrap(

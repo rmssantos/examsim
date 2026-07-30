@@ -191,7 +191,7 @@ body:not(.dark-mode) .home-board { border-color: transparent; }
   margin: 0;
 }
 .cr-topnav-brand .logo-img { width: 26px; height: auto; }
-.cr-topnav-brand h1 {
+.cr-topnav-brand .cr-wordmark {
   background: none;
   -webkit-background-clip: initial;
   background-clip: initial;
@@ -358,6 +358,15 @@ body:not(.dark-mode) .home-board { border-color: transparent; }
   margin-top: 2px;
 }
 .stat-card .stat-label-icon { color: var(--accent-bright); }
+.hero-catalog-proof {
+  margin: 0.65rem 0.15rem 0;
+  color: var(--rail-text);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.hero-catalog-proof strong { color: var(--rail-text-strong); }
 /* image support tile stays out of the hero (kept from previous layout decision) */
 .hero-proof .support-card { display: none; }
 

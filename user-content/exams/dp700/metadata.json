@@ -2,7 +2,7 @@
   "id": "dp700",
   "name": "DP-700",
   "fullName": "Implementing Data Engineering Solutions Using Microsoft Fabric",
-  "description": "Free 25-question preview of the Examplar DP-700 (Microsoft Fabric Data Engineer Associate) practice pack. Original scenario questions written from official Microsoft Learn documentation, aligned to the DP-700 study guide (skills measured as of April 20, 2026). The full 280-question pack is available separately. Not real exam questions.",
+  "description": "Free 25-question preview of the Examplar DP-700 (Microsoft Fabric Data Engineer Associate) practice pack. Original scenario questions written from official Microsoft Learn documentation, aligned to the DP-700 study guide (skills measured as of July 21, 2026). The full 280-question pack is available separately. Not real exam questions.",
   "duration": 40,
   "questionCount": 25,
   "passScore": 70,
@@ -28,7 +28,7 @@
       "name": "Implement and manage an analytics solution",
       "weightRange": "30-35%",
       "source": "Microsoft DP-700 study guide",
-      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-700",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700",
       "mappedModules": [
         "Configure Microsoft Fabric Workspace Settings",
         "Lifecycle Management and Deployment Pipelines",
@@ -42,7 +42,7 @@
       "name": "Ingest and transform data",
       "weightRange": "30-35%",
       "source": "Microsoft DP-700 study guide",
-      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-700",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700",
       "mappedModules": [
         "Loading Patterns: Full, Incremental, and Dimensional",
         "Choosing a Data Store and Transformation Engine",
@@ -56,7 +56,7 @@
       "name": "Monitor and optimize an analytics solution",
       "weightRange": "30-35%",
       "source": "Microsoft DP-700 study guide",
-      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-700",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700",
       "mappedModules": [
         "Monitor Fabric Items and Configure Alerts",
         "Resolve Errors: Pipelines, Dataflows Gen2, and Notebooks",
@@ -129,16 +129,16 @@
     }
   ],
   "contentReview": {
-    "lastReviewed": "2026-06-11",
-    "sourceOfTruth": "Microsoft DP-700 study guide (skills measured as of April 20, 2026)",
-    "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-700",
-    "objectiveVersion": "DP-700 skills measured as of April 20, 2026"
+    "lastReviewed": "2026-07-30",
+    "sourceOfTruth": "Microsoft DP-700 study guide (skills measured as of July 21, 2026)",
+    "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700",
+    "objectiveVersion": "DP-700 skills measured as of July 21, 2026"
   },
   "resources": [
     {
       "icon": "fas fa-book",
       "name": "Microsoft DP-700 Study Guide",
-      "url": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-700"
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700"
     },
     {
       "icon": "fas fa-graduation-cap",

@@ -8,6 +8,28 @@ SW = (ROOT / "service-worker.js").read_text(encoding="utf-8")
 
 
 class RoadmapsPageTests(unittest.TestCase):
+    def test_canonical_uses_the_static_github_pages_url(self):
+        self.assertIn(
+            '<link rel="canonical" href="https://examplar.app/roadmaps.html">',
+            HTML,
+        )
+        self.assertNotIn(
+            '<link rel="canonical" href="https://examplar.app/roadmaps">',
+            HTML,
+        )
+
+    def test_page_has_one_intent_heading_and_a_neutral_wordmark(self):
+        headings = re.findall(r"<h1\b[^>]*>(.*?)</h1>", HTML, flags=re.IGNORECASE | re.DOTALL)
+        heading_text = re.sub(r"<[^>]+>", "", headings[0]) if headings else ""
+
+        self.assertEqual(len(headings), 1)
+        self.assertIn("Career roadmaps", heading_text)
+
+        topbar = HTML[HTML.index("cr-topbar"):HTML.index("cr-hero-zone")]
+        self.assertNotRegex(topbar, r"<h1\b")
+        self.assertIn('class="cr-wordmark"', topbar)
+        self.assertIn("Exampl", topbar)
+
     def test_page_exists(self):
         self.assertTrue(HTML, "roadmaps.html must exist")
 

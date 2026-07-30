@@ -70,10 +70,10 @@
   ],
   "hasImages": false,
   "contentReview": {
-    "lastReviewed": "2026-05-20",
-    "sourceOfTruth": "Microsoft Learn AB-730 study guide and certification page",
+    "lastReviewed": "2026-07-30",
+    "sourceOfTruth": "Microsoft Learn AB-730 study guide (skills measured as of July 22, 2026)",
     "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-730",
-    "objectiveVersion": "Microsoft Learn objectives reviewed 2026-05-20"
+    "objectiveVersion": "AB-730 skills measured as of July 22, 2026"
   },
   "objectiveDomains": [
     {

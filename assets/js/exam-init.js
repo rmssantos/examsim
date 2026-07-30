@@ -3,6 +3,60 @@ window.ExamApp = window.ExamApp || {};
 window.ExamApp.externalExamBootstrap = true;
 document.body.dataset.examInitManaged = 'true';
 
+function resolveSessionConfig(config = {}) {
+  const normalizedMode = String(config.pageMode || '').trim().toLowerCase();
+  const normalizedSession = String(config.requestedSession || '').trim().toLowerCase();
+
+  if (normalizedMode === 'study') {
+    return {
+      sessionType: 'study',
+      questionCount: config.normalQuestionCount,
+      duration: config.normalDuration
+    };
+  }
+
+  if (normalizedSession !== 'diagnostic') {
+    return {
+      sessionType: 'full',
+      questionCount: config.normalQuestionCount,
+      duration: config.normalDuration
+    };
+  }
+
+  const positiveInteger = (value) => {
+    const number = Number(value);
+    return Number.isFinite(number) && number > 0 ? Math.floor(number) : null;
+  };
+  const positiveNumber = (value) => {
+    const number = Number(value);
+    return Number.isFinite(number) && number > 0 ? number : null;
+  };
+
+  // `count` is deliberately not consulted. A diagnostic is one fixed product
+  // shape, bounded only by the questions actually available in the pool.
+  const rawAvailableCount = Number(config.availableQuestionCount);
+  const availableCount = Number.isFinite(rawAvailableCount) && rawAvailableCount >= 0
+    ? Math.floor(rawAvailableCount)
+    : (positiveInteger(config.normalQuestionCount) || 1);
+  const diagnosticCount = Math.min(10, availableCount);
+  const sourceQuestionCount = positiveInteger(config.sourceQuestionCount)
+    || positiveInteger(config.normalQuestionCount)
+    || availableCount
+    || 1;
+  const sourceDuration = positiveNumber(config.sourceDuration)
+    || positiveNumber(config.normalDuration)
+    || 5;
+
+  return {
+    sessionType: 'diagnostic',
+    questionCount: diagnosticCount,
+    duration: Math.max(
+      5,
+      Math.round(diagnosticCount * (sourceDuration / sourceQuestionCount))
+    )
+  };
+}
+
 function closeExamTab() {
   // Try to close the tab (works if opened via window.open)
   window.close();
@@ -84,6 +138,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Check if exam exists in window.userExams (loaded by exam-loader.js)
   if (window.userExams && window.userExams[examId]) {
     const examData = window.userExams[examId];
+    const isBundledTrusted = window.ExamApp.isBundledTrustedExam?.(examData) === true;
 
     if (window.examSimulator) {
       window.examSimulator.currentExam = examId;
@@ -153,6 +208,19 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
       }
 
+      const sessionConfig = resolveSessionConfig({
+        pageMode,
+        requestedSession: params.get('session'),
+        requestedCount: params.get('count'),
+        availableQuestionCount: questions.length,
+        normalQuestionCount: questionCount,
+        normalDuration: duration,
+        sourceQuestionCount: originalQuestionCount,
+        sourceDuration: originalDuration
+      });
+      questionCount = sessionConfig.questionCount;
+      duration = sessionConfig.duration;
+
       // Load exam into simulator
       window.examSimulator.examData[examId] = {
         name: metadata.name || examId.toUpperCase(),
@@ -162,10 +230,19 @@ document.addEventListener('DOMContentLoaded', async function() {
         passScore: metadata.passScore || 70,
         questions: questions,
         modules: metadata.modules || [],
-        recommendedPro: metadata.recommendedPro || null,
-        pro: metadata.pro || null,
-        selectedModules: isCustomModulePractice ? selectedModules : null
+        resources: metadata.resources || [],
+        recommendedPro: isBundledTrusted ? (metadata.recommendedPro || null) : null,
+        pro: isBundledTrusted ? (metadata.pro || null) : null,
+        source: examData.source,
+        trust: examData.trust,
+        selectedModules: isCustomModulePractice ? selectedModules : null,
+        sessionType: sessionConfig.sessionType
       };
+      window.ExamApp?.analytics?.trackSessionConfigured?.(examId, {
+        sessionType: sessionConfig.sessionType,
+        questionCount,
+        durationMinutes: duration
+      });
 
       window.ExamApp.log(`✅ Loaded ${questions.length} questions for ${examId} (Session Target: ${questionCount}, Duration: ${duration} mins)`);
       if (isCustomModulePractice) {

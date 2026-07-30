@@ -17,19 +17,19 @@
   {
     "question_type": "MULTI",
     "module": "Configure Microsoft Fabric Workspace Settings",
-    "question": "A workspace admin is configuring a custom Spark pool in the Fabric workspace Spark settings. Which of the following are configurable on a custom Spark pool? (Choose two.)",
+    "question": "A workspace admin is choosing Apache Airflow runtime settings in Microsoft Fabric. Which TWO statements correctly distinguish the Starter pool from a Custom pool?",
     "options": [
-      "The node size, selected from sizes such as Small, Medium, Large, X-Large, and XX-Large",
-      "Autoscale, which scales the pool between a configured minimum and maximum number of nodes",
-      "The pay-as-you-go per-GB rate charged for OneLake storage",
-      "The default sensitivity label applied to all items in the workspace"
+      "The Starter pool is the default, offers an instant Apache Airflow runtime, and is deprovisioned when it is not in use.",
+      "A Custom pool offers configurable compute and autoscale settings and remains always on until it is manually paused.",
+      "A Custom pool cannot configure compute node size, extra nodes, or autoscale.",
+      "The Starter pool is intended only for always-on production workloads, while Custom pools are limited to occasional development."
     ],
     "correct": [
       0,
       1
     ],
-    "explanation": "On a custom Spark pool you can select the node size from the available sizes and enable autoscale to scale between a minimum and maximum node count, along with dynamic executor allocation. Both of these are pool-level compute settings. The OneLake per-GB storage rate is a billing rate, not a Spark pool setting. A default sensitivity label is a governance setting delegated at the domain or tenant level, not part of a custom Spark pool configuration.",
-    "reference": "https://learn.microsoft.com/fabric/data-engineering/create-custom-spark-pools#create-custom-spark-pools",
+    "explanation": "For Apache Airflow workspace settings, the Starter pool is the default and provides an instant runtime that is deprovisioned when it is not in use. A Custom pool offers flexible compute settings, including node size, extra nodes, and autoscale, and stays on until manually paused. Microsoft positions the Starter pool for development and the Custom pool for production.",
+    "reference": "https://learn.microsoft.com/en-us/fabric/data-factory/apache-airflow-jobs-workspace-settings",
     "id": 2
   },
   {

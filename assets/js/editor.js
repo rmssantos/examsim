@@ -160,8 +160,33 @@
 
   function ensureFields(q){
     q.options = Array.isArray(q.options) ? q.options : [];
-    if (q.question_images && q.question_images.length && !q._meta) q._meta = {};
     return q;
+  }
+
+  function createEditorTextInput(className, index, value, placeholder = '') {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = className;
+    input.dataset.idx = String(index);
+    input.value = String(value ?? '');
+    if (placeholder) input.placeholder = placeholder;
+    return input;
+  }
+
+  function createOptionDeleteButton(index, itemLabel) {
+    const label = `Delete ${itemLabel} ${index + 1}`;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn danger opt-del';
+    button.dataset.idx = String(index);
+    button.setAttribute('aria-label', label);
+    button.title = label;
+
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-trash';
+    icon.setAttribute('aria-hidden', 'true');
+    button.appendChild(icon);
+    return button;
   }
 
   function renderForm(){
@@ -201,14 +226,30 @@
       statements.forEach((stmt, idx) => {
         const row = document.createElement('div');
         row.className = 'option-row yn-matrix-row';
-        row.innerHTML = `
-          <input type="text" data-idx="${idx}" class="stmt-text" value="${escapeHtml(stmt)}" placeholder="Statement ${idx + 1}">
-          <div class="yn-radio-group">
-            <label class="yn-radio"><input type="radio" name="yn-${idx}" data-idx="${idx}" value="0" class="yn-correct"> Yes</label>
-            <label class="yn-radio"><input type="radio" name="yn-${idx}" data-idx="${idx}" value="1" class="yn-correct"> No</label>
-          </div>
-          <button type="button" class="btn danger opt-del" data-idx="${idx}" aria-label="Delete statement ${idx + 1}" title="Delete statement ${idx + 1}"><i class="fas fa-trash" aria-hidden="true"></i></button>
-        `;
+        row.appendChild(createEditorTextInput(
+          'stmt-text',
+          idx,
+          stmt,
+          `Statement ${idx + 1}`
+        ));
+
+        const radioGroup = document.createElement('div');
+        radioGroup.className = 'yn-radio-group';
+        [['0', 'Yes'], ['1', 'No']].forEach(([value, text]) => {
+          const label = document.createElement('label');
+          label.className = 'yn-radio';
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = `yn-${idx}`;
+          radio.dataset.idx = String(idx);
+          radio.value = value;
+          radio.className = 'yn-correct';
+          label.appendChild(radio);
+          label.appendChild(document.createTextNode(` ${text}`));
+          radioGroup.appendChild(label);
+        });
+        row.appendChild(radioGroup);
+        row.appendChild(createOptionDeleteButton(idx, 'statement'));
         optWrap.appendChild(row);
       });
 
@@ -227,18 +268,25 @@
 
         if (isSequence) {
           // For SEQUENCE: show order number + text (no checkbox)
-          row.innerHTML = `
-            <span class="sequence-order-num">${idx + 1}.</span>
-            <input type="text" data-idx="${idx}" class="opt-text" value="${escapeHtml(opt)}">
-            <button type="button" class="btn danger opt-del" data-idx="${idx}" aria-label="Delete sequence option ${idx + 1}" title="Delete sequence option ${idx + 1}"><i class="fas fa-trash" aria-hidden="true"></i></button>
-          `;
+          const order = document.createElement('span');
+          order.className = 'sequence-order-num';
+          order.textContent = `${idx + 1}.`;
+          row.appendChild(order);
+          row.appendChild(createEditorTextInput('opt-text', idx, opt));
+          row.appendChild(createOptionDeleteButton(idx, 'sequence option'));
         } else {
           // For other types: show checkbox + text
-          row.innerHTML = `
-            <input type="text" data-idx="${idx}" class="opt-text" value="${escapeHtml(opt)}">
-            <label class="small"><input type="checkbox" class="opt-correct" data-idx="${idx}"> Correct</label>
-            <button type="button" class="btn danger opt-del" data-idx="${idx}" aria-label="Delete option ${idx + 1}" title="Delete option ${idx + 1}"><i class="fas fa-trash" aria-hidden="true"></i></button>
-          `;
+          row.appendChild(createEditorTextInput('opt-text', idx, opt));
+          const correctLabel = document.createElement('label');
+          correctLabel.className = 'small';
+          const correct = document.createElement('input');
+          correct.type = 'checkbox';
+          correct.className = 'opt-correct';
+          correct.dataset.idx = String(idx);
+          correctLabel.appendChild(correct);
+          correctLabel.appendChild(document.createTextNode(' Correct'));
+          row.appendChild(correctLabel);
+          row.appendChild(createOptionDeleteButton(idx, 'option'));
         }
 
         optWrap.appendChild(row);
@@ -1353,13 +1401,7 @@
 
   // Hash function for change detection
   function hashItems(items){
-    return JSON.stringify(items.map(q => ({
-      id: q.id,
-      question: q.question,
-      options: q.options,
-      correct: q.correct,
-      module: q.module
-    })));
+    return JSON.stringify(items);
   }
 
   // Mark changes as unsaved
@@ -1547,6 +1589,55 @@
     });
 
     // Image upload handlers (dev local server)
+    let uploadCsrfToken = null;
+    let uploadSessionPromise = null;
+
+    async function getUploadCsrfToken(forceRefresh = false) {
+      if (forceRefresh) uploadCsrfToken = null;
+      if (uploadCsrfToken) return uploadCsrfToken;
+
+      if (!uploadSessionPromise) {
+        const request = (async () => {
+          const response = await fetch('/__upload_session', {
+            cache: 'no-store',
+            credentials: 'same-origin'
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+          const payload = await response.json();
+          if (!payload || typeof payload.csrfToken !== 'string' || !payload.csrfToken) {
+            throw new Error('Invalid upload session');
+          }
+          uploadCsrfToken = payload.csrfToken;
+          return uploadCsrfToken;
+        })();
+        uploadSessionPromise = request;
+        request.finally(() => {
+          if (uploadSessionPromise === request) uploadSessionPromise = null;
+        }).catch(() => {});
+      }
+
+      return uploadSessionPromise;
+    }
+
+    async function uploadImageWithCsrf(url, file) {
+      let token = await getUploadCsrfToken();
+      const send = (csrfToken) => fetch(url, {
+        method: 'PUT',
+        credentials: 'same-origin',
+        headers: { 'X-Examplar-CSRF-Token': csrfToken },
+        body: file
+      });
+
+      let response = await send(token);
+      if (response.status === 403) {
+        if (uploadCsrfToken === token) uploadCsrfToken = null;
+        token = await getUploadCsrfToken();
+        response = await send(token);
+      }
+      return response;
+    }
+
     async function uploadFiles(inputEl, targetTextarea){
       const files = Array.from(inputEl.files||[]);
       if (!files.length) return;
@@ -1562,7 +1653,7 @@
             throw new Error(`Image exceeds ${Math.round(window.ExamApp.EXAM_LIMITS.maxImageBytes / 1024 / 1024)} MB`);
           }
           const url = `/__upload_images?exam=${encodeURIComponent(exam)}&name=${encodeURIComponent(f.name)}`;
-          const res = await fetch(url, { method: 'PUT', body: f });
+          const res = await uploadImageWithCsrf(url, f);
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const data = await res.json();
           if (data && data.filename) results.push(data.filename);
