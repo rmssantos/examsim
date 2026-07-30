@@ -95,6 +95,54 @@ class LocalUploadSecurityTests(unittest.TestCase):
         self.assertNotIn("access-control-allow-origin", headers)
         self.assertNotIn("access-control-allow-credentials", headers)
 
+    def test_host_and_origin_validation_return_server_derived_values(self):
+        class RequestHeaderValue(str):
+            def strip(self):
+                return self
+
+            def lower(self):
+                return self
+
+        class RequestHeaders:
+            def __init__(self, values):
+                self.values = values
+
+            def get_all(self, name, default):
+                return self.values.get(name, default)
+
+        handler = object.__new__(_QuietHandler)
+        handler.server = self.httpd
+
+        request_host = RequestHeaderValue(self.loopback_host)
+        handler.headers = RequestHeaders({"Host": [request_host]})
+        validated_host = handler.validated_host()
+        self.assertEqual(self.loopback_host, validated_host)
+        self.assertIs(type(validated_host), str)
+        self.assertIsNot(request_host, validated_host)
+
+        request_origin = RequestHeaderValue(self.loopback_origin)
+        handler.headers = RequestHeaders({"Origin": [request_origin]})
+        origin_is_valid, response_origin = handler.validated_origin(
+            validated_host,
+            required=True,
+        )
+        self.assertTrue(origin_is_valid)
+        self.assertEqual(self.loopback_origin, response_origin)
+        self.assertIs(type(response_origin), str)
+        self.assertIsNot(request_origin, response_origin)
+
+        for line_break in ("\r", "\n", "\r\n"):
+            with self.subTest(line_break=repr(line_break)):
+                handler.headers = RequestHeaders({
+                    "Origin": [
+                        f"{self.loopback_origin}{line_break}X-Injected: true"
+                    ],
+                })
+                self.assertEqual(
+                    (False, None),
+                    handler.validated_origin(validated_host, required=True),
+                )
+
     def test_invalid_or_missing_host_cannot_obtain_upload_token(self):
         invalid_hosts = [
             None,

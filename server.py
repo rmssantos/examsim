@@ -88,13 +88,20 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         if len(values) != 1:
             return None
 
-        host = values[0].strip().lower()
+        raw_host = values[0]
+        if '\r' in raw_host or '\n' in raw_host:
+            return None
+
+        host = raw_host.strip().lower()
         port = self.server.server_address[1]
-        allowed_hosts = {
+        allowed_hosts = (
             f'127.0.0.1:{port}',
             f'localhost:{port}',
-        }
-        return host if host in allowed_hosts else None
+        )
+        for allowed_host in allowed_hosts:
+            if host == allowed_host:
+                return allowed_host
+        return None
 
     def validated_origin(self, host, required):
         values = self.headers.get_all('Origin', [])
@@ -103,11 +110,15 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         if len(values) != 1:
             return (False, None)
 
-        origin = values[0].strip()
+        raw_origin = values[0]
+        if '\r' in raw_origin or '\n' in raw_origin:
+            return (False, None)
+
+        origin = raw_origin.strip()
         expected_origin = f'http://{host}'
         if origin != expected_origin:
             return (False, None)
-        return (True, origin)
+        return (True, expected_origin)
 
     def reject_invalid_host(self):
         self.send_json(421, {'error': 'Misdirected request'})
