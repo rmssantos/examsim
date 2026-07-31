@@ -213,14 +213,7 @@ class MultiExamSimulator {
                    userAnswer.every((ans, i) => ans === correctAnswers[i]);
         }
 
-        if (type === 'DRAG_DROP_SELECT') {
-            if (!Array.isArray(userAnswer)) return false;
-            const correctAnswers = question.correct;
-            return userAnswer.length === correctAnswers.length &&
-                   userAnswer.every((ans, i) => ans === correctAnswers[i]);
-        }
-
-        // SINGLE or MULTI
+        // Unordered selections (MULTI or DRAG_DROP_SELECT)
         if (Array.isArray(question.correct)) {
             if (!Array.isArray(userAnswer)) return false;
             const sortedUser = [...userAnswer].sort();
