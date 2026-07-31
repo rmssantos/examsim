@@ -297,7 +297,7 @@ def build_crosslinks(meta: dict, all_exams: list, root: str = "../../") -> str:
     if not others:
         return ""
     links = "\n".join(
-        f'      <li><a href="{root}exams/{esc(e.get("id", ""))}/index.html">'
+        f'      <li><a href="{root}exams/{esc(e.get("id", ""))}/" data-file-index>'
         f"{esc(exam_code(e))} practice exam</a></li>"
         for e in others
     )
@@ -537,7 +537,7 @@ def render_hub(all_exams: list) -> str:
     def card(e: dict) -> str:
         badge = "" if is_free(e) else '<span class="hub-badge">Free preview</span>'
         return (
-            f'      <li><a class="hub-card" href="{esc(e["id"])}/index.html">'
+            f'      <li><a class="hub-card" href="{esc(e["id"])}/" data-file-index>'
             f'<span class="hub-code">{esc(exam_code(e))}</span>'
             f'<span class="hub-name">{esc(e.get("fullName") or exam_code(e))}</span>'
             f"{badge}</a></li>"
@@ -578,12 +578,12 @@ def render_hub(all_exams: list) -> str:
 <body class="exam-landing">
   <header class="cr-topbar">
     <div class="cr-topnav">
-      <a class="logo cr-topnav-brand" href="{root}index.html" aria-label="Examplar home">
+      <a class="logo cr-topnav-brand" href="{root}" data-file-index aria-label="Examplar home">
         <img class="logo-img" src="{root}assets/media/examplar-mark.png" alt="Examplar logo" width="64" height="64" decoding="async">
         <span class="cr-wordmark">Exampl<span class="logo-accent">a</span>r</span>
       </a>
       <nav class="cr-topnav-links" aria-label="Site links">
-        <a href="{root}index.html">Home</a>
+        <a href="{root}" data-file-index>Home</a>
         <a href="{root}roadmaps.html">Roadmaps</a>
         <a href="https://github.com/rmssantos/examsim" target="_blank" rel="noopener noreferrer">GitHub</a>
         <div class="theme-controls">
@@ -596,7 +596,7 @@ def render_hub(all_exams: list) -> str:
   </header>
   <main class="landing-main">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
-      <a href="{root}index.html">Home</a> <span aria-hidden="true">/</span>
+      <a href="{root}" data-file-index>Home</a> <span aria-hidden="true">/</span>
       <span aria-current="page">Exams</span>
     </nav>
     <header class="landing-hero">
@@ -610,7 +610,7 @@ def render_hub(all_exams: list) -> str:
   </main>
   <footer class="landing-footer">
     <nav class="landing-footer-links" aria-label="Site links">
-      <a href="{root}index.html">Examplar home</a>
+      <a href="{root}" data-file-index>Examplar home</a>
       <a href="{root}privacy-and-storage.html">Privacy &amp; storage</a>
     </nav>
   </footer>

@@ -19,9 +19,21 @@
     }
   }
 
+  function applyFileIndexFallbacks() {
+    if (window.location.protocol !== 'file:') return;
+
+    document.querySelectorAll('a[data-file-index]').forEach(link => {
+      const href = link.getAttribute('href');
+      if (!href || !href.endsWith('/')) return;
+      link.setAttribute('href', `${href}index.html`);
+    });
+  }
+
   applyTheme(preferredTheme());
 
   document.addEventListener('DOMContentLoaded', () => {
+    applyFileIndexFallbacks();
+
     const toggle = document.getElementById('legalThemeToggle');
     if (!toggle) return;
 
