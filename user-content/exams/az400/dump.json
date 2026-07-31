@@ -338,18 +338,22 @@
     "id": 21
   },
   {
-    "question_type": "STANDARD",
-    "module": "Authentication and authorization methods",
-    "question": "Your team's source code is hosted on GitHub. A vendor maintains one private repository for you and needs write access to only that single repository, with no visibility into the rest of your GitHub organization's repositories or settings. Following least privilege, how should you grant the vendor access?",
+    "question_type": "MULTI",
+    "module": "Automated security and compliance scanning",
+    "question": "A team wants automated repository checks that detect source-code vulnerabilities, committed credentials, and vulnerable open-source dependencies before release. Which controls should it enable? (Choose three.)",
     "options": [
-      "Add the vendor as an organization owner so they can self-manage their access",
-      "Add the vendor as an outside collaborator on that one repository with the Write role",
-      "Make the vendor an organization member and add them to a team with Write access",
-      "Give the vendor an organization Admin role scoped to the repository"
+      "Code scanning to identify vulnerabilities and coding errors",
+      "Secret scanning to detect committed tokens and private keys",
+      "Dependabot scanning and alerts for vulnerable dependencies",
+      "A quarterly manual review with all automated repository scanning disabled"
     ],
-    "correct": 1,
-    "explanation": "An outside collaborator is a user who is not a member of the organization but is given explicit access to a single repository, which makes it the right fit for a contractor or vendor that needs limited access. Granting the Write role lets them push to the repository, while staying outside the organization means they get no visibility into other repositories or organization settings. Making them an organization member exposes broader org context and team structures. Organization owner grants full control of the entire organization. There is no organization Admin role scoped to a single repository; organization-level admin or owner roles are far too broad, violating least privilege.",
-    "reference": "https://learn.microsoft.com/training/modules/github-introduction-administration/4-how-github-organization-permission-works",
+    "correct": [
+      0,
+      1,
+      2
+    ],
+    "explanation": "Code scanning analyzes code for security vulnerabilities and errors, secret scanning detects credentials such as tokens and private keys in repository history, and Dependabot alerts identify vulnerable dependencies. Disabling automated checks leaves the required security and compliance scanning gap in the delivery workflow.",
+    "reference": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/recommendations-reference-data",
     "id": 22
   },
   {
@@ -383,18 +387,23 @@
     "id": 24
   },
   {
-    "question_type": "STANDARD",
-    "module": "Configure monitoring for a DevOps environment",
-    "question": "An operations team manages many Azure Storage accounts and wants an at-scale, ready-made view of each account's availability, latency, transactions, and capacity, with the ability to drill into failures, without deploying agents or writing queries. Which Azure Monitor capability delivers this with no configuration required?",
-    "options": [
-      "A metric alert rule on each storage account's availability metric",
-      "Storage insights, which presents a curated workbook view of storage performance, capacity, and availability",
-      "A custom Log Analytics workbook built from KQL queries against the storage diagnostic logs",
-      "Container insights pointed at the storage accounts"
+    "question_type": "YES_NO_MATRIX",
+    "module": "Analyze metrics from instrumentation",
+    "question": "A DevOps team is analyzing metrics and telemetry from an instrumented distributed application. For each statement, indicate whether it is correct.",
+    "statements": [
+      "CPU, memory, disk, and network are infrastructure performance indicators that can be inspected.",
+      "Application Insights can be used to inspect distributed tracing across application components.",
+      "Basic KQL queries can interrogate logs collected in Azure Monitor.",
+      "Application metrics make usage and application-performance analysis unnecessary."
     ],
-    "correct": 1,
-    "explanation": "Storage insights provides comprehensive, curated monitoring of Azure Storage accounts, delivering a unified at-scale view of performance, capacity, and availability with drill-down workbooks for availability, performance, failures, and capacity. The docs state it does not require enabling or configuring anything because storage metrics are collected by default. Building a custom workbook requires authoring KQL, Container insights monitors Kubernetes container workloads rather than storage accounts, and a metric alert notifies on a threshold rather than providing the curated multi-account visualization.",
-    "reference": "https://learn.microsoft.com/azure/storage/common/storage-insights-overview",
+    "correct": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "explanation": "The instrumentation objective covers infrastructure performance indicators, metrics derived from collected telemetry, distributed tracing with Azure Monitor Application Insights, and basic KQL log queries. Metrics support usage and application-performance analysis; they do not make that analysis unnecessary.",
+    "reference": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-400",
     "id": 25
   }
 ]

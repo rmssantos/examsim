@@ -93,6 +93,52 @@ class PublicRepositoryBoundaryTests(unittest.TestCase):
 
 
 class PublicMessagingTests(unittest.TestCase):
+    def test_manifest_uses_qualified_local_first_language(self):
+        manifest = json.loads(
+            (ROOT / "manifest.webmanifest").read_text(encoding="utf-8")
+        )
+        description = manifest["description"].lower()
+
+        self.assertIn("local-first", description)
+        self.assertIn("offline-capable", description)
+        self.assertNotIn("private", description)
+
+    def test_home_distinguishes_browser_questions_from_the_full_catalog(self):
+        exam_root = ROOT / "user-content" / "exams"
+        exam_ids = json.loads((exam_root / "index.json").read_text(encoding="utf-8"))
+        metadata = [
+            json.loads(
+                (exam_root / exam_id / "metadata.json").read_text(encoding="utf-8")
+            )
+            for exam_id in exam_ids
+        ]
+        bundled_total = sum(int(item["totalQuestions"]) for item in metadata)
+        fully_free_total = sum(
+            int(item["totalQuestions"])
+            for item in metadata
+            if item.get("commercialStatus", "free") == "free"
+        )
+        full_catalog_total = sum(
+            int(item["totalQuestions"])
+            if item.get("commercialStatus", "free") == "free"
+            else int(item["pro"]["questions"])
+            for item in metadata
+        )
+        self.assertEqual(bundled_total, 1070)
+        self.assertEqual(fully_free_total, 900)
+        self.assertEqual(full_catalog_total, 2849)
+
+        home = (ROOT / "index.html").read_text(encoding="utf-8")
+        self.assertIn("Questions available in this browser", home)
+        self.assertIn(
+            f"{fully_free_total:,} fully free questions",
+            home,
+        )
+        self.assertIn(
+            f"{full_catalog_total:,} across Free + Complete packs",
+            home,
+        )
+
     def test_marketing_copy_does_not_make_absolute_privacy_claims(self):
         paths = [
             ROOT / "README.md",
@@ -113,6 +159,36 @@ class PublicMessagingTests(unittest.TestCase):
             for phrase in forbidden:
                 with self.subTest(path=path.relative_to(ROOT), phrase=phrase):
                     self.assertNotIn(phrase, text)
+
+    def test_linkedin_drafts_have_one_destination_and_no_private_snapshots(self):
+        draft_paths = sorted(
+            (ROOT / "docs" / "marketing" / "linkedin-posts").glob("*.md")
+        )
+        self.assertEqual(8, len(draft_paths))
+
+        forbidden_private_markers = (
+            "urn:li:activity",
+            "members reached",
+            "followers gained",
+            "aggregate linkedin analytics supplied",
+            "top supplied post snapshot",
+        )
+        for path in draft_paths:
+            text = path.read_text(encoding="utf-8")
+            front_matter = text.split("---", 2)[1]
+            cta_match = re.search(r'^cta_url:\s*"([^"]+)"$', front_matter, re.M)
+            self.assertIsNotNone(cta_match, path.name)
+
+            draft_copy = text.split("## Draft copy", 1)[1].split(
+                "## Editorial notes", 1
+            )[0]
+            urls = re.findall(r"https://[^\s]+", draft_copy)
+            self.assertEqual([cta_match.group(1)], urls, path.name)
+
+            lowered = text.lower()
+            for marker in forbidden_private_markers:
+                with self.subTest(path=path.name, marker=marker):
+                    self.assertNotIn(marker, lowered)
 
     def test_public_privacy_page_describes_access_without_internal_tools(self):
         text = (ROOT / "privacy-and-storage.html").read_text(encoding="utf-8")

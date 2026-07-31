@@ -67,7 +67,7 @@
     {
       "icon": "fas fa-book",
       "name": "Microsoft Learn SC-900 Study Guide",
-      "url": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/"
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-900"
     },
     {
       "icon": "fas fa-laptop",
@@ -77,10 +77,10 @@
   ],
   "hasImages": false,
   "contentReview": {
-    "lastReviewed": "2026-05-20",
-    "sourceOfTruth": "Microsoft Learn certification page and practice assessment",
-    "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/",
-    "objectiveVersion": "Microsoft Learn objectives reviewed 2026-05-20"
+    "lastReviewed": "2026-07-30",
+    "sourceOfTruth": "Microsoft Learn SC-900 study guide (skills measured as of July 28, 2026)",
+    "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-900",
+    "objectiveVersion": "SC-900 skills measured as of July 28, 2026"
   },
   "objectiveDomains": [
     {
@@ -88,7 +88,7 @@
       "name": "Describe the concepts of security, compliance, and identity",
       "weightRange": "10-15%",
       "source": "Microsoft Learn SC-900 study guide",
-      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-900",
       "mappedModules": [
         "Security, Compliance & Identity Concepts",
         "Service Trust & Privacy"
@@ -99,7 +99,7 @@
       "name": "Describe the capabilities of Microsoft Entra",
       "weightRange": "25-30%",
       "source": "Microsoft Learn SC-900 study guide",
-      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-900",
       "mappedModules": [
         "Microsoft Entra"
       ]
@@ -109,7 +109,7 @@
       "name": "Describe the capabilities of Microsoft security solutions",
       "weightRange": "35-40%",
       "source": "Microsoft Learn SC-900 study guide",
-      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-900",
       "mappedModules": [
         "Azure Security",
         "Microsoft Defender for Cloud",
@@ -120,9 +120,9 @@
     {
       "code": "SCI-4",
       "name": "Describe the capabilities of Microsoft compliance solutions",
-      "weightRange": "25-30%",
+      "weightRange": "20-25%",
       "source": "Microsoft Learn SC-900 study guide",
-      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/security-compliance-and-identity-fundamentals/",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-900",
       "mappedModules": [
         "Microsoft Purview Compliance",
         "Data Lifecycle & Records",

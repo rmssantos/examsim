@@ -64,10 +64,23 @@ class MobileA11yReadinessTests(unittest.TestCase):
     def test_editor_icon_delete_buttons_have_accessible_names(self):
         js = (ROOT / "assets/js/editor.js").read_text(encoding="utf-8")
 
-        self.assertIn('aria-label="Delete statement ${idx + 1}"', js)
-        self.assertIn('aria-label="Delete sequence option ${idx + 1}"', js)
-        self.assertIn('aria-label="Delete option ${idx + 1}"', js)
-        self.assertIn('<i class="fas fa-trash" aria-hidden="true"></i>', js)
+        self.assertIn(
+            "function createOptionDeleteButton(index, itemLabel)",
+            js,
+        )
+        self.assertIn(
+            "const label = `Delete ${itemLabel} ${index + 1}`;",
+            js,
+        )
+        self.assertIn("button.setAttribute('aria-label', label);", js)
+        self.assertIn("button.title = label;", js)
+        self.assertIn("icon.className = 'fas fa-trash';", js)
+        self.assertIn("icon.setAttribute('aria-hidden', 'true');", js)
+        for item_label in ("statement", "sequence option", "option"):
+            self.assertIn(
+                f"createOptionDeleteButton(idx, '{item_label}')",
+                js,
+            )
 
     def test_mobile_exam_rail_collapses_to_top_strip(self):
         css = (ROOT / "assets/css/exam-v2.css").read_text(encoding="utf-8")

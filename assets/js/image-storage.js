@@ -155,6 +155,126 @@ class ImageStorage {
         });
     }
 
+    async replaceExamImages(examId, imageFiles) {
+        await this.ensureReady();
+        if (!this.db) {
+            throw new Error('Image storage is not available.');
+        }
+        if (!window.ExamApp.isSafeExamId(examId)) {
+            throw new Error('Invalid exam id');
+        }
+        if (!Array.isArray(imageFiles)) {
+            throw new Error('Image replacement must be an array.');
+        }
+
+        const limits = window.ExamApp.EXAM_LIMITS;
+        if (imageFiles.length > limits.maxImages) {
+            throw new Error(`Too many images. Maximum is ${limits.maxImages}.`);
+        }
+        const names = new Set();
+        let totalBytes = 0;
+        const timestamp = Date.now();
+        const records = imageFiles.map((image) => {
+            const fileName = image?.fileName;
+            if (
+                !window.ExamApp.isSafeImageFileName(fileName)
+                || names.has(fileName)
+            ) {
+                throw new Error('Invalid or duplicate image filename.');
+            }
+            names.add(fileName);
+
+            const mimeType = image?.mimeType
+                || window.ExamApp.getImageMimeType(fileName);
+            if (!limits.allowedImageMimeTypes.includes(mimeType)) {
+                throw new Error(`Unsupported image MIME type for ${fileName}.`);
+            }
+            let blob = image?.blob;
+            if (!(blob instanceof Blob)) {
+                const buffer = image?.buffer;
+                if (
+                    !(buffer instanceof ArrayBuffer)
+                    && !ArrayBuffer.isView(buffer)
+                ) {
+                    throw new Error(`Invalid image payload for ${fileName}.`);
+                }
+                blob = new Blob([buffer], { type: mimeType });
+            }
+            if (blob.size > limits.maxImageBytes) {
+                throw new Error(`Image ${fileName} is too large.`);
+            }
+            totalBytes += blob.size;
+            if (totalBytes > limits.maxTotalImageBytes) {
+                throw new Error('Images exceed the shared safety limit.');
+            }
+            const key = `${examId}_${fileName}`;
+            return {
+                image: {
+                    key,
+                    examId,
+                    fileName,
+                    blob,
+                    mimeType,
+                    size: blob.size,
+                    timestamp
+                },
+                metadata: {
+                    key,
+                    examId,
+                    fileName,
+                    mimeType,
+                    size: blob.size,
+                    timestamp
+                }
+            };
+        });
+
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction(
+                [this.storeName, 'image_metadata'],
+                'readwrite'
+            );
+            const imagesStore = transaction.objectStore(this.storeName);
+            const metadataStore = transaction.objectStore('image_metadata');
+            let pendingDeletes = 2;
+            let writesQueued = false;
+
+            const queueWrites = () => {
+                pendingDeletes -= 1;
+                if (pendingDeletes !== 0 || writesQueued) return;
+                writesQueued = true;
+                for (const record of records) {
+                    imagesStore.put(record.image);
+                    metadataStore.put(record.metadata);
+                }
+            };
+            const deleteExisting = (store) => {
+                const request = store
+                    .index('examId')
+                    .openCursor(IDBKeyRange.only(examId));
+                request.onsuccess = (event) => {
+                    const cursor = event.target.result;
+                    if (cursor) {
+                        cursor.delete();
+                        cursor.continue();
+                        return;
+                    }
+                    queueWrites();
+                };
+            };
+
+            deleteExisting(imagesStore);
+            deleteExisting(metadataStore);
+            transaction.oncomplete = () => resolve(records.length);
+            transaction.onerror = () => reject(
+                transaction.error || new Error('Image replacement failed.')
+            );
+            transaction.onabort = () => reject(
+                transaction.error || new Error('Image replacement was aborted.')
+            );
+        });
+    }
+
     async getImage(examId, fileName) {
         await this.ensureReady();
         if (!window.ExamApp.isSafeExamId(examId) || !window.ExamApp.isSafeImageFileName(fileName)) {

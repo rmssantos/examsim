@@ -46,14 +46,6 @@
 			.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 			.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 	}
-	// https-only hrefs (matches labs.js): escapeHtml stops HTML injection but not a
-	// javascript:/data: scheme on a crafted pro URL or resource link.
-	function safeHref(url) {
-		try {
-			const parsed = new URL(String(url), window.location.origin);
-			return parsed.protocol === 'https:' ? parsed.href : '#';
-		} catch (_) { return '#'; }
-	}
 	// Allowlist icon class strings (Font Awesome tokens only) before injecting them
 	// into a class attribute, per the repo guideline for JSON-derived class names.
 	function safeIconClass(raw, fallback) {
@@ -84,25 +76,41 @@
 	}
 
 	function deriveNodeState(progress) {
-		const attempts = progress && Array.isArray(progress.attempts) ? progress.attempts : [];
-		if (!attempts.length) return 'not-started';
-		const best = Number(progress && progress.bestScore) || 0;
-		return best >= PASS_THRESHOLD ? 'passed' : 'started';
+		const summary = window.ExamApp.getProgressSummary(progress);
+		if (!summary.totalAttempts) return 'not-started';
+		return summary.bestScore >= PASS_THRESHOLD && summary.completionAttempts > 0
+			? 'passed'
+			: 'started';
 	}
 
 	function progressStats(progress) {
 		const attempts = progress && Array.isArray(progress.attempts) ? progress.attempts : [];
 		if (!attempts.length) return null;
+		const summary = window.ExamApp.getProgressSummary(progress);
 		const last = attempts[attempts.length - 1];
 		let lastDate = '';
 		try { lastDate = last.date ? new Date(last.date).toLocaleDateString() : ''; } catch (_) { lastDate = ''; }
-		return { best: Number(progress.bestScore) || 0, attempts: attempts.length, lastScore: Number(last.score) || 0, lastDate };
+		return {
+			best: summary.completionAttempts > 0 ? summary.bestScore : null,
+			attempts: summary.totalAttempts,
+			lastScore: Number(last.score) || 0,
+			lastDate
+		};
 	}
 
 	async function fetchJson(url) {
 		const res = await fetch(url, { credentials: 'same-origin' });
 		if (!res.ok) throw new Error('Failed to load ' + url);
 		return res.json();
+	}
+
+	function mergeStoredRoadmapMetadata(bundledMetadata, storedRecord) {
+		return {
+			...(bundledMetadata || {}),
+			...((storedRecord && storedRecord.metadata) || {}),
+			source: 'imported',
+			trust: 'local-unverified'
+		};
 	}
 
 	// doneSet is the manual-complete set, read once per render pass (see renderIndex /
@@ -122,8 +130,8 @@
 		// preview), mirroring how the home decides ownership. An owned pack is never "pro".
 		const owned = !!state.ownedById[id];
 		const isPro = meta.commercialStatus === 'pro-preview' && !owned;
-		const attemptCount = progress && Array.isArray(progress.attempts) ? progress.attempts.length : 0;
-		const best = attemptCount ? (Number(progress.bestScore) || 0) : null;
+		const progressSummary = window.ExamApp.getProgressSummary(progress);
+		const best = progressSummary.completionAttempts > 0 ? progressSummary.bestScore : null;
 		const nodeState = deriveNodeState(progress);
 		const manualDone = state.doneSet.has(id);
 		return {
@@ -179,7 +187,7 @@
 		const s = progressStats(node.progress);
 		const progressHtml = s
 			? '<div class="rn-d-grid">' +
-				'<div><span>Best</span><strong>' + s.best + '%</strong></div>' +
+				(s.best != null ? '<div><span>Best</span><strong>' + s.best + '%</strong></div>' : '') +
 				'<div><span>Last</span><strong>' + s.lastScore + '%</strong></div>' +
 				'<div><span>Attempts</span><strong>' + s.attempts + '</strong></div>' +
 				(s.lastDate ? '<div><span>Last attempt</span><strong>' + escapeHtml(s.lastDate) + '</strong></div>' : '') +
@@ -195,10 +203,16 @@
 					return '<li><i class="' + safeIconClass(icon, 'fas fa-check-circle') + '" aria-hidden="true"></i> ' + escapeHtml(name) + '</li>';
 				}).join('') + '</ul></div>'
 			: '';
-		const resourcesHtml = resources.length
+		const resourceLinks = resources.map(r => {
+			const href = window.ExamApp.resourceUrlForTrust(r.url, m);
+			if (!href) return '';
+			return '<a href="' + escapeHtml(href) + '" target="_blank" rel="noopener noreferrer">' +
+				'<i class="' + safeIconClass(r.icon, 'fas fa-link') + '" aria-hidden="true"></i> ' +
+				escapeHtml(r.name || 'Reference') + '</a>';
+		}).join('');
+		const resourcesHtml = resourceLinks
 			? '<div class="rn-d-block"><h4>Study resources</h4><div class="rn-d-resources">' +
-				resources.map(r => '<a href="' + escapeHtml(safeHref(r.url)) + '" target="_blank" rel="noopener noreferrer">' +
-					'<i class="' + safeIconClass(r.icon, 'fas fa-link') + '" aria-hidden="true"></i> ' + escapeHtml(r.name || 'Reference') + '</a>').join('') +
+				resourceLinks +
 				'</div></div>'
 			: '';
 		return '<div class="rn-d-block"><h4>Exam information</h4><div class="rn-d-grid">' +
@@ -322,7 +336,7 @@
 				(Array.isArray(pro.highlights) && pro.highlights.length
 					? '<ul class="pro-modal-list">' + pro.highlights.map(h => '<li><i class="fas fa-check" aria-hidden="true"></i> ' + escapeHtml(h) + '</li>').join('') + '</ul>'
 					: '') +
-				'<a class="pro-modal-buy" href="' + escapeHtml(safeHref(pro.url)) + '" target="_blank" rel="noopener noreferrer">' +
+				'<a class="pro-modal-buy" href="' + escapeHtml(window.ExamApp.safeExternalUrl(pro.url) || '#') + '" target="_blank" rel="noopener noreferrer">' +
 					'<i class="fas fa-store" aria-hidden="true"></i> Get the full pack' + (pro.price ? ' (' + escapeHtml(pro.price) + ')' : '') + '</a>' +
 				'<div class="pro-modal-divider"></div>' +
 				'<p class="pro-modal-activate-text">Already purchased? Import your pack file and enter your license key on the homepage to activate it on this device.</p>' +
@@ -352,7 +366,13 @@
 		const ids = [...new Set(state.tracks.flatMap(t => t.packs.map(e => resolveEntry(e).id)))];
 		const metas = await Promise.all(ids.map(id =>
 			fetchJson('user-content/exams/' + id + '/metadata.json').catch(() => ({ id }))));
-		ids.forEach((id, i) => { state.metaById[id] = metas[i]; });
+		ids.forEach((id, i) => {
+			state.metaById[id] = {
+				...(metas[i] || {}),
+				source: 'bundled',
+				trust: 'bundled'
+			};
+		});
 		// Detect which packs the learner already owns. When the full pack is imported its
 		// metadata no longer carries the preview flag, exactly as the home reads it, so we
 		// take the stored metadata as the source of truth over the bundled preview file.
@@ -362,7 +382,7 @@
 				const stored = rec && rec.metadata;
 				if (stored && !stored.preview) {
 					state.ownedById[id] = true;
-					state.metaById[id] = { ...state.metaById[id], ...stored };
+					state.metaById[id] = mergeStoredRoadmapMetadata(state.metaById[id], rec);
 				}
 			} catch (_) { /* storage unavailable - keep the bundled preview */ }
 		}));

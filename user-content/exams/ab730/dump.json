@@ -1271,7 +1271,7 @@
   {
     "id": 77,
     "module": "Prompting and Conversation Management",
-    "question": "What is a good reason to rename a Copilot chat?",
+    "question": "What is a good reason to rename a Microsoft 365 Copilot chat?",
     "options": [
       "To remove all citations",
       "To make a useful conversation easier to find later",
@@ -1279,7 +1279,7 @@
       "To change source permissions"
     ],
     "correct": 1,
-    "explanation": "Copilot keeps chats in a history list, and a descriptive name makes a useful conversation easy to locate and resume later. Renaming does not change citations, source permissions, or the legal status of any output.",
+    "explanation": "Microsoft 365 Copilot keeps chats in a history list, and a descriptive name makes a useful conversation easy to locate and resume later. Renaming does not change citations, source permissions, or the legal status of any output.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/en-us/training/paths/explore-microsoft-365-copilot-business-chat/"
   },
@@ -1370,7 +1370,7 @@
   {
     "id": 83,
     "module": "Prompting and Conversation Management",
-    "question": "Which actions help manage Copilot conversations?",
+    "question": "Which actions help manage Microsoft 365 Copilot conversations?",
     "options": [
       "Find prior chats by topic",
       "Delete conversations that are no longer needed",
@@ -1382,7 +1382,7 @@
       1,
       2
     ],
-    "explanation": "Conversation management helps organize work, while old context may become outdated.",
+    "explanation": "Microsoft 365 Copilot conversation management helps organize work, while old context may become outdated.",
     "question_type": "MULTI",
     "reference": "https://learn.microsoft.com/en-us/training/paths/explore-microsoft-365-copilot-business-chat/"
   },

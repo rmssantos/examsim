@@ -24,8 +24,6 @@
 
     function cleanRoutesSupported() {
         if (isFileMode()) return false;
-        const host = window.location.hostname;
-        if (host === 'localhost' || host === '127.0.0.1') return true;
         return Boolean(navigator.serviceWorker?.controller);
     }
 

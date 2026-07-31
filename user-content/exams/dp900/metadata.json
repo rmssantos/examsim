@@ -2,7 +2,7 @@
   "id": "dp900",
   "name": "DP-900",
   "fullName": "Microsoft Azure Data Fundamentals",
-  "description": "Free Microsoft Azure Data Fundamentals (DP-900) practice exam. Original questions written from official Microsoft Learn documentation, aligned to the DP-900 study guide (skills measured as of November 1, 2024). Not real exam questions.",
+  "description": "Free Microsoft Azure Data Fundamentals (DP-900) practice exam. Original questions written from official Microsoft Learn documentation, aligned to the DP-900 study guide (skills measured as of July 21, 2026). Not real exam questions.",
   "duration": 45,
   "questionCount": 50,
   "passScore": 70,
@@ -28,7 +28,7 @@
       "name": "Describe core data concepts",
       "weightRange": "25-30%",
       "source": "Microsoft DP-900 study guide",
-      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-900",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-900",
       "mappedModules": [
         "Ways to Represent Data and Common File Formats",
         "Types of Databases and Data Storage Options",
@@ -40,7 +40,7 @@
       "name": "Identify considerations for relational data on Azure",
       "weightRange": "20-25%",
       "source": "Microsoft DP-900 study guide",
-      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-900",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-900",
       "mappedModules": [
         "Relational Concepts, Normalization, and SQL",
         "Azure Relational Data Services"
@@ -51,7 +51,7 @@
       "name": "Describe considerations for working with non-relational data on Azure",
       "weightRange": "15-20%",
       "source": "Microsoft DP-900 study guide",
-      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-900",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-900",
       "mappedModules": [
         "Azure Storage: Blob, File, and Table",
         "Azure Cosmos DB Capabilities and APIs"
@@ -62,7 +62,7 @@
       "name": "Describe an analytics workload on Azure",
       "weightRange": "25-30%",
       "source": "Microsoft DP-900 study guide",
-      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-900",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-900",
       "mappedModules": [
         "Large-Scale Analytics: Ingestion, Processing, and Data Stores",
         "Azure Databricks, Synapse, and Microsoft Fabric",
@@ -118,16 +118,16 @@
     }
   ],
   "contentReview": {
-    "lastReviewed": "2026-06-11",
-    "sourceOfTruth": "Microsoft DP-900 study guide (skills measured as of November 1, 2024)",
-    "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-900",
-    "objectiveVersion": "DP-900 skills measured as of November 1, 2024"
+    "lastReviewed": "2026-07-30",
+    "sourceOfTruth": "Microsoft DP-900 study guide (skills measured as of July 21, 2026)",
+    "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-900",
+    "objectiveVersion": "DP-900 skills measured as of July 21, 2026"
   },
   "resources": [
     {
       "icon": "fas fa-book",
       "name": "Microsoft DP-900 Study Guide",
-      "url": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/dp-900"
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-900"
     },
     {
       "icon": "fas fa-graduation-cap",

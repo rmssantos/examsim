@@ -14,30 +14,38 @@ class DocumentationLinkTests(unittest.TestCase):
         if not node:
             self.skipTest("node not available")
 
-        script_path = ROOT / "assets" / "js" / "script-multi-exam.js"
+        script_path = ROOT / "assets" / "js" / "utils.js"
         node_script = r"""
 const fs = require('fs');
 const vm = require('vm');
 const source = fs.readFileSync(process.argv[1], 'utf8');
-const start = source.indexOf('const OFFICIAL_DOCUMENTATION_HOSTS');
-const end = source.indexOf('class TimerManager', start);
-if (start < 0 || end < 0) throw new Error('documentation URL helper not found');
-
-const sandbox = { URL };
-vm.runInNewContext(
-  source.slice(start, end) + `
-    ;result = {
-      awsDocs: isOfficialDocumentationUrl('https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html'),
-      awsSite: isOfficialDocumentationUrl('https://aws.amazon.com/documentation/'),
-      microsoftDocs: isOfficialDocumentationUrl('https://learn.microsoft.com/en-us/azure/'),
-      phishingSuffix: isOfficialDocumentationUrl('https://docs.aws.amazon.com.evil.example/login'),
-      credentialTrick: isOfficialDocumentationUrl('https://docs.aws.amazon.com@evil.example/login'),
-      arbitraryHttps: isOfficialDocumentationUrl('https://example.com/docs'),
-      insecureHttp: isOfficialDocumentationUrl('http://docs.aws.amazon.com/example')
-    };
-  `,
-  sandbox
-);
+const sandbox = {
+  window: {
+    ExamApp: {},
+    location: { hostname: 'examplar.app', search: '' }
+  },
+  localStorage: {
+    getItem() { return null; },
+    setItem() {},
+    removeItem() {}
+  },
+  document: {},
+  URL,
+  URLSearchParams
+};
+vm.runInNewContext(source, sandbox);
+const check = sandbox.window.ExamApp.isOfficialDocumentationUrl;
+sandbox.result = typeof check === 'function' ? {
+  awsDocs: check('https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html'),
+  awsSite: check('https://aws.amazon.com/documentation/'),
+  microsoftDocs: check('https://learn.microsoft.com/en-us/azure/'),
+  phishingSuffix: check('https://docs.aws.amazon.com.evil.example/login'),
+  credentialTrick: check('https://docs.aws.amazon.com@evil.example/login'),
+  allowedHostCredentials: check('https://user:pass@docs.aws.amazon.com/example'),
+  arbitraryHttps: check('https://example.com/docs'),
+  insecureHttp: check('http://docs.aws.amazon.com/example'),
+  nonDefaultPort: check('https://docs.aws.amazon.com:8443/example')
+} : null;
 console.log(JSON.stringify(sandbox.result));
 """
         result = subprocess.run(
@@ -55,8 +63,10 @@ console.log(JSON.stringify(sandbox.result));
                 "microsoftDocs": True,
                 "phishingSuffix": False,
                 "credentialTrick": False,
+                "allowedHostCredentials": False,
                 "arbitraryHttps": False,
                 "insecureHttp": False,
+                "nonDefaultPort": False,
             },
             json.loads(result.stdout),
         )
@@ -64,7 +74,10 @@ console.log(JSON.stringify(sandbox.result));
     def test_markdown_conversion_keeps_disallowed_links_literal(self):
         script = (ROOT / "assets" / "js" / "script-multi-exam.js").read_text(encoding="utf-8")
 
-        self.assertIn("(match, label, url) => isOfficialDocumentationUrl(url)", script)
+        self.assertIn(
+            "(match, label, url) => window.ExamApp.isOfficialDocumentationUrl(url)",
+            script,
+        )
         self.assertIn(": match", script)
         self.assertNotIn(
             '\'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>\'',

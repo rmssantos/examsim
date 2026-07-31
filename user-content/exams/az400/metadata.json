@@ -32,18 +32,18 @@
   "preview": true,
   "contentOrigin": "original",
   "contentReview": {
-    "lastReviewed": "2026-06-10",
-    "sourceOfTruth": "Microsoft Learn AZ-400 study guide and certification page",
-    "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-400",
-    "objectiveVersion": "Skills measured as of April 24, 2026"
+    "lastReviewed": "2026-07-30",
+    "sourceOfTruth": "Microsoft Learn AZ-400 study guide (skills measured as of July 27, 2026)",
+    "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-400",
+    "objectiveVersion": "AZ-400 skills measured as of July 27, 2026"
   },
   "objectiveDomains": [
     {
       "code": "AZ400-1",
       "name": "Design and implement processes and communications",
       "weightRange": "10-15%",
-      "source": "AZ-400 skills measured (as of April 24, 2026)",
-      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-400",
+      "source": "AZ-400 skills measured as of July 27, 2026",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-400",
       "mappedModules": [
         "Traceability and flow of work",
         "DevOps metrics and queries",
@@ -54,8 +54,8 @@
       "code": "AZ400-2",
       "name": "Design and implement a source control strategy",
       "weightRange": "10-15%",
-      "source": "AZ-400 skills measured (as of April 24, 2026)",
-      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-400",
+      "source": "AZ-400 skills measured as of July 27, 2026",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-400",
       "mappedModules": [
         "Branching strategy and pull request workflow",
         "Repository configuration and management"
@@ -65,8 +65,8 @@
       "code": "AZ400-3",
       "name": "Design and implement build and release pipelines",
       "weightRange": "50-55%",
-      "source": "AZ-400 skills measured (as of April 24, 2026)",
-      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-400",
+      "source": "AZ-400 skills measured as of July 27, 2026",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-400",
       "mappedModules": [
         "Package management strategy",
         "Pipeline testing and quality gates",
@@ -80,8 +80,8 @@
       "code": "AZ400-4",
       "name": "Develop a security and compliance plan",
       "weightRange": "10-15%",
-      "source": "AZ-400 skills measured (as of April 24, 2026)",
-      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-400",
+      "source": "AZ-400 skills measured as of July 27, 2026",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-400",
       "mappedModules": [
         "Authentication and authorization methods",
         "Managing sensitive information in automation",
@@ -92,8 +92,8 @@
       "code": "AZ400-5",
       "name": "Implement an instrumentation strategy",
       "weightRange": "5-10%",
-      "source": "AZ-400 skills measured (as of April 24, 2026)",
-      "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-400",
+      "source": "AZ-400 skills measured as of July 27, 2026",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-400",
       "mappedModules": [
         "Configure monitoring for a DevOps environment",
         "Analyze metrics from instrumentation"
@@ -170,7 +170,7 @@
     {
       "icon": "fas fa-book",
       "name": "Microsoft Learn AZ-400 Study Guide",
-      "url": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-400"
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-400"
     },
     {
       "icon": "fas fa-graduation-cap",

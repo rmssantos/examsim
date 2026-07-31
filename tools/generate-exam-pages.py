@@ -89,6 +89,9 @@ def is_free(meta: dict) -> bool:
 
 def build_facts(meta: dict) -> str:
     bank_label = "Question bank" if is_free(meta) else "Free preview questions"
+    review = meta.get("contentReview")
+    if not isinstance(review, dict):
+        review = {}
     pairs = [
         ("Vendor", meta.get("vendor")),
         ("Certification", exam_code(meta)),
@@ -97,6 +100,8 @@ def build_facts(meta: dict) -> str:
         (bank_label, meta.get("totalQuestions")),
         ("Time limit", f"{meta.get('duration')} min" if meta.get("duration") is not None else None),
         ("Pass score", f"{meta.get('passScore')}%" if meta.get("passScore") is not None else None),
+        ("Objective version", review.get("objectiveVersion")),
+        ("Last reviewed", review.get("lastReviewed")),
     ]
     pro = meta.get("pro") or {}
     if pro.get("questions"):
@@ -336,10 +341,6 @@ def page_kicker(meta: dict) -> str:
     return "Free practice exam" if is_free(meta) else "Free preview"
 
 
-def cta_label(meta: dict) -> str:
-    return "Start practicing free" if is_free(meta) else "Start the free preview"
-
-
 def _parse_price(price: str) -> tuple:
     """Split a price like '19 EUR' into ('19', 'EUR'); default currency EUR."""
     parts = str(price or "").split()
@@ -482,12 +483,21 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
         "og_image": OG_IMAGE,
         "theme_color": THEME_COLOR,
         "exam_code": esc(code),
+        "exam_id": esc(meta["id"]),
         "full_name": esc(full),
         "intro": esc(intro),
         "kicker": esc(page_kicker(meta)),
-        "cta_label": esc(cta_label(meta)),
         "root": root,
-        "cta_url": f"{root}exam.html?exam={esc(meta['id'])}",
+        "diagnostic_cta_url": (
+            f"{root}exam.html?exam={esc(meta['id'])}"
+            "&amp;session=diagnostic&amp;count=10"
+        ),
+        "full_cta_url": f"{root}exam.html?exam={esc(meta['id'])}",
+        "full_cta_label": (
+            "Start full practice"
+            if is_free(meta)
+            else "Start full preview"
+        ),
         "facts": build_facts(meta),
         "domains": build_domains(meta),
         "modules": build_modules(meta),
@@ -502,7 +512,11 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
 
 
 def render_sitemap(all_exams: list) -> str:
-    entries = [(f"{SITE}/", "1.0"), (f"{SITE}/exams/", "0.9")]
+    entries = [
+        (f"{SITE}/", "1.0"),
+        (f"{SITE}/exams/", "0.9"),
+        (f"{SITE}/roadmaps.html", "0.8"),
+    ]
     entries += [(f"{SITE}/exams/{e['id']}/", "0.8") for e in all_exams]
     entries.append((f"{SITE}/privacy-and-storage.html", "0.3"))
     body = "\n".join(

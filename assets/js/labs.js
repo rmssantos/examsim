@@ -59,19 +59,6 @@
 
   const SAFE_IMAGE_RE = /^[A-Za-z0-9_. -]{1,128}\.(?:jpg|jpeg|png|gif|webp)$/i;
 
-  // Only allow https in hrefs (matches the validator's official-doc gate). escapeHtml
-  // stops HTML injection but not a javascript:/data: scheme, and imported packs are not
-  // re-validated at runtime, so a crafted lab reference or pro URL could otherwise
-  // execute on click or downgrade the link to plain HTTP.
-  function safeHref(url) {
-    try {
-      const parsed = new URL(String(url), window.location.origin);
-      return parsed.protocol === 'https:' ? parsed.href : '#';
-    } catch (_) {
-      return '#';
-    }
-  }
-
   function getQueryExamId() {
     return new URLSearchParams(window.location.search).get('exam') || '';
   }
@@ -96,12 +83,17 @@
     return next.includes(labId);
   }
 
-  function emptyState(message, metadata) {
+  function emptyState(message, exam) {
     if (nav) nav.innerHTML = '<span class="cr-palette-label">Labs</span>';
     if (packSub) packSub.textContent = '';
+    const trustedBundled = window.ExamApp?.isBundledTrustedExam?.(exam) === true;
+    const metadata = exam && exam.metadata;
     const proUrl = metadata && metadata.pro && metadata.pro.url;
-    const upsell = proUrl
-      ? `<a class="btn btn-primary" href="${escapeHtml(safeHref(proUrl))}" target="_blank" rel="noopener noreferrer">Get the full pack</a>`
+    const safeProUrl = trustedBundled && proUrl
+      ? window.ExamApp.safeExternalUrl(proUrl)
+      : null;
+    const upsell = safeProUrl
+      ? `<a class="btn btn-primary" href="${escapeHtml(safeProUrl)}" target="_blank" rel="noopener noreferrer">Get the full pack</a>`
       : '';
     workspace.innerHTML = `<div class="labs-empty"><p>${escapeHtml(message)}</p>${upsell}</div>`;
   }
@@ -150,13 +142,24 @@
       + '</li>';
   }
 
-  function workspaceMarkup(lab, examId, isBundled) {
+  function workspaceMarkup(lab, examId, examData) {
+    const isBundled = window.ExamApp.isBundledTrustedExam(examData);
     const prereqs = Array.isArray(lab.prerequisites) ? lab.prerequisites : [];
     const steps = Array.isArray(lab.steps) ? lab.steps : [];
     const cleanup = Array.isArray(lab.cleanup) ? lab.cleanup : [];
     const refs = Array.isArray(lab.references) ? lab.references : [];
     const done = isDone(examId, lab.id);
     const costLine = `${lab.estCost ? formatInline(lab.estCost) + ' ' : ''}Your account, your cost: Examplar is not responsible for any cloud charges.`;
+    const referencesMarkup = refs.map((reference) => {
+      const label = escapeHtml(reference && (reference.label || reference.url));
+      const href = window.ExamApp.resourceUrlForTrust(
+        reference && reference.url,
+        examData
+      );
+      return href
+        ? `<li><a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${label}</a></li>`
+        : '';
+    }).join('');
 
     return `
       <article class="lab-detail">
@@ -178,7 +181,7 @@
 
         ${cleanup.length ? `<section class="lab-section lab-cleanup"><h2 class="lab-section-title"><i class="fas fa-broom" aria-hidden="true"></i> Clean up (avoid charges)</h2><ul class="lab-list">${cleanup.map((c) => `<li>${formatInline(c)}</li>`).join('')}</ul></section>` : ''}
 
-        ${refs.length ? `<section class="lab-section lab-refs"><h2 class="lab-section-title">Official references</h2><ul class="lab-list">${refs.map((r) => `<li><a href="${escapeHtml(safeHref(r.url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.label || r.url)}</a></li>`).join('')}</ul></section>` : ''}
+        ${referencesMarkup ? `<section class="lab-section lab-refs"><h2 class="lab-section-title">Official references</h2><ul class="lab-list">${referencesMarkup}</ul></section>` : ''}
 
         <div class="lab-actions">
           <button type="button" class="btn btn-primary" id="lab-done-btn" data-lab-id="${escapeHtml(lab.id)}">
@@ -190,25 +193,25 @@
       </article>`;
   }
 
-  function render(examId, metadata, labs, selectedId, isBundled) {
+  function render(examId, metadata, labs, selectedId, examData) {
     const selected = labs.find((l) => l.id === selectedId) || labs[0];
     const name = (metadata && (metadata.name || metadata.certificationCode)) || examId.toUpperCase();
     if (packBadge) packBadge.textContent = `${name} hands-on labs`;
     if (packSub) packSub.textContent = `${labs.length} lab${labs.length === 1 ? '' : 's'} in your own free-tier account`;
 
     nav.innerHTML = navMarkup(labs, examId, selected.id);
-    workspace.innerHTML = workspaceMarkup(selected, examId, isBundled);
+    workspace.innerHTML = workspaceMarkup(selected, examId, examData);
 
     nav.querySelectorAll('.labs-nav-item').forEach((btn) => {
       btn.addEventListener('click', () => {
-        render(examId, metadata, labs, btn.dataset.labId, isBundled);
+        render(examId, metadata, labs, btn.dataset.labId, examData);
         workspace.scrollIntoView({ block: 'start', behavior: 'smooth' });
       });
     });
     const doneBtn = document.getElementById('lab-done-btn');
     doneBtn?.addEventListener('click', () => {
       toggleDone(examId, doneBtn.dataset.labId);
-      render(examId, metadata, labs, selected.id, isBundled);
+      render(examId, metadata, labs, selected.id, examData);
     });
   }
 
@@ -236,16 +239,14 @@
     // (null/non-object or missing a usable id) before rendering instead of crashing on it.
     const labs = (Array.isArray(exam.labs) ? exam.labs : [])
       .filter((lab) => lab && typeof lab === 'object' && typeof lab.id === 'string' && lab.id);
-    const isBundled = exam.source === 'bundled';
-
     const name = (metadata && (metadata.fullName || metadata.name)) || examId.toUpperCase();
     document.title = `${name} labs | Examplar`;
 
     if (!labs.length) {
-      emptyState('This pack does not include hands-on labs yet.', metadata);
+      emptyState('This pack does not include hands-on labs yet.', exam);
       return;
     }
-    render(examId, metadata, labs, labs[0].id, isBundled);
+    render(examId, metadata, labs, labs[0].id, exam);
   }
 
   if (document.readyState === 'loading') {

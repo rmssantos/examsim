@@ -6,12 +6,21 @@
     const CONFIG = Object.freeze({
         connectionString: '__APPINSIGHTS_CONNECTION_STRING__',
         optOutKey: 'exam_analytics_opt_out',
-        analyticsVersion: '1.2.0',
+        attributionKey: 'exam_analytics_attribution',
+        analyticsVersion: '1.3.0',
         publicExamIds: Object.freeze(['ab730', 'ab731', 'sc900', 'az900', 'az104', 'saac03', 'clfc02', 'ai901', 'az305', 'az400', 'dp900', 'dp700', 'ai103', 'sc300'])
     });
 
     const connection = parseConnectionString(CONFIG.connectionString);
     const publicExamIds = new Set(CONFIG.publicExamIds);
+    const campaignParameters = Object.freeze({
+        ref: 'acquisition_ref',
+        utm_source: 'campaign_source',
+        utm_medium: 'campaign_medium',
+        utm_campaign: 'campaign_name',
+        utm_content: 'campaign_content'
+    });
+    const campaignPropertyNames = new Set(Object.values(campaignParameters));
 
     function parseConnectionString(value) {
         return String(value || '').split(';').reduce((result, part) => {
@@ -43,6 +52,32 @@
     function safeLocalStorageRemove(key) {
         try {
             localStorage.removeItem(key);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    function safeSessionStorageGet(key) {
+        try {
+            return sessionStorage.getItem(key);
+        } catch (_) {
+            return null;
+        }
+    }
+
+    function safeSessionStorageSet(key, value) {
+        try {
+            sessionStorage.setItem(key, value);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    function safeSessionStorageRemove(key) {
+        try {
+            sessionStorage.removeItem(key);
             return true;
         } catch (_) {
             return false;
@@ -100,28 +135,73 @@
         }
     }
 
-    function attributionProperties() {
-        const properties = {};
-
-        try {
-            const params = new URL(window.location.href).searchParams;
-            const campaignParameters = {
-                ref: 'acquisition_ref',
-                utm_source: 'campaign_source',
-                utm_medium: 'campaign_medium',
-                utm_campaign: 'campaign_name'
-            };
-            Object.entries(campaignParameters).forEach(([parameter, property]) => {
-                const value = sanitizeAttributionValue(params.get(parameter));
-                if (value) properties[property] = value;
-            });
-        } catch (_) {
-            // Ignore malformed or unavailable page URLs.
+    function sanitizeAttributionValue(value) {
+        const raw = String(value ?? '').trim();
+        if (!raw || !/^[A-Za-z0-9][A-Za-z0-9 _.-]{0,79}$/.test(raw)) {
+            return '';
         }
+        return normalizeString(raw, 80).toLowerCase();
+    }
 
+    function sanitizeReferrerHostname(value) {
+        const hostname = String(value ?? '').trim().toLowerCase();
+        if (
+            !hostname
+            || hostname.length > 253
+            || !/^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$/.test(hostname)
+            || hostname.includes('..')
+        ) {
+            return '';
+        }
+        return hostname;
+    }
+
+    function sanitizeAttributionRecord(value) {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+        const properties = {};
+        campaignPropertyNames.forEach((property) => {
+            const sanitized = sanitizeAttributionValue(value[property]);
+            if (sanitized) properties[property] = sanitized;
+        });
+        const referrerHost = sanitizeReferrerHostname(value.referrer_host);
+        if (referrerHost) properties.referrer_host = referrerHost;
+        return properties;
+    }
+
+    function readStoredAttribution() {
+        const raw = safeSessionStorageGet(CONFIG.attributionKey);
+        if (!raw) return {};
+        try {
+            const properties = sanitizeAttributionRecord(JSON.parse(raw));
+            if (Object.keys(properties).length === 0) {
+                safeSessionStorageRemove(CONFIG.attributionKey);
+                return {};
+            }
+            const sanitized = JSON.stringify(properties);
+            if (sanitized !== raw) {
+                safeSessionStorageSet(CONFIG.attributionKey, sanitized);
+            }
+            return properties;
+        } catch (_) {
+            safeSessionStorageRemove(CONFIG.attributionKey);
+            return {};
+        }
+    }
+
+    function writeStoredAttribution(properties) {
+        const sanitized = sanitizeAttributionRecord(properties);
+        if (Object.keys(sanitized).length === 0) {
+            safeSessionStorageRemove(CONFIG.attributionKey);
+            return {};
+        }
+        safeSessionStorageSet(CONFIG.attributionKey, JSON.stringify(sanitized));
+        return sanitized;
+    }
+
+    function externalReferrerHostname() {
         try {
             const referrer = new URL(String(document.referrer || ''));
-            const hostname = referrer.hostname.toLowerCase();
+            const hostname = sanitizeReferrerHostname(referrer.hostname);
             const isSamePublicSite = isPublicSiteHost(hostname) && isPublicSiteHost();
             if (
                 ['http:', 'https:'].includes(referrer.protocol)
@@ -129,21 +209,48 @@
                 && hostname !== String(window.location.hostname || '').toLowerCase()
                 && !isSamePublicSite
             ) {
-                properties.referrer_host = hostname;
+                return hostname;
             }
         } catch (_) {
             // Direct visits and invalid referrers have no attribution property.
         }
-
-        return properties;
+        return '';
     }
 
-    function sanitizeAttributionValue(value) {
-        const raw = String(value ?? '').trim();
-        if (!raw || raw.length > 80 || !/^[A-Za-z0-9][A-Za-z0-9 _.-]*$/.test(raw)) {
-            return '';
+    function attributionProperties() {
+        if (!isPublicSiteHost() || isOptedOut()) {
+            safeSessionStorageRemove(CONFIG.attributionKey);
+            return {};
         }
-        return normalizeString(raw, 80).toLowerCase();
+
+        let params = null;
+        try {
+            params = new URL(window.location.href).searchParams;
+        } catch (_) {
+            // Malformed URLs can still inherit a previously validated tab record.
+        }
+
+        const hasExplicitCampaign = Boolean(
+            params && Object.keys(campaignParameters).some(parameter => params.has(parameter))
+        );
+        if (hasExplicitCampaign) {
+            const properties = {};
+            Object.entries(campaignParameters).forEach(([parameter, property]) => {
+                const value = sanitizeAttributionValue(params.get(parameter));
+                if (value) properties[property] = value;
+            });
+            const referrerHost = externalReferrerHostname();
+            if (referrerHost) properties.referrer_host = referrerHost;
+            return writeStoredAttribution(properties);
+        }
+
+        const stored = readStoredAttribution();
+        if (Object.keys(stored).length > 0) return stored;
+
+        const referrerHost = externalReferrerHostname();
+        return referrerHost
+            ? writeStoredAttribution({ referrer_host: referrerHost })
+            : {};
     }
 
     function normalizeString(value, maxLength = 80) {
@@ -183,8 +290,40 @@
         return sanitized;
     }
 
+    function findRuntimeExam(examId) {
+        const registries = [
+            window.userExams,
+            window.ExamApp?.userExams,
+            window.examSimulator?.examData,
+            window.ExamApp?.examSimulator?.examData
+        ];
+        for (const registry of registries) {
+            if (
+                registry
+                && typeof registry === 'object'
+                && Object.prototype.hasOwnProperty.call(registry, examId)
+            ) {
+                return { found: true, exam: registry[examId] };
+            }
+        }
+        return { found: false, exam: null };
+    }
+
     function getExamProperties(examId) {
         const normalized = String(examId || '').trim().toLowerCase();
+        const runtime = findRuntimeExam(normalized);
+        if (runtime.found) {
+            if (runtime.exam?.source === 'bundled' && runtime.exam?.trust === 'bundled') {
+                return { exam_id: normalized, exam_source: 'bundled' };
+            }
+            if (runtime.exam?.source === 'imported' && runtime.exam?.trust === 'local-unverified') {
+                return { exam_id: 'imported', exam_source: 'imported' };
+            }
+            return { exam_id: 'unknown', exam_source: 'unknown' };
+        }
+
+        // Generated landing pages do not load the runtime pack registry. Their
+        // immutable public catalog IDs remain the only bundled provenance signal.
         if (publicExamIds.has(normalized)) {
             return { exam_id: normalized, exam_source: 'bundled' };
         }
@@ -310,21 +449,70 @@
         return sendEnvelope(buildPageViewEnvelope());
     }
 
-    function trackExamStarted(examId, details = {}) {
-        return trackEvent('exam_started', getExamProperties(examId), {
-            question_count: details.questionCount
+    function normalizeSessionType(value) {
+        const normalized = String(value || '').trim().toLowerCase();
+        return ['full', 'diagnostic', 'study'].includes(normalized) ? normalized : 'unknown';
+    }
+
+    function boundedSessionMeasurements(details = {}) {
+        const measurements = {};
+        if (
+            typeof details.questionCount === 'number'
+            && Number.isInteger(details.questionCount)
+            && details.questionCount >= 1
+            && details.questionCount <= 1000
+        ) {
+            measurements.question_count = details.questionCount;
+        }
+        if (
+            typeof details.durationMinutes === 'number'
+            && Number.isFinite(details.durationMinutes)
+            && details.durationMinutes >= 1
+            && details.durationMinutes <= 1440
+        ) {
+            measurements.duration_minutes = details.durationMinutes;
+        }
+        return measurements;
+    }
+
+    function trackLandingCtaClicked(examId, action) {
+        const normalizedAction = String(action || '').trim().toLowerCase();
+        if (!['diagnostic', 'full'].includes(normalizedAction)) return false;
+        return trackEvent('landing_cta_clicked', {
+            ...getExamProperties(examId),
+            action: normalizedAction
         });
+    }
+
+    function trackSessionConfigured(examId, details = {}) {
+        return trackEvent('session_configured', {
+            ...getExamProperties(examId),
+            session_type: normalizeSessionType(details.sessionType)
+        }, boundedSessionMeasurements(details));
+    }
+
+    function trackExamFirstAnswered(examId, details = {}) {
+        return trackEvent('exam_first_answered', {
+            ...getExamProperties(examId),
+            session_type: normalizeSessionType(details.sessionType)
+        });
+    }
+
+    function trackExamStarted(examId, details = {}) {
+        return trackEvent('exam_started', {
+            ...getExamProperties(examId),
+            session_type: normalizeSessionType(details.sessionType)
+        }, boundedSessionMeasurements(details));
     }
 
     function trackExamCompleted(examId, details = {}) {
         return trackEvent('exam_completed', {
             ...getExamProperties(examId),
+            session_type: normalizeSessionType(details.sessionType),
             passed: Boolean(details.passed),
             score_bucket: scoreBucket(details.score),
             duration_bucket: durationBucket(details.timeSpent)
-        }, {
-            question_count: details.questionCount
-        });
+        }, boundedSessionMeasurements(details));
     }
 
     function trackProUnlockClicked(examId) {
@@ -451,6 +639,9 @@
         const persisted = disabled
             ? safeLocalStorageSet(CONFIG.optOutKey, 'true')
             : safeLocalStorageRemove(CONFIG.optOutKey);
+        if (disabled) {
+            safeSessionStorageRemove(CONFIG.attributionKey);
+        }
         if (persisted) updatePrivacyButtonState();
         return persisted;
     }
@@ -595,7 +786,25 @@
         updatePrivacyButtonState();
     }
 
+    let landingCtaHandlerInstalled = false;
+
+    function installLandingCtaTracking() {
+        if (landingCtaHandlerInstalled) return;
+        landingCtaHandlerInstalled = true;
+        document.addEventListener('click', (event) => {
+            const target = event.target;
+            if (!target || typeof target.closest !== 'function') return;
+            const cta = target.closest('[data-analytics-event="landing_cta_clicked"]');
+            if (!cta) return;
+            trackLandingCtaClicked(
+                cta.dataset?.analyticsExam,
+                cta.dataset?.analyticsAction
+            );
+        });
+    }
+
     function init() {
+        installLandingCtaTracking();
         injectPrivacyButton();
         trackPageView();
     }
@@ -604,6 +813,9 @@
     window.ExamApp.analytics = Object.freeze({
         trackEvent,
         trackPageView,
+        trackLandingCtaClicked,
+        trackSessionConfigured,
+        trackExamFirstAnswered,
         trackExamStarted,
         trackExamCompleted,
         trackProUnlockClicked,

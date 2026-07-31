@@ -7,6 +7,30 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class HomeHeaderLayoutTests(unittest.TestCase):
+    def test_home_has_one_intent_heading_and_a_neutral_wordmark(self):
+        html = (ROOT / "index.html").read_text(encoding="utf-8")
+        headings = re.findall(r"<h1\b[^>]*>(.*?)</h1>", html, flags=re.IGNORECASE | re.DOTALL)
+        heading_text = re.sub(r"<[^>]+>", "", headings[0]) if headings else ""
+
+        self.assertEqual(len(headings), 1)
+        self.assertIn("Certification practice", heading_text)
+        self.assertIn("built like a cockpit", heading_text)
+
+        topbar = html[html.index("cr-topbar"):html.index("cr-hero-zone")]
+        self.assertNotRegex(topbar, r"<h1\b")
+        self.assertIn('class="cr-wordmark"', topbar)
+        self.assertIn("Exampl", topbar)
+
+    def test_home_brand_mark_is_decorative_beside_the_text_wordmark(self):
+        html = (ROOT / "index.html").read_text(encoding="utf-8")
+        topbar = html[html.index("cr-topbar"):html.index("cr-hero-zone")]
+
+        self.assertRegex(
+            topbar,
+            r'<img\b[^>]*class="logo-img"[^>]*\balt=""',
+        )
+        self.assertIn('class="cr-wordmark"', topbar)
+
     def test_every_theme_toggle_icon_is_swappable(self):
         runtime = (ROOT / "assets/js/script-multi-exam.js").read_text(encoding="utf-8")
 

@@ -23,6 +23,8 @@ Examplar uses:
   records;
 - localStorage for small settings, analytics opt-out, activation state, and
   legacy compatibility;
+- sessionStorage for sanitized campaign attribution during the current browser
+  tab only;
 - Cache Storage for app files needed for offline access.
 
 Browser storage is isolated by site origin and browser profile. Clearing site
@@ -40,9 +42,18 @@ The public deployment can collect:
 - progress and editor import/export actions;
 - unlock, pro modal, purchase-link, and import-activation counts;
 - results-screen upsell and pass-story link counts;
+- generated landing-page CTA, configured session, and first-answer interaction
+  counts;
 - pass/fail, coarse score and duration buckets;
-- sanitized `ref`, `utm_source`, `utm_medium`, and `utm_campaign` labels;
+- sanitized `ref`, `utm_source`, `utm_medium`, `utm_campaign`, and `utm_content`
+  labels;
 - external referrer hostname without the full URL or path.
+
+Campaign labels and the external referrer hostname are stored in sessionStorage
+so they can be attached to later events in the same tab. A later URL with
+explicit campaign parameters replaces the previous tab attribution. Only the
+known fields above are retained; there is no visitor ID, campaign timestamp, or
+cross-tab attribution record.
 
 Bundled exam labels are restricted to `ab730`, `ab731`, `sc900`, `az900`,
 `az104`, `saac03`, `clfc02`, `ai901`, `az305`, `az400`, `dp900`, `dp700`, `ai103`, and `sc300`. Other exam IDs are reported only as `imported`.
@@ -68,6 +79,8 @@ Examplar telemetry does not intentionally collect:
 - license keys or payment details.
 
 Sanitizers discard campaign values resembling emails, URLs, or paths.
+The first-answer event is only a bounded interaction count: it does not contain
+the question, answer, question ID, or selected response.
 
 ## Analytics Choice
 
@@ -78,7 +91,8 @@ control to opt out. The preference is stored in:
 localStorage['exam_analytics_opt_out'] = 'true'
 ```
 
-Changing or clearing browser storage can reset that preference.
+Opting out also clears campaign attribution from the current tab. Changing or
+clearing browser storage can reset the persistent opt-out preference.
 
 ## Local and Self-Hosted Use
 

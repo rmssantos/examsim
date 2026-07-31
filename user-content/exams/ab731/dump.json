@@ -471,41 +471,41 @@
   },
   {
     "id": 29,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "Which scenario best fits Microsoft Foundry and Foundry Tools?",
     "options": [
-      "A business needs to build or evaluate AI-powered solutions using models, Azure AI services, and secure enterprise capabilities.",
+      "A business needs to build or evaluate AI-powered solutions using agents, models, Foundry Tools, and unified enterprise governance.",
       "A manager wants to avoid all AI governance.",
       "A user only needs to rewrite one email in Outlook.",
       "A team wants to print paper forms faster."
     ],
     "correct": 0,
-    "explanation": "Foundry and Foundry Tools support building, selecting, grounding, evaluating, and operating AI solutions beyond simple individual productivity tasks.",
+    "explanation": "Microsoft Foundry unifies agents, models, and Foundry Tools with tracing, monitoring, evaluations, RBAC, networking, and policy controls for enterprise AI solutions.",
     "question_type": "STANDARD",
-    "reference": "https://learn.microsoft.com/azure/foundry/what-is-foundry"
+    "reference": "https://learn.microsoft.com/en-us/azure/foundry/what-is-foundry"
   },
   {
     "id": 30,
-    "module": "Microsoft Foundry and Azure AI Services",
-    "question": "Which Azure AI or Foundry capabilities can support business AI solutions?",
+    "module": "Microsoft Foundry and Foundry Tools",
+    "question": "Which capabilities are explicitly included under Foundry Tools in the current AB-731 objectives?",
     "options": [
-      "Document Intelligence or language capabilities for extracting and processing content",
+      "Azure Vision in Foundry Tools",
       "A policy to publish all sensitive data publicly",
-      "Azure Vision for image analysis scenarios",
-      "Azure AI Search for retrieval scenarios"
+      "Azure AI Search",
+      "Microsoft Foundry"
     ],
     "correct": [
       0,
       2,
       3
     ],
-    "explanation": "Azure AI services and Foundry Tools include search, vision, language, document, and model capabilities that can support secure business solutions.",
+    "explanation": "The current AB-731 objectives list Azure Vision in Foundry Tools, Azure AI Search, and Microsoft Foundry as Foundry Tools capabilities. Publishing sensitive data publicly is not an AI capability and conflicts with secure adoption.",
     "question_type": "MULTI",
-    "reference": "https://learn.microsoft.com/azure/ai-services/computer-vision/overview-image-analysis"
+    "reference": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-731"
   },
   {
     "id": 31,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "For each Foundry-related statement, indicate whether it is correct.",
     "statements": [
       "Foundry Tools can support prebuilt AI capabilities for common tasks.",
@@ -525,7 +525,7 @@
   },
   {
     "id": 32,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "A retailer wants to extract information from invoices and route exceptions for review. Which capability area is most relevant?",
     "options": [
       "Document intelligence and workflow integration",
@@ -540,7 +540,7 @@
   },
   {
     "id": 33,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "Which factor is most important when matching an AI model to a business need?",
     "options": [
       "The oldest available model regardless of capability",
@@ -555,7 +555,7 @@
   },
   {
     "id": 34,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "Arrange the steps for selecting an AI approach with Foundry Tools.",
     "options": [
       "Compare model or service options",
@@ -575,7 +575,7 @@
   },
   {
     "id": 35,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "A business wants to search a large knowledge base and generate grounded answers. Which combination is most relevant?",
     "options": [
       "Azure AI Search with a generative model in a retrieval-augmented pattern",
@@ -590,7 +590,7 @@
   },
   {
     "id": 36,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "Why is evaluation important before scaling a Foundry-based AI solution?",
     "options": [
       "It helps measure quality, safety, relevance, and business outcome performance.",
@@ -605,8 +605,8 @@
   },
   {
     "id": 37,
-    "module": "Microsoft Foundry and Azure AI Services",
-    "question": "Which business need is best served by Azure Vision capabilities?",
+    "module": "Microsoft Foundry and Foundry Tools",
+    "question": "Which business need is best served by Azure Vision in Foundry Tools?",
     "options": [
       "Summarizing a Teams meeting transcript",
       "Scheduling a recurring prompt in Copilot Chat",
@@ -614,7 +614,7 @@
       "Renaming a Word document"
     ],
     "correct": 2,
-    "explanation": "Vision capabilities are used for image analysis scenarios such as inspection, classification, extraction, and visual understanding.",
+    "explanation": "Azure Vision in Foundry Tools supports image analysis scenarios such as inspection, classification, extraction, and visual understanding.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/azure/foundry/responsible-ai/computer-vision/image-analysis-transparency-note"
   },
@@ -794,17 +794,17 @@
   {
     "id": 48,
     "module": "Adoption, Licensing, and Change Strategy",
-    "question": "A leader must choose between pay-as-you-go and prepaid Azure AI service models. What should drive the decision?",
+    "question": "A Foundry Tools service or feature is eligible for both pay-as-you-go billing and commitment tiers. Which criteria should guide the billing-model choice?",
     "options": [
       "A decision made without usage estimates",
       "Avoiding cost monitoring",
-      "Expected usage pattern, budget predictability, scalability needs, and cost governance",
+      "Expected usage volume, predictable costs, and cost governance requirements",
       "The option with the longest name"
     ],
     "correct": 2,
-    "explanation": "Subscription model choice should consider demand, predictability, budget, scalability, and governance.",
+    "explanation": "Pay-as-you-go charges according to actual service usage. For an eligible service or feature, a commitment tier uses a fixed fee to provide predictable costs, so expected usage volume and cost governance requirements should drive the choice.",
     "question_type": "STANDARD",
-    "reference": "https://learn.microsoft.com/azure/ai-services/commitment-tier"
+    "reference": "https://learn.microsoft.com/en-us/azure/foundry/concepts/manage-costs"
   },
   {
     "id": 49,
@@ -829,17 +829,21 @@
   {
     "id": 50,
     "module": "Adoption, Licensing, and Change Strategy",
-    "question": "Which licensing consideration is most relevant when planning Microsoft 365 Copilot adoption?",
+    "question": "Which Copilot license types should an adoption plan account for? (Select all that apply.)",
     "options": [
-      "Whether all employees must receive the same license immediately",
-      "Whether license planning can ignore business priorities",
-      "Which users and scenarios need Copilot capabilities and how costs align with expected value",
-      "Whether AI governance can be skipped after licenses are purchased"
+      "Pay-as-you-go",
+      "Monthly",
+      "Included with a Microsoft 365 subscription",
+      "A perpetual device license that includes every future Copilot service"
     ],
-    "correct": 2,
-    "explanation": "Licensing should map to user groups, scenarios, expected value, budget, and rollout plans. It should not ignore governance or business priorities.",
-    "question_type": "STANDARD",
-    "reference": "https://learn.microsoft.com/microsoft-365/copilot/microsoft-365-copilot-licensing"
+    "correct": [
+      0,
+      1,
+      2
+    ],
+    "explanation": "The current AB-731 adoption objective lists Copilot license types that include pay-as-you-go, monthly, and access included with a Microsoft 365 subscription. It does not list a perpetual device license that automatically includes every future Copilot service.",
+    "question_type": "MULTI",
+    "reference": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-731"
   },
   {
     "id": 51,
@@ -1509,7 +1513,7 @@
   },
   {
     "id": 90,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "A company wants to build a custom AI assistant for product support. Which platform area is most relevant?",
     "options": [
       "A local printer driver",
@@ -1524,26 +1528,26 @@
   },
   {
     "id": 91,
-    "module": "Microsoft Foundry and Azure AI Services",
-    "question": "Which Azure AI services can support common business solutions?",
+    "module": "Microsoft Foundry and Foundry Tools",
+    "question": "Which Foundry Tools capabilities are included in the current AB-731 objectives?",
     "options": [
       "Azure AI Search",
-      "Document Intelligence",
+      "Azure Vision in Foundry Tools",
       "A rule to expose all private files",
-      "Azure Vision"
+      "Microsoft Foundry"
     ],
     "correct": [
       0,
       1,
       3
     ],
-    "explanation": "Azure AI services support search, vision, document, language, and other AI scenarios.",
+    "explanation": "The current objectives identify Azure AI Search, Azure Vision in Foundry Tools, and Microsoft Foundry as Foundry Tools capabilities. Exposing private files is not a capability and violates secure AI practices.",
     "question_type": "MULTI",
-    "reference": "https://learn.microsoft.com/azure/ai-services/document-intelligence/overview?view=doc-intel-4.0.0"
+    "reference": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-731"
   },
   {
     "id": 92,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "For each Foundry statement, indicate whether it is correct.",
     "statements": [
       "Foundry can help compare model options.",
@@ -1563,7 +1567,7 @@
   },
   {
     "id": 93,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "Which service is most relevant for retrieving content from a large knowledge base for grounded answers?",
     "options": [
       "A slide transition effect",
@@ -1578,7 +1582,7 @@
   },
   {
     "id": 94,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "Arrange a custom AI solution lifecycle.",
     "options": [
       "Monitor and improve after release",
@@ -1598,8 +1602,8 @@
   },
   {
     "id": 95,
-    "module": "Microsoft Foundry and Azure AI Services",
-    "question": "Which scenario is best suited for Azure Vision?",
+    "module": "Microsoft Foundry and Foundry Tools",
+    "question": "Which scenario is best suited for Azure Vision in Foundry Tools?",
     "options": [
       "Inspecting images for product defects",
       "Creating a calendar invite",
@@ -1607,13 +1611,13 @@
       "Renaming a chat"
     ],
     "correct": 0,
-    "explanation": "Azure Vision analyzes visual content, so it suits inspecting images for product defects. Calendar invites, transcript summaries, and chat renaming are text or productivity tasks, not image analysis.",
+    "explanation": "Azure Vision in Foundry Tools analyzes visual content, so it suits inspecting images for product defects. Calendar invites, transcript summaries, and chat renaming are text or productivity tasks, not image analysis.",
     "question_type": "STANDARD",
     "reference": "https://learn.microsoft.com/azure/ai-services/computer-vision/overview-image-analysis"
   },
   {
     "id": 96,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "Which concerns should be evaluated before scaling a Foundry solution?",
     "options": [
       "Latency",
@@ -1632,7 +1636,7 @@
   },
   {
     "id": 97,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "A company needs to extract fields from invoices. Which capability area fits best?",
     "options": [
       "Meeting recap",
@@ -1647,7 +1651,7 @@
   },
   {
     "id": 98,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "For each service selection statement, indicate whether it is correct.",
     "statements": [
       "Cost and latency can affect service choice.",
@@ -1667,7 +1671,7 @@
   },
   {
     "id": 99,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "Why should leaders compare small and large models for a task?",
     "options": [
       "Small models cannot be evaluated",
@@ -1682,7 +1686,7 @@
   },
   {
     "id": 100,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "Which capability helps determine whether AI outputs meet quality expectations?",
     "options": [
       "Skipping test data",
@@ -1697,7 +1701,7 @@
   },
   {
     "id": 101,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "Which components are common in an enterprise AI assistant?",
     "options": [
       "Identity and access controls",
@@ -1716,7 +1720,7 @@
   },
   {
     "id": 102,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "A team wants to classify customer messages by intent. Which AI capability area is relevant?",
     "options": [
       "Physical access control",
@@ -1731,7 +1735,7 @@
   },
   {
     "id": 103,
-    "module": "Microsoft Foundry and Azure AI Services",
+    "module": "Microsoft Foundry and Foundry Tools",
     "question": "What should a leader ask before approving a custom AI build?",
     "options": [
       "Whether custom build is always more impressive",

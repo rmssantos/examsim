@@ -3,6 +3,7 @@ import importlib.util
 import json
 import tempfile
 import unittest
+from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,6 +19,17 @@ def _load_generator():
 
 
 gen = _load_generator()
+
+
+class _AnalyticsElementParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.tracked = []
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        if "data-analytics-event" in attributes:
+            self.tracked.append((tag, attributes))
 
 SAMPLE = {
     "id": "sc900",
@@ -82,6 +94,29 @@ class FragmentTests(unittest.TestCase):
         self.assertIn("70%", html_out)
         self.assertIn("<table", html_out)
 
+    def test_facts_table_exposes_review_metadata_only_when_present(self):
+        without_review = gen.build_facts(SAMPLE)
+        self.assertNotIn("Objective version", without_review)
+        self.assertNotIn("Last reviewed", without_review)
+
+        reviewed = dict(
+            SAMPLE,
+            contentReview={
+                "objectiveVersion": "Skills <measured> & reviewed July 2026",
+                "lastReviewed": "2026-07-30",
+            },
+        )
+        reviewed_facts = gen.build_facts(reviewed)
+        self.assertIn(
+            "<th scope=\"row\">Objective version</th>"
+            "<td>Skills &lt;measured&gt; &amp; reviewed July 2026</td>",
+            reviewed_facts,
+        )
+        self.assertIn(
+            '<th scope="row">Last reviewed</th><td>2026-07-30</td>',
+            reviewed_facts,
+        )
+
     def test_sections_render_when_present(self):
         self.assertIn("Microsoft Entra", gen.build_modules(SAMPLE))
         self.assertIn("10-15%", gen.build_domains(SAMPLE))
@@ -137,6 +172,12 @@ class SiteTests(unittest.TestCase):
         xml = gen.render_sitemap([SAMPLE, dict(SAMPLE, id="az900")])
         self.assertIn("<loc>https://examplar.app/</loc>", xml)
         self.assertIn("<loc>https://examplar.app/exams/</loc>", xml)
+        self.assertEqual(
+            xml.count("<loc>https://examplar.app/roadmaps.html</loc>"),
+            1,
+        )
+        self.assertNotIn("https://examplar.app/roadmaps</loc>", xml)
+        self.assertNotIn("https://examplar.app/roadmaps/</loc>", xml)
         self.assertIn("<loc>https://examplar.app/exams/sc900/</loc>", xml)
         self.assertIn("<loc>https://examplar.app/exams/az900/</loc>", xml)
         self.assertIn("<loc>https://examplar.app/privacy-and-storage.html</loc>", xml)
@@ -299,6 +340,63 @@ class AnalyticsWiringTests(unittest.TestCase):
     def test_analytics_classifies_landing_pages(self):
         js = (ROOT / "assets" / "js" / "analytics.js").read_text(encoding="utf-8")
         self.assertIn("'landing'", js)
+
+    def test_landing_has_exactly_two_tracked_diagnostic_and_full_ctas(self):
+        page = self._render(SAMPLE)
+        parser = _AnalyticsElementParser()
+        parser.feed(page)
+
+        self.assertEqual(len(parser.tracked), 2)
+        primary_tag, primary = parser.tracked[0]
+        secondary_tag, secondary = parser.tracked[1]
+        self.assertEqual(primary_tag, "a")
+        self.assertEqual(secondary_tag, "a")
+        self.assertEqual(primary["class"], "landing-cta")
+        self.assertEqual(primary["data-analytics-event"], "landing_cta_clicked")
+        self.assertEqual(primary["data-analytics-exam"], "sc900")
+        self.assertEqual(primary["data-analytics-action"], "diagnostic")
+        self.assertEqual(
+            primary["href"],
+            "../../exam.html?exam=sc900&session=diagnostic&count=10",
+        )
+        self.assertIn("landing-cta-secondary", secondary["class"].split())
+        self.assertEqual(secondary["data-analytics-event"], "landing_cta_clicked")
+        self.assertEqual(secondary["data-analytics-exam"], "sc900")
+        self.assertEqual(secondary["data-analytics-action"], "full")
+        self.assertEqual(secondary["href"], "../../exam.html?exam=sc900")
+        self.assertIn("Start 10-question diagnostic", page)
+        self.assertIn("Start full practice", page)
+
+    def test_paid_preview_labels_the_secondary_cta_as_full_preview(self):
+        page = self._render(SAMPLE_PRO)
+        parser = _AnalyticsElementParser()
+        parser.feed(page)
+
+        secondary = parser.tracked[1][1]
+        self.assertEqual(secondary["data-analytics-action"], "full")
+        self.assertEqual(secondary["href"], "../../exam.html?exam=az104")
+        self.assertIn("Start full preview", page)
+        self.assertNotIn("Start full practice", page)
+
+    def test_lab_and_commercial_ctas_are_not_activation_ctas(self):
+        meta = dict(
+            SAMPLE_PRO,
+            labCount=1,
+            labTopics=["Configure a virtual network"],
+        )
+        page = self._render(meta)
+        parser = _AnalyticsElementParser()
+        parser.feed(page)
+
+        self.assertEqual(len(parser.tracked), 2)
+        self.assertEqual(
+            [attributes["data-analytics-action"] for _, attributes in parser.tracked],
+            ["diagnostic", "full"],
+        )
+        self.assertEqual(
+            [attributes["data-analytics-exam"] for _, attributes in parser.tracked],
+            ["az104", "az104"],
+        )
 
 
 class KeywordCoverageTests(unittest.TestCase):

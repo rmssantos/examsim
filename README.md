@@ -60,26 +60,31 @@ upload endpoint. It binds to the loopback interface by default.
 ### Direct File Use
 
 Opening `index.html` directly can work for basic use, but browser security rules
-limit automatic folder discovery and some image workflows. Use `python server.py`
-for the supported local development experience.
+limit automatic folder discovery and some image workflows. ZIP import is
+intentionally unavailable under `file://` because extraction runs in an isolated
+Web Worker; run `python server.py` and open `http://localhost:8000` for ZIP packs.
+JSON import and basic practice can still work in direct-file mode.
 
 ## Exam Packs
 
 Public packs live under:
 
-```text
-user-content/exams/<exam-id>/
-|-- dump.json
-|-- metadata.json
-|-- manifest.json
-`-- images/
-```
+`user-content/exams/<exam-id>/`
+
+Each directory contains the required question-data JSON, pack metadata, an
+integrity manifest, and optional images. The
+[question and metadata schema](docs/Pack-Format.md) defines the exact filenames
+and structure.
 
 Users can also import:
 
 - a JSON question array;
 - a combined JSON object containing `id`, `metadata`, and `questions`;
-- a ZIP containing `dump.json`, optional `metadata.json`, and optional images.
+- a ZIP containing the required question-data JSON, optional metadata, and
+  optional images.
+
+ZIP import requires the public HTTPS site or the supported local HTTP server. It
+does not run when `index.html` is opened directly as a `file://` URL.
 
 Imported packs and their progress are stored in that browser profile. They are
 not uploaded to the public repository or server.
@@ -127,7 +132,7 @@ the updated content and submit a pull request or GitHub issue.
 This repository contains original educational practice content. It must not
 contain:
 
-- copied live exam questions or official exam dumps;
+- copied live exam questions or unauthorized assessment collections;
 - proprietary packs without redistribution rights;
 - private paid-pack sources or delivery artifacts;
 - license keys, buyer data, analytics exports, or internal commercial records;

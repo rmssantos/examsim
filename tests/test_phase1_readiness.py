@@ -254,13 +254,21 @@ class EditorBootstrapTests(unittest.TestCase):
 
 
 class PageWeightAndAccessibilityTests(unittest.TestCase):
-    def test_jszip_is_loaded_only_when_zip_import_is_requested(self):
+    def test_jszip_is_loaded_only_inside_the_zip_worker(self):
         index_html = (ROOT / "index.html").read_text(encoding="utf-8")
         homepage = (ROOT / "assets" / "js" / "homepage.js").read_text(encoding="utf-8")
+        zip_worker = (ROOT / "assets" / "js" / "zip-import-worker.js").read_text(
+            encoding="utf-8"
+        )
         service_worker = (ROOT / "service-worker.js").read_text(encoding="utf-8")
         self.assertNotIn('<script src="assets/vendor/jszip/jszip.min.js"', index_html)
-        self.assertIn("async ensureJsZipLoaded()", homepage)
-        self.assertIn("await this.ensureJsZipLoaded()", homepage)
+        self.assertNotIn("JSZip", homepage)
+        self.assertIn("new Worker(workerUrl)", homepage)
+        self.assertIn(
+            "importScripts('../vendor/jszip/jszip.min.js')",
+            zip_worker,
+        )
+        self.assertIn("./assets/js/zip-import-worker.js", service_worker)
         self.assertIn("./assets/vendor/jszip/jszip.min.js", service_worker)
 
     def test_primary_pages_have_skip_links_and_main_landmarks(self):

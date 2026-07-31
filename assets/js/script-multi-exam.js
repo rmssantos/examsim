@@ -1,41 +1,32 @@
 ﻿// Multi-Exam Simulator - Generic Exam Support
 // Supports categorized images (question images vs explanation images)
 
-const OFFICIAL_DOCUMENTATION_HOSTS = Object.freeze([
-    'docs.aws.amazon.com',
-    'aws.amazon.com',
-    'learn.microsoft.com'
-]);
-
 const PASS_STORY_DISCUSSION_URL = 'https://github.com/rmssantos/examsim/discussions/77';
 
-function isOfficialDocumentationUrl(value) {
-    try {
-        const parsed = new URL(String(value || ''));
-        if (parsed.protocol !== 'https:') return false;
-
-        const hostname = parsed.hostname.toLowerCase();
-        return OFFICIAL_DOCUMENTATION_HOSTS.some(
-            allowed => hostname === allowed || hostname.endsWith(`.${allowed}`)
-        );
-    } catch (_) {
-        return false;
-    }
-}
-
 class TimerManager {
-    constructor() {
+    constructor(now = () => Date.now()) {
         this.timer = null;
         this.remainingTime = 0;
+        this.deadlineMs = null;
+        this.now = now;
+        this.runToken = null;
     }
 
     start(totalSeconds, onTick, onExpire) {
         this.stop();
         this.remainingTime = totalSeconds;
+        this.deadlineMs = this.now() + (totalSeconds * 1000);
+        const runToken = {};
+        this.runToken = runToken;
         this.timer = setInterval(() => {
-            this.remainingTime--;
+            if (this.runToken !== runToken) return;
+
+            this.remainingTime = Math.max(
+                0,
+                Math.ceil((this.deadlineMs - this.now()) / 1000)
+            );
             onTick(this.remainingTime);
-            if (this.remainingTime <= 0) {
+            if (this.remainingTime <= 0 && this.runToken === runToken) {
                 this.stop();
                 onExpire();
             }
@@ -43,10 +34,12 @@ class TimerManager {
     }
 
     stop() {
-        if (this.timer) {
+        if (this.timer !== null) {
             clearInterval(this.timer);
             this.timer = null;
         }
+        this.deadlineMs = null;
+        this.runToken = null;
     }
 
     getRemainingTime() {
@@ -135,6 +128,7 @@ class MultiExamSimulator {
         this.studySessionId = null;
         this.localIdCounter = 0;
         this.attemptReviewDetailLimit = 10;
+        this.firstAnswerTracked = false;
 
         this.init();
     }
@@ -338,24 +332,6 @@ class MultiExamSimulator {
             }
         }
 
-        // Apply localStorage overrides for any loaded exam
-        for (const examId of Object.keys(this.examData)) {
-            try {
-                if (!window.ExamApp.isSafeExamId(examId)) continue;
-                if (window.userExams?.[examId]?.storage === 'indexedDB') continue;
-                const overrideRaw = localStorage.getItem(`custom_${examId}_questions`);
-                if (overrideRaw) {
-                    const parsed = JSON.parse(overrideRaw);
-                    if (Array.isArray(parsed) && parsed.length > 0 && window.ExamApp.validateExamData(parsed).valid) {
-                        window.ExamApp.log(`Using local override for ${examId} questions`);
-                        this.examData[examId].questions = parsed;
-                    }
-                }
-            } catch (e) {
-                window.ExamApp.warn(`Failed to parse custom_${examId}_questions override:`, e);
-            }
-        }
-
         const summary = {};
         for (const [id, data] of Object.entries(this.examData)) {
             summary[id] = data.questions.length;
@@ -509,9 +485,17 @@ class MultiExamSimulator {
 
             // Try browser-loaded custom exam first
             if (window.userExams?.[code]?.questions) {
-                const data = window.userExams[code].questions;
-                if (Array.isArray(data) && data.length && window.ExamApp.validateExamData(data).valid) {
-                    const meta = getMeta(data);
+                const runtimeExam = window.userExams[code];
+                const data = runtimeExam.questions;
+                const meta = getMeta(data);
+                const labs = Object.prototype.hasOwnProperty.call(runtimeExam, 'labs')
+                    ? runtimeExam.labs
+                    : undefined;
+                if (
+                    Array.isArray(data)
+                    && data.length
+                    && window.ExamApp.validateExamData(data, meta, labs).valid
+                ) {
                     this.examData['custom'] = {
                         name: meta.name || code.toUpperCase(),
                         fullName: meta.fullName || meta.name || code,
@@ -532,8 +516,21 @@ class MultiExamSimulator {
                 const raw = localStorage.getItem(`custom_${code}_questions`);
                 if (raw) {
                     const data = JSON.parse(raw);
-                    if (Array.isArray(data) && data.length && window.ExamApp.validateExamData(data).valid) {
-                        const meta = getMeta(data);
+                    const meta = getMeta(data);
+                    let labs;
+                    const rawLabs = localStorage.getItem(`custom_${code}_labs`);
+                    if (rawLabs !== null) {
+                        try {
+                            labs = JSON.parse(rawLabs);
+                        } catch (_) {
+                            labs = undefined;
+                        }
+                    }
+                    if (
+                        Array.isArray(data)
+                        && data.length
+                        && window.ExamApp.validateExamData(data, meta, labs).valid
+                    ) {
                         this.examData['custom'] = {
                             name: meta.name || code.toUpperCase(),
                             fullName: meta.fullName || meta.name || code,
@@ -587,8 +584,24 @@ class MultiExamSimulator {
 
         // Prefer in-memory exams (server mode auto-detection)
         const fromMemory = window.userExams && window.userExams[examId];
-        if (fromMemory && Array.isArray(fromMemory.questions) && fromMemory.questions.length > 0 && window.ExamApp.validateExamData(fromMemory.questions, fromMemory.metadata).valid) {
+        const fromMemoryLabs = (
+            fromMemory
+            && Object.prototype.hasOwnProperty.call(fromMemory, 'labs')
+        )
+            ? fromMemory.labs
+            : undefined;
+        if (
+            fromMemory
+            && Array.isArray(fromMemory.questions)
+            && fromMemory.questions.length > 0
+            && window.ExamApp.validateExamData(
+                fromMemory.questions,
+                fromMemory.metadata,
+                fromMemoryLabs
+            ).valid
+        ) {
             const metadata = fromMemory.metadata || {};
+            const isBundledTrusted = window.ExamApp.isBundledTrustedExam?.(fromMemory) === true;
             this.examData[examId] = {
                 name: metadata.name || examId.toUpperCase(),
                 fullName: metadata.fullName || metadata.name || `Exam: ${examId}`,
@@ -596,10 +609,13 @@ class MultiExamSimulator {
                 questionCount: metadata.questionCount || 45,
                 passScore: metadata.passScore || 70,
                 questions: fromMemory.questions,
+                labs: fromMemoryLabs === undefined ? [] : fromMemoryLabs,
                 modules: metadata.modules || [],
-                recommendedPro: metadata.recommendedPro || null,
-                pro: metadata.pro || null,
-                resources: metadata.resources || []
+                recommendedPro: isBundledTrusted ? (metadata.recommendedPro || null) : null,
+                pro: isBundledTrusted ? (metadata.pro || null) : null,
+                resources: metadata.resources || [],
+                source: fromMemory.source,
+                trust: fromMemory.trust
             };
             return true;
         }
@@ -609,7 +625,6 @@ class MultiExamSimulator {
             const raw = localStorage.getItem(`custom_${examId}_questions`);
             if (!raw) return false;
             const questions = JSON.parse(raw);
-            if (!Array.isArray(questions) || questions.length === 0 || !window.ExamApp.validateExamData(questions).valid) return false;
             let metadata = {};
             try {
                 const metaRaw = localStorage.getItem(`exam_metadata_${examId}`);
@@ -617,6 +632,20 @@ class MultiExamSimulator {
             } catch (_) {
                 metadata = {};
             }
+            let labs;
+            const labsRaw = localStorage.getItem(`custom_${examId}_labs`);
+            if (labsRaw !== null) {
+                try {
+                    labs = JSON.parse(labsRaw);
+                } catch (_) {
+                    labs = undefined;
+                }
+            }
+            if (
+                !Array.isArray(questions)
+                || questions.length === 0
+                || !window.ExamApp.validateExamData(questions, metadata, labs).valid
+            ) return false;
             this.examData[examId] = {
                 name: metadata.name || examId.toUpperCase(),
                 fullName: metadata.fullName || metadata.name || `Exam: ${examId}`,
@@ -624,10 +653,13 @@ class MultiExamSimulator {
                 questionCount: metadata.questionCount || 45,
                 passScore: metadata.passScore || 70,
                 questions,
+                labs: labs === undefined ? [] : labs,
                 modules: metadata.modules || [],
-                recommendedPro: metadata.recommendedPro || null,
-                pro: metadata.pro || null,
-                resources: metadata.resources || []
+                recommendedPro: null,
+                pro: null,
+                resources: metadata.resources || [],
+                source: 'imported',
+                trust: 'local-unverified'
             };
             return true;
         } catch (error) {
@@ -712,9 +744,16 @@ class MultiExamSimulator {
         const resourcesList = document.getElementById('resources-list');
         if (resourcesList) {
             resourcesList.innerHTML = '';
-            exam.resources.forEach(resource => {
+            const isBundledTrusted = window.ExamApp.isBundledTrustedExam?.(exam) === true;
+            (Array.isArray(exam.resources) ? exam.resources : []).forEach(resource => {
                 const safeHref = this.safeUrl(resource.url);
                 if (!safeHref) return;
+                if (
+                    !isBundledTrusted
+                    && !window.ExamApp.isOfficialDocumentationUrl(safeHref)
+                ) {
+                    return;
+                }
 
                 const a = document.createElement('a');
                 a.href = safeHref;
@@ -885,6 +924,13 @@ class MultiExamSimulator {
         return this.mode === 'study';
     }
 
+    getSessionType() {
+        if (this.isStudyMode()) return 'study';
+        return this.examData?.[this.currentExam]?.sessionType === 'diagnostic'
+            ? 'diagnostic'
+            : 'full';
+    }
+
     startCurrentMode() {
         if (this.isStudyMode()) {
             this.startStudyMode();
@@ -984,6 +1030,7 @@ class MultiExamSimulator {
         this.studyQueueSummary = null;
         this.studySessionResults = new Map();
         this.studySessionId = null;
+        this.firstAnswerTracked = false;
 
         // Update exam badge in header
         document.getElementById('current-exam-badge').textContent = this.examData[this.currentExam].name;
@@ -1005,7 +1052,8 @@ class MultiExamSimulator {
     this.showQuestion(0);
 
     window.ExamApp?.analytics?.trackExamStarted(this.currentExam, {
-        questionCount: this.activeQuestions.length
+        questionCount: this.activeQuestions.length,
+        sessionType: this.getSessionType()
     });
 
         // Switch to exam screen
@@ -1038,6 +1086,7 @@ class MultiExamSimulator {
         this.startTime = new Date();
         this.studySessionId = this.generateLocalId('study_session');
         this.studySessionResults = new Map();
+        this.firstAnswerTracked = false;
 
         const examName = this.examData[this.currentExam].name;
         const badge = document.getElementById('current-exam-badge');
@@ -1369,7 +1418,7 @@ class MultiExamSimulator {
         // contain arbitrary Markdown, so other URLs remain escaped literal text.
         formattedText = formattedText.replace(
             /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-            (match, label, url) => isOfficialDocumentationUrl(url)
+            (match, label, url) => window.ExamApp.isOfficialDocumentationUrl(url)
                 ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${label}</a>`
                 : match
         );
@@ -1401,7 +1450,11 @@ class MultiExamSimulator {
         const seen = new Set();
         for (const r of raw) {
             const ref = this.safeUrl(r);
-            if (!ref || !isOfficialDocumentationUrl(ref) || seen.has(ref)) continue;
+            if (
+                !ref
+                || !window.ExamApp.isOfficialDocumentationUrl(ref)
+                || seen.has(ref)
+            ) continue;
             seen.add(ref);
             hrefs.push(ref);
         }
@@ -1422,6 +1475,7 @@ class MultiExamSimulator {
 
     // Upsell the pack's own full version on the results screen (pro-preview packs).
     renderProUpsell(metadata) {
+        if (window.ExamApp.isBundledTrustedExam?.(metadata) !== true) return '';
         const pro = metadata && metadata.pro;
         const url = pro && this.safeUrl(pro.url);
         if (!url) return '';
@@ -1442,6 +1496,7 @@ class MultiExamSimulator {
 
     // Cross-sell a recommended paid pack on the results screen (e.g. CLF-C02 -> SAA-C03).
     renderRecommendedPro(metadata) {
+        if (window.ExamApp.isBundledTrustedExam?.(metadata) !== true) return '';
         const rec = metadata && metadata.recommendedPro;
         const url = rec && this.safeUrl(rec.url);
         if (!url) return '';
@@ -1909,6 +1964,13 @@ class MultiExamSimulator {
     }
 
     handleAnswerChanged() {
+        if (!this.firstAnswerTracked) {
+            this.firstAnswerTracked = true;
+            window.ExamApp?.analytics?.trackExamFirstAnswered?.(this.currentExam, {
+                sessionType: this.getSessionType()
+            });
+        }
+
         // Any real interaction marks the current question as touched, so an
         // auto-initialized SEQUENCE order is not mistaken for a user attempt.
         this.touchedQuestions.add(this.currentQuestionIndex);
@@ -2564,7 +2626,8 @@ class MultiExamSimulator {
             score,
             passed,
             timeSpent,
-            questionCount: total
+            questionCount: total,
+            sessionType: this.getSessionType()
         });
     }
 
@@ -2778,6 +2841,7 @@ class MultiExamSimulator {
     saveProgress(score, passed, timeSpent) {
         const examKey = `${this.currentExam}_progress`;
         let progress = JSON.parse(localStorage.getItem(examKey) || '{"attempts": [], "bestScore": 0, "totalPassed": 0}');
+        const previousSummary = window.ExamApp.getProgressSummary(progress);
         const questions = this.getCurrentQuestions();
         const questionResults = this.buildAttemptQuestionResults(questions);
         const incorrectCount = questionResults.filter(result => !result.correct && !result.skipped).length;
@@ -2795,12 +2859,18 @@ class MultiExamSimulator {
             skippedCount,
             hasReviewDetails: true,
             questionResults,
-            modules: this.examData[this.currentExam]?.selectedModules || null
+            modules: this.examData[this.currentExam]?.selectedModules || null,
+            sessionType: this.getSessionType()
         };
 
         progress.attempts.push(attempt);
-        progress.bestScore = Math.max(progress.bestScore, score);
-        if (passed) progress.totalPassed++;
+        const summary = window.ExamApp.getProgressSummary({
+            ...progress,
+            totalPassed: previousSummary.totalPassed
+                + (attempt.sessionType !== 'diagnostic' && passed ? 1 : 0)
+        });
+        progress.bestScore = summary.bestScore;
+        progress.totalPassed = summary.totalPassed;
 
         try {
             this.saveProgressToStorage(examKey, progress);
@@ -2822,16 +2892,20 @@ class MultiExamSimulator {
         if (this.currentExam) {
             const examKey = `${this.currentExam}_progress`;
             const progress = JSON.parse(localStorage.getItem(examKey) || '{"attempts": [], "bestScore": 0, "totalPassed": 0}');
+            const summary = window.ExamApp.getProgressSummary(progress);
 
-            document.getElementById('total-attempts').textContent = progress.attempts.length;
-            document.getElementById('best-score').textContent = progress.attempts.length > 0 ? `${progress.bestScore || 0}%` : '-';
+            document.getElementById('total-attempts').textContent = summary.totalAttempts;
+            document.getElementById('best-score').textContent = summary.completionAttempts > 0
+                ? `${summary.bestScore}%`
+                : '-';
 
-            const passRate = progress.attempts.length > 0 ?
-                Math.round((progress.totalPassed / progress.attempts.length) * 100) : 0;
-            document.getElementById('pass-rate').textContent = progress.attempts.length > 0 ? `${passRate}%` : '-';
+            document.getElementById('pass-rate').textContent = summary.passRate != null
+                ? `${summary.passRate}%`
+                : '-';
         } else {
             // On homepage, show global stats from all exams
             let totalAttempts = 0;
+            let completionAttempts = 0;
             let bestScoreOverall = 0;
             let totalPassed = 0;
 
@@ -2842,9 +2916,11 @@ class MultiExamSimulator {
                     try {
                         const progress = JSON.parse(localStorage.getItem(key));
                         if (progress && progress.attempts) {
-                            totalAttempts += progress.attempts.length;
-                            bestScoreOverall = Math.max(bestScoreOverall, progress.bestScore || 0);
-                            totalPassed += progress.totalPassed || 0;
+                            const summary = window.ExamApp.getProgressSummary(progress);
+                            totalAttempts += summary.totalAttempts;
+                            completionAttempts += summary.completionAttempts;
+                            bestScoreOverall = Math.max(bestScoreOverall, summary.bestScore);
+                            totalPassed += summary.totalPassed;
                         }
                     } catch (e) {
                         // Skip invalid progress data
@@ -2858,9 +2934,11 @@ class MultiExamSimulator {
                         try {
                             const progress = JSON.parse(localStorage.getItem(key));
                             if (progress && progress.attempts) {
-                                totalAttempts += progress.attempts.length;
-                                bestScoreOverall = Math.max(bestScoreOverall, progress.bestScore || 0);
-                                totalPassed += progress.totalPassed || 0;
+                                const summary = window.ExamApp.getProgressSummary(progress);
+                                totalAttempts += summary.totalAttempts;
+                                completionAttempts += summary.completionAttempts;
+                                bestScoreOverall = Math.max(bestScoreOverall, summary.bestScore);
+                                totalPassed += summary.totalPassed;
                             }
                         } catch (e) {}
                     }
@@ -2872,10 +2950,12 @@ class MultiExamSimulator {
             const passRateEl = document.getElementById('pass-rate');
 
             if (totalAttemptsEl) totalAttemptsEl.textContent = totalAttempts;
-            if (bestScoreEl) bestScoreEl.textContent = totalAttempts > 0 ? `${bestScoreOverall}%` : '-';
+            if (bestScoreEl) bestScoreEl.textContent = completionAttempts > 0 ? `${bestScoreOverall}%` : '-';
 
-            const passRate = totalAttempts > 0 ? Math.round((totalPassed / totalAttempts) * 100) : 0;
-            if (passRateEl) passRateEl.textContent = totalAttempts > 0 ? `${passRate}%` : '-';
+            const passRate = completionAttempts > 0
+                ? Math.round((totalPassed / completionAttempts) * 100)
+                : null;
+            if (passRateEl) passRateEl.textContent = passRate != null ? `${passRate}%` : '-';
         }
     }
 
@@ -3128,9 +3208,7 @@ function showProgressModal(allProgress) {
     Object.entries(allProgress).forEach(([examId, progress]) => {
         const examName = getExamName(examId);
         const attempts = progress.attempts || [];
-        const bestScore = progress.bestScore || 0;
-        const totalPassed = progress.totalPassed || 0;
-        const passRate = attempts.length > 0 ? Math.round((totalPassed / attempts.length) * 100) : 0;
+        const summary = window.ExamApp.getProgressSummary(progress);
         const avgScore = attempts.length > 0 ? Math.round(attempts.reduce((sum, a) => sum + a.score, 0) / attempts.length) : 0;
         const recentAttempts = attempts.slice(-5);
         const trend = calculateTrend(recentAttempts);
@@ -3147,8 +3225,10 @@ function showProgressModal(allProgress) {
         header.appendChild(heading);
 
         const best = document.createElement('span');
-        best.className = `progress-best ${bestScore >= 70 ? 'passed' : 'failed'}`;
-        best.textContent = `Best: ${bestScore}%`;
+        best.className = `progress-best ${summary.bestScore >= 70 ? 'passed' : 'failed'}`;
+        best.textContent = summary.completionAttempts > 0
+            ? `Best: ${summary.bestScore}%`
+            : 'Best: —';
         header.appendChild(best);
         card.appendChild(header);
 
@@ -3156,7 +3236,10 @@ function showProgressModal(allProgress) {
         metrics.className = 'progress-metric-grid';
         metrics.appendChild(createMetricCard('Attempts', String(attempts.length)));
         metrics.appendChild(createMetricCard('Avg Score', `${avgScore}%`));
-        metrics.appendChild(createMetricCard('Pass Rate', `${passRate}%`));
+        metrics.appendChild(createMetricCard(
+            'Pass Rate',
+            summary.passRate != null ? `${summary.passRate}%` : '—'
+        ));
         metrics.appendChild(createMetricCard('Trend', trend));
         card.appendChild(metrics);
 

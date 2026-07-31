@@ -13,7 +13,7 @@
     (function () {
       var segments = window.location.pathname.split('/').filter(Boolean);
       var routeIndex = segments.findIndex(function (segment) {
-        return segment === 'editor' || segment === 'exam' || segment === 'study' || segment === 'privacy-and-storage';
+        return segment === 'editor' || segment === 'exam' || segment === 'study' || segment === 'privacy-and-storage' || segment === 'roadmaps';
       });
       var base = '/' + (routeIndex > 0 ? segments.slice(0, routeIndex).join('/') + '/' : '');
       var route = routeIndex >= 0 ? segments[routeIndex] : '';
@@ -27,6 +27,8 @@
         if (route === 'study' && !params.has('mode')) params.set('mode', 'study');
       } else if (route === 'privacy-and-storage') {
         target = 'privacy-and-storage.html';
+      } else if (route === 'roadmaps') {
+        target = 'roadmaps.html';
       }
 
       var query = params.toString();

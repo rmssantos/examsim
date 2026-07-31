@@ -16,7 +16,20 @@ window.ExamApp.EXAM_LIMITS = Object.freeze({
     maxZipBytes: 50 * 1024 * 1024,
     maxZipEntries: 512,
     maxZipUncompressedBytes: 120 * 1024 * 1024,
+    zipWorkerTimeoutMs: 30 * 1000,
     maxQuestions: 1000,
+    maxOptions: 50,
+    maxStatements: 50,
+    maxCorrectAnswers: 50,
+    maxQuestionImageRefs: 20,
+    maxQuestionReferences: 20,
+    maxLabs: 50,
+    maxLabImageRefs: 20,
+    maxLabSteps: 100,
+    maxLabPrerequisites: 25,
+    maxLabCleanup: 25,
+    maxLabReferences: 25,
+    maxMetadataListItems: 100,
     maxImages: 250,
     maxImageBytes: 10 * 1024 * 1024,
     maxTotalImageBytes: 100 * 1024 * 1024,
@@ -36,6 +49,85 @@ window.ExamApp.EXAM_LIMITS = Object.freeze({
 window.ExamApp.PUBLIC_HOSTS = Object.freeze(['examplar.app', 'www.examplar.app', 'rmssantos.github.io']);
 window.ExamApp.isPublicSiteHost = function isPublicSiteHost(hostname = window.location.hostname) {
     return window.ExamApp.PUBLIC_HOSTS.includes(hostname);
+};
+
+window.ExamApp.EXAM_PROVENANCE = Object.freeze({
+    bundled: Object.freeze({ source: 'bundled', trust: 'bundled' }),
+    imported: Object.freeze({ source: 'imported', trust: 'local-unverified' })
+});
+
+window.ExamApp.isBundledTrustedExam = function isBundledTrustedExam(exam) {
+    return Boolean(exam && exam.source === 'bundled' && exam.trust === 'bundled');
+};
+
+window.ExamApp.sanitizeExamMetadata = function sanitizeExamMetadata(metadata, options = {}) {
+    if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) return metadata || null;
+
+    const sanitized = { ...metadata };
+    delete sanitized.source;
+    delete sanitized.trust;
+    if (options.allowCommercial !== true) {
+        delete sanitized.pro;
+        delete sanitized.recommendedPro;
+    }
+    return sanitized;
+};
+
+window.ExamApp.OFFICIAL_DOCUMENTATION_HOSTS = Object.freeze([
+    'docs.aws.amazon.com',
+    'aws.amazon.com',
+    'learn.microsoft.com',
+    'docs.microsoft.com',
+    'azure.microsoft.com',
+    'microsoft.com',
+    'cloud.google.com'
+]);
+
+window.ExamApp.isOfficialDocumentationUrl = function isOfficialDocumentationUrl(value) {
+    try {
+        const parsed = new URL(String(value || ''));
+        if (
+            parsed.protocol !== 'https:'
+            || parsed.username
+            || parsed.password
+            || parsed.port
+        ) {
+            return false;
+        }
+
+        const hostname = parsed.hostname.toLowerCase();
+        return window.ExamApp.OFFICIAL_DOCUMENTATION_HOSTS.some(
+            allowed => hostname === allowed || hostname.endsWith(`.${allowed}`)
+        );
+    } catch (_) {
+        return false;
+    }
+};
+
+window.ExamApp.safeExternalUrl = function safeExternalUrl(value) {
+    const candidate = String(value || '').trim();
+    if (!candidate) return null;
+
+    try {
+        const parsed = new URL(candidate, window.location.href);
+        if (
+            parsed.protocol !== 'https:'
+            || parsed.username
+            || parsed.password
+        ) {
+            return null;
+        }
+        return parsed.href;
+    } catch (_) {
+        return null;
+    }
+};
+
+window.ExamApp.resourceUrlForTrust = function resourceUrlForTrust(value, exam) {
+    const safeUrl = window.ExamApp.safeExternalUrl(value);
+    if (!safeUrl) return null;
+    if (window.ExamApp.isBundledTrustedExam(exam)) return safeUrl;
+    return window.ExamApp.isOfficialDocumentationUrl(safeUrl) ? safeUrl : null;
 };
 
 function safeGetLocalStorage(key) {
@@ -71,7 +163,13 @@ window.ExamApp.getRegistry = function getRegistry(key) {
 
 window.ExamApp.setRegistry = function setRegistry(key, values) {
     const unique = [...new Set((values || []).filter(window.ExamApp.isSafeExamId))].sort();
-    localStorage.setItem(key, JSON.stringify(unique));
+    try {
+        localStorage.setItem(key, JSON.stringify(unique));
+    } catch (error) {
+        // Registries are reconstructible indexes. A failed index write must not
+        // turn an already-durable exam/progress save into a reported failure.
+        window.ExamApp.warn(`Failed to update local registry ${key}:`, error);
+    }
     return unique;
 };
 
@@ -134,80 +232,68 @@ window.ExamApp.getImageMimeType = function getImageMimeType(fileName) {
     return mimeTypes[extension] || null;
 };
 
-window.ExamApp.inspectZipEntries = function inspectZipEntries(zip) {
-    if (!zip || typeof zip.forEach !== 'function') {
-        throw new Error('Invalid ZIP archive.');
+window.ExamApp.getProgressSummary = function getProgressSummary(progress) {
+    const attempts = Array.isArray(progress?.attempts) ? progress.attempts : [];
+    // Diagnostics are deliberately retained in the attempt history, but they are
+    // a short placement check rather than certification-completion evidence.
+    // Full, study, and pre-sessionType legacy attempts retain the old semantics.
+    const hasDiagnostic = attempts.some(attempt => attempt?.sessionType === 'diagnostic');
+    const completion = attempts.filter(attempt => attempt?.sessionType !== 'diagnostic');
+    const diagnosticPassedCount = attempts.filter(
+        attempt => attempt?.sessionType === 'diagnostic' && attempt?.passed === true
+    ).length;
+    const derivedTotalPassed = completion.filter(attempt => attempt?.passed === true).length;
+    const unknownEligiblePassedCount = completion.filter(
+        attempt => attempt && attempt.passed === undefined
+    ).length;
+    const derivedBestScore = completion.reduce((best, attempt) => {
+        const score = Number(attempt?.score);
+        return Number.isFinite(score) ? Math.max(best, score) : best;
+    }, 0);
+    // Records from before sessionType existed may only carry the aggregate fields.
+    // Preserve those values, then reconcile them against explicit diagnostic and
+    // eligible-attempt evidence so inflated diagnostic aggregates are repaired.
+    const legacyBestScore = Number(progress?.bestScore);
+    const legacyTotalPassed = Number(progress?.totalPassed);
+    const bestScore = !hasDiagnostic && Number.isFinite(legacyBestScore)
+        ? Math.max(derivedBestScore, legacyBestScore)
+        : derivedBestScore;
+    const clampPassed = value => Math.min(
+        completion.length,
+        Math.max(0, Number.isFinite(value) ? Math.trunc(value) : 0)
+    );
+    const aggregatePassed = Number.isInteger(legacyTotalPassed)
+        ? legacyTotalPassed
+        : derivedTotalPassed;
+    let totalPassed;
+    if (hasDiagnostic) {
+        const evidenceLimit = derivedTotalPassed + unknownEligiblePassedCount;
+        const clampToEvidence = value => Math.min(evidenceLimit, clampPassed(value));
+        // Pre-fix records included passing diagnostics in totalPassed, while
+        // fixed records already exclude them. Reconcile both representations:
+        // subtract explicit diagnostic passes, but retain aggregate-only passes
+        // that can belong to legacy attempts where `passed` was never recorded.
+        const aggregateEligiblePassed = clampToEvidence(
+            aggregatePassed - diagnosticPassedCount
+        );
+        const alreadyEligiblePassed = clampToEvidence(aggregatePassed);
+        totalPassed = clampPassed(Math.max(
+            derivedTotalPassed,
+            aggregateEligiblePassed,
+            alreadyEligiblePassed
+        ));
+    } else {
+        totalPassed = clampPassed(Math.max(derivedTotalPassed, aggregatePassed));
     }
 
-    const limits = window.ExamApp.EXAM_LIMITS;
-    let entryCount = 0;
-    let totalBytes = 0;
-    let totalImageBytes = 0;
-    let dumpEntry = null;
-    let metadataEntry = null;
-    const imageFiles = [];
-
-    zip.forEach((relativePath, entry) => {
-        entryCount += 1;
-        if (entryCount > limits.maxZipEntries) {
-            throw new Error(`ZIP contains too many entries. Maximum is ${limits.maxZipEntries}.`);
-        }
-        if (entry.dir) return;
-
-        const normalized = String(relativePath || entry.name || '')
-            .replace(/\\/g, '/')
-            .replace(/^\/+/, '');
-        const uncompressedSize = Number(entry?._data?.uncompressedSize);
-        if (!Number.isSafeInteger(uncompressedSize) || uncompressedSize < 0) {
-            throw new Error(`Unable to verify the uncompressed size of ${normalized || 'a ZIP entry'}.`);
-        }
-
-        totalBytes += uncompressedSize;
-        if (totalBytes > limits.maxZipUncompressedBytes) {
-            throw new Error(`ZIP expands beyond the ${Math.round(limits.maxZipUncompressedBytes / 1024 / 1024)} MB safety limit.`);
-        }
-
-        if (/(^|\/)dump\.json$/i.test(normalized)) {
-            if (uncompressedSize > limits.maxJsonBytes) {
-                throw new Error(`dump.json is too large. Maximum size is ${Math.round(limits.maxJsonBytes / 1024 / 1024)} MB.`);
-            }
-            if (!dumpEntry || normalized.length < dumpEntry.normalizedPath.length) {
-                dumpEntry = { entry, normalizedPath: normalized };
-            }
-        }
-
-        if (/(^|\/)metadata\.json$/i.test(normalized)) {
-            if (uncompressedSize > limits.maxJsonBytes) {
-                throw new Error(`metadata.json is too large. Maximum size is ${Math.round(limits.maxJsonBytes / 1024 / 1024)} MB.`);
-            }
-            if (!metadataEntry || normalized.length < metadataEntry.normalizedPath.length) {
-                metadataEntry = { entry, normalizedPath: normalized };
-            }
-        }
-
-        if (/\.(jpg|jpeg|png|gif|webp)$/i.test(normalized)) {
-            const fileName = normalized.split('/').pop();
-            if (!window.ExamApp.isSafeImageFileName(fileName)) return;
-            if (uncompressedSize > limits.maxImageBytes) {
-                throw new Error(`Image ${fileName} is too large. Maximum size is ${Math.round(limits.maxImageBytes / 1024 / 1024)} MB.`);
-            }
-            totalImageBytes += uncompressedSize;
-            imageFiles.push({ fileName, entry });
-            if (imageFiles.length > limits.maxImages) {
-                throw new Error(`ZIP contains too many images. Maximum is ${limits.maxImages}.`);
-            }
-            if (totalImageBytes > limits.maxTotalImageBytes) {
-                throw new Error(`ZIP images are too large in total. Maximum is ${Math.round(limits.maxTotalImageBytes / 1024 / 1024)} MB.`);
-            }
-        }
-    });
-
     return {
-        dumpEntry: dumpEntry?.entry || null,
-        metadataEntry: metadataEntry?.entry || null,
-        imageFiles,
-        entryCount,
-        totalBytes
+        totalAttempts: attempts.length,
+        completionAttempts: completion.length,
+        bestScore,
+        totalPassed,
+        passRate: completion.length
+            ? Math.round((totalPassed / completion.length) * 100)
+            : null
     };
 };
 
@@ -256,9 +342,9 @@ window.ExamApp.normalizeProgressRecord = function normalizeProgressRecord(progre
 
         const attempt = {
             score: source.score,
-            passed: source.passed === true,
             timeSpent: source.timeSpent === undefined ? 0 : source.timeSpent
         };
+        if (source.passed !== undefined) attempt.passed = source.passed;
 
         if (source.attemptId !== undefined) {
             const attemptId = normalizeString(source.attemptId, 200);
@@ -266,6 +352,14 @@ window.ExamApp.normalizeProgressRecord = function normalizeProgressRecord(progre
             attempt.attemptId = attemptId;
         }
         if (source.date !== undefined) attempt.date = source.date;
+
+        if (source.sessionType !== undefined) {
+            if (
+                typeof source.sessionType !== 'string'
+                || !['full', 'diagnostic', 'study'].includes(source.sessionType)
+            ) return null;
+            attempt.sessionType = source.sessionType;
+        }
 
         for (const field of ['questionCount', 'correctCount', 'incorrectCount', 'skippedCount']) {
             if (source[field] === undefined) continue;
@@ -316,15 +410,20 @@ window.ExamApp.normalizeProgressRecord = function normalizeProgressRecord(progre
         attempts.push(attempt);
     }
 
-    const derivedBestScore = attempts.reduce((best, attempt) => Math.max(best, attempt.score), 0);
-    const derivedTotalPassed = attempts.filter((attempt) => attempt.passed).length;
     if (progress.bestScore !== undefined && !isFiniteNumber(progress.bestScore, 0, 100)) return null;
     if (progress.totalPassed !== undefined && !isInteger(progress.totalPassed, 0, attempts.length)) return null;
+    const summary = window.ExamApp.getProgressSummary({
+        attempts,
+        bestScore: progress.bestScore,
+        totalPassed: progress.totalPassed
+    });
 
     return {
         attempts,
-        bestScore: progress.bestScore === undefined ? derivedBestScore : progress.bestScore,
-        totalPassed: progress.totalPassed === undefined ? derivedTotalPassed : progress.totalPassed
+        // Re-derive these legacy aggregates so records written before diagnostics
+        // were separated cannot continue to mark a roadmap as completed.
+        bestScore: summary.bestScore,
+        totalPassed: summary.totalPassed
     };
 };
 
@@ -348,9 +447,242 @@ window.ExamApp.normalizeQuestionType = function normalizeQuestionType(question) 
     return aliases[rawType] || rawType;
 };
 
-window.ExamApp.validateExamData = function validateExamData(questions, metadata = null) {
+window.ExamApp.validateExamMetadata = function validateExamMetadata(
+    metadata,
+    questionTotal = null,
+    labs = undefined
+) {
     const errors = [];
     const warnings = [];
+    const limits = window.ExamApp.EXAM_LIMITS;
+
+    if (metadata === null || metadata === undefined) {
+        if (Array.isArray(labs) && labs.length > 0) {
+            errors.push('Metadata with labCount is required when labs are present.');
+        }
+        return { valid: errors.length === 0, errors, warnings };
+    }
+    if (typeof metadata !== 'object' || Array.isArray(metadata)) {
+        errors.push('Metadata must be an object.');
+        return { valid: false, errors, warnings };
+    }
+
+    const pending = [{ value: metadata, path: 'Metadata' }];
+    const seen = new Set();
+    while (pending.length > 0) {
+        const current = pending.pop();
+        const value = current.value;
+        if (!value || typeof value !== 'object' || seen.has(value)) continue;
+        seen.add(value);
+
+        if (Array.isArray(value)) {
+            if (value.length > limits.maxMetadataListItems) {
+                errors.push(`${current.path} has too many items; maximum is ${limits.maxMetadataListItems}.`);
+            }
+            value.slice(0, limits.maxMetadataListItems).forEach((item, index) => {
+                pending.push({ value: item, path: `${current.path}[${index}]` });
+            });
+            continue;
+        }
+        for (const [field, nested] of Object.entries(value)) {
+            pending.push({ value: nested, path: `${current.path}.${field}` });
+        }
+    }
+
+    if (metadata.id !== undefined && !window.ExamApp.isSafeExamId(metadata.id)) {
+        errors.push('Metadata id is invalid.');
+    }
+    if (
+        metadata.questionCount !== undefined
+        && (
+            !Number.isInteger(metadata.questionCount)
+            || metadata.questionCount < 1
+            || metadata.questionCount > limits.maxQuestions
+            || (Number.isInteger(questionTotal) && metadata.questionCount > questionTotal)
+        )
+    ) {
+        errors.push('Metadata questionCount must be between 1 and total questions.');
+    }
+    if (metadata.totalQuestions !== undefined) {
+        if (
+            !Number.isInteger(metadata.totalQuestions)
+            || metadata.totalQuestions < 1
+            || metadata.totalQuestions > limits.maxQuestions
+        ) {
+            errors.push(`Metadata totalQuestions must be between 1 and ${limits.maxQuestions}.`);
+        } else if (
+            Number.isInteger(questionTotal)
+            && metadata.totalQuestions !== questionTotal
+        ) {
+            warnings.push('Metadata totalQuestions does not match question count.');
+        }
+    }
+
+    if (
+        metadata.labCount !== undefined
+        && (
+            !Number.isInteger(metadata.labCount)
+            || metadata.labCount < 0
+            || metadata.labCount > limits.maxLabs
+        )
+    ) {
+        errors.push(`Metadata labCount must be between 0 and ${limits.maxLabs}.`);
+    }
+    if (Array.isArray(labs)) {
+        if (labs.length > 0 && metadata.labCount === undefined) {
+            errors.push('Metadata labCount is required when labs are present.');
+        } else if (
+            metadata.labCount !== undefined
+            && metadata.labCount !== labs.length
+        ) {
+            errors.push('Metadata labCount must match the number of labs.');
+        }
+    }
+
+    return { valid: errors.length === 0, errors, warnings };
+};
+
+window.ExamApp.validateExamLabs = function validateExamLabs(labs) {
+    const errors = [];
+    const limits = window.ExamApp.EXAM_LIMITS;
+    const hasText = (value, maxLength = limits.maxTextLength) => (
+        typeof value === 'string'
+        && value.trim().length > 0
+        && value.trim().length <= maxLength
+    );
+
+    if (!Array.isArray(labs)) {
+        errors.push('Labs must be an array.');
+        return { valid: false, errors, warnings: [] };
+    }
+    if (labs.length > limits.maxLabs) {
+        errors.push(`Labs has ${labs.length} entries; maximum is ${limits.maxLabs}.`);
+    }
+
+    const ids = new Set();
+    labs.slice(0, limits.maxLabs).forEach((lab, index) => {
+        const label = `Lab ${index + 1}`;
+        if (!lab || typeof lab !== 'object' || Array.isArray(lab)) {
+            errors.push(`${label}: item must be an object.`);
+            return;
+        }
+
+        const id = typeof lab.id === 'string' ? lab.id.trim() : '';
+        if (!id || id.length > 200) errors.push(`${label}: id is required or too long.`);
+        if (id && ids.has(id)) errors.push(`${label}: duplicate id ${id}.`);
+        if (id) ids.add(id);
+
+        for (const field of [
+            'domain',
+            'title',
+            'objective',
+            'expectedResult',
+            'estCost',
+            'objectiveVersion'
+        ]) {
+            if (!hasText(lab[field])) errors.push(`${label}: ${field} is required or too long.`);
+        }
+        if (typeof lab.freeTierOnly !== 'boolean') {
+            errors.push(`${label}: freeTierOnly must be true or false.`);
+        }
+        if (
+            typeof lab.sourceVerifiedOn !== 'string'
+            || !/^\d{4}-\d{2}-\d{2}$/.test(lab.sourceVerifiedOn.trim())
+        ) {
+            errors.push(`${label}: sourceVerifiedOn must be an ISO date (YYYY-MM-DD).`);
+        }
+
+        const boundedTextList = (field, maximum) => {
+            const values = lab[field];
+            if (!Array.isArray(values) || values.length === 0) {
+                errors.push(`${label}: ${field} must be a non-empty array of strings.`);
+                return;
+            }
+            if (values.length > maximum) {
+                errors.push(`${label}: ${field} has too many items; maximum is ${maximum}.`);
+            }
+            values.slice(0, maximum).forEach((value) => {
+                if (!hasText(value)) {
+                    errors.push(`${label}: ${field} entries must be non-empty strings.`);
+                }
+            });
+        };
+        boundedTextList('prerequisites', limits.maxLabPrerequisites);
+        boundedTextList('cleanup', limits.maxLabCleanup);
+
+        const steps = lab.steps;
+        let labImageRefs = 0;
+        if (!Array.isArray(steps) || steps.length === 0) {
+            errors.push(`${label}: steps must be a non-empty array.`);
+        } else {
+            if (steps.length > limits.maxLabSteps) {
+                errors.push(`${label}: steps has too many items; maximum is ${limits.maxLabSteps}.`);
+            }
+            steps.slice(0, limits.maxLabSteps).forEach((step, stepIndex) => {
+                if (!step || typeof step !== 'object' || Array.isArray(step)) {
+                    errors.push(`${label}: step ${stepIndex + 1} must be an object.`);
+                    return;
+                }
+                if (!Number.isInteger(step.n)) {
+                    errors.push(`${label}: step ${stepIndex + 1} n must be an integer.`);
+                }
+                if (!hasText(step.instruction)) {
+                    errors.push(`${label}: step ${stepIndex + 1} instruction is required or too long.`);
+                }
+                if (!hasText(step.expected)) {
+                    errors.push(`${label}: step ${stepIndex + 1} expected is required or too long.`);
+                }
+                if (step.image !== undefined) {
+                    labImageRefs += 1;
+                    if (
+                        !step.image
+                        || typeof step.image !== 'object'
+                        || Array.isArray(step.image)
+                        || !window.ExamApp.isSafeImageFileName(step.image.filename)
+                    ) {
+                        errors.push(`${label}: step ${stepIndex + 1} image filename is invalid.`);
+                    }
+                }
+            });
+        }
+        if (labImageRefs > limits.maxLabImageRefs) {
+            errors.push(`${label}: step images exceed the maximum of ${limits.maxLabImageRefs}.`);
+        }
+
+        const references = lab.references;
+        if (!Array.isArray(references) || references.length === 0) {
+            errors.push(`${label}: references must be a non-empty array.`);
+        } else {
+            if (references.length > limits.maxLabReferences) {
+                errors.push(`${label}: references has too many items; maximum is ${limits.maxLabReferences}.`);
+            }
+            references.slice(0, limits.maxLabReferences).forEach((reference, refIndex) => {
+                if (
+                    !reference
+                    || typeof reference !== 'object'
+                    || Array.isArray(reference)
+                    || !hasText(reference.label, 1000)
+                    || !hasText(reference.url, 5000)
+                ) {
+                    errors.push(`${label}: reference ${refIndex + 1} must have label and url.`);
+                } else if (!window.ExamApp.isOfficialDocumentationUrl(reference.url)) {
+                    errors.push(`${label}: reference ${refIndex + 1} must use an official HTTPS documentation URL.`);
+                }
+            });
+        }
+    });
+
+    return { valid: errors.length === 0, errors, warnings: [] };
+};
+
+window.ExamApp.validateExamData = function validateExamData(
+    questions,
+    metadata = null,
+    labs = undefined
+) {
+    const errors = [];
+    const warnings = [];
+    const limits = window.ExamApp.EXAM_LIMITS;
     const supportedTypes = new Set(['STANDARD', 'MULTI', 'YES_NO_MATRIX', 'SEQUENCE', 'DRAG_DROP_SELECT']);
     const items = Array.isArray(questions) ? questions : null;
 
@@ -360,20 +692,21 @@ window.ExamApp.validateExamData = function validateExamData(questions, metadata 
     }
 
     if (items.length === 0) errors.push('Exam must contain at least one question.');
-    if (items.length > window.ExamApp.EXAM_LIMITS.maxQuestions) {
-        errors.push(`Exam has ${items.length} questions; maximum is ${window.ExamApp.EXAM_LIMITS.maxQuestions}.`);
+    if (items.length > limits.maxQuestions) {
+        errors.push(`Exam has ${items.length} questions; maximum is ${limits.maxQuestions}.`);
     }
 
     const ids = new Set();
     const hasValidIndex = (index, options) => Number.isInteger(index) && Array.isArray(options) && index >= 0 && index < options.length;
-    const hasText = (value, maxLength = window.ExamApp.EXAM_LIMITS.maxTextLength) => {
-        const text = String(value || '').trim();
-        return text.length > 0 && text.length <= maxLength;
-    };
+    const hasText = (value, maxLength = limits.maxTextLength) => (
+        typeof value === 'string'
+        && value.trim().length > 0
+        && value.trim().length <= maxLength
+    );
 
-    items.forEach((question, index) => {
+    items.slice(0, limits.maxQuestions).forEach((question, index) => {
         const label = `Question ${index + 1}`;
-        if (!question || typeof question !== 'object') {
+        if (!question || typeof question !== 'object' || Array.isArray(question)) {
             errors.push(`${label}: item must be an object.`);
             return;
         }
@@ -384,8 +717,12 @@ window.ExamApp.validateExamData = function validateExamData(questions, metadata 
         if (id) ids.add(id);
 
         if (!hasText(question.question)) errors.push(`${label}: question text is empty or too long.`);
-        if (question.explanation !== undefined && !hasText(question.explanation)) warnings.push(`${label}: explanation is empty or too long.`);
-        if (question.module !== undefined && !hasText(question.module, 200)) warnings.push(`${label}: module is empty or too long.`);
+        if (question.explanation !== undefined && !hasText(question.explanation)) {
+            errors.push(`${label}: explanation is empty, invalid, or too long.`);
+        }
+        if (question.module !== undefined && !hasText(question.module, 200)) {
+            errors.push(`${label}: module is empty, invalid, or too long.`);
+        }
 
         const type = window.ExamApp.normalizeQuestionType(question);
         if (!supportedTypes.has(type)) errors.push(`${label}: unsupported question_type ${type}.`);
@@ -395,8 +732,11 @@ window.ExamApp.validateExamData = function validateExamData(questions, metadata 
             if (!Array.isArray(question.options) || question.options.length < 2) {
                 errors.push(`${label}: options must contain at least two items.`);
             } else {
-                question.options.forEach((option, optionIndex) => {
-                    if (!hasText(option, window.ExamApp.EXAM_LIMITS.maxOptionLength)) {
+                if (question.options.length > limits.maxOptions) {
+                    errors.push(`${label}: options has too many items; maximum is ${limits.maxOptions}.`);
+                }
+                question.options.slice(0, limits.maxOptions).forEach((option, optionIndex) => {
+                    if (!hasText(option, limits.maxOptionLength)) {
                         errors.push(`${label}: option ${optionIndex + 1} is empty or too long.`);
                     }
                 });
@@ -409,13 +749,22 @@ window.ExamApp.validateExamData = function validateExamData(questions, metadata 
             if (!Array.isArray(question.correct) || question.correct.length === 0) {
                 errors.push(`${label}: correct must be a non-empty array.`);
             } else {
-                question.correct.forEach((correctIndex) => {
+                if (question.correct.length > limits.maxCorrectAnswers) {
+                    errors.push(`${label}: correct has too many items; maximum is ${limits.maxCorrectAnswers}.`);
+                }
+                question.correct.slice(0, limits.maxCorrectAnswers).forEach((correctIndex) => {
                     if (!hasValidIndex(correctIndex, question.options)) errors.push(`${label}: invalid correct option index ${correctIndex}.`);
                 });
+                const correctIndices = question.correct.filter(Number.isInteger);
+                if (new Set(correctIndices).size !== correctIndices.length) {
+                    errors.push(`${label}: correct must not contain duplicate option indices.`);
+                }
             }
         } else if (type === 'SEQUENCE') {
             if (!Array.isArray(question.options) || !Array.isArray(question.correct) || question.correct.length !== question.options.length) {
                 errors.push(`${label}: correct sequence must match options length.`);
+            } else if (question.correct.length > limits.maxCorrectAnswers) {
+                errors.push(`${label}: correct has too many items; maximum is ${limits.maxCorrectAnswers}.`);
             } else {
                 const sorted = [...question.correct].sort((a, b) => a - b);
                 for (let i = 0; i < question.options.length; i++) {
@@ -429,8 +778,11 @@ window.ExamApp.validateExamData = function validateExamData(questions, metadata 
             if (!Array.isArray(question.statements) || question.statements.length === 0) {
                 errors.push(`${label}: statements must contain at least one item.`);
             } else {
-                question.statements.forEach((statement, statementIndex) => {
-                    if (!hasText(statement, window.ExamApp.EXAM_LIMITS.maxOptionLength)) {
+                if (question.statements.length > limits.maxStatements) {
+                    errors.push(`${label}: statements has too many items; maximum is ${limits.maxStatements}.`);
+                }
+                question.statements.slice(0, limits.maxStatements).forEach((statement, statementIndex) => {
+                    if (!hasText(statement, limits.maxOptionLength)) {
                         errors.push(`${label}: statement ${statementIndex + 1} is empty or too long.`);
                     }
                 });
@@ -439,7 +791,10 @@ window.ExamApp.validateExamData = function validateExamData(questions, metadata 
             if (!Array.isArray(question.correct) || !Array.isArray(question.statements) || question.correct.length !== question.statements.length) {
                 errors.push(`${label}: correct responses must match statements length.`);
             } else {
-                question.correct.forEach((answer) => {
+                if (question.correct.length > limits.maxCorrectAnswers) {
+                    errors.push(`${label}: correct has too many items; maximum is ${limits.maxCorrectAnswers}.`);
+                }
+                question.correct.slice(0, limits.maxCorrectAnswers).forEach((answer) => {
                     if (answer !== 0 && answer !== 1) errors.push(`${label}: YES/NO answers must be 0 or 1.`);
                 });
             }
@@ -447,28 +802,90 @@ window.ExamApp.validateExamData = function validateExamData(questions, metadata 
             if (!Array.isArray(question.correct) || question.correct.length === 0) {
                 errors.push(`${label}: correct must be a non-empty array.`);
             } else {
-                question.correct.forEach((correctIndex) => {
+                if (question.correct.length > limits.maxCorrectAnswers) {
+                    errors.push(`${label}: correct has too many items; maximum is ${limits.maxCorrectAnswers}.`);
+                }
+                question.correct.slice(0, limits.maxCorrectAnswers).forEach((correctIndex) => {
                     if (!hasValidIndex(correctIndex, question.options)) errors.push(`${label}: invalid selected option index ${correctIndex}.`);
                 });
+                const correctIndices = question.correct.filter(Number.isInteger);
+                if (new Set(correctIndices).size !== correctIndices.length) {
+                    errors.push(`${label}: correct must not contain duplicate option indices.`);
+                }
             }
 
-            if (question.drag_select_required !== undefined) {
-                const required = question.drag_select_required;
-                if (!Number.isInteger(required) || required < 1 || required > (question.options || []).length) {
-                    errors.push(`${label}: drag_select_required is invalid.`);
+            const required = question.drag_select_required;
+            if (
+                !Number.isInteger(required)
+                || required < 1
+                || !Array.isArray(question.options)
+                || required > question.options.length
+                || !Array.isArray(question.correct)
+                || required !== question.correct.length
+            ) {
+                errors.push(`${label}: drag_select_required is invalid.`);
+            }
+        }
+
+        let imageRefCount = 0;
+        for (const field of ['question_images', 'explanation_images']) {
+            if (question[field] === undefined) continue;
+            if (!Array.isArray(question[field])) {
+                errors.push(`${label}: ${field} must be an array.`);
+                continue;
+            }
+            imageRefCount += question[field].length;
+            question[field]
+                .slice(0, limits.maxQuestionImageRefs)
+                .forEach((reference, referenceIndex) => {
+                    if (
+                        !reference
+                        || typeof reference !== 'object'
+                        || Array.isArray(reference)
+                        || !window.ExamApp.isSafeImageFileName(reference.filename)
+                    ) {
+                        errors.push(`${label}: ${field} entry ${referenceIndex + 1} has an invalid filename.`);
+                    }
+                });
+        }
+        if (imageRefCount > limits.maxQuestionImageRefs) {
+            errors.push(`${label}: image references exceed the maximum of ${limits.maxQuestionImageRefs}.`);
+        }
+
+        if (question.references !== undefined) {
+            if (!Array.isArray(question.references)) {
+                errors.push(`${label}: references must be an array.`);
+            } else {
+                if (question.references.length > limits.maxQuestionReferences) {
+                    errors.push(`${label}: references has too many items; maximum is ${limits.maxQuestionReferences}.`);
                 }
+                question.references
+                    .slice(0, limits.maxQuestionReferences)
+                    .forEach((reference, referenceIndex) => {
+                        if (!hasText(reference, 5000)) {
+                            errors.push(`${label}: reference ${referenceIndex + 1} must be a non-empty string.`);
+                        }
+                    });
             }
         }
     });
 
-    if (metadata && typeof metadata === 'object') {
-        if (metadata.id !== undefined && !window.ExamApp.isSafeExamId(metadata.id)) errors.push('Metadata id is invalid.');
-        if (metadata.questionCount !== undefined && (!Number.isInteger(metadata.questionCount) || metadata.questionCount < 1 || metadata.questionCount > items.length)) {
-            errors.push('Metadata questionCount must be between 1 and total questions.');
-        }
-        if (metadata.totalQuestions !== undefined && metadata.totalQuestions !== items.length) {
-            warnings.push('Metadata totalQuestions does not match question count.');
-        }
+    // validateExamData represents a complete pack, so an omitted labs field is
+    // an empty lab set. Metadata-only discovery calls validateExamMetadata
+    // directly and may still defer this reconciliation until the dump loads.
+    const completePackLabs = labs === undefined ? [] : labs;
+    const metadataValidation = window.ExamApp.validateExamMetadata(
+        metadata,
+        items.length,
+        completePackLabs
+    );
+    errors.push(...metadataValidation.errors);
+    warnings.push(...metadataValidation.warnings);
+
+    if (labs !== undefined) {
+        const labValidation = window.ExamApp.validateExamLabs(labs);
+        errors.push(...labValidation.errors);
+        warnings.push(...labValidation.warnings);
     }
 
     return { valid: errors.length === 0, errors, warnings };

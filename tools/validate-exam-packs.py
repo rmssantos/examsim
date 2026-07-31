@@ -19,6 +19,22 @@ from typing import Any
 EXAM_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 IMAGE_NAME_RE = re.compile(r"^[A-Za-z0-9_. -]{1,128}$")
 SUPPORTED_TYPES = {"STANDARD", "MULTI", "YES_NO_MATRIX", "SEQUENCE", "DRAG_DROP_SELECT"}
+MAX_QUESTIONS = 1000
+MAX_OPTIONS = 50
+MAX_STATEMENTS = 50
+MAX_CORRECT_ANSWERS = 50
+MAX_QUESTION_IMAGE_REFS = 20
+MAX_QUESTION_REFERENCES = 20
+MAX_LABS = 50
+MAX_LAB_IMAGE_REFS = 20
+MAX_LAB_STEPS = 100
+MAX_LAB_PREREQUISITES = 25
+MAX_LAB_CLEANUP = 25
+MAX_LAB_REFERENCES = 25
+MAX_METADATA_LIST_ITEMS = 100
+MAX_TEXT_LENGTH = 20000
+MAX_MODULE_LENGTH = 200
+MAX_REFERENCE_LENGTH = 5000
 
 # Lab guides (the `labs` array in a pack's dump.json) are non-graded hands-on content.
 # References must point at official documentation; the safety fields below are hard gates
@@ -176,6 +192,11 @@ class PackValidator:
         if not questions:
             self.add_issue(dump_path, "exam must contain at least one question")
             return
+        if len(questions) > MAX_QUESTIONS:
+            self.add_issue(
+                dump_path,
+                f"exam has {len(questions)} questions; maximum is {MAX_QUESTIONS}",
+            )
 
         self.pack_count += 1
         self.question_count += len(questions)
@@ -204,6 +225,29 @@ class PackValidator:
         if not isinstance(metadata, dict):
             self.add_issue(path, "metadata.json must be an object")
             return
+
+        pending: list[tuple[str, Any]] = [("metadata", metadata)]
+        seen: set[int] = set()
+        while pending:
+            field_path, value = pending.pop()
+            if not isinstance(value, (dict, list)) or id(value) in seen:
+                continue
+            seen.add(id(value))
+            if isinstance(value, list):
+                if len(value) > MAX_METADATA_LIST_ITEMS:
+                    self.add_issue(
+                        path,
+                        f"{field_path} has too many items; maximum is {MAX_METADATA_LIST_ITEMS}",
+                    )
+                pending.extend(
+                    (f"{field_path}[{index}]", item)
+                    for index, item in enumerate(value[:MAX_METADATA_LIST_ITEMS])
+                )
+            else:
+                pending.extend(
+                    (f"{field_path}.{field}", nested)
+                    for field, nested in value.items()
+                )
 
         metadata_id = metadata.get("id")
         if metadata_id is not None and metadata_id != exam_id:
@@ -239,12 +283,15 @@ class PackValidator:
 
             for field in TAXONOMY_LIST_FIELDS:
                 values = metadata.get(field)
-                if not isinstance(values, list) or not values or any(not has_text(value) for value in values):
+                if not isinstance(values, list) or not values or any(
+                    not has_text(value)
+                    for value in values[:MAX_METADATA_LIST_ITEMS]
+                ):
                     self.add_issue(path, f"{field} must be a non-empty array of strings")
 
     def validate_questions(self, exam_id: str, questions: list[Any], path: Path) -> None:
         ids = set()
-        for index, question in enumerate(questions, start=1):
+        for index, question in enumerate(questions[:MAX_QUESTIONS], start=1):
             label = f"question {index}"
             if not isinstance(question, dict):
                 self.add_issue(path, f"{label}: item must be an object")
@@ -260,6 +307,16 @@ class PackValidator:
 
             if not has_text(question.get("question")):
                 self.add_issue(path, f"{label}: question text is required")
+            if "explanation" in question and not has_text(
+                question.get("explanation"),
+                MAX_TEXT_LENGTH,
+            ):
+                self.add_issue(path, f"{label}: explanation is empty, invalid, or too long")
+            if "module" in question and not has_text(
+                question.get("module"),
+                MAX_MODULE_LENGTH,
+            ):
+                self.add_issue(path, f"{label}: module is empty, invalid, or too long")
 
             question_type = normalize_question_type(question)
             if question_type not in SUPPORTED_TYPES:
@@ -271,7 +328,12 @@ class PackValidator:
                 if not isinstance(options, list) or len(options) < 2:
                     self.add_issue(path, f"{label}: options must contain at least two entries")
                     continue
-                for option_index, option in enumerate(options, start=1):
+                if len(options) > MAX_OPTIONS:
+                    self.add_issue(
+                        path,
+                        f"{label}: options has too many items; maximum is {MAX_OPTIONS}",
+                    )
+                for option_index, option in enumerate(options[:MAX_OPTIONS], start=1):
                     if not has_text(option):
                         self.add_issue(path, f"{label}: option {option_index} is empty")
 
@@ -289,42 +351,95 @@ class PackValidator:
             if not isinstance(correct, list) or not correct:
                 self.add_issue(path, f"{label}: correct must be a non-empty array")
             else:
-                for value in correct:
+                if len(correct) > MAX_CORRECT_ANSWERS:
+                    self.add_issue(
+                        path,
+                        f"{label}: correct has too many items; maximum is {MAX_CORRECT_ANSWERS}",
+                    )
+                for value in correct[:MAX_CORRECT_ANSWERS]:
                     if not valid_option_index(value, options):
                         self.add_issue(path, f"{label}: invalid correct option index {value!r}")
+                correct_indices = [value for value in correct if is_plain_int(value)]
+                if len(set(correct_indices)) != len(correct_indices):
+                    self.add_issue(path, f"{label}: correct must not contain duplicate option indices")
         elif question_type == "SEQUENCE":
             if not isinstance(correct, list) or not isinstance(options, list) or len(correct) != len(options):
                 self.add_issue(path, f"{label}: correct sequence must match options length")
-            elif sorted(correct) != list(range(len(options))):
-                self.add_issue(path, f"{label}: correct sequence must be a permutation of option indices")
+            elif len(correct) > MAX_CORRECT_ANSWERS:
+                self.add_issue(
+                    path,
+                    f"{label}: correct has too many items; maximum is {MAX_CORRECT_ANSWERS}",
+                )
+            else:
+                if (
+                    not all(is_plain_int(value) for value in correct)
+                    or sorted(correct) != list(range(len(options)))
+                ):
+                    self.add_issue(path, f"{label}: correct sequence must be a permutation of option indices")
         elif question_type == "DRAG_DROP_SELECT":
             if not isinstance(correct, list) or not correct:
                 self.add_issue(path, f"{label}: correct must be a non-empty array")
             else:
-                for value in correct:
+                if len(correct) > MAX_CORRECT_ANSWERS:
+                    self.add_issue(
+                        path,
+                        f"{label}: correct has too many items; maximum is {MAX_CORRECT_ANSWERS}",
+                    )
+                for value in correct[:MAX_CORRECT_ANSWERS]:
                     if not valid_option_index(value, options):
                         self.add_issue(path, f"{label}: invalid selected option index {value!r}")
+                correct_indices = [value for value in correct if is_plain_int(value)]
+                if len(set(correct_indices)) != len(correct_indices):
+                    self.add_issue(path, f"{label}: correct must not contain duplicate option indices")
             required = question.get("drag_select_required")
-            if required is not None and (
-                not is_plain_int(required)
+            if (
+                "drag_select_required" not in question
+                or not is_plain_int(required)
                 or required < 1
                 or not isinstance(options, list)
                 or required > len(options)
+                or not isinstance(correct, list)
+                or required != len(correct)
             ):
                 self.add_issue(path, f"{label}: drag_select_required is invalid")
         elif question_type == "YES_NO_MATRIX":
             statements = question.get("statements")
             if not isinstance(statements, list) or not statements:
                 self.add_issue(path, f"{label}: statements must contain at least one entry")
-            elif any(not has_text(statement) for statement in statements):
-                self.add_issue(path, f"{label}: statements must be non-empty strings")
+            else:
+                if len(statements) > MAX_STATEMENTS:
+                    self.add_issue(
+                        path,
+                        f"{label}: statements has too many items; maximum is {MAX_STATEMENTS}",
+                    )
+                if any(not has_text(statement) for statement in statements[:MAX_STATEMENTS]):
+                    self.add_issue(path, f"{label}: statements must be non-empty strings")
 
             if not isinstance(correct, list) or not isinstance(statements, list) or len(correct) != len(statements):
                 self.add_issue(path, f"{label}: correct responses must match statements length")
-            elif any(answer not in (0, 1) or isinstance(answer, bool) for answer in correct):
-                self.add_issue(path, f"{label}: YES_NO_MATRIX answers must be 0 or 1")
+            else:
+                if len(correct) > MAX_CORRECT_ANSWERS:
+                    self.add_issue(
+                        path,
+                        f"{label}: correct has too many items; maximum is {MAX_CORRECT_ANSWERS}",
+                    )
+                if any(
+                    answer not in (0, 1) or isinstance(answer, bool)
+                    for answer in correct[:MAX_CORRECT_ANSWERS]
+                ):
+                    self.add_issue(path, f"{label}: YES_NO_MATRIX answers must be 0 or 1")
 
     def validate_image_refs(self, exam_id: str, question: dict[str, Any], label: str, path: Path) -> None:
+        total_refs = sum(
+            len(question.get(field))
+            for field in ("question_images", "explanation_images")
+            if isinstance(question.get(field), list)
+        )
+        if total_refs > MAX_QUESTION_IMAGE_REFS:
+            self.add_issue(
+                path,
+                f"{label}: image references exceed the maximum of {MAX_QUESTION_IMAGE_REFS}",
+            )
         for field in ("question_images", "explanation_images"):
             refs = question.get(field)
             if refs is None:
@@ -332,7 +447,7 @@ class PackValidator:
             if not isinstance(refs, list):
                 self.add_issue(path, f"{label}: {field} must be an array")
                 continue
-            for ref in refs:
+            for ref in refs[:MAX_QUESTION_IMAGE_REFS]:
                 if not isinstance(ref, dict) or not isinstance(ref.get("filename"), str):
                     self.add_issue(path, f"{label}: {field} entries must contain filename")
                     continue
@@ -344,19 +459,39 @@ class PackValidator:
                 if not image_path.is_file():
                     self.add_issue(path, f"{label}: missing image file images/{filename}")
 
+        references = question.get("references")
+        if "references" in question:
+            if not isinstance(references, list):
+                self.add_issue(path, f"{label}: references must be an array")
+            elif len(references) > MAX_QUESTION_REFERENCES:
+                self.add_issue(
+                    path,
+                    f"{label}: references has too many items; maximum is {MAX_QUESTION_REFERENCES}",
+                )
+            if isinstance(references, list):
+                for reference_index, reference in enumerate(
+                    references[:MAX_QUESTION_REFERENCES],
+                    start=1,
+                ):
+                    if not has_text(reference, MAX_REFERENCE_LENGTH):
+                        self.add_issue(
+                            path,
+                            f"{label}: reference {reference_index} must be a non-empty string",
+                        )
+
     def validate_labs(self, exam_id: str, labs: Any, path: Path) -> None:
         for message in lab_validation_messages(labs):
             self.add_issue(path, message)
         if not isinstance(labs, list):
             return
-        for lab in labs:
+        for lab in labs[:MAX_LABS]:
             if not isinstance(lab, dict):
                 continue
             lab_label = f"lab {str(lab.get('id') or 'unknown')!r}"
             steps = lab.get("steps")
             if not isinstance(steps, list):
                 continue
-            for step in steps:
+            for step in steps[:MAX_LAB_STEPS]:
                 if not isinstance(step, dict) or "image" not in step:
                     continue
                 image = step.get("image")
@@ -391,8 +526,11 @@ def is_plain_number(value: Any) -> bool:
     return (is_plain_int(value) or isinstance(value, float)) and not isinstance(value, bool)
 
 
-def has_text(value: Any) -> bool:
-    return isinstance(value, str) and bool(value.strip())
+def has_text(value: Any, max_length: int | None = None) -> bool:
+    if not isinstance(value, str):
+        return False
+    stripped = value.strip()
+    return bool(stripped) and (max_length is None or len(stripped) <= max_length)
 
 
 def valid_option_index(value: Any, options: Any) -> bool:
@@ -423,6 +561,12 @@ def is_official_doc_url(url: Any) -> bool:
         return False
     if parsed.scheme != "https":
         return False
+    try:
+        port = parsed.port
+    except ValueError:
+        return False
+    if parsed.username or parsed.password or port is not None:
+        return False
     host = (parsed.hostname or "").lower()
     return any(
         host == suffix or host.endswith("." + suffix)
@@ -442,8 +586,10 @@ def lab_validation_messages(labs: Any) -> list[str]:
         return ["labs must be an array"]
 
     messages: list[str] = []
+    if len(labs) > MAX_LABS:
+        messages.append(f"labs has too many entries; maximum is {MAX_LABS}")
     seen: set[str] = set()
-    for index, lab in enumerate(labs, start=1):
+    for index, lab in enumerate(labs[:MAX_LABS], start=1):
         label = f"lab {index}"
         if not isinstance(lab, dict):
             messages.append(f"{label}: item must be an object")
@@ -471,19 +617,34 @@ def lab_validation_messages(labs: Any) -> list[str]:
 
         prerequisites = lab.get("prerequisites")
         if not isinstance(prerequisites, list) or not prerequisites or any(
-            not has_text(item) for item in prerequisites
+            not has_text(item) for item in prerequisites[:MAX_LAB_PREREQUISITES]
         ):
             messages.append(f"{label}: prerequisites must be a non-empty array of strings")
+        elif len(prerequisites) > MAX_LAB_PREREQUISITES:
+            messages.append(
+                f"{label}: prerequisites has too many items; maximum is {MAX_LAB_PREREQUISITES}"
+            )
 
         cleanup = lab.get("cleanup")
-        if not isinstance(cleanup, list) or not cleanup or any(not has_text(item) for item in cleanup):
+        if not isinstance(cleanup, list) or not cleanup or any(
+            not has_text(item) for item in cleanup[:MAX_LAB_CLEANUP]
+        ):
             messages.append(f"{label}: cleanup must be a non-empty array of strings")
+        elif len(cleanup) > MAX_LAB_CLEANUP:
+            messages.append(
+                f"{label}: cleanup has too many items; maximum is {MAX_LAB_CLEANUP}"
+            )
 
         steps = lab.get("steps")
         if not isinstance(steps, list) or not steps:
             messages.append(f"{label}: steps must be a non-empty array")
         else:
-            for step_index, step in enumerate(steps, start=1):
+            if len(steps) > MAX_LAB_STEPS:
+                messages.append(
+                    f"{label}: steps has too many items; maximum is {MAX_LAB_STEPS}"
+                )
+            image_refs = 0
+            for step_index, step in enumerate(steps[:MAX_LAB_STEPS], start=1):
                 if not isinstance(step, dict):
                     messages.append(f"{label}: step {step_index} must be an object")
                     continue
@@ -493,12 +654,25 @@ def lab_validation_messages(labs: Any) -> list[str]:
                     messages.append(f"{label}: step {step_index} instruction is required")
                 if not has_text(step.get("expected")):
                     messages.append(f"{label}: step {step_index} expected is required")
+                if "image" in step:
+                    image_refs += 1
+            if image_refs > MAX_LAB_IMAGE_REFS:
+                messages.append(
+                    f"{label}: step images exceed the maximum of {MAX_LAB_IMAGE_REFS}"
+                )
 
         references = lab.get("references")
         if not isinstance(references, list) or not references:
             messages.append(f"{label}: references must be a non-empty array")
         else:
-            for ref_index, ref in enumerate(references, start=1):
+            if len(references) > MAX_LAB_REFERENCES:
+                messages.append(
+                    f"{label}: references has too many items; maximum is {MAX_LAB_REFERENCES}"
+                )
+            for ref_index, ref in enumerate(
+                references[:MAX_LAB_REFERENCES],
+                start=1,
+            ):
                 if not isinstance(ref, dict) or not has_text(ref.get("label")) or not has_text(ref.get("url")):
                     messages.append(f"{label}: reference {ref_index} must have label and url")
                     continue
