@@ -6,6 +6,11 @@ import unittest
 from html.parser import HTMLParser
 from pathlib import Path
 
+try:
+    from .node_harness import run_node_snippet
+except ImportError:
+    from node_harness import run_node_snippet
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -30,6 +35,17 @@ class _AnalyticsElementParser(HTMLParser):
         attributes = dict(attrs)
         if "data-analytics-event" in attributes:
             self.tracked.append((tag, attributes))
+
+
+class _AnchorParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.anchors = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "a":
+            self.anchors.append(dict(attrs))
+
 
 SAMPLE = {
     "id": "sc900",
@@ -166,6 +182,29 @@ class RenderTests(unittest.TestCase):
     def test_page_has_no_unsubstituted_placeholders(self):
         self.assertNotIn("$", self._render())
 
+    def test_exam_navigation_uses_clean_directory_urls(self):
+        other = dict(SAMPLE, id="az900", name="AZ-900", certificationCode="AZ-900")
+        template = (ROOT / "tools" / "exam-page-template.html").read_text(encoding="utf-8")
+        parser = _AnchorParser()
+        parser.feed(gen.render_exam_page(SAMPLE, [SAMPLE, other], template))
+
+        brand = next(
+            anchor
+            for anchor in parser.anchors
+            if "cr-topnav-brand" in anchor.get("class", "").split()
+        )
+        self.assertEqual(brand["href"], "../../")
+        self.assertIn("data-file-index", brand)
+        self.assertFalse(
+            any("index.html" in anchor.get("href", "") for anchor in parser.anchors)
+        )
+        self.assertTrue(
+            any(anchor.get("href") == "../../exams/" for anchor in parser.anchors)
+        )
+        self.assertTrue(
+            any(anchor.get("href") == "../../exams/az900/" for anchor in parser.anchors)
+        )
+
 
 class SiteTests(unittest.TestCase):
     def test_sitemap_lists_home_hub_and_each_exam(self):
@@ -184,8 +223,75 @@ class SiteTests(unittest.TestCase):
 
     def test_hub_links_every_exam(self):
         html_out = gen.render_hub([SAMPLE, dict(SAMPLE, id="az900", certificationCode="AZ-900")])
-        self.assertIn('href="sc900/index.html"', html_out)
-        self.assertIn('href="az900/index.html"', html_out)
+        self.assertIn('href="sc900/"', html_out)
+        self.assertIn('href="az900/"', html_out)
+
+    def test_hub_navigation_uses_clean_directory_urls(self):
+        parser = _AnchorParser()
+        parser.feed(gen.render_hub([SAMPLE]))
+
+        brand = next(
+            anchor
+            for anchor in parser.anchors
+            if "cr-topnav-brand" in anchor.get("class", "").split()
+        )
+        self.assertEqual(brand["href"], "../")
+        self.assertIn("data-file-index", brand)
+        self.assertFalse(
+            any("index.html" in anchor.get("href", "") for anchor in parser.anchors)
+        )
+        card = next(
+            anchor
+            for anchor in parser.anchors
+            if "hub-card" in anchor.get("class", "").split()
+        )
+        self.assertEqual(card["href"], "sc900/")
+        self.assertIn("data-file-index", card)
+
+    def test_file_mode_restores_directory_index_fallbacks(self):
+        node_script = r"""
+const fs = require('fs');
+const vm = require('vm');
+const source = fs.readFileSync(process.argv[1], 'utf8');
+
+function resolve(protocol) {
+  let onReady = null;
+  const link = {
+    attributes: { href: '../../' },
+    getAttribute(name) { return this.attributes[name] ?? null; },
+    setAttribute(name, value) { this.attributes[name] = value; }
+  };
+  const context = {
+    window: {
+      location: { protocol },
+      matchMedia() { return { matches: false }; }
+    },
+    localStorage: {
+      getItem() { return null; },
+      setItem() {}
+    },
+    document: {
+      body: { classList: { toggle() {}, contains() { return false; } } },
+      getElementById() { return null; },
+      querySelectorAll(selector) {
+        return selector === 'a[data-file-index]' ? [link] : [];
+      },
+      addEventListener(event, callback) {
+        if (event === 'DOMContentLoaded') onReady = callback;
+      }
+    }
+  };
+  vm.createContext(context);
+  vm.runInContext(source, context);
+  if (onReady) onReady();
+  return link.attributes.href;
+}
+
+console.log(JSON.stringify({ file: resolve('file:'), http: resolve('https:') }));
+"""
+        result = run_node_snippet(ROOT / "assets" / "js" / "legal-page.js", node_script)
+        self.assertEqual(result["file"], "../../index.html")
+        self.assertEqual(result["http"], "../../")
 
     def test_write_site_produces_files_for_missing_metadata_safely(self):
         with tempfile.TemporaryDirectory() as tmp:
