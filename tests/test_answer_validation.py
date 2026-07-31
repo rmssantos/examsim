@@ -61,6 +61,21 @@ def evaluate_answer_cases(cases):
 
 
 class AnswerValidationTests(unittest.TestCase):
+    def test_multi_selection_remains_order_independent(self):
+        question = {
+            "question_type": "MULTI",
+            "correct": [0, 1],
+        }
+
+        actual = evaluate_answer_cases(
+            [
+                (question, [1, 0]),
+                (question, [0, 0]),
+            ]
+        )
+
+        self.assertEqual(actual, [True, False])
+
     def test_drag_drop_selection_is_order_independent(self):
         question = {
             "question_type": "DRAG_DROP_SELECT",
