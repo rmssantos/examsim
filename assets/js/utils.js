@@ -104,6 +104,32 @@ window.ExamApp.isOfficialDocumentationUrl = function isOfficialDocumentationUrl(
     }
 };
 
+window.ExamApp.safeExternalUrl = function safeExternalUrl(value) {
+    const candidate = String(value || '').trim();
+    if (!candidate) return null;
+
+    try {
+        const parsed = new URL(candidate, window.location.href);
+        if (
+            parsed.protocol !== 'https:'
+            || parsed.username
+            || parsed.password
+        ) {
+            return null;
+        }
+        return parsed.href;
+    } catch (_) {
+        return null;
+    }
+};
+
+window.ExamApp.resourceUrlForTrust = function resourceUrlForTrust(value, exam) {
+    const safeUrl = window.ExamApp.safeExternalUrl(value);
+    if (!safeUrl) return null;
+    if (window.ExamApp.isBundledTrustedExam(exam)) return safeUrl;
+    return window.ExamApp.isOfficialDocumentationUrl(safeUrl) ? safeUrl : null;
+};
+
 function safeGetLocalStorage(key) {
     try {
         return localStorage.getItem(key);

@@ -1,6 +1,7 @@
 """Browser schema regression tests for absent labs and advertised lab counts."""
 
 import json
+import shutil
 import subprocess
 import textwrap
 import unittest
@@ -8,6 +9,27 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def _run_node(script: str) -> dict:
+    node = shutil.which("node")
+    if not node:
+        raise unittest.SkipTest("node not available")
+
+    result = subprocess.run(
+        [node, "-e", script],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        timeout=15,
+    )
+    if result.returncode != 0:
+        raise AssertionError(result.stdout)
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError as error:
+        raise AssertionError(f"Node returned invalid JSON:\n{result.stdout}") from error
 
 
 class LabsPresenceValidationTests(unittest.TestCase):
@@ -58,16 +80,7 @@ class LabsPresenceValidationTests(unittest.TestCase):
             }));
             """
         )
-        result = subprocess.run(
-            ["node", "-e", script],
-            cwd=ROOT,
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            timeout=15,
-        )
-        self.assertEqual(0, result.returncode, result.stdout)
-        payload = json.loads(result.stdout)
+        payload = _run_node(script)
 
         self.assertFalse(payload["completePack"]["valid"])
         self.assertTrue(
@@ -86,10 +99,68 @@ class LabsPresenceValidationTests(unittest.TestCase):
             const fs = require('fs');
             const vm = require('vm');
             const source = fs.readFileSync('assets/js/script-multi-exam.js', 'utf8');
-            const start = source.indexOf('loadExamFromRuntime(examId) {');
-            const end = source.indexOf('\\n    _completeExamSelection', start);
-            if (start < 0 || end < 0) throw new Error('runtime loader method not found');
-            const methodSource = source.slice(start, end);
+            function extractMethod(methodName) {
+              const match = new RegExp(
+                `^\\\\s*(?:async\\\\s+)?${methodName}\\\\s*\\\\(`,
+                'm'
+              ).exec(source);
+              if (!match) throw new Error('runtime loader method not found');
+              const start = match.index;
+              const openingBrace = source.indexOf('{', start);
+              if (openingBrace < 0) throw new Error('runtime loader method not found');
+
+              let depth = 0;
+              let quote = null;
+              let escaped = false;
+              let lineComment = false;
+              let blockComment = false;
+              for (let index = openingBrace; index < source.length; index += 1) {
+                const char = source[index];
+                const next = source[index + 1];
+                if (lineComment) {
+                  if (char === '\\n') lineComment = false;
+                  continue;
+                }
+                if (blockComment) {
+                  if (char === '*' && next === '/') {
+                    blockComment = false;
+                    index += 1;
+                  }
+                  continue;
+                }
+                if (quote) {
+                  if (escaped) {
+                    escaped = false;
+                  } else if (char === '\\\\') {
+                    escaped = true;
+                  } else if (char === quote) {
+                    quote = null;
+                  }
+                  continue;
+                }
+                if (char === '/' && next === '/') {
+                  lineComment = true;
+                  index += 1;
+                  continue;
+                }
+                if (char === '/' && next === '*') {
+                  blockComment = true;
+                  index += 1;
+                  continue;
+                }
+                if (char === "'" || char === '"' || char === '`') {
+                  quote = char;
+                  continue;
+                }
+                if (char === '{') depth += 1;
+                if (char === '}') {
+                  depth -= 1;
+                  if (depth === 0) return source.slice(start, index + 1);
+                }
+              }
+              throw new Error('runtime loader method not found');
+            }
+            const methodSource = extractMethod('loadExamFromRuntime');
             const validationCalls = [];
             const context = {
               window: {
@@ -141,16 +212,7 @@ class LabsPresenceValidationTests(unittest.TestCase):
             }));
             """
         )
-        result = subprocess.run(
-            ["node", "-e", script],
-            cwd=ROOT,
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            timeout=15,
-        )
-        self.assertEqual(0, result.returncode, result.stdout)
-        payload = json.loads(result.stdout)
+        payload = _run_node(script)
 
         self.assertTrue(payload["loaded"])
         self.assertEqual(

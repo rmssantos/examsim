@@ -400,53 +400,59 @@ class Sprint1ReadinessTests(unittest.TestCase):
 
         over_cases = {}
 
-        def add_case(name, mutation):
+        def add_case(name, mutation, expected):
             dump = copy.deepcopy(exact_dump)
             metadata = copy.deepcopy(exact_metadata)
             mutation(dump, metadata)
-            over_cases[name] = (dump, metadata)
+            over_cases[name] = (dump, metadata, expected)
 
         add_case(
             "options",
             lambda dump, _metadata: dump["questions"][0].update(
                 {"options": ["Option"] * 51}
             ),
+            "options has too many items; maximum is 50",
         )
         add_case(
             "correct",
             lambda dump, _metadata: dump["questions"][0].update(
                 {"correct": list(range(51))}
             ),
+            "correct has too many items; maximum is 50",
         )
         add_case(
             "statements",
             lambda dump, _metadata: dump["questions"][1].update(
                 {"statements": ["Statement"] * 51}
             ),
+            "statements has too many items; maximum is 50",
         )
         add_case(
             "question images",
             lambda dump, _metadata: dump["questions"][0].update(
                 {"question_images": [{"filename": "image.png"}] * 21}
             ),
+            "image references exceed the maximum of 20",
         )
         add_case(
             "question references",
             lambda dump, _metadata: dump["questions"][0].update(
                 {"references": ["https://learn.microsoft.com/security/"] * 21}
             ),
+            "references has too many items; maximum is 20",
         )
 
         def add_extra_lab(dump, metadata):
             dump["labs"].append(lab(50))
             metadata["labCount"] = 51
 
-        add_case("labs", add_extra_lab)
+        add_case("labs", add_extra_lab, "labs has too many entries; maximum is 50")
         add_case(
             "lab steps",
             lambda dump, _metadata: dump["labs"][0].update(
                 {"steps": [step(index) for index in range(101)]}
             ),
+            "steps has too many items; maximum is 100",
         )
         add_case(
             "lab images",
@@ -458,24 +464,28 @@ class Sprint1ReadinessTests(unittest.TestCase):
                     ]
                 }
             ),
+            "step images exceed the maximum of 20",
         )
         add_case(
             "lab prerequisites",
             lambda dump, _metadata: dump["labs"][0].update(
                 {"prerequisites": ["Prerequisite"] * 26}
             ),
+            "prerequisites has too many items; maximum is 25",
         )
         add_case(
             "lab cleanup",
             lambda dump, _metadata: dump["labs"][0].update(
                 {"cleanup": ["Cleanup"] * 26}
             ),
+            "cleanup has too many items; maximum is 25",
         )
         add_case(
             "lab references",
             lambda dump, _metadata: dump["labs"][0].update(
                 {"references": [reference(index) for index in range(26)]}
             ),
+            "references has too many items; maximum is 25",
         )
         add_case(
             "credentialed lab reference",
@@ -489,24 +499,28 @@ class Sprint1ReadinessTests(unittest.TestCase):
                     ]
                 }
             ),
+            "official documentation URL",
         )
         add_case(
             "metadata lists",
             lambda _dump, metadata: metadata.update(
                 {"modules": ["Module"] * 101}
             ),
+            "metadata.modules has too many items; maximum is 100",
         )
         add_case(
             "nested metadata lists",
             lambda _dump, metadata: metadata["objectiveDomains"][0].update(
                 {"mappedModules": ["Module"] * 101}
             ),
+            "metadata.objectiveDomains[0].mappedModules has too many items; maximum is 100",
         )
 
-        for name, (dump, metadata) in over_cases.items():
+        for name, (dump, metadata, expected) in over_cases.items():
             with self.subTest(boundary=name):
                 result = validate(dump, metadata)
                 self.assertNotEqual(result.returncode, 0, result.stdout)
+                self.assertIn(expected, result.stdout)
 
     def test_docs_describe_current_yes_no_matrix_schema_and_study_mode_status(self):
         data_docs = (ROOT / "docs/Pack-Format.md").read_text(encoding="utf-8")

@@ -32,6 +32,9 @@ MAX_LAB_PREREQUISITES = 25
 MAX_LAB_CLEANUP = 25
 MAX_LAB_REFERENCES = 25
 MAX_METADATA_LIST_ITEMS = 100
+MAX_TEXT_LENGTH = 20000
+MAX_MODULE_LENGTH = 200
+MAX_REFERENCE_LENGTH = 5000
 
 # Lab guides (the `labs` array in a pack's dump.json) are non-graded hands-on content.
 # References must point at official documentation; the safety fields below are hard gates
@@ -304,6 +307,16 @@ class PackValidator:
 
             if not has_text(question.get("question")):
                 self.add_issue(path, f"{label}: question text is required")
+            if "explanation" in question and not has_text(
+                question.get("explanation"),
+                MAX_TEXT_LENGTH,
+            ):
+                self.add_issue(path, f"{label}: explanation is empty, invalid, or too long")
+            if "module" in question and not has_text(
+                question.get("module"),
+                MAX_MODULE_LENGTH,
+            ):
+                self.add_issue(path, f"{label}: module is empty, invalid, or too long")
 
             question_type = normalize_question_type(question)
             if question_type not in SUPPORTED_TYPES:
@@ -358,7 +371,10 @@ class PackValidator:
                     f"{label}: correct has too many items; maximum is {MAX_CORRECT_ANSWERS}",
                 )
             else:
-                if sorted(correct) != list(range(len(options))):
+                if (
+                    not all(is_plain_int(value) for value in correct)
+                    or sorted(correct) != list(range(len(options)))
+                ):
                     self.add_issue(path, f"{label}: correct sequence must be a permutation of option indices")
         elif question_type == "DRAG_DROP_SELECT":
             if not isinstance(correct, list) or not correct:
@@ -444,7 +460,7 @@ class PackValidator:
                     self.add_issue(path, f"{label}: missing image file images/{filename}")
 
         references = question.get("references")
-        if references is not None:
+        if "references" in question:
             if not isinstance(references, list):
                 self.add_issue(path, f"{label}: references must be an array")
             elif len(references) > MAX_QUESTION_REFERENCES:
@@ -452,6 +468,16 @@ class PackValidator:
                     path,
                     f"{label}: references has too many items; maximum is {MAX_QUESTION_REFERENCES}",
                 )
+            if isinstance(references, list):
+                for reference_index, reference in enumerate(
+                    references[:MAX_QUESTION_REFERENCES],
+                    start=1,
+                ):
+                    if not has_text(reference, MAX_REFERENCE_LENGTH):
+                        self.add_issue(
+                            path,
+                            f"{label}: reference {reference_index} must be a non-empty string",
+                        )
 
     def validate_labs(self, exam_id: str, labs: Any, path: Path) -> None:
         for message in lab_validation_messages(labs):
@@ -500,8 +526,11 @@ def is_plain_number(value: Any) -> bool:
     return (is_plain_int(value) or isinstance(value, float)) and not isinstance(value, bool)
 
 
-def has_text(value: Any) -> bool:
-    return isinstance(value, str) and bool(value.strip())
+def has_text(value: Any, max_length: int | None = None) -> bool:
+    if not isinstance(value, str):
+        return False
+    stripped = value.strip()
+    return bool(stripped) and (max_length is None or len(stripped) <= max_length)
 
 
 def valid_option_index(value: Any, options: Any) -> bool:

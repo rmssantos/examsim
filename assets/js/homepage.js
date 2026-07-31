@@ -563,29 +563,8 @@ return (Array.isArray(modules) ? modules : [])
 	.filter(Boolean);
 }
 
-safeExternalUrl(url) {
-const value = String(url || '').trim();
-if (!value) return '#';
-
-try {
-const parsed = new URL(value, window.location.href);
-return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '#';
-} catch (_) {
-return '#';
-}
-}
-
 isBundledTrustedExam(examData) {
 return window.ExamApp?.isBundledTrustedExam?.(examData) === true;
-}
-
-resourceUrlForExam(url, examData) {
-const safeUrl = this.safeExternalUrl(url);
-if (safeUrl === '#') return null;
-if (this.isBundledTrustedExam(examData)) return safeUrl;
-return window.ExamApp?.isOfficialDocumentationUrl?.(safeUrl) === true
-	? safeUrl
-	: null;
 }
 
 createIcon(iconClass, extraClass = '') {
@@ -874,7 +853,7 @@ dialog.appendChild(list);
 
 const buy = document.createElement('a');
 buy.className = 'pro-modal-buy';
-buy.href = this.safeExternalUrl(pro.url);
+buy.href = window.ExamApp.safeExternalUrl(pro.url) || '#';
 buy.target = '_blank';
 buy.rel = 'noopener noreferrer';
 buy.appendChild(this.createIcon('fas fa-store'));
@@ -1074,24 +1053,36 @@ this.modulesList.innerHTML = '';
 
 renderResources(resources, examData) {
 if (!this.resourcesList) return;
-if (Array.isArray(resources) && resources.length > 0) {
-this.resourcesList.innerHTML = '';
-resources.forEach(resource => {
-const safeHref = this.resourceUrlForExam(resource.url, examData);
+this.renderResourceLinks(
+	this.resourcesList,
+	resources,
+	examData,
+	'Add resource links in metadata to show quick shortcuts.',
+	'resource-link'
+);
+}
+
+renderResourceLinks(container, resources, examData, emptyMessage, linkClass = '') {
+if (!container) return 0;
+container.innerHTML = '';
+let rendered = 0;
+(Array.isArray(resources) ? resources : []).forEach(resource => {
+const safeHref = window.ExamApp.resourceUrlForTrust(resource.url, examData);
 if (!safeHref) return;
 const link = document.createElement('a');
 link.href = safeHref;
 link.target = '_blank';
 link.rel = 'noopener noreferrer';
-link.className = 'resource-link';
+link.className = linkClass;
 link.appendChild(this.createIcon(resource.icon || 'fas fa-link'));
 link.appendChild(document.createTextNode(` ${resource.name || 'Reference'}`));
-this.resourcesList.appendChild(link);
+container.appendChild(link);
+rendered += 1;
 });
-} else {
-this.resourcesList.innerHTML = '';
-this.appendTextElement(this.resourcesList, 'p', 'muted', 'Add resource links in metadata to show quick shortcuts.');
+if (rendered === 0) {
+this.appendTextElement(container, 'p', 'muted', emptyMessage);
 }
+return rendered;
 }
 
 highlightSelectedCard(examId) {
@@ -1251,23 +1242,12 @@ selectNoneBtn.addEventListener('click', () => {
 // Initialize selected questions count
 this.updateSelectedQuestionsCount(examId);
 
-if (metadata.resources && metadata.resources.length > 0) {
-	resourcesList.innerHTML = '';
-	metadata.resources.forEach(resource => {
-	const safeHref = this.resourceUrlForExam(resource.url, examData);
-	if (!safeHref) return;
-	const link = document.createElement('a');
-	link.href = safeHref;
-	link.target = '_blank';
-	link.rel = 'noopener noreferrer';
-	link.appendChild(this.createIcon(resource.icon || 'fas fa-link'));
-	link.appendChild(document.createTextNode(` ${resource.name || 'Reference'}`));
-	resourcesList.appendChild(link);
-	});
-} else {
-	resourcesList.innerHTML = '';
-	this.appendTextElement(resourcesList, 'p', 'muted', 'No resources available');
-}
+this.renderResourceLinks(
+	resourcesList,
+	metadata.resources,
+	examData,
+	'No resources available'
+);
 } else {
 modulesSection.classList.add('is-hidden');
 delete modulesList.dataset.exam;
@@ -1695,7 +1675,12 @@ const previousCompletionAttempt = completionAttempts.length > 1
 const lastDiagnosticAttempt = diagnosticAttempts.length > 0
 	? diagnosticAttempts[diagnosticAttempts.length - 1]
 	: null;
-const avgTime = attempts.reduce((sum, attempt) => sum + (attempt.timeSpent || 0), 0) / attempts.length;
+const avgTime = completionAttempts.length > 0
+	? completionAttempts.reduce(
+		(sum, attempt) => sum + (attempt.timeSpent || 0),
+		0
+	) / completionAttempts.length
+	: 0;
 const trendDelta = previousCompletionAttempt
 	? Number(lastCompletionAttempt.score || 0) - Number(previousCompletionAttempt.score || 0)
 	: null;

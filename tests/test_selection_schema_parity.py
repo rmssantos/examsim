@@ -4,49 +4,30 @@ import json
 import subprocess
 import sys
 import tempfile
-import textwrap
 import unittest
 from pathlib import Path
+
+try:
+    from .node_harness import run_node_snippet, utils_bootstrap
+except ImportError:
+    from node_harness import run_node_snippet, utils_bootstrap
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def validate_in_browser(question: dict) -> dict:
-    script = textwrap.dedent(
-        """
-        const fs = require('fs');
-        const vm = require('vm');
-
-        global.window = {
-          location: { hostname: 'localhost', search: '', href: 'http://localhost/' }
-        };
-        global.document = {
-          createElement() { return { appendChild() {}, innerHTML: '' }; },
-          createTextNode(value) { return { value }; }
-        };
-        global.localStorage = {
-          getItem() { return null; },
-          setItem() {},
-          removeItem() {}
-        };
-
-        vm.runInThisContext(fs.readFileSync('assets/js/utils.js', 'utf8'));
-        const question = JSON.parse(process.argv[1]);
+    script = utils_bootstrap(
+        f"""
+        const question = JSON.parse({json.dumps(json.dumps(question))});
         console.log(JSON.stringify(window.ExamApp.validateExamData([question])));
         """
     )
-    result = subprocess.run(
-        ["node", "-e", script, json.dumps(question)],
-        cwd=ROOT,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+    return run_node_snippet(
+        ROOT / "assets/js/utils.js",
+        script,
         timeout=15,
     )
-    if result.returncode != 0:
-        raise AssertionError(result.stdout)
-    return json.loads(result.stdout)
 
 
 def validate_with_cli(question: dict) -> subprocess.CompletedProcess:
@@ -149,6 +130,59 @@ class SelectionSchemaParityTests(unittest.TestCase):
                     question,
                     "drag_select_required",
                 )
+
+    def test_optional_explanation_and_module_require_bounded_text(self):
+        base = {
+            "id": "bounded-text",
+            "question_type": "STANDARD",
+            "question": "Choose one option.",
+            "options": ["A", "B"],
+            "correct": 0,
+        }
+        invalid_cases = {
+            "empty explanation": (
+                {**base, "explanation": "   "},
+                "explanation",
+            ),
+            "oversized module": (
+                {**base, "module": "m" * 201},
+                "module",
+            ),
+        }
+
+        for name, (question, message) in invalid_cases.items():
+            with self.subTest(case=name):
+                self.assert_rejected_by_browser_and_cli(question, message)
+
+    def test_question_references_require_non_empty_bounded_strings(self):
+        base = {
+            "id": "bounded-reference",
+            "question_type": "STANDARD",
+            "question": "Choose one option.",
+            "options": ["A", "B"],
+            "correct": 0,
+        }
+        self.assert_rejected_by_browser_and_cli(
+            {**base, "references": None},
+            "references",
+        )
+        for reference in ("   ", 42, "r" * 5001):
+            with self.subTest(reference=repr(reference)[:40]):
+                self.assert_rejected_by_browser_and_cli(
+                    {**base, "references": [reference]},
+                    "reference 1",
+                )
+
+    def test_sequence_with_mixed_correct_types_is_rejected_without_cli_crash(self):
+        question = {
+            "id": "mixed-sequence",
+            "question_type": "SEQUENCE",
+            "question": "Order the options.",
+            "options": ["A", "B"],
+            "correct": [0, "a"],
+        }
+
+        self.assert_rejected_by_browser_and_cli(question, "permutation")
 
 
 if __name__ == "__main__":

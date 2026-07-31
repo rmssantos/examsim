@@ -686,6 +686,7 @@ console.log(JSON.stringify({
 const fs = require('fs');
 const vm = require('vm');
 const source = fs.readFileSync(process.argv[1], 'utf8');
+const utilsSource = fs.readFileSync(process.argv[2], 'utf8');
 const start = source.indexOf('class HomePage');
 const end = source.indexOf('// Initialize when page loads');
 const classSource = source.slice(start, end);
@@ -709,31 +710,23 @@ const progressByKey = new Map([
   })]
 ]);
 const context = {
+  URL,
+  URLSearchParams,
+  console,
   localStorage: {
     getItem(key) { return progressByKey.get(key) || null; }
   },
+  document: {
+    createElement() { return { appendChild() {}, innerHTML: '' }; },
+    createTextNode(value) { return { value }; }
+  },
   window: {
-    ExamApp: {
-      getProgressSummary(progress) {
-        const completion = progress.attempts.filter(
-          attempt => attempt.sessionType !== 'diagnostic'
-        );
-        const passed = completion.filter(attempt => attempt.passed === true).length;
-        return {
-          completionAttempts: completion.length,
-          bestScore: completion.length
-            ? Math.max(...completion.map(attempt => Number(attempt.score || 0)))
-            : 0,
-          passRate: completion.length
-            ? Math.round((passed / completion.length) * 100)
-            : null
-        };
-      },
-      warn() {}
-    }
+    location: { hostname: 'localhost', search: '', href: 'http://localhost/' }
   }
 };
-vm.runInNewContext(
+vm.createContext(context);
+vm.runInContext(utilsSource, context, { filename: 'utils.js' });
+vm.runInContext(
   classSource + '\n;globalThis.HomePage = HomePage;',
   context,
   { filename: 'homepage.js' }
@@ -756,7 +749,13 @@ console.log(JSON.stringify({
 }));
 """
         result = subprocess.run(
-            [node, "-e", node_script, str(ROOT / "assets/js/homepage.js")],
+            [
+                node,
+                "-e",
+                node_script,
+                str(ROOT / "assets/js/homepage.js"),
+                str(ROOT / "assets/js/utils.js"),
+            ],
             check=True,
             capture_output=True,
             text=True,

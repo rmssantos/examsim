@@ -109,6 +109,17 @@ window.__createOptionDeleteButton = createOptionDeleteButton;`
             timeout=20,
             cwd=ROOT,
         )
+        unavailable_markers = (
+            "cannot find module 'playwright'",
+            'cannot find package "playwright"',
+            "executable doesn't exist",
+            "browser executable not found",
+            "playwright install",
+        )
+        if result.returncode != 0 and any(
+            marker in result.stderr.lower() for marker in unavailable_markers
+        ):
+            self.skipTest("Playwright module or Chromium binary not available")
         self.assertEqual(result.returncode, 0, msg=result.stderr)
         rendered = json.loads(result.stdout)
         self.assertFalse(rendered["injected"])

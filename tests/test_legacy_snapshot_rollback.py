@@ -1,6 +1,7 @@
 """Quota-sensitive regression test for legacy exam mirror rollback."""
 
 import json
+import shutil
 import subprocess
 import textwrap
 import unittest
@@ -12,6 +13,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class LegacySnapshotRollbackTests(unittest.TestCase):
     def test_rollback_clears_partial_values_before_restoring_snapshot(self):
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("node not available")
+
         script = textwrap.dedent(
             """
             const fs = require('fs');
@@ -66,7 +71,7 @@ class LegacySnapshotRollbackTests(unittest.TestCase):
             """
         )
         result = subprocess.run(
-            ["node", "-e", script],
+            [node, "-e", script],
             cwd=ROOT,
             text=True,
             stdout=subprocess.PIPE,

@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -288,10 +289,20 @@ class July2026SourceLedgerTests(unittest.TestCase):
             "DP-900": ("July 21, 2026", "dp-900"),
             "DP-700": ("July 21, 2026", "dp-700"),
         }
+        sections = {
+            match.group(1).strip(): match.group(2)
+            for match in re.finditer(
+                r"^## ([^\r\n]+)\r?\n(.*?)(?=^## |\Z)",
+                ledger,
+                flags=re.MULTILINE | re.DOTALL,
+            )
+        }
         for exam_id, (date, slug) in expected.items():
-            self.assertIn(exam_id, ledger)
-            self.assertIn(date, ledger)
-            self.assertIn(f"{STUDY_GUIDE_ROOT}/{slug}", ledger)
+            with self.subTest(exam_id=exam_id):
+                self.assertIn(exam_id, sections)
+                section = sections[exam_id]
+                self.assertIn(date, section)
+                self.assertIn(f"{STUDY_GUIDE_ROOT}/{slug}", section)
         self.assertIn(
             "local module label is now “Microsoft Foundry and Foundry Tools”",
             ledger,

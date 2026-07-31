@@ -1,10 +1,12 @@
 """Regression tests for the Phase 1–2 foundations work."""
 
-import json
-import shutil
-import subprocess
 import unittest
 from pathlib import Path
+
+try:
+    from .node_harness import run_node_snippet
+except ImportError:
+    from node_harness import run_node_snippet
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,10 +14,6 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class TimerManagerTests(unittest.TestCase):
     def test_timer_uses_elapsed_wall_clock_and_ignores_stale_callbacks(self):
-        node = shutil.which("node")
-        if not node:
-            self.skipTest("node not available")
-
         script_path = ROOT / "assets" / "js" / "script-multi-exam.js"
         node_script = r"""
 const fs = require('fs');
@@ -83,14 +81,7 @@ vm.runInNewContext(
 );
 console.log(JSON.stringify(sandbox.result));
 """
-        result = subprocess.run(
-            [node, "-e", node_script, str(script_path)],
-            check=True,
-            capture_output=True,
-            text=True,
-            timeout=5,
-        )
-        payload = json.loads(result.stdout)
+        payload = run_node_snippet(script_path, node_script)
 
         self.assertEqual(30, payload["afterThirtyPointFourSeconds"])
         self.assertEqual(0, payload["afterDeadline"])
@@ -104,10 +95,6 @@ console.log(JSON.stringify(sandbox.result));
 
 class SessionConfigTests(unittest.TestCase):
     def test_diagnostic_session_is_fixed_bounded_and_uses_a_safe_duration(self):
-        node = shutil.which("node")
-        if not node:
-            self.skipTest("node not available")
-
         script_path = ROOT / "assets" / "js" / "exam-init.js"
         node_script = r"""
 const fs = require('fs');
@@ -174,14 +161,7 @@ const result = {
 };
 console.log(JSON.stringify(result));
 """
-        result = subprocess.run(
-            [node, "-e", node_script, str(script_path)],
-            check=True,
-            capture_output=True,
-            text=True,
-            timeout=5,
-        )
-        payload = json.loads(result.stdout)
+        payload = run_node_snippet(script_path, node_script)
 
         full = {"sessionType": "full", "questionCount": 50, "duration": 45}
         self.assertEqual(full, payload["full"])
@@ -221,10 +201,6 @@ console.log(JSON.stringify(result));
 
 class RouterTests(unittest.TestCase):
     def test_localhost_requires_an_active_service_worker_for_clean_routes(self):
-        node = shutil.which("node")
-        if not node:
-            self.skipTest("node not available")
-
         script_path = ROOT / "assets" / "js" / "router.js"
         node_script = r"""
 const fs = require('fs');
@@ -255,14 +231,7 @@ const withController = router.buildUrl('roadmaps');
 
 console.log(JSON.stringify({ withoutController, withController }));
 """
-        result = subprocess.run(
-            [node, "-e", node_script, str(script_path)],
-            check=True,
-            capture_output=True,
-            text=True,
-            timeout=5,
-        )
-        payload = json.loads(result.stdout)
+        payload = run_node_snippet(script_path, node_script)
 
         self.assertEqual("roadmaps.html", payload["withoutController"])
         self.assertEqual("/examplar/roadmaps", payload["withController"])

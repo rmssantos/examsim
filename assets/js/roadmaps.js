@@ -46,20 +46,6 @@
 			.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 			.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 	}
-	// https-only hrefs (matches labs.js): escapeHtml stops HTML injection but not a
-	// javascript:/data: scheme on a crafted pro URL or resource link.
-	function safeHref(url) {
-		try {
-			const parsed = new URL(String(url), window.location.origin);
-			return parsed.protocol === 'https:' ? parsed.href : '#';
-		} catch (_) { return '#'; }
-	}
-	function roadmapResourceHref(url, metadata) {
-		const href = safeHref(url);
-		if (href === '#') return null;
-		if (window.ExamApp?.isBundledTrustedExam?.(metadata) === true) return href;
-		return window.ExamApp?.isOfficialDocumentationUrl?.(href) === true ? href : null;
-	}
 	// Allowlist icon class strings (Font Awesome tokens only) before injecting them
 	// into a class attribute, per the repo guideline for JSON-derived class names.
 	function safeIconClass(raw, fallback) {
@@ -218,7 +204,7 @@
 				}).join('') + '</ul></div>'
 			: '';
 		const resourceLinks = resources.map(r => {
-			const href = roadmapResourceHref(r.url, m);
+			const href = window.ExamApp.resourceUrlForTrust(r.url, m);
 			if (!href) return '';
 			return '<a href="' + escapeHtml(href) + '" target="_blank" rel="noopener noreferrer">' +
 				'<i class="' + safeIconClass(r.icon, 'fas fa-link') + '" aria-hidden="true"></i> ' +
@@ -350,7 +336,7 @@
 				(Array.isArray(pro.highlights) && pro.highlights.length
 					? '<ul class="pro-modal-list">' + pro.highlights.map(h => '<li><i class="fas fa-check" aria-hidden="true"></i> ' + escapeHtml(h) + '</li>').join('') + '</ul>'
 					: '') +
-				'<a class="pro-modal-buy" href="' + escapeHtml(safeHref(pro.url)) + '" target="_blank" rel="noopener noreferrer">' +
+				'<a class="pro-modal-buy" href="' + escapeHtml(window.ExamApp.safeExternalUrl(pro.url) || '#') + '" target="_blank" rel="noopener noreferrer">' +
 					'<i class="fas fa-store" aria-hidden="true"></i> Get the full pack' + (pro.price ? ' (' + escapeHtml(pro.price) + ')' : '') + '</a>' +
 				'<div class="pro-modal-divider"></div>' +
 				'<p class="pro-modal-activate-text">Already purchased? Import your pack file and enter your license key on the homepage to activate it on this device.</p>' +

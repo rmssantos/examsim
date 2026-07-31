@@ -264,20 +264,7 @@ class ExamManager {
     }
 
     sanitizeMetadata(metadata, allowCommercial = false) {
-        if (typeof window.ExamApp.sanitizeExamMetadata === 'function') {
-            return window.ExamApp.sanitizeExamMetadata(metadata, { allowCommercial });
-        }
-        if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
-            return metadata || null;
-        }
-        const sanitized = { ...metadata };
-        delete sanitized.source;
-        delete sanitized.trust;
-        if (!allowCommercial) {
-            delete sanitized.pro;
-            delete sanitized.recommendedPro;
-        }
-        return sanitized;
+        return window.ExamApp.sanitizeExamMetadata(metadata, { allowCommercial });
     }
 
     // Generate metadata for exam

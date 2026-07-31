@@ -1,8 +1,10 @@
-import json
-import shutil
-import subprocess
 import unittest
 from pathlib import Path
+
+try:
+    from .node_harness import run_node_snippet
+except ImportError:
+    from node_harness import run_node_snippet
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -10,10 +12,6 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class AnalyticsProvenanceTests(unittest.TestCase):
     def test_exam_source_prefers_runtime_provenance_over_public_id(self):
-        node = shutil.which("node")
-        if not node:
-            self.skipTest("node not available")
-
         node_script = r"""
 const fs = require('fs');
 let source = fs.readFileSync(process.argv[1], 'utf8');
@@ -66,14 +64,10 @@ console.log(JSON.stringify({
   legacyUnregisteredImport: properties('not-in-the-runtime')
 }));
 """
-        result = subprocess.run(
-            [node, "-e", node_script, str(ROOT / "assets/js/analytics.js")],
-            check=True,
-            capture_output=True,
-            text=True,
-            timeout=5,
+        payload = run_node_snippet(
+            ROOT / "assets/js/analytics.js",
+            node_script,
         )
-        payload = json.loads(result.stdout)
 
         self.assertEqual(
             payload["bundled"],
@@ -93,10 +87,6 @@ console.log(JSON.stringify({
         )
 
     def test_runtime_never_overlays_legacy_questions_on_bundled_trust(self):
-        node = shutil.which("node")
-        if not node:
-            self.skipTest("node not available")
-
         node_script = r"""
 const fs = require('fs');
 const vm = require('vm');
@@ -147,19 +137,10 @@ const simulator = {
 holder.loadQuestions.call(simulator);
 console.log(JSON.stringify(simulator.examData.sc900));
 """
-        result = subprocess.run(
-            [
-                node,
-                "-e",
-                node_script,
-                str(ROOT / "assets/js/script-multi-exam.js"),
-            ],
-            check=True,
-            capture_output=True,
-            text=True,
-            timeout=5,
+        payload = run_node_snippet(
+            ROOT / "assets/js/script-multi-exam.js",
+            node_script,
         )
-        payload = json.loads(result.stdout)
 
         self.assertEqual([{"id": "bundled"}], payload["questions"])
         self.assertEqual("bundled", payload["source"])

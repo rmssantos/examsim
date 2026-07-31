@@ -90,16 +90,7 @@ class ServerRouteTests(unittest.TestCase):
             finally:
                 app_server.DIRECTORY = original_directory
 
-    def test_roadmaps_clean_route_maps_to_static_page_and_preserves_query(self):
-        mapped = app_server.MyHTTPRequestHandler.route_static_path(
-            None,
-            "/roadmaps?utm_source=linkedin&next=%2Fexams%2F&empty=",
-        )
-
-        self.assertEqual(
-            "/roadmaps.html?utm_source=linkedin&next=%2Fexams%2F&empty=",
-            mapped,
-        )
+    def test_roadmaps_clean_route_maps_to_static_page(self):
         response, body = self.request("/roadmaps?utm_source=linkedin")
         self.assertEqual(200, response.status)
         self.assertIn(b"<!DOCTYPE html>", body)

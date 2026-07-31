@@ -523,7 +523,7 @@ class MultiExamSimulator {
                         try {
                             labs = JSON.parse(rawLabs);
                         } catch (_) {
-                            labs = rawLabs;
+                            labs = undefined;
                         }
                     }
                     if (
@@ -638,7 +638,7 @@ class MultiExamSimulator {
                 try {
                     labs = JSON.parse(labsRaw);
                 } catch (_) {
-                    labs = labsRaw;
+                    labs = undefined;
                 }
             }
             if (

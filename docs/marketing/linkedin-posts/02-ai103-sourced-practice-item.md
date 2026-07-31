@@ -19,7 +19,7 @@ sources:
 
 ## Draft copy
 
-One AI-103 practice item — and the documentation behind it.
+One AI-103 practice item: the documentation behind it.
 
 You deploy an AI application to Azure. It must call a Microsoft Foundry resource
 without storing an API key in code or application settings.

@@ -357,11 +357,13 @@ try {
   const collisionContract = await page.evaluate(async (zipBytes) => {
     const manager = window.examManager;
     const homepage = window.homepage;
+    const imageStorage = window.ExamApp.imageStorage || window.imageStorage;
     const originalAnalytics = window.ExamApp.analytics;
-    const originalImport = manager.importExam.bind(manager);
+    const originalImport = manager.importExam;
     const originalConfirm = window.showCustomConfirm;
-    const originalNotification = homepage.showNotification.bind(homepage);
-    const originalStoreImage = window.imageStorage?.storeImageBlob?.bind(window.imageStorage);
+    const originalNotification = homepage.showNotification;
+    const originalStoreImage = imageStorage?.storeImageBlob;
+    const originalReplaceImages = imageStorage?.replaceExamImages;
     const importCalls = [];
     const confirmations = [];
     const completed = [];
@@ -372,7 +374,7 @@ try {
 
     manager.importExam = async (...args) => {
       importCalls.push(args);
-      return originalImport(...args);
+      return originalImport.apply(manager, args);
     };
     window.showCustomConfirm = async (...args) => {
       confirmations.push(args);
@@ -384,11 +386,19 @@ try {
       trackImportFailed: (file) => failed.push(file.name)
     };
     homepage.showNotification = (message) => notifications.push(message);
-    if (window.imageStorage) {
-      window.imageStorage.storeImageBlob = async () => {
-        imageWrites += 1;
-        return true;
-      };
+    if (imageStorage) {
+      if (typeof originalStoreImage === 'function') {
+        imageStorage.storeImageBlob = async () => {
+          imageWrites += 1;
+          return true;
+        };
+      }
+      if (typeof originalReplaceImages === 'function') {
+        imageStorage.replaceExamImages = async () => {
+          imageWrites += 1;
+          return true;
+        };
+      }
     }
 
     const question = (text) => ({
@@ -429,61 +439,70 @@ try {
     const cancelId = 'security-preview-cancel';
     const confirmId = 'security-preview-confirm';
     const zipCancelId = 'security-preview-zip-cancel';
-    makePreview(cancelId, 'old-cancel');
-    makePreview(confirmId, 'old-confirm');
-    makePreview(zipCancelId, 'old-zip');
+    const seededIds = [cancelId, confirmId, zipCancelId];
 
-    decision = false;
-    await homepage.handleFiles([makeJson(cancelId, 'new-cancel')]);
+    try {
+      makePreview(cancelId, 'old-cancel');
+      makePreview(confirmId, 'old-confirm');
+      makePreview(zipCancelId, 'old-zip');
 
-    decision = true;
-    await homepage.handleFiles([makeJson(confirmId, 'new-confirm')]);
+      decision = false;
+      await homepage.handleFiles([makeJson(cancelId, 'new-cancel')]);
 
-    decision = false;
-    await homepage.handleFiles([
-      new File(
-        [new Uint8Array(zipBytes)],
-        `${zipCancelId}.zip`,
-        { type: 'application/zip' }
-      )
-    ]);
+      decision = true;
+      await homepage.handleFiles([makeJson(confirmId, 'new-confirm')]);
 
-    const result = {
-      importCalls: importCalls.map((args) => ({
-        examId: args[0],
-        argumentCount: args.length,
-        imageFiles: args[2],
-        options: args[3] || null
-      })),
-      confirmations: confirmations.length,
-      completed: completed.slice(),
-      failed: failed.slice(),
-      notifications: notifications.slice(),
-      imageWrites,
-      cancelQuestion: window.userExams[cancelId]?.questions?.[0]?.question,
-      confirmQuestion: window.userExams[confirmId]?.questions?.[0]?.question,
-      confirmSource: window.userExams[confirmId]?.source,
-      confirmTrust: window.userExams[confirmId]?.trust,
-      zipQuestion: window.userExams[zipCancelId]?.questions?.[0]?.question
-    };
+      decision = false;
+      await homepage.handleFiles([
+        new File(
+          [new Uint8Array(zipBytes)],
+          `${zipCancelId}.zip`,
+          { type: 'application/zip' }
+        )
+      ]);
 
-    manager.importExam = originalImport;
-    window.showCustomConfirm = originalConfirm;
-    window.ExamApp.analytics = originalAnalytics;
-    homepage.showNotification = originalNotification;
-    if (window.imageStorage && originalStoreImage) {
-      window.imageStorage.storeImageBlob = originalStoreImage;
+      return {
+        importCalls: importCalls.map((args) => ({
+          examId: args[0],
+          argumentCount: args.length,
+          imageFiles: args[2],
+          options: args[3] || null
+        })),
+        confirmations: confirmations.length,
+        completed: completed.slice(),
+        failed: failed.slice(),
+        notifications: notifications.slice(),
+        imageWrites,
+        cancelQuestion: window.userExams[cancelId]?.questions?.[0]?.question,
+        confirmQuestion: window.userExams[confirmId]?.questions?.[0]?.question,
+        confirmSource: window.userExams[confirmId]?.source,
+        confirmTrust: window.userExams[confirmId]?.trust,
+        zipQuestion: window.userExams[zipCancelId]?.questions?.[0]?.question
+      };
+    } finally {
+      manager.importExam = originalImport;
+      window.showCustomConfirm = originalConfirm;
+      window.ExamApp.analytics = originalAnalytics;
+      homepage.showNotification = originalNotification;
+      if (imageStorage && typeof originalStoreImage === 'function') {
+        imageStorage.storeImageBlob = originalStoreImage;
+      }
+      if (imageStorage && typeof originalReplaceImages === 'function') {
+        imageStorage.replaceExamImages = originalReplaceImages;
+      }
+      await Promise.allSettled(seededIds.map(async (id) => {
+        try {
+          await window.ExamApp.examStorage.deleteExamContent(id);
+        } finally {
+          window.ExamApp.removeFromRegistry(window.ExamApp.STORAGE_KEYS.exams, id);
+          localStorage.removeItem(`custom_${id}_questions`);
+          localStorage.removeItem(`exam_metadata_${id}`);
+          localStorage.removeItem(`custom_${id}_labs`);
+          delete window.userExams[id];
+        }
+      }));
+      homepage.hideImportProgress();
     }
-    for (const id of [cancelId, confirmId, zipCancelId]) {
-      await window.ExamApp.examStorage.deleteExamContent(id);
-      window.ExamApp.removeFromRegistry(window.ExamApp.STORAGE_KEYS.exams, id);
-      localStorage.removeItem(`custom_${id}_questions`);
-      localStorage.removeItem(`exam_metadata_${id}`);
-      localStorage.removeItem(`custom_${id}_labs`);
-      delete window.userExams[id];
-    }
-    homepage.hideImportProgress();
-    return result;
   }, Array.from(collisionZipBytes));
   assert.equal(collisionContract.confirmations, 3, 'Each JSON/ZIP collision must ask exactly once.');
   assert.equal(collisionContract.cancelQuestion, 'old-cancel', 'Cancelling JSON replacement must keep the existing pack.');

@@ -313,10 +313,84 @@
             const legacy = this.getLegacyExam(examId);
             if (legacy && options.migrateLegacy !== false) {
                 try {
-                    await this.putExam(examId, legacy.questions, legacy.metadata, { labs: legacy.labs });
+                    const labsValidation = Array.isArray(legacy.labs)
+                        && typeof window.ExamApp.validateExamLabs === 'function'
+                        ? window.ExamApp.validateExamLabs(legacy.labs)
+                        : null;
+                    const canMigrateLabs = Array.isArray(legacy.labs)
+                        && (!labsValidation || labsValidation.valid);
+                    const hasInvalidLegacyLabs = (
+                        legacy.labs !== undefined
+                        && !canMigrateLabs
+                    );
+                    const migrationLabs = canMigrateLabs
+                        ? legacy.labs
+                        : undefined;
+                    const actualLabCount = Array.isArray(migrationLabs)
+                        ? migrationLabs.length
+                        : 0;
+                    const metadataObject = (
+                        legacy.metadata
+                        && typeof legacy.metadata === 'object'
+                        && !Array.isArray(legacy.metadata)
+                    )
+                        ? legacy.metadata
+                        : null;
+                    const declaredLabCount = metadataObject?.labCount;
+                    const migratedMetadata = (
+                        actualLabCount > 0
+                        && declaredLabCount === undefined
+                    )
+                        ? { ...(metadataObject || {}), labCount: actualLabCount }
+                        : legacy.metadata;
+                    const effectiveLabCount = migratedMetadata?.labCount;
+                    const labCountMatches = effectiveLabCount === undefined
+                        ? actualLabCount === 0
+                        : (
+                            Number.isInteger(effectiveLabCount)
+                            && effectiveLabCount === actualLabCount
+                        );
+                    const migrationValidation = (
+                        typeof window.ExamApp.validateExamData === 'function'
+                    )
+                        ? window.ExamApp.validateExamData(
+                            legacy.questions,
+                            migratedMetadata,
+                            migrationLabs
+                        )
+                        : { valid: true };
+                    if (
+                        !labCountMatches
+                        || migrationValidation.valid !== true
+                    ) {
+                        window.ExamApp.warn(
+                            `Skipping invalid legacy migration for ${examId}`
+                        );
+                        window.ExamApp.analytics?.trackStorageMigration?.('exam', 'failed');
+                        return legacy;
+                    }
+                    const migrationOptions = canMigrateLabs
+                        ? { labs: migrationLabs }
+                        : {};
+                    if (hasInvalidLegacyLabs) {
+                        window.ExamApp.warn(
+                            `Dropping invalid legacy labs for ${examId} during migration`
+                        );
+                    }
+                    await this.putExam(
+                        examId,
+                        legacy.questions,
+                        migratedMetadata,
+                        migrationOptions
+                    );
+                    const migratedLegacy = { ...legacy };
+                    if (!canMigrateLabs) {
+                        delete migratedLegacy.labs;
+                    }
+                    migratedLegacy.metadata = migratedMetadata;
                     window.ExamApp.analytics?.trackStorageMigration?.('exam', 'success');
                     return {
-                        ...legacy,
+                        ...migratedLegacy,
                         source: 'imported',
                         trust: 'local-unverified',
                         storage: 'indexedDB'

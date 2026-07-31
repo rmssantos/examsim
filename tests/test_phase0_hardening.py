@@ -7,6 +7,11 @@ import textwrap
 import unittest
 from pathlib import Path
 
+try:
+    from .node_harness import utils_bootstrap
+except ImportError:
+    from node_harness import utils_bootstrap
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -22,38 +27,17 @@ def run_node(script: str) -> subprocess.CompletedProcess:
     )
 
 
-def utils_bootstrap(assertions: str) -> str:
-    return textwrap.dedent(
-        f"""
-        const fs = require('fs');
-        const vm = require('vm');
-        global.window = {{
-          location: {{ hostname: 'localhost', search: '', href: 'http://localhost/' }}
-        }};
-        global.document = {{
-          createElement() {{ return {{ appendChild() {{}}, innerHTML: '' }}; }},
-          createTextNode(value) {{ return {{ value }}; }}
-        }};
-        global.localStorage = {{
-          getItem() {{ return null; }},
-          setItem() {{}},
-          removeItem() {{}}
-        }};
-        vm.runInThisContext(fs.readFileSync('assets/js/utils.js', 'utf8'));
-        {assertions}
-        """
-    )
-
-
 class ZipBoundaryTests(unittest.TestCase):
     def test_zip_worker_preflights_oversized_json_before_streaming(self):
         worker = (ROOT / "assets" / "js" / "zip-import-worker.js").read_text(
             encoding="utf-8"
         )
-        self.assertIn("preflight(entries, limits)", worker)
+        preflight_call = "preflight(entries, limits, declaredSizes)"
+        self.assertIn(preflight_call, worker)
         self.assertIn("declared > limits.maxJsonBytes", worker)
+        self.assertNotIn("_data?.uncompressedSize", worker)
         self.assertLess(
-            worker.index("preflight(entries, limits)"),
+            worker.index(preflight_call),
             worker.index("await streamEntry("),
         )
 

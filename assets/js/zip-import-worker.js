@@ -173,6 +173,7 @@ function preflightRawArchive(archiveBuffer, limits) {
     }
 
     const names = new Set();
+    const declaredSizes = new Map();
     let cursor = centralOffset;
     for (let index = 0; index < totalEntries; index += 1) {
         if (
@@ -213,6 +214,7 @@ function preflightRawArchive(archiveBuffer, limits) {
             );
         }
         names.add(nameKey);
+        declaredSizes.set(nameKey, uncompressedSize);
 
         if (
             localOffset + 30 > centralOffset
@@ -245,6 +247,7 @@ function preflightRawArchive(archiveBuffer, limits) {
     if (cursor !== centralEnd) {
         throw invalidArchive('ZIP central directory entry count is inconsistent.');
     }
+    return declaredSizes;
 }
 
 function shortestEntry(entries, predicate) {
@@ -344,12 +347,7 @@ function streamEntry(entry, onChunk) {
     });
 }
 
-function declaredSize(entry) {
-    const size = Number(entry?._data?.uncompressedSize);
-    return Number.isSafeInteger(size) && size >= 0 ? size : null;
-}
-
-function preflight(entries, limits) {
+function preflight(entries, limits, declaredSizes) {
     if (entries.length > limits.maxZipEntries) {
         throw limitError(`ZIP contains too many entries. Maximum is ${limits.maxZipEntries}.`);
     }
@@ -366,8 +364,12 @@ function preflight(entries, limits) {
                 throw limitError(`ZIP contains too many images. Maximum is ${limits.maxImages}.`);
             }
         }
-        const declared = declaredSize(descriptor.entry);
-        if (declared === null) continue;
+        const declared = declaredSizes.get(descriptor.path);
+        if (!Number.isSafeInteger(declared) || declared < 0) {
+            throw invalidArchive(
+                `ZIP size metadata is missing for ${descriptor.path}.`
+            );
+        }
 
         packageBytes += declared;
         if (packageBytes > limits.maxZipUncompressedBytes) {
@@ -399,7 +401,7 @@ async function extractArchive(archiveBuffer, requestedLimits) {
     }
 
     const limits = resolveLimits(requestedLimits);
-    preflightRawArchive(archiveBuffer, limits);
+    const declaredSizes = preflightRawArchive(archiveBuffer, limits);
     const zip = await JSZip.loadAsync(archiveBuffer);
     const entries = [];
     zip.forEach((relativePath, entry) => {
@@ -409,7 +411,7 @@ async function extractArchive(archiveBuffer, requestedLimits) {
         });
     });
 
-    preflight(entries, limits);
+    preflight(entries, limits, declaredSizes);
     const dump = shortestEntry(entries, isDumpPath);
     const metadata = shortestEntry(entries, isMetadataPath);
     if (!dump) {

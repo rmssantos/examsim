@@ -1299,6 +1299,7 @@ window.ExamApp.examsLoadedPromise.then(() => {
                 archive.writestr("b/shared.png", b"B" * 1200)
             duplicate_bytes = bytearray(duplicate_bomb_zip.read_bytes())
             search_offset = 0
+            duplicate_entry_patched = False
             while True:
                 central_offset = duplicate_bytes.find(
                     b"PK\x01\x02",
@@ -1332,11 +1333,12 @@ window.ExamApp.examsLoadedPromise.then(() => {
                         central_offset + 24,
                         1,
                     )
+                    duplicate_entry_patched = True
                     break
                 search_offset = (
                     name_start + name_length + extra_length + comment_length
                 )
-            else:
+            if not duplicate_entry_patched:
                 self.fail("Could not patch duplicate image central directory")
             duplicate_bomb_zip.write_bytes(duplicate_bytes)
 
@@ -2622,8 +2624,7 @@ async function exerciseStorage() {
     'forged',
     [{ id: 1, question: 'Q' }],
     { name: 'Forged', source: 'bundled', trust: 'bundled' },
-    [],
-    { source: 'bundled', trust: 'bundled' }
+    { labs: [], source: 'bundled', trust: 'bundled' }
   );
   storage.getRecord = async () => ({
     examId: 'forged',
@@ -2749,6 +2750,7 @@ async function exerciseLoader() {
                 for warning in payload["storage"]["warnings"]
             )
         )
+        self.assertEqual([], payload["storage"]["persisted"]["labs"])
 
         bundled = payload["loader"]["bundle"]
         self.assertEqual("bundled", bundled["source"])
@@ -2769,6 +2771,7 @@ async function exerciseLoader() {
 const fs = require('fs');
 const vm = require('vm');
 const roadmapSource = fs.readFileSync(process.argv[1], 'utf8');
+const utilsSource = fs.readFileSync(process.argv[2], 'utf8');
 const helperStart = roadmapSource.indexOf('function escapeHtml');
 const helperEnd = roadmapSource.indexOf('function resolveEntry', helperStart);
 const mergeStart = roadmapSource.indexOf('function mergeStoredRoadmapMetadata');
@@ -2790,20 +2793,30 @@ if (!helperFound) {
 
 const sandbox = {
   window: {
-    ExamApp: {
-      isBundledTrustedExam(metadata) {
-        return metadata?.source === 'bundled' && metadata?.trust === 'bundled';
-      },
-      isOfficialDocumentationUrl(value) {
-        return new URL(value).hostname === 'learn.microsoft.com';
-      }
-    },
-    location: { origin: 'https://examplar.app' }
+    ExamApp: {},
+    location: {
+      origin: 'https://examplar.app',
+      href: 'https://examplar.app/roadmaps',
+      hostname: 'examplar.app',
+      search: ''
+    }
+  },
+  document: {
+    createElement() { return { appendChild() {}, innerHTML: '' }; },
+    createTextNode(value) { return { value }; }
+  },
+  localStorage: {
+    getItem() { return null; },
+    setItem() {},
+    removeItem() {}
   },
   URL,
+  URLSearchParams,
   console: { log() {}, warn() {}, error() {} }
 };
-vm.runInNewContext(
+vm.createContext(sandbox);
+vm.runInContext(utilsSource, sandbox, { filename: 'utils.js' });
+vm.runInContext(
   roadmapSource.slice(helperStart, helperEnd)
     + roadmapSource.slice(mergeStart, mergeEnd)
     + 'function progressStats() { return null; }'
@@ -2847,6 +2860,7 @@ console.log(JSON.stringify(sandbox.result));
         payload = self._run_node(
             node_script,
             ROOT / "assets" / "js" / "roadmaps.js",
+            ROOT / "assets" / "js" / "utils.js",
         )
 
         self.assertTrue(payload["helperFound"])

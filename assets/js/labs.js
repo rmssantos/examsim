@@ -59,22 +59,6 @@
 
   const SAFE_IMAGE_RE = /^[A-Za-z0-9_. -]{1,128}\.(?:jpg|jpeg|png|gif|webp)$/i;
 
-  // Bundled metadata retains its existing HTTPS behavior. Local packs have a
-  // narrower capability: only centrally allowlisted official documentation is
-  // clickable, regardless of any source/trust fields embedded in their metadata.
-  function safeHref(url, officialOnly = false) {
-    try {
-      const parsed = new URL(String(url), window.location.origin);
-      if (parsed.protocol !== 'https:') return null;
-      if (officialOnly && window.ExamApp?.isOfficialDocumentationUrl?.(parsed.href) !== true) {
-        return null;
-      }
-      return parsed.href;
-    } catch (_) {
-      return null;
-    }
-  }
-
   function getQueryExamId() {
     return new URLSearchParams(window.location.search).get('exam') || '';
   }
@@ -105,7 +89,9 @@
     const trustedBundled = window.ExamApp?.isBundledTrustedExam?.(exam) === true;
     const metadata = exam && exam.metadata;
     const proUrl = metadata && metadata.pro && metadata.pro.url;
-    const safeProUrl = trustedBundled && proUrl ? safeHref(proUrl) : null;
+    const safeProUrl = trustedBundled && proUrl
+      ? window.ExamApp.safeExternalUrl(proUrl)
+      : null;
     const upsell = safeProUrl
       ? `<a class="btn btn-primary" href="${escapeHtml(safeProUrl)}" target="_blank" rel="noopener noreferrer">Get the full pack</a>`
       : '';
@@ -156,7 +142,8 @@
       + '</li>';
   }
 
-  function workspaceMarkup(lab, examId, isBundled) {
+  function workspaceMarkup(lab, examId, examData) {
+    const isBundled = window.ExamApp.isBundledTrustedExam(examData);
     const prereqs = Array.isArray(lab.prerequisites) ? lab.prerequisites : [];
     const steps = Array.isArray(lab.steps) ? lab.steps : [];
     const cleanup = Array.isArray(lab.cleanup) ? lab.cleanup : [];
@@ -165,7 +152,10 @@
     const costLine = `${lab.estCost ? formatInline(lab.estCost) + ' ' : ''}Your account, your cost: Examplar is not responsible for any cloud charges.`;
     const referencesMarkup = refs.map((reference) => {
       const label = escapeHtml(reference && (reference.label || reference.url));
-      const href = safeHref(reference && reference.url, !isBundled);
+      const href = window.ExamApp.resourceUrlForTrust(
+        reference && reference.url,
+        examData
+      );
       return href
         ? `<li><a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${label}</a></li>`
         : '';
@@ -203,25 +193,25 @@
       </article>`;
   }
 
-  function render(examId, metadata, labs, selectedId, isBundled) {
+  function render(examId, metadata, labs, selectedId, examData) {
     const selected = labs.find((l) => l.id === selectedId) || labs[0];
     const name = (metadata && (metadata.name || metadata.certificationCode)) || examId.toUpperCase();
     if (packBadge) packBadge.textContent = `${name} hands-on labs`;
     if (packSub) packSub.textContent = `${labs.length} lab${labs.length === 1 ? '' : 's'} in your own free-tier account`;
 
     nav.innerHTML = navMarkup(labs, examId, selected.id);
-    workspace.innerHTML = workspaceMarkup(selected, examId, isBundled);
+    workspace.innerHTML = workspaceMarkup(selected, examId, examData);
 
     nav.querySelectorAll('.labs-nav-item').forEach((btn) => {
       btn.addEventListener('click', () => {
-        render(examId, metadata, labs, btn.dataset.labId, isBundled);
+        render(examId, metadata, labs, btn.dataset.labId, examData);
         workspace.scrollIntoView({ block: 'start', behavior: 'smooth' });
       });
     });
     const doneBtn = document.getElementById('lab-done-btn');
     doneBtn?.addEventListener('click', () => {
       toggleDone(examId, doneBtn.dataset.labId);
-      render(examId, metadata, labs, selected.id, isBundled);
+      render(examId, metadata, labs, selected.id, examData);
     });
   }
 
@@ -249,8 +239,6 @@
     // (null/non-object or missing a usable id) before rendering instead of crashing on it.
     const labs = (Array.isArray(exam.labs) ? exam.labs : [])
       .filter((lab) => lab && typeof lab === 'object' && typeof lab.id === 'string' && lab.id);
-    const isBundled = window.ExamApp?.isBundledTrustedExam?.(exam) === true;
-
     const name = (metadata && (metadata.fullName || metadata.name)) || examId.toUpperCase();
     document.title = `${name} labs | Examplar`;
 
@@ -258,7 +246,7 @@
       emptyState('This pack does not include hands-on labs yet.', exam);
       return;
     }
-    render(examId, metadata, labs, labs[0].id, isBundled);
+    render(examId, metadata, labs, labs[0].id, exam);
   }
 
   if (document.readyState === 'loading') {
