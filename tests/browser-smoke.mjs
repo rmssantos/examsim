@@ -789,6 +789,45 @@ try {
     'Full practice must keep the normal AZ-900 count, type, and duration.'
   );
 
+  // The fixed privacy control must clear both navigation actions on mobile.
+  // Localhost does not inject the public-site control, so add the same class
+  // that analytics.js uses and verify the real computed layout.
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobileControlBoxes = await page.evaluate(() => {
+    const privacy = document.createElement('button');
+    privacy.type = 'button';
+    privacy.className = 'analytics-privacy-button';
+    privacy.textContent = 'Privacy settings';
+    document.body.appendChild(privacy);
+    document.querySelector('.navigation-buttons')?.scrollIntoView({ block: 'end' });
+
+    const rect = (element) => {
+      const { left, top, right, bottom } = element.getBoundingClientRect();
+      return { left, top, right, bottom };
+    };
+    return {
+      privacy: rect(privacy),
+      previous: rect(document.getElementById('prev-btn')),
+      next: rect(document.getElementById('next-btn'))
+    };
+  });
+  const overlaps = (first, second) => first.left < second.right
+    && first.right > second.left
+    && first.top < second.bottom
+    && first.bottom > second.top;
+  assert.equal(
+    overlaps(mobileControlBoxes.privacy, mobileControlBoxes.previous),
+    false,
+    `Mobile Privacy settings must not overlap Previous: ${JSON.stringify(mobileControlBoxes)}`
+  );
+  assert.equal(
+    overlaps(mobileControlBoxes.privacy, mobileControlBoxes.next),
+    false,
+    `Mobile Privacy settings must not overlap Next: ${JSON.stringify(mobileControlBoxes)}`
+  );
+  await page.evaluate(() => document.querySelector('.analytics-privacy-button')?.remove());
+  await page.setViewportSize({ width: 1280, height: 720 });
+
   // Exam runtime regressions:
   //  - the results "Questions answered" stat must report answered/total, not the bank size;
   //  - "Show Answer" before attempting a question must read as a neutral reveal, not "Incorrect".
