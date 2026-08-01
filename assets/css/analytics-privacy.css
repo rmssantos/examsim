@@ -111,3 +111,10 @@
 [data-theme="dark"] .analytics-privacy-button:hover {
     background: #1f2937;
 }
+
+@media (max-width: 760px) {
+    .analytics-privacy-button {
+        left: 12px;
+        right: auto;
+    }
+}
