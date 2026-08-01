@@ -5,6 +5,39 @@
 // Global namespace for ExamApp
 window.ExamApp = window.ExamApp || {};
 
+window.ExamApp.toWellFormedString = function toWellFormedString(value) {
+    let text;
+    try {
+        text = String(value ?? '');
+    } catch (_) {
+        return '';
+    }
+    if (typeof text.toWellFormed === 'function') {
+        try {
+            return text.toWellFormed();
+        } catch (_) { /* fall through to the compatible code-unit path */ }
+    }
+
+    let result = '';
+    for (let index = 0; index < text.length; index++) {
+        const unit = text.charCodeAt(index);
+        if (unit >= 0xD800 && unit <= 0xDBFF) {
+            const next = text.charCodeAt(index + 1);
+            if (next >= 0xDC00 && next <= 0xDFFF) {
+                result += text[index] + text[index + 1];
+                index++;
+            } else {
+                result += '\uFFFD';
+            }
+        } else if (unit >= 0xDC00 && unit <= 0xDFFF) {
+            result += '\uFFFD';
+        } else {
+            result += text[index];
+        }
+    }
+    return result;
+};
+
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.appendChild(document.createTextNode(text));
@@ -159,8 +192,8 @@ window.ExamApp.sanitizeExamMetadata = function sanitizeExamMetadata(metadata, op
     } catch (_) {
         return null;
     }
-    if (isArray) return metadata;
-    if (prototype !== Object.prototype && prototype !== null) return metadata;
+    if (isArray) return null;
+    if (prototype !== Object.prototype && prototype !== null) return null;
 
     const sanitized = {};
     const maximumKeys = window.ExamApp.EXAM_LIMITS?.maxMetadataObjectKeys || 100;
@@ -169,14 +202,14 @@ window.ExamApp.sanitizeExamMetadata = function sanitizeExamMetadata(metadata, op
         for (const key in metadata) {
             if (!Object.prototype.hasOwnProperty.call(metadata, key)) continue;
             keyCount += 1;
-            if (keyCount > maximumKeys) return metadata;
+            if (keyCount > maximumKeys) return null;
             const descriptor = Object.getOwnPropertyDescriptor(metadata, key);
             if (
                 !descriptor
                 || descriptor.enumerable !== true
                 || !Object.prototype.hasOwnProperty.call(descriptor, 'value')
             ) {
-                return metadata;
+                return null;
             }
             Object.defineProperty(sanitized, key, {
                 value: descriptor.value,
@@ -1139,6 +1172,7 @@ window.ExamApp.validateExamData = function validateExamData(
 ) {
     const errors = [];
     const warnings = [];
+    let grandfatheredQuestionIdCount = 0;
     const limits = window.ExamApp.EXAM_LIMITS;
     const supportedTypes = new Set(['STANDARD', 'MULTI', 'YES_NO_MATRIX', 'SEQUENCE', 'DRAG_DROP_SELECT']);
     const items = Array.isArray(questions) ? questions : null;
@@ -1148,7 +1182,7 @@ window.ExamApp.validateExamData = function validateExamData(
 
     if (!items) {
         errors.push('Exam data must be an array of questions.');
-        return { valid: false, errors, warnings };
+        return { valid: false, errors, warnings, grandfatheredQuestionIdCount };
     }
 
     if (items.length === 0) errors.push('Exam must contain at least one question.');
@@ -1184,6 +1218,7 @@ window.ExamApp.validateExamData = function validateExamData(
                 errors.push(`${label}: id exceeds the ${limits.maxQuestionIdLength}-character maximum.`);
             } else {
                 if (isLegacyLongId) {
+                    grandfatheredQuestionIdCount += 1;
                     warnings.push(
                         `${label}: grandfathered stored id exceeds ${limits.maxQuestionIdLength} UTF-16 code units.`
                     );
@@ -1377,7 +1412,12 @@ window.ExamApp.validateExamData = function validateExamData(
         warnings.push(...labValidation.warnings);
     }
 
-    return { valid: errors.length === 0, errors, warnings };
+    return {
+        valid: errors.length === 0,
+        errors,
+        warnings,
+        grandfatheredQuestionIdCount
+    };
 };
 
 window.ExamApp.validateStoredExamData = function validateStoredExamData(
@@ -1390,12 +1430,13 @@ window.ExamApp.validateStoredExamData = function validateStoredExamData(
     const result = window.ExamApp.validateExamData(questions, metadata, labs, {
         storedRecord
     });
-    const grandfatheredCount = result.warnings.filter(
-        warning => warning.includes('grandfathered stored id')
-    ).length;
+    const grandfatheredCount = Number.isInteger(result.grandfatheredQuestionIdCount)
+        ? result.grandfatheredQuestionIdCount
+        : 0;
     if (result.valid && grandfatheredCount > 0) {
+        const limit = window.ExamApp.EXAM_LIMITS.maxQuestionIdLength;
         window.ExamApp.warn(
-            `Loaded stored exam "${String(examId)}" with ${grandfatheredCount} grandfathered question id(s) longer than ${window.ExamApp.EXAM_LIMITS.maxQuestionIdLength} UTF-16 code units. New imports remain limited to 120.`
+            `Loaded stored exam "${String(examId)}" with ${grandfatheredCount} grandfathered question id(s) longer than ${limit} UTF-16 code units. New imports remain limited to ${limit}.`
         );
     }
     return result;

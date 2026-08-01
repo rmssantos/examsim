@@ -430,6 +430,20 @@ const result = this.readOwnDataProperty(metadata, field);
 return result.valid && result.found ? result.value : undefined;
 }
 
+readExamQuestions(examData) {
+const result = this.readOwnDataProperty(examData, 'questions');
+if (!result.valid || !result.found) return [];
+return this.boundedArrayDataValues(
+	result.value,
+	this.metadataLimit('maxQuestions', 2000)
+);
+}
+
+readExamHasImages(examData) {
+const result = this.readOwnDataProperty(examData, 'hasImages');
+return result.valid && result.found && result.value === true;
+}
+
 getExamMetadataSnapshot(examData) {
 const metadataResult = this.readOwnDataProperty(examData, 'metadata');
 const metadata = metadataResult.valid && metadataResult.found
@@ -1299,13 +1313,14 @@ const imagesEl = document.getElementById('exam-images');
 document.getElementById('current-exam-name').textContent = metadata.name || examId.toUpperCase();
 if (durationEl) durationEl.textContent = `${metadata.duration || 45} minutes`;
 if (questionsEl) {
-const total = Array.isArray(examData.questions) ? examData.questions.length : metadata.totalQuestions;
+const total = this.readExamQuestions(examData).length || metadata.totalQuestions;
 questionsEl.textContent = `${metadata.questionCount || total || 0} questions`;
 }
 if (passScoreEl) passScoreEl.textContent = `${metadata.passScore || 70}%`;
 if (imagesEl) {
-imagesEl.textContent = examData.hasImages ? 'Includes images' : 'No images detected';
-imagesEl.classList.toggle('has-images', !!examData.hasImages);
+const hasImages = this.readExamHasImages(examData);
+imagesEl.textContent = hasImages ? 'Includes images' : 'No images detected';
+imagesEl.classList.toggle('has-images', hasImages);
 }
 
 if (this.currentExamInfo) this.currentExamInfo.style.display = 'block';
@@ -1390,10 +1405,10 @@ if (detailsTaxonomy) {
 	detailsTaxonomy.replaceChildren(this.createExamTaxonomy(examId, examData, { variant: 'details' }));
 }
 document.getElementById('details-exam-duration').textContent = `${metadata.duration || 45} min`;
-const questions = Array.isArray(examData.questions) ? examData.questions : [];
+const questions = this.readExamQuestions(examData);
 document.getElementById('details-exam-questions').textContent = `${metadata.questionCount || metadata.totalQuestions || questions.length}`;
 document.getElementById('details-exam-pass-score').textContent = `${metadata.passScore || 70}%`;
-document.getElementById('details-exam-images').textContent = examData.hasImages ? 'Yes' : 'No';
+document.getElementById('details-exam-images').textContent = this.readExamHasImages(examData) ? 'Yes' : 'No';
 
 // Populate progress
 this.renderDetailsProgress(examId, stats);
@@ -1669,7 +1684,7 @@ updateSelectedQuestionsCount(examId) {
 	if (!examData) return;
 
 	const metadata = this.getExamMetadataSnapshot(examData);
-	const questions = Array.isArray(examData.questions) ? examData.questions : [];
+	const questions = this.readExamQuestions(examData);
 	const modulesList = document.getElementById('details-modules-list');
 		if (!modulesList) return;
 	const checkedItems = modulesList.querySelectorAll('li.checked');
@@ -1913,7 +1928,7 @@ this.renderDetailsProgress(this.selectedExamId, stats);
 updatePreviewHighlights(metadata, examData) {
 if (!this.previewHighlights) return;
 const chips = [];
-const questionCount = metadata.questionCount || examData?.questions?.length;
+const questionCount = metadata.questionCount || this.readExamQuestions(examData).length;
 const duration = metadata.duration || 0;
 if (questionCount) chips.push(`${questionCount} questions`);
 if (duration) chips.push(`${duration} minutes`);
@@ -1921,7 +1936,7 @@ const moduleCount = this.getModuleSnapshots(
 	this.readMetadataCollection(metadata, 'modules')
 ).length;
 if (moduleCount) chips.push(`${moduleCount} modules`);
-if (examData?.hasImages) chips.push('Includes images');
+if (this.readExamHasImages(examData)) chips.push('Includes images');
 if (chips.length === 0) chips.push('Import data to unlock stats');
 this.renderPreviewChips(chips);
 }

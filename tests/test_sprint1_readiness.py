@@ -1,5 +1,6 @@
 import copy
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -16,6 +17,15 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class Sprint1ReadinessTests(unittest.TestCase):
+    def service_worker_cache_version(self):
+        text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
+        match = re.search(
+            r"const CACHE_VERSION = '(examsim-pwa-v\d+\.\d+)';",
+            text,
+        )
+        self.assertIsNotNone(match, "service-worker CACHE_VERSION declaration is missing")
+        return match.group(1)
+
     def test_service_worker_versioned_and_network_first_for_mutable_exam_assets(self):
         text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
         core_start = text.index("const CORE_ASSETS")
@@ -66,11 +76,11 @@ class Sprint1ReadinessTests(unittest.TestCase):
 
     def test_service_worker_revalidates_app_shell_assets_before_cache_fallback(self):
         text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
+        self.service_worker_cache_version()
         start = text.index("const APP_SHELL_NETWORK_FIRST_ASSETS")
         end = text.index("\n\nfunction sameOrigin", start)
         app_shell_assets = text[start:end]
 
-        self.assertIn("const CACHE_VERSION = 'examsim-pwa-v6.5';", text)
         self.assertIn("APP_SHELL_NETWORK_FIRST_ASSETS", text)
         self.assertIn("const APP_SHELL_NETWORK_FIRST_ASSETS = [", app_shell_assets)
         self.assertNotIn("CORE_ASSETS.filter", app_shell_assets)
@@ -199,6 +209,7 @@ async function dispatch(pathname, options = {}) {
                 )
 
     def test_service_worker_activation_only_deletes_obsolete_examplar_caches(self):
+        cache_version = self.service_worker_cache_version()
         node_script = r"""
 const fs = require('fs');
 const vm = require('vm');
@@ -209,8 +220,8 @@ let claimed = 0;
 const cacheKeys = [
   'examsim-pwa-v6.3-static',
   'examsim-pwa-v6.4-runtime',
-  'examsim-pwa-v6.5-static',
-  'examsim-pwa-v6.5-runtime',
+  '__CURRENT_CACHE_VERSION__-static',
+  '__CURRENT_CACHE_VERSION__-runtime',
   'another-project-v3',
   'workbox-precache-v1'
 ];
@@ -261,6 +272,7 @@ activation.then(() => {
   process.exit(1);
 });
 """
+        node_script = node_script.replace("__CURRENT_CACHE_VERSION__", cache_version)
         activation = run_node_snippet(ROOT / "service-worker.js", node_script)
 
         self.assertCountEqual(

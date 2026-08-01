@@ -438,9 +438,21 @@ class MultiExamSimulator {
     }
 
     validateStoredExamData(questions, metadata, labs, examId, storedRecord) {
-        const validator = window.ExamApp.validateStoredExamData
-            || window.ExamApp.validateExamData;
-        return validator(questions, metadata, labs, examId, storedRecord).valid;
+        if (typeof window.ExamApp.validateStoredExamData === 'function') {
+            return window.ExamApp.validateStoredExamData(
+                questions,
+                metadata,
+                labs,
+                examId,
+                storedRecord
+            ).valid;
+        }
+        return window.ExamApp.validateExamData(
+            questions,
+            metadata,
+            labs,
+            { storedRecord }
+        ).valid;
     }
 
     validateRuntimeExamData(record, questions, metadata, labs, examId) {

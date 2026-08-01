@@ -137,12 +137,30 @@ class ExamManager {
                 const metadata = examData.metadata || this.generateMetadata(examId, questions || []);
                 const isBrowserStored = window.ExamApp.isBrowserStoredExamRecord?.(examData)
                     === true;
-                const questionValidator = isBrowserStored
-                    ? (window.ExamApp.validateStoredExamData || window.ExamApp.validateExamData)
-                    : window.ExamApp.validateExamData;
-                const validation = questions
-                    ? questionValidator(questions, metadata, labs, examId, examData)
-                    : window.ExamApp.validateExamMetadata(metadata, null, undefined);
+                let validation;
+                if (!questions) {
+                    validation = window.ExamApp.validateExamMetadata(metadata, null, undefined);
+                } else if (
+                    isBrowserStored
+                    && typeof window.ExamApp.validateStoredExamData === 'function'
+                ) {
+                    validation = window.ExamApp.validateStoredExamData(
+                        questions,
+                        metadata,
+                        labs,
+                        examId,
+                        examData
+                    );
+                } else if (isBrowserStored) {
+                    validation = window.ExamApp.validateExamData(
+                        questions,
+                        metadata,
+                        labs,
+                        { storedRecord: examData }
+                    );
+                } else {
+                    validation = window.ExamApp.validateExamData(questions, metadata, labs);
+                }
                 if (!validation.valid) {
                     window.ExamApp.warn(
                         `Skipping invalid exam ${examId}:`,
@@ -289,7 +307,11 @@ class ExamManager {
     }
 
     sanitizeMetadata(metadata, allowCommercial = false) {
-        return window.ExamApp.sanitizeExamMetadata(metadata, { allowCommercial });
+        const sanitized = window.ExamApp.sanitizeExamMetadata(metadata, { allowCommercial });
+        if (metadata !== null && metadata !== undefined && sanitized === null) {
+            throw new Error('Exam metadata could not be sanitized safely.');
+        }
+        return sanitized;
     }
 
     snapshotImportedJson(value) {
@@ -309,10 +331,13 @@ class ExamManager {
             : 5 * 1024 * 1024;
         const maximumDepth = 32;
         const active = new Set();
+        const snapshotRejections = new WeakSet();
         let nodeCount = 0;
 
         const fail = (path, reason) => {
-            throw new Error(`${path} ${reason}`);
+            const error = new Error(`${path} ${reason}`);
+            snapshotRejections.add(error);
+            throw error;
         };
         const clone = (source, path, depth) => {
             nodeCount += 1;
@@ -427,9 +452,7 @@ class ExamManager {
                         });
                     }
                 } catch (error) {
-                    if (error instanceof Error && /^(Imported exam|Imported exam\.)/.test(error.message)) {
-                        throw error;
-                    }
+                    if (snapshotRejections.has(error)) throw error;
                     fail(path, 'could not be enumerated safely.');
                 }
                 return snapshot;

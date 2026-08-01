@@ -90,7 +90,13 @@
 
         sanitizeLocalMetadata(metadata) {
             if (typeof window.ExamApp.sanitizeExamMetadata === 'function') {
-                return window.ExamApp.sanitizeExamMetadata(metadata, { allowCommercial: false });
+                const sanitized = window.ExamApp.sanitizeExamMetadata(metadata, {
+                    allowCommercial: false
+                });
+                if (metadata !== null && metadata !== undefined && sanitized === null) {
+                    throw new Error('Exam metadata could not be sanitized safely.');
+                }
+                return sanitized;
             }
             if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
                 return metadata || null;
@@ -142,8 +148,8 @@
         putLegacyExam(examId, questions, metadata, labs) {
             if (!window.ExamApp.isSafeExamId(examId) || !Array.isArray(questions)) return false;
             if (labs !== undefined && !Array.isArray(labs)) return false;
-            localStorage.setItem(this.legacyQuestionKey(examId), JSON.stringify(questions));
             const safeMetadata = this.sanitizeLocalMetadata(metadata);
+            localStorage.setItem(this.legacyQuestionKey(examId), JSON.stringify(questions));
             if (safeMetadata) {
                 localStorage.setItem(this.legacyMetadataKey(examId), JSON.stringify(safeMetadata));
             } else {
@@ -353,17 +359,23 @@
                             Number.isInteger(effectiveLabCount)
                             && effectiveLabCount === actualLabCount
                         );
-                    const storedValidator = window.ExamApp.validateStoredExamData
-                        || window.ExamApp.validateExamData;
-                    const migrationValidation = typeof storedValidator === 'function'
-                        ? storedValidator(
+                    let migrationValidation = { valid: true };
+                    if (typeof window.ExamApp.validateStoredExamData === 'function') {
+                        migrationValidation = window.ExamApp.validateStoredExamData(
                             legacy.questions,
                             migratedMetadata,
                             migrationLabs,
                             examId,
                             legacy
-                        )
-                        : { valid: true };
+                        );
+                    } else if (typeof window.ExamApp.validateExamData === 'function') {
+                        migrationValidation = window.ExamApp.validateExamData(
+                            legacy.questions,
+                            migratedMetadata,
+                            migrationLabs,
+                            { storedRecord: legacy }
+                        );
+                    }
                     if (
                         !labCountMatches
                         || migrationValidation.valid !== true

@@ -49,6 +49,56 @@ class QuestionIdValidationTests(unittest.TestCase):
     def cli_id_issues(cls, question_id):
         return cls.cli_issues_for_ids([question_id])
 
+    def test_utils_exposes_total_well_formed_string_helper(self):
+        payload = self.run_node(
+            r"""
+            const fs = require('fs');
+            const vm = require('vm');
+            try {
+              Object.defineProperty(String.prototype, 'toWellFormed', {
+                configurable: true,
+                value: undefined,
+                writable: true
+              });
+            } catch (_) {
+              String.prototype.toWellFormed = undefined;
+            }
+
+            global.window = {
+              location: { hostname: 'localhost', search: '', href: 'http://localhost/' }
+            };
+            global.document = {
+              createElement() { return { appendChild() {}, innerHTML: '' }; },
+              createTextNode(value) { return { value }; }
+            };
+            global.localStorage = {
+              getItem() { return null; },
+              setItem() {},
+              removeItem() {}
+            };
+            vm.runInThisContext(fs.readFileSync(process.argv[1], 'utf8'));
+
+            const helper = window.ExamApp.toWellFormedString;
+            const hostile = { toString() { throw new Error('blocked conversion'); } };
+            const malformed = typeof helper === 'function'
+              ? helper('left-\uD800-right')
+              : '';
+            console.log(JSON.stringify({
+              helperType: typeof helper,
+              malformedCodeUnits: Array.from(malformed, (character) => character.charCodeAt(0)),
+              hostile: typeof helper === 'function' ? helper(hostile) : null
+            }));
+            """,
+            ROOT / "assets" / "js" / "utils.js",
+        )
+
+        self.assertEqual("function", payload["helperType"])
+        self.assertEqual(
+            [108, 101, 102, 116, 45, 65533, 45, 114, 105, 103, 104, 116],
+            payload["malformedCodeUnits"],
+        )
+        self.assertEqual("", payload["hostile"])
+
     def test_runtime_enforces_question_id_length_and_well_formed_unicode(self):
         payload = self.run_node(
             r"""
@@ -580,6 +630,312 @@ class QuestionIdValidationTests(unittest.TestCase):
         self.assertFalse(payload["forgedRuntime"])
         self.assertTrue(payload["storedRuntime"])
         self.assertTrue(payload["storedRuntimeMarked"])
+
+    def test_stored_validator_fallback_passes_provenance_options_in_runtime_helpers(self):
+        payload = self.run_node(
+            r"""
+            const fs = require('fs');
+            const vm = require('vm');
+            const source = fs.readFileSync('assets/js/script-multi-exam.js', 'utf8');
+            global.window = {
+              ExamApp: {
+                validateExamData(...args) {
+                  window.validationArgs = args;
+                  return { valid: true, errors: [], warnings: [] };
+                }
+              }
+            };
+            global.document = {
+              addEventListener() {},
+              getElementById() { return null; },
+              querySelectorAll() { return []; },
+              body: { dataset: {} }
+            };
+            vm.runInThisContext(
+              `${source}\nglobalThis.MultiExamSimulatorUnderTest = MultiExamSimulator;`
+            );
+
+            const storedRecord = { examId: 'legacy' };
+            const simulator = Object.create(MultiExamSimulatorUnderTest.prototype);
+            const valid = simulator.validateStoredExamData(
+              [{ id: 'q1' }],
+              null,
+              [],
+              'legacy',
+              storedRecord
+            );
+            console.log(JSON.stringify({
+              valid,
+              argumentCount: window.validationArgs.length,
+              optionsType: typeof window.validationArgs[3],
+              preserved: window.validationArgs[3]?.storedRecord === storedRecord
+            }));
+            """,
+            ROOT / "assets" / "js" / "script-multi-exam.js",
+        )
+
+        self.assertTrue(payload["valid"])
+        self.assertEqual(4, payload["argumentCount"])
+        self.assertEqual("object", payload["optionsType"])
+        self.assertTrue(payload["preserved"])
+
+    def test_exam_loader_fallback_passes_marked_storage_record_as_options(self):
+        payload = self.run_node(
+            r"""
+            const fs = require('fs');
+            const vm = require('vm');
+            const storedRecord = {
+              examId: 'legacy',
+              questions: [{ id: 'q1', question: 'Question?', options: ['A'], correct: 0 }],
+              metadata: null,
+              labs: [],
+              storage: 'indexedDB'
+            };
+            let validationArgs = null;
+            global.window = {
+              ExamApp: {
+                isSafeExamId() { return true; },
+                sanitizeExamMetadata(value) { return value; },
+                validateExamMetadata() { return { valid: true, errors: [], warnings: [] }; },
+                validateExamData(...args) {
+                  validationArgs = args;
+                  return { valid: true, errors: [], warnings: [] };
+                },
+                isBrowserStoredExamRecord(record) { return record === storedRecord; },
+                markBrowserStoredExamRecord(record) { return record; },
+                warn() {},
+                log() {},
+                examStorage: {
+                  async listExamIds() { return ['legacy']; },
+                  async getExam() { return storedRecord; },
+                  async listProgressExamIds() { return []; },
+                  async getProgress() { return null; }
+                }
+              },
+              userExams: {},
+              location: { hostname: 'localhost', search: '', href: 'http://localhost/' }
+            };
+            window.window = window;
+            global.fetch = async () => ({
+              ok: true,
+              async json() { return []; },
+              async text() { return ''; }
+            });
+            global.console = { log() {}, warn() {}, error() {} };
+            vm.runInThisContext(fs.readFileSync('assets/js/exam-loader.js', 'utf8'));
+            window.ExamApp.examsLoadedPromise.then(() => {
+              process.stdout.write(JSON.stringify({
+                loaded: Boolean(window.userExams.legacy),
+                argumentCount: validationArgs?.length,
+                optionsType: typeof validationArgs?.[3],
+                preserved: validationArgs?.[3]?.storedRecord === storedRecord
+              }));
+            }).catch((error) => {
+              process.stderr.write(String(error && error.stack || error));
+              process.exit(1);
+            });
+            """,
+            ROOT / "assets" / "js" / "exam-loader.js",
+        )
+
+        self.assertTrue(payload["loaded"])
+        self.assertEqual(4, payload["argumentCount"])
+        self.assertEqual("object", payload["optionsType"])
+        self.assertTrue(payload["preserved"])
+
+    def test_exam_storage_migration_fallback_passes_marked_record_as_options(self):
+        payload = self.run_node(
+            r"""
+            const fs = require('fs');
+            const vm = require('vm');
+            const values = new Map([
+              ['custom_legacy_questions', JSON.stringify([
+                { id: 'q1', question: 'Question?', options: ['A'], correct: 0 }
+              ])]
+            ]);
+            const marked = new WeakSet();
+            let validationArgs = null;
+            global.localStorage = {
+              get length() { return values.size; },
+              key(index) { return [...values.keys()][index] || null; },
+              getItem(key) { return values.has(key) ? values.get(key) : null; },
+              setItem(key, value) { values.set(key, String(value)); },
+              removeItem(key) { values.delete(key); }
+            };
+            global.window = {
+              indexedDB: null,
+              ExamApp: {
+                isSafeExamId() { return true; },
+                sanitizeExamMetadata(value) { return value; },
+                markBrowserStoredExamRecord(record) { marked.add(record); return record; },
+                isBrowserStoredExamRecord(record) { return marked.has(record); },
+                validateExamData(...args) {
+                  validationArgs = args;
+                  return { valid: true, errors: [], warnings: [] };
+                },
+                warn() {}
+              }
+            };
+            vm.runInThisContext(fs.readFileSync('assets/js/exam-storage.js', 'utf8'));
+            window.ExamApp.examStorage.getExam('legacy').then((record) => {
+              process.stdout.write(JSON.stringify({
+                resolved: Boolean(record),
+                argumentCount: validationArgs?.length,
+                optionsType: typeof validationArgs?.[3],
+                preserved: Boolean(
+                  validationArgs?.[3]?.storedRecord
+                  && marked.has(validationArgs[3].storedRecord)
+                )
+              }));
+            }).catch((error) => {
+              process.stderr.write(String(error && error.stack || error));
+              process.exit(1);
+            });
+            """,
+            ROOT / "assets" / "js" / "exam-storage.js",
+        )
+
+        self.assertTrue(payload["resolved"])
+        self.assertEqual(4, payload["argumentCount"])
+        self.assertEqual("object", payload["optionsType"])
+        self.assertTrue(payload["preserved"])
+
+    def test_exam_manager_uses_each_validator_argument_contract(self):
+        payload = self.run_node(
+            r"""
+            const fs = require('fs');
+            const vm = require('vm');
+            const marked = new WeakSet();
+            const calls = [];
+            global.localStorage = {
+              getItem() { return null; },
+              setItem() {},
+              removeItem() {}
+            };
+            global.window = {
+              ExamApp: {
+                isSafeExamId() { return true; },
+                isBrowserStoredExamRecord(record) { return marked.has(record); },
+                markBrowserStoredExamRecord(record) { marked.add(record); return record; },
+                validateExamData(...args) {
+                  calls.push(args);
+                  return { valid: true, errors: [], warnings: [] };
+                },
+                validateExamMetadata() { return { valid: true, errors: [], warnings: [] }; },
+                warn() {}
+              },
+              userExams: {}
+            };
+            global.console = { log() {}, warn() {}, error() {} };
+            vm.runInThisContext(fs.readFileSync('assets/js/exam-manager.js', 'utf8'));
+            const manager = window.examManager;
+            const question = { id: 'q1', question: 'Question?', options: ['A'], correct: 0 };
+            const networkRecord = {
+              questions: [question], metadata: {}, labs: [], source: 'bundled', storage: 'network'
+            };
+            const storedRecord = {
+              questions: [question], metadata: {}, labs: [], source: 'imported', storage: 'indexedDB'
+            };
+            marked.add(storedRecord);
+            manager.loadFromUserContent = async (examId) => (
+              examId === 'network' ? networkRecord : storedRecord
+            );
+            manager.loadFromLocalStorage = async () => null;
+
+            (async () => {
+              const network = await manager.loadExamData('network');
+              const stored = await manager.loadExamData('stored');
+              process.stdout.write(JSON.stringify({
+                networkLoaded: Boolean(network),
+                storedLoaded: Boolean(stored),
+                networkArgumentCount: calls[0]?.length,
+                networkOptions: calls[0]?.[3] ?? null,
+                storedArgumentCount: calls[1]?.length,
+                storedPreserved: calls[1]?.[3]?.storedRecord === storedRecord
+              }));
+            })().catch((error) => {
+              process.stderr.write(String(error && error.stack || error));
+              process.exit(1);
+            });
+            """,
+            ROOT / "assets" / "js" / "exam-manager.js",
+        )
+
+        self.assertTrue(payload["networkLoaded"])
+        self.assertTrue(payload["storedLoaded"])
+        self.assertEqual(3, payload["networkArgumentCount"])
+        self.assertIsNone(payload["networkOptions"])
+        self.assertEqual(4, payload["storedArgumentCount"])
+        self.assertTrue(payload["storedPreserved"])
+
+    def test_stored_validation_reports_structured_grandfathering_with_dynamic_limit(self):
+        payload = self.run_node(
+            r"""
+            const fs = require('fs');
+            const vm = require('vm');
+            const loggedWarnings = [];
+            global.window = {
+              ExamApp: {},
+              location: { hostname: 'localhost', search: '', href: 'http://localhost/' }
+            };
+            global.document = {
+              createElement() { return { appendChild() {}, innerHTML: '' }; },
+              createTextNode(value) { return { value }; }
+            };
+            global.localStorage = {
+              getItem() { return null; },
+              setItem() {},
+              removeItem() {}
+            };
+            vm.runInThisContext(fs.readFileSync(process.argv[1], 'utf8'));
+            window.ExamApp.warn = (...args) => loggedWarnings.push(args.map(String).join(' '));
+
+            const question = (id) => ({
+              id,
+              question: 'Question?',
+              options: ['A', 'B'],
+              correct: 0
+            });
+            const record = {
+              questions: [question('x'.repeat(121)), question('y'.repeat(121))],
+              metadata: null,
+              labs: []
+            };
+            window.ExamApp.markBrowserStoredExamRecord(record);
+            const direct = window.ExamApp.validateExamData(
+              record.questions,
+              record.metadata,
+              record.labs,
+              { storedRecord: record }
+            );
+
+            const validateStored = window.ExamApp.validateStoredExamData;
+            window.ExamApp.EXAM_LIMITS = {
+              ...window.ExamApp.EXAM_LIMITS,
+              maxQuestionIdLength: 64
+            };
+            window.ExamApp.validateExamData = () => ({
+              valid: true,
+              errors: [],
+              warnings: ['Recovery wording may change independently.'],
+              grandfatheredQuestionIdCount: 2
+            });
+            validateStored([], null, [], 'legacy-pack', record);
+
+            console.log(JSON.stringify({
+              directCount: direct.grandfatheredQuestionIdCount ?? null,
+              loggedWarnings
+            }));
+            """,
+            ROOT / "assets" / "js" / "utils.js",
+        )
+
+        self.assertEqual(2, payload["directCount"])
+        self.assertEqual(1, len(payload["loggedWarnings"]))
+        recovery_warning = payload["loggedWarnings"][0]
+        self.assertIn("2 grandfathered question id(s)", recovery_warning)
+        self.assertIn("limited to 64", recovery_warning)
+        self.assertNotIn("limited to 120", recovery_warning)
 
     def test_stored_long_id_legacy_collision_quarantines_the_pack(self):
         payload = self.run_node(

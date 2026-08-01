@@ -454,18 +454,209 @@ class MetadataHardeningTests(unittest.TestCase):
                     self.assertTrue(outcome["errors"], outcome)
         self.assertEqual(0, payload["sanitizedSymbolCount"])
 
+    def test_metadata_sanitizer_fails_closed_for_rejected_root_shapes(self):
+        payload = self.run_node(
+            r"""
+            const fs = require('fs');
+            const vm = require('vm');
+            global.window = {
+              location: { hostname: 'localhost', search: '', href: 'http://localhost/' }
+            };
+            global.document = {
+              createElement() { return { appendChild() {}, innerHTML: '' }; },
+              createTextNode(value) { return { value }; }
+            };
+            global.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+            vm.runInThisContext(fs.readFileSync(process.argv[1], 'utf8'));
+
+            const arrayMetadata = [];
+            arrayMetadata.pro = { url: 'https://example.invalid/buy' };
+
+            class MetadataRecord {}
+            const nonPlainMetadata = new MetadataRecord();
+            nonPlainMetadata.source = 'bundled';
+
+            const oversizedMetadata = Object.fromEntries(
+              Array.from({ length: 101 }, (_, index) => [`field${index}`, index])
+            );
+            oversizedMetadata.trust = 'bundled';
+
+            let getterHits = 0;
+            const accessorMetadata = {};
+            Object.defineProperty(accessorMetadata, 'preview', {
+              enumerable: true,
+              get() {
+                getterHits++;
+                throw new Error('metadata getter executed');
+              }
+            });
+
+            const rejected = [
+              arrayMetadata,
+              nonPlainMetadata,
+              oversizedMetadata,
+              accessorMetadata
+            ].map(metadata => window.ExamApp.sanitizeExamMetadata(metadata) === null);
+
+            console.log(JSON.stringify({ rejected, getterHits }));
+            """
+        )
+
+        self.assertEqual([True, True, True, True], payload["rejected"])
+        self.assertEqual(0, payload["getterHits"])
+
+    def test_metadata_rejection_prevents_storage_writes_and_registry_updates(self):
+        payload = self.run_node(
+            r"""
+            const fs = require('fs');
+            const vm = require('vm');
+            let localWrites = 0;
+            let indexedWrites = 0;
+            let registrations = 0;
+            let getterHits = 0;
+            global.window = {
+              indexedDB: null,
+              location: { hostname: 'localhost', search: '', href: 'http://localhost/' }
+            };
+            global.document = {
+              createElement() { return { appendChild() {}, innerHTML: '' }; },
+              createTextNode(value) { return { value }; }
+            };
+            global.localStorage = {
+              getItem() { return null; },
+              setItem() { localWrites++; },
+              removeItem() {},
+              get length() { return 0; },
+              key() { return null; }
+            };
+            vm.runInThisContext(fs.readFileSync(process.argv[1], 'utf8'));
+            window.ExamApp.warn = () => {};
+            window.ExamApp.addToRegistry = () => { registrations++; };
+            vm.runInThisContext(fs.readFileSync('assets/js/exam-storage.js', 'utf8'));
+            vm.runInThisContext(fs.readFileSync('assets/js/exam-manager.js', 'utf8'));
+
+            const metadata = {};
+            Object.defineProperty(metadata, 'preview', {
+              enumerable: true,
+              get() {
+                getterHits++;
+                throw new Error('metadata getter executed');
+              }
+            });
+            const questions = [{
+              id: 'q1',
+              question: 'Question?',
+              question_type: 'STANDARD',
+              options: ['A', 'B'],
+              correct: 0
+            }];
+            window.ExamApp.examStorage.putRecord = async () => {
+              indexedWrites++;
+              return true;
+            };
+
+            (async () => {
+              let indexedRejected = false;
+              let legacyRejected = false;
+              let managerRejected = false;
+              try {
+                await window.ExamApp.examStorage.putExam('hostile', questions, metadata);
+              } catch (_) {
+                indexedRejected = true;
+              }
+              try {
+                window.ExamApp.examStorage.putLegacyExam('hostile', questions, metadata);
+              } catch (_) {
+                legacyRejected = true;
+              }
+              try {
+                window.ExamApp.examManager.sanitizeMetadata(metadata, false);
+              } catch (_) {
+                managerRejected = true;
+              }
+              console.log(JSON.stringify({
+                indexedRejected,
+                legacyRejected,
+                managerRejected,
+                indexedWrites,
+                localWrites,
+                registrations,
+                getterHits
+              }));
+            })();
+            """
+        )
+
+        self.assertTrue(payload["indexedRejected"], payload)
+        self.assertTrue(payload["legacyRejected"], payload)
+        self.assertTrue(payload["managerRejected"], payload)
+        self.assertEqual(0, payload["indexedWrites"], payload)
+        self.assertEqual(0, payload["localWrites"], payload)
+        self.assertEqual(0, payload["registrations"], payload)
+        self.assertEqual(0, payload["getterHits"], payload)
+
+    def test_bundled_metadata_rejection_does_not_register_exam(self):
+        payload = self.run_node(
+            r"""
+            const fs = require('fs');
+            const vm = require('vm');
+            global.window = {
+              location: { hostname: 'localhost', search: '', href: 'http://localhost/' }
+            };
+            global.document = {
+              createElement() { return { appendChild() {}, innerHTML: '' }; },
+              createTextNode(value) { return { value }; }
+            };
+            global.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+            vm.runInThisContext(fs.readFileSync(process.argv[1], 'utf8'));
+            window.ExamApp.log = () => {};
+            window.ExamApp.warn = () => {};
+            window.ExamApp.examStorage = null;
+            global.fetch = async url => {
+              if (String(url).endsWith('user-content/exams/index.json')) {
+                return { ok: true, json: async () => ['hostile'] };
+              }
+              if (String(url).endsWith('user-content/exams/hostile/metadata.json')) {
+                const metadata = [];
+                metadata.source = 'bundled';
+                return { ok: true, json: async () => metadata };
+              }
+              throw new Error(`Unexpected fetch: ${url}`);
+            };
+            vm.runInThisContext(fs.readFileSync('assets/js/exam-loader.js', 'utf8'));
+
+            window.ExamApp.examsLoadedPromise.then(() => {
+              console.log(JSON.stringify({
+                registered: Object.prototype.hasOwnProperty.call(window.userExams, 'hostile')
+              }));
+            });
+            """
+        )
+
+        self.assertFalse(payload["registered"], payload)
+
     def test_runtime_metadata_uses_capped_json_visible_key_enumeration(self):
         source = (ROOT / "assets" / "js" / "utils.js").read_text(encoding="utf-8")
-        sanitizer = source[
-            source.index("window.ExamApp.sanitizeExamMetadata") :
-            source.index("window.ExamApp.OFFICIAL_DOCUMENTATION_HOSTS")
-        ]
-        validator = source[
-            source.index("window.ExamApp.validateExamMetadata") :
-            source.index("window.ExamApp.validateExamLabs")
-        ]
-        for label, section in (("sanitizer", sanitizer), ("validator", validator)):
+        markers = (
+            (
+                "sanitizer",
+                "window.ExamApp.sanitizeExamMetadata",
+                "window.ExamApp.OFFICIAL_DOCUMENTATION_HOSTS",
+            ),
+            (
+                "validator",
+                "window.ExamApp.validateExamMetadata",
+                "window.ExamApp.validateExamLabs",
+            ),
+        )
+        for label, start_marker, end_marker in markers:
             with self.subTest(section=label):
+                start = source.find(start_marker)
+                end = source.find(end_marker)
+                self.assertNotEqual(-1, start, f"{label} start marker is missing")
+                self.assertNotEqual(-1, end, f"{label} end marker is missing")
+                self.assertLess(start, end, f"{label} markers are out of order")
+                section = source[start:end]
                 self.assertNotIn("Reflect.ownKeys", section)
                 self.assertIn("for (const key in", section)
 
@@ -497,6 +688,53 @@ class MetadataHardeningTests(unittest.TestCase):
                 self.assertTrue(messages, field)
                 self.assertLessEqual(len(messages), 100)
                 self.assertLessEqual(max(map(len, messages)), 300)
+
+    def test_cli_rejects_metadata_numbers_that_are_non_finite_in_javascript(self):
+        invalid_values = {
+            "nan": float("nan"),
+            "positive_infinity": float("inf"),
+            "negative_infinity": float("-inf"),
+            "javascript_overflow": 10**400,
+        }
+        for name, value in invalid_values.items():
+            with self.subTest(case=name):
+                validator = VALIDATOR.PackValidator(ROOT)
+                validator.validate_metadata(
+                    "metadata-test",
+                    {"customNumber": value},
+                    ROOT / "metadata-test.json",
+                    [],
+                )
+                messages = [issue.message for issue in validator.issues]
+                self.assertTrue(
+                    any("finite JSON number" in message for message in messages),
+                    messages,
+                )
+
+        for value in (0, 1.5, 10**300):
+            with self.subTest(case=f"finite_{value}"):
+                validator = VALIDATOR.PackValidator(ROOT)
+                validator.validate_metadata(
+                    "metadata-test",
+                    {"customNumber": value},
+                    ROOT / "metadata-test.json",
+                    [],
+                )
+                self.assertEqual([], [issue.message for issue in validator.issues])
+
+    def test_cli_question_count_diagnostic_names_the_dump_question_count(self):
+        validator = VALIDATOR.PackValidator(ROOT)
+        validator.validate_metadata(
+            "metadata-test",
+            {"questionCount": 2},
+            ROOT / "metadata-test.json",
+            [{}],
+        )
+
+        self.assertEqual(
+            ["questionCount cannot exceed the dump question count"],
+            [issue.message for issue in validator.issues],
+        )
 
     def test_import_rejects_oversized_metadata_before_any_write(self):
         payload = self.run_node(
@@ -723,6 +961,51 @@ class MetadataHardeningTests(unittest.TestCase):
         self.assertEqual(0, payload["generateCalls"])
         self.assertEqual([], payload["writes"])
         self.assertEqual([], payload["registered"])
+
+    def test_import_snapshot_does_not_trust_hostile_error_message_prefixes(self):
+        payload = self.run_node(
+            r"""
+            const fs = require('fs');
+            const vm = require('vm');
+            global.window = {
+              location: { hostname: 'localhost', search: '', href: 'http://localhost/' },
+              userExams: {}
+            };
+            global.document = {
+              createElement() { return { appendChild() {}, innerHTML: '' }; },
+              createTextNode(value) { return { value }; }
+            };
+            global.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+            vm.runInThisContext(fs.readFileSync(process.argv[1], 'utf8'));
+            vm.runInThisContext(fs.readFileSync('assets/js/exam-manager.js', 'utf8'));
+
+            const maximumKeys = window.ExamApp.EXAM_LIMITS.maxMetadataObjectKeys;
+            const overLimit = Object.fromEntries(
+              Array.from({ length: maximumKeys + 1 }, (_, index) => [`field${index}`, index])
+            );
+            const hostile = new Proxy({ safe: true }, {
+              ownKeys() {
+                throw new Error('Imported exam forged internal rejection.');
+              }
+            });
+            const internal = window.ExamApp.examManager.snapshotImportedJson({ payload: overLimit });
+            const external = window.ExamApp.examManager.snapshotImportedJson({ payload: hostile });
+
+            console.log(JSON.stringify({
+              internalError: internal.error,
+              externalError: external.error
+            }));
+            """
+        )
+
+        self.assertEqual(
+            "Imported exam.payload has too many keys; maximum is 100.",
+            payload["internalError"],
+        )
+        self.assertEqual(
+            "Imported exam.payload could not be enumerated safely.",
+            payload["externalError"],
+        )
 
     def test_import_snapshot_accepts_schema_maximum_question_cardinalities(self):
         payload = self.run_node(
@@ -1195,6 +1478,7 @@ class MetadataHardeningTests(unittest.TestCase):
 
             let scalarGetterHits = 0;
             let rootGetterHits = 0;
+            let examFieldGetterHits = 0;
             let conversionHits = 0;
             const accessorMetadata = {};
             [
@@ -1261,11 +1545,35 @@ class MetadataHardeningTests(unittest.TestCase):
               trust: 'bundled',
               hasImages: false
             };
+            const hostileExam = {
+              metadata: {},
+              source: 'bundled',
+              trust: 'bundled'
+            };
+            ['questions', 'hasImages'].forEach(field => {
+              Object.defineProperty(hostileExam, field, {
+                enumerable: true,
+                get() {
+                  examFieldGetterHits++;
+                  throw new Error(`${field} getter executed`);
+                }
+              });
+            });
+            const revokedRoot = Proxy.revocable({
+              metadata: {},
+              questions: [],
+              source: 'bundled',
+              trust: 'bundled',
+              hasImages: false
+            }, {});
+            revokedRoot.revoke();
             window.userExams = {
               scalar: scalarExam,
               object: objectExam,
               root: rootExam,
-              revoked: revokedExam
+              revoked: revokedExam,
+              hostile: hostileExam,
+              revokedRoot: revokedRoot.proxy
             };
             window.ExamApp.ensureExamLoaded = async id => window.userExams[id];
             window.examSimulator = { currentExam: null, examData: {} };
@@ -1320,6 +1628,18 @@ class MetadataHardeningTests(unittest.TestCase):
               ));
               capture('info', () => homepageUnderTest.showExamInfo('scalar'));
               capture('details', () => homepageUnderTest.showExamDetailsPlaceholder('object'));
+              capture('info-hostile', () => homepageUnderTest.showExamInfo('hostile'));
+              capture('details-hostile', () => homepageUnderTest.showExamDetailsPlaceholder('hostile'));
+              capture('count-hostile', () => window.HomePageForTest.prototype
+                .updateSelectedQuestionsCount.call(homepageUnderTest, 'hostile'));
+              capture('highlight-hostile', () => window.HomePageForTest.prototype
+                .updatePreviewHighlights.call(homepageUnderTest, {}, hostileExam));
+              capture('info-revoked-root', () => homepageUnderTest.showExamInfo('revokedRoot'));
+              capture('details-revoked-root', () => homepageUnderTest.showExamDetailsPlaceholder('revokedRoot'));
+              capture('count-revoked-root', () => window.HomePageForTest.prototype
+                .updateSelectedQuestionsCount.call(homepageUnderTest, 'revokedRoot'));
+              capture('highlight-revoked-root', () => window.HomePageForTest.prototype
+                .updatePreviewHighlights.call(homepageUnderTest, {}, revokedRoot.proxy));
               homepageUnderTest.selectedExamId = 'object';
               capture('preview', () => homepageUnderTest.refreshHeroPreview());
               try {
@@ -1331,6 +1651,7 @@ class MetadataHardeningTests(unittest.TestCase):
                 errors,
                 scalarGetterHits,
                 rootGetterHits,
+                examFieldGetterHits,
                 conversionHits
               }));
             })();
@@ -1341,6 +1662,7 @@ class MetadataHardeningTests(unittest.TestCase):
         self.assertEqual([], payload["errors"], payload)
         self.assertEqual(0, payload["scalarGetterHits"])
         self.assertEqual(0, payload["rootGetterHits"])
+        self.assertEqual(0, payload["examFieldGetterHits"])
         self.assertEqual(0, payload["conversionHits"])
 
     def test_homepage_uses_bounded_inert_snapshots_in_actual_module_and_resource_paths(self):

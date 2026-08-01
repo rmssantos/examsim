@@ -2,38 +2,7 @@
 (function () {
     'use strict';
 
-    function toWellFormedString(value) {
-        let text;
-        try {
-            text = String(value ?? '');
-        } catch (_) {
-            return '';
-        }
-        if (typeof text.toWellFormed === 'function') {
-            try {
-                return text.toWellFormed();
-            } catch (_) { /* fall through to the compatible code-unit path */ }
-        }
-
-        let result = '';
-        for (let index = 0; index < text.length; index++) {
-            const unit = text.charCodeAt(index);
-            if (unit >= 0xD800 && unit <= 0xDBFF) {
-                const next = text.charCodeAt(index + 1);
-                if (next >= 0xDC00 && next <= 0xDFFF) {
-                    result += text[index] + text[index + 1];
-                    index++;
-                } else {
-                    result += '\uFFFD';
-                }
-            } else if (unit >= 0xDC00 && unit <= 0xDFFF) {
-                result += '\uFFFD';
-            } else {
-                result += text[index];
-            }
-        }
-        return result;
-    }
+    const toWellFormedString = window.ExamApp.toWellFormedString;
 
     class StudyStorage {
         constructor() {
@@ -202,8 +171,11 @@
                 request.onsuccess = () => {
                     const records = Array.isArray(request.result) ? request.result : [];
                     const byQuestionId = new Map();
+                    const normalizedExamId = toWellFormedString(examId || '').trim();
                     records.forEach((record) => {
-                        if (!this.recordMatchesIdentity(record, examId, record?.questionId)) return;
+                        if (!record || typeof record !== 'object') return;
+                        const recordExamId = toWellFormedString(record.examId || '').trim();
+                        if (recordExamId !== normalizedExamId) return;
                         const canonicalId = this.normalizeQuestionId(record.questionId);
                         if (!canonicalId) return;
                         const current = byQuestionId.get(canonicalId);

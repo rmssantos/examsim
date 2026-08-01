@@ -7,7 +7,7 @@
     const MIN_EASE = 1.3;
     const DEFAULT_EASE = 2.5;
 
-    function toWellFormedString(value) {
+    function compatibilityToWellFormedString(value) {
         let text;
         try {
             text = String(value ?? '');
@@ -38,6 +38,13 @@
             }
         }
         return result;
+    }
+
+    const toWellFormedString = typeof window.ExamApp.toWellFormedString === 'function'
+        ? window.ExamApp.toWellFormedString
+        : compatibilityToWellFormedString;
+    if (typeof window.ExamApp.toWellFormedString !== 'function') {
+        window.ExamApp.toWellFormedString = toWellFormedString;
     }
 
     function toTime(value) {

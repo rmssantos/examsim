@@ -12,6 +12,46 @@ except ImportError:
 
 ROOT = Path(__file__).resolve().parents[1]
 
+STUDY_NODE_BOOTSTRAP = textwrap.dedent(
+    r"""
+    const fs = require('fs');
+    const vm = require('vm');
+    global.window = {
+      indexedDB: null,
+      ExamApp: {
+        isSafeExamId() { return true; },
+        warn() {}
+      },
+      dispatchEvent() {}
+    };
+    global.CustomEvent = class CustomEvent {};
+    vm.runInThisContext(fs.readFileSync('assets/js/study-scheduler.js', 'utf8'));
+    vm.runInThisContext(fs.readFileSync('assets/js/study-storage.js', 'utf8'));
+    const storage = window.ExamApp.studyStorage;
+    """
+)
+
+LEGACY_KEY_HELPERS = textwrap.dedent(
+    r"""
+    function legacyHash(value) {
+      let hash = 2166136261;
+      for (let index = 0; index < value.length; index++) {
+        hash ^= value.charCodeAt(index);
+        hash = Math.imul(hash, 16777619);
+      }
+      return (hash >>> 0).toString(16).padStart(8, '0');
+    }
+    function legacyKey(examId, questionId) {
+      const normalized = String(questionId ?? '').trim().replace(/\s+/g, ' ');
+      return `studyStats_${examId}_${legacyHash(normalized)}_${encodeURIComponent(normalized).slice(0, 80)}`;
+    }
+    function v2Key(examId, questionId) {
+      const normalized = String(questionId ?? '').trim().replace(/\s+/g, ' ');
+      return `studyStats:v2:${encodeURIComponent(examId)}:${encodeURIComponent(normalized)}`;
+    }
+    """
+)
+
 
 class StudyStorageKeyMigrationTests(unittest.TestCase):
     def run_node(self, script: str):
@@ -21,15 +61,21 @@ class StudyStorageKeyMigrationTests(unittest.TestCase):
             timeout=30,
         )
 
-    def test_v2_keys_are_unique_while_the_legacy_builder_stays_exact(self):
+    def test_scheduler_and_storage_reuse_the_shared_string_helper(self):
         payload = self.run_node(
             r"""
             const fs = require('fs');
             const vm = require('vm');
+            const calls = [];
+            const sharedHelper = (value) => {
+              calls.push(String(value ?? ''));
+              return `shared-${String(value ?? '')}`;
+            };
             global.window = {
               indexedDB: null,
               ExamApp: {
                 isSafeExamId() { return true; },
+                toWellFormedString: sharedHelper,
                 warn() {}
               },
               dispatchEvent() {}
@@ -37,23 +83,91 @@ class StudyStorageKeyMigrationTests(unittest.TestCase):
             global.CustomEvent = class CustomEvent {};
             vm.runInThisContext(fs.readFileSync('assets/js/study-scheduler.js', 'utf8'));
             vm.runInThisContext(fs.readFileSync('assets/js/study-storage.js', 'utf8'));
-            const storage = window.ExamApp.studyStorage;
 
+            const schedulerValue = window.ExamApp.studyScheduler.normalizeQuestionId('scheduler');
+            const callsAfterScheduler = calls.length;
+            const storageValue = window.ExamApp.studyStorage.encodeKeyPart('storage');
+            console.log(JSON.stringify({
+              schedulerValue,
+              storageValue,
+              schedulerUsedSharedHelper: callsAfterScheduler > 0,
+              storageUsedSharedHelper: calls.length > callsAfterScheduler,
+              helperWasNotReplaced: window.ExamApp.toWellFormedString === sharedHelper
+            }));
+            """
+        )
+
+        self.assertEqual("shared-scheduler", payload["schedulerValue"])
+        self.assertEqual("shared-storage", payload["storageValue"])
+        self.assertTrue(payload["schedulerUsedSharedHelper"])
+        self.assertTrue(payload["storageUsedSharedHelper"])
+        self.assertTrue(payload["helperWasNotReplaced"])
+
+    def test_get_records_normalizes_each_candidate_question_id_once(self):
+        payload = self.run_node(
+            STUDY_NODE_BOOTSTRAP
+            + r"""
+            const candidates = [
+              null,
+              { examId: 'other', questionId: 'wrong-exam', key: 'other' },
+              { examId: 'az900', questionId: '', key: 'empty' },
+              { examId: 'az900', questionId: 'q1', key: 'legacy-q1' }
+            ];
+            storage.db = {
+              transaction() {
+                return {
+                  objectStore() {
+                    return {
+                      index() {
+                        return {
+                          getAll() {
+                            const request = { result: undefined, error: null };
+                            queueMicrotask(() => {
+                              request.result = candidates;
+                              request.onsuccess();
+                            });
+                            return request;
+                          }
+                        };
+                      }
+                    };
+                  }
+                };
+              }
+            };
+            storage.initPromise = Promise.resolve(storage.db);
+
+            const originalNormalize = storage.normalizeQuestionId.bind(storage);
+            let normalizationCalls = 0;
+            storage.normalizeQuestionId = (value) => {
+              normalizationCalls++;
+              return originalNormalize(value);
+            };
+
+            (async () => {
+              const records = await storage.getRecordsForExam('az900');
+              console.log(JSON.stringify({
+                normalizationCalls,
+                ids: records.map((record) => record.questionId)
+              }));
+            })().catch((error) => {
+              process.stderr.write(String(error && error.stack || error));
+              process.exit(1);
+            });
+            """
+        )
+
+        self.assertEqual(2, payload["normalizationCalls"])
+        self.assertEqual(["q1"], payload["ids"])
+
+    def test_v2_keys_are_unique_while_the_legacy_builder_stays_exact(self):
+        payload = self.run_node(
+            STUDY_NODE_BOOTSTRAP
+            + LEGACY_KEY_HELPERS
+            + r"""
             const first = 'a'.repeat(80) + '001pf8';
             const second = 'a'.repeat(80) + '00irj6';
 
-            function legacyHash(value) {
-              let hash = 2166136261;
-              for (let index = 0; index < value.length; index++) {
-                hash ^= value.charCodeAt(index);
-                hash = Math.imul(hash, 16777619);
-              }
-              return (hash >>> 0).toString(16).padStart(8, '0');
-            }
-            function expectedLegacyKey(examId, questionId) {
-              const normalized = String(questionId ?? '').trim().replace(/\s+/g, ' ');
-              return `studyStats_${examId}_${legacyHash(normalized)}_${encodeURIComponent(normalized).slice(0, 80)}`;
-            }
             function callLegacy(examId, questionId) {
               return typeof storage.buildLegacyKey === 'function'
                 ? storage.buildLegacyKey(examId, questionId)
@@ -61,8 +175,8 @@ class StudyStorageKeyMigrationTests(unittest.TestCase):
             }
 
             console.log(JSON.stringify({
-              expectedLegacyFirst: expectedLegacyKey('az900', first),
-              expectedLegacySecond: expectedLegacyKey('az900', second),
+              expectedLegacyFirst: legacyKey('az900', first),
+              expectedLegacySecond: legacyKey('az900', second),
               actualLegacyFirst: callLegacy('az900', first),
               actualLegacySecond: callLegacy('az900', second),
               v2First: storage.buildKey('az900', first),
@@ -86,22 +200,9 @@ class StudyStorageKeyMigrationTests(unittest.TestCase):
 
     def test_legacy_records_fall_back_and_migrate_without_crossing_collisions(self):
         payload = self.run_node(
-            r"""
-            const fs = require('fs');
-            const vm = require('vm');
-            global.window = {
-              indexedDB: null,
-              ExamApp: {
-                isSafeExamId() { return true; },
-                warn() {}
-              },
-              dispatchEvent() {}
-            };
-            global.CustomEvent = class CustomEvent {};
-            vm.runInThisContext(fs.readFileSync('assets/js/study-scheduler.js', 'utf8'));
-            vm.runInThisContext(fs.readFileSync('assets/js/study-storage.js', 'utf8'));
-            const storage = window.ExamApp.studyStorage;
-
+            STUDY_NODE_BOOTSTRAP
+            + LEGACY_KEY_HELPERS
+            + r"""
             function clone(value) {
               return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
             }
@@ -200,22 +301,6 @@ class StudyStorageKeyMigrationTests(unittest.TestCase):
               };
             }
 
-            function legacyHash(value) {
-              let hash = 2166136261;
-              for (let index = 0; index < value.length; index++) {
-                hash ^= value.charCodeAt(index);
-                hash = Math.imul(hash, 16777619);
-              }
-              return (hash >>> 0).toString(16).padStart(8, '0');
-            }
-            function legacyKey(examId, questionId) {
-              const normalized = String(questionId ?? '').trim().replace(/\s+/g, ' ');
-              return `studyStats_${examId}_${legacyHash(normalized)}_${encodeURIComponent(normalized).slice(0, 80)}`;
-            }
-            function v2Key(examId, questionId) {
-              const normalized = String(questionId ?? '').trim().replace(/\s+/g, ' ');
-              return `studyStats:v2:${encodeURIComponent(examId)}:${encodeURIComponent(normalized)}`;
-            }
             function use(records, failure = {}) {
               const db = memoryDb(records, failure);
               storage.db = db;

@@ -320,6 +320,17 @@ class PackValidator:
                     )
                 continue
 
+            if isinstance(value, (int, float)) and not isinstance(value, bool):
+                try:
+                    finite_number = math.isfinite(value)
+                except OverflowError:
+                    finite_number = False
+                if not finite_number:
+                    add_metadata_issue(
+                        f"{field_path} must contain a finite JSON number"
+                    )
+                continue
+
             if isinstance(value, list):
                 if len(value) > MAX_METADATA_LIST_ITEMS:
                     add_metadata_issue(
@@ -390,7 +401,7 @@ class PackValidator:
             if not is_plain_int(question_count) or question_count < 1:
                 add_metadata_issue("questionCount must be a positive integer")
             elif question_total is not None and question_count > question_total:
-                add_metadata_issue("questionCount cannot exceed totalQuestions")
+                add_metadata_issue("questionCount cannot exceed the dump question count")
 
         if "passScore" in metadata:
             pass_score = metadata["passScore"]

@@ -15,9 +15,13 @@ window.userExams = window.ExamApp.userExams;
 
     function sanitizeMetadata(metadata, allowCommercial) {
         if (typeof window.ExamApp.sanitizeExamMetadata === 'function') {
-            return window.ExamApp.sanitizeExamMetadata(metadata, {
+            const sanitized = window.ExamApp.sanitizeExamMetadata(metadata, {
                 allowCommercial: allowCommercial === true
             });
+            if (metadata !== null && metadata !== undefined && sanitized === null) {
+                throw new Error('Exam metadata could not be sanitized safely.');
+            }
+            return sanitized;
         }
         if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
             return metadata || null;
@@ -119,15 +123,20 @@ window.userExams = window.ExamApp.userExams;
                     const labs = Object.prototype.hasOwnProperty.call(storedExam, 'labs')
                         ? storedExam.labs
                         : undefined;
-                    const validateStored = window.ExamApp.validateStoredExamData
-                        || window.ExamApp.validateExamData;
-                    const validation = validateStored(
-                        storedExam.questions,
-                        metadata,
-                        labs,
-                        examId,
-                        storedExam
-                    );
+                    const validation = typeof window.ExamApp.validateStoredExamData === 'function'
+                        ? window.ExamApp.validateStoredExamData(
+                            storedExam.questions,
+                            metadata,
+                            labs,
+                            examId,
+                            storedExam
+                        )
+                        : window.ExamApp.validateExamData(
+                            storedExam.questions,
+                            metadata,
+                            labs,
+                            { storedRecord: storedExam }
+                        );
                     if (!validation.valid) {
                         console.error(`Failed to load ${examId} from browser storage: invalid data`, validation.errors.slice(0, 10));
                         continue;
