@@ -113,8 +113,9 @@
 }
 
 @media (max-width: 760px) {
-    .analytics-privacy-button {
-        left: 12px;
-        right: auto;
+    .exam-runtime-page .analytics-privacy-button {
+        right: 12px;
+        bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+        left: auto;
     }
 }

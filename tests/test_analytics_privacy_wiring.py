@@ -13,33 +13,48 @@ def _html_files():
 
 
 class AnalyticsPrivacyWiringTests(unittest.TestCase):
-    def test_privacy_control_moves_clear_of_mobile_next_button(self):
+    def test_mobile_privacy_layout_ships_in_a_fresh_pwa_cache(self):
+        service_worker = (ROOT / "service-worker.js").read_text(encoding="utf-8")
+        version = re.search(
+            r"const CACHE_VERSION = 'examsim-pwa-v(?P<major>\d+)\.(?P<minor>\d+)';",
+            service_worker,
+        )
+
+        self.assertIsNotNone(version)
+        self.assertGreaterEqual(
+            (int(version.group("major")), int(version.group("minor"))),
+            (6, 6),
+        )
+
+    def test_privacy_control_moves_clear_of_mobile_exam_navigation(self):
         css = (ROOT / "assets/css/analytics-privacy.css").read_text(encoding="utf-8")
 
-        # The simulator's Next action is anchored on the lower-right of the
-        # mobile exam screen. The fixed privacy control must use the opposite
-        # edge at this breakpoint so both tap targets remain independent.
+        # Previous and Next occupy the lower edge of the mobile exam screen.
+        # Keep the fixed privacy control above that navigation bar.
         mobile_rule = re.search(
             re.compile(
                 r"@media\s*\(max-width:\s*760px\)\s*\{"
-                r"\s*(?P<selector>\.analytics-privacy-button\s*\{"
+                r"\s*(?P<selector>\.exam-runtime-page\s+"
+                r"\.analytics-privacy-button\s*\{"
                 r"(?P<declarations>[^}]*)\})",
             ),
             css,
         )
         self.assertIsNotNone(mobile_rule)
         declarations = mobile_rule.group("declarations")
-        self.assertRegex(declarations, r"(?m)^\s*left:\s*12px;")
-        self.assertRegex(declarations, r"(?m)^\s*right:\s*auto;")
+        self.assertRegex(declarations, r"(?m)^\s*right:\s*12px;")
+        self.assertRegex(
+            declarations,
+            r"(?m)^\s*bottom:\s*calc\(72px\s*\+\s*"
+            r"env\(safe-area-inset-bottom,\s*0px\)\);",
+        )
+        self.assertRegex(declarations, r"(?m)^\s*left:\s*auto;")
 
-        # A later base selector would override the mobile declarations. The
-        # mobile rule must therefore be the final direct button rule in the
-        # stylesheet's cascade.
-        button_rules = list(re.finditer(
-            r"(?m)^[ \t]*(?P<selector>\.analytics-privacy-button\s*\{[^}]*\})",
-            css,
-        ))
-        self.assertEqual(button_rules[-1].start("selector"), mobile_rule.start("selector"))
+        exam_html = (ROOT / "exam.html").read_text(encoding="utf-8")
+        self.assertRegex(
+            exam_html,
+            r'<body\b[^>]*\bclass="[^"]*\bexam-runtime-page\b[^"]*"',
+        )
 
     def test_pages_loading_analytics_also_load_the_privacy_stylesheet(self):
         # analytics.js injects the "Privacy settings" button + dialog; without
