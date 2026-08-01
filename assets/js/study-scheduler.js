@@ -7,6 +7,47 @@
     const MIN_EASE = 1.3;
     const DEFAULT_EASE = 2.5;
 
+    function compatibilityToWellFormedString(value) {
+        let text;
+        try {
+            text = String(value ?? '');
+        } catch (_) {
+            return '';
+        }
+        if (typeof text.toWellFormed === 'function') {
+            try {
+                const converted = text.toWellFormed();
+                if (typeof converted === 'string') return converted;
+            } catch (_) { /* fall through to the compatible code-unit path */ }
+        }
+
+        let result = '';
+        for (let index = 0; index < text.length; index++) {
+            const unit = text.charCodeAt(index);
+            if (unit >= 0xD800 && unit <= 0xDBFF) {
+                const next = text.charCodeAt(index + 1);
+                if (next >= 0xDC00 && next <= 0xDFFF) {
+                    result += text[index] + text[index + 1];
+                    index++;
+                } else {
+                    result += '\uFFFD';
+                }
+            } else if (unit >= 0xDC00 && unit <= 0xDFFF) {
+                result += '\uFFFD';
+            } else {
+                result += text[index];
+            }
+        }
+        return result;
+    }
+
+    const toWellFormedString = typeof window.ExamApp.toWellFormedString === 'function'
+        ? window.ExamApp.toWellFormedString
+        : compatibilityToWellFormedString;
+    if (typeof window.ExamApp.toWellFormedString !== 'function') {
+        window.ExamApp.toWellFormedString = toWellFormedString;
+    }
+
     function toTime(value) {
         const time = new Date(value || 0).getTime();
         return Number.isFinite(time) ? time : 0;
@@ -23,7 +64,15 @@
     }
 
     function normalizeQuestionId(questionId) {
-        const value = String(questionId ?? '').trim().replace(/\s+/g, ' ');
+        let value = null;
+        if (typeof window.ExamApp.canonicalizeQuestionId === 'function') {
+            try {
+                value = window.ExamApp.canonicalizeQuestionId(questionId);
+            } catch (_) { /* use the total compatibility path */ }
+        }
+        if (typeof value !== 'string') {
+            value = toWellFormedString(questionId).trim().replace(/\s+/g, ' ');
+        }
         if (!value) return '';
         if (value.length <= 120) return value;
         return `q_${hashString(value)}_${encodeURIComponent(value).slice(0, 80)}`;

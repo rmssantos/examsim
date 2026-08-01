@@ -7,7 +7,7 @@
         connectionString: '__APPINSIGHTS_CONNECTION_STRING__',
         optOutKey: 'exam_analytics_opt_out',
         attributionKey: 'exam_analytics_attribution',
-        analyticsVersion: '1.3.0',
+        analyticsVersion: '1.4.0',
         publicExamIds: Object.freeze(['ab730', 'ab731', 'sc900', 'az900', 'az104', 'saac03', 'clfc02', 'ai901', 'az305', 'az400', 'dp900', 'dp700', 'ai103', 'sc300'])
     });
 
@@ -559,20 +559,14 @@
         });
     }
 
-    function trackStudyStarted(examId, details = {}) {
-        return trackEvent('study_started', getExamProperties(examId), {
-            question_count: details.questionCount,
-            due_count: details.dueCount,
-            new_count: details.newCount,
-            weak_count: details.weakCount
-        });
+    function trackStudyStarted(examId) {
+        return trackEvent('study_started', getExamProperties(examId));
     }
 
-    function trackStudyQuestionAnswered(examId, details = {}) {
-        return trackEvent('study_question_answered', {
+    function trackStudyFirstAnswered(examId) {
+        return trackEvent('study_first_answered', {
             ...getExamProperties(examId),
-            result: details.isCorrect ? 'correct' : 'incorrect',
-            answer_state: details.wasAnswered ? 'answered' : 'blank'
+            session_type: 'study'
         });
     }
 
@@ -690,7 +684,7 @@
         dialog.appendChild(title);
 
         const description = document.createElement('p');
-        description.textContent = 'The online version collects limited visit, campaign attribution, exam usage, and commercial interaction events. Azure can add coarse location and client metadata. It does not collect questions, answers, imported files, filenames, names, emails, full referrer URLs, or a persistent visitor ID.';
+        description.textContent = 'The online version collects limited visit, campaign attribution, exam usage, and commercial interaction events. Study telemetry is limited to session start, one first-answer interaction per Study session, and completion aggregates. Study start and first-answer events contain only bounded exam/session context. Study completion telemetry sends session-level question, answered, and correct counts plus coarse accuracy and duration buckets. These aggregates are not linked to question identifiers or content; however, results from very small Study sessions may be inferable. Examplar does not send individual answer events, question IDs or text, options, answer state, or selected responses. Azure can add coarse location and client metadata. It does not collect imported files, filenames, names, emails, full referrer URLs, or a persistent visitor ID.';
         dialog.appendChild(description);
 
         const status = document.createElement('div');
@@ -826,7 +820,7 @@
         trackProResultsCtaClicked,
         trackPassStoryClicked,
         trackStudyStarted,
-        trackStudyQuestionAnswered,
+        trackStudyFirstAnswered,
         trackStudyCompleted,
         trackAttemptReviewOpened,
         trackStudyMissedStarted,

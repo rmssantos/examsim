@@ -12,6 +12,12 @@ Notable public changes are recorded here. Dates use `YYYY-MM-DD`.
 - Consolidated and updated the public documentation.
 - Removed internal commercial workflow and review-status details from public
   files.
+- Hardened imported exam metadata, question identifiers, and legacy Study Mode
+  storage migration against malformed or excessively complex data.
+- Reduced Study Mode analytics to session milestones and aggregate completion
+  statistics, with matching privacy documentation.
+- Revalidated JSZip through the service worker while retaining the offline
+  fallback and limiting cache cleanup to Examplar-owned caches.
 
 ## 2.0.1 - 2025-12-12
 

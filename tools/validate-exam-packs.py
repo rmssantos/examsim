@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import re
 import sys
 import urllib.parse
@@ -20,6 +21,8 @@ EXAM_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 IMAGE_NAME_RE = re.compile(r"^[A-Za-z0-9_. -]{1,128}$")
 SUPPORTED_TYPES = {"STANDARD", "MULTI", "YES_NO_MATRIX", "SEQUENCE", "DRAG_DROP_SELECT"}
 MAX_QUESTIONS = 1000
+MAX_QUESTION_ID_LENGTH = 120
+MAX_SAFE_INTEGER = (2**53) - 1
 MAX_OPTIONS = 50
 MAX_STATEMENTS = 50
 MAX_CORRECT_ANSWERS = 50
@@ -32,6 +35,14 @@ MAX_LAB_PREREQUISITES = 25
 MAX_LAB_CLEANUP = 25
 MAX_LAB_REFERENCES = 25
 MAX_METADATA_LIST_ITEMS = 100
+MAX_METADATA_TAXONOMY_LIST_ITEMS = 20
+MAX_METADATA_TAXONOMY_STRING_LENGTH = 200
+MAX_METADATA_STRING_LENGTH = 5000
+MAX_METADATA_OBJECT_KEYS = 100
+MAX_METADATA_KEY_LENGTH = 200
+MAX_METADATA_DEPTH = 10
+MAX_METADATA_NODES = 5000
+MAX_METADATA_VALIDATION_ERRORS = 100
 MAX_TEXT_LENGTH = 20000
 MAX_MODULE_LENGTH = 200
 MAX_REFERENCE_LENGTH = 5000
@@ -64,6 +75,46 @@ MANIFEST_FORMAT = "examsim-manifest"
 MANIFEST_VERSION = 1
 TAXONOMY_TEXT_FIELDS = ("vendor", "certificationCode", "level", "productFamily", "contentType", "commercialStatus")
 TAXONOMY_LIST_FIELDS = ("domains",)
+QUESTION_ID_WHITESPACE_RE = re.compile(
+    r"[ \f\n\r\t\v\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+"
+)
+
+
+def utf16_code_unit_length(value: str) -> int | None:
+    """Return the browser-equivalent string length, or None for lone surrogates."""
+    try:
+        return len(value.encode("utf-16-le")) // 2
+    except UnicodeEncodeError:
+        return None
+
+
+def parse_question_id(value: Any) -> tuple[str | None, str | None]:
+    if isinstance(value, str):
+        text = value
+    elif isinstance(value, bool):
+        return None, "id must be a non-empty string or safe integer"
+    elif isinstance(value, int):
+        if abs(value) > MAX_SAFE_INTEGER:
+            return None, "id must be a non-empty string or safe integer"
+        text = str(value)
+    elif isinstance(value, float):
+        if not math.isfinite(value) or not value.is_integer() or abs(value) > MAX_SAFE_INTEGER:
+            return None, "id must be a non-empty string or safe integer"
+        text = str(int(value))
+    else:
+        return None, "id must be a non-empty string or safe integer"
+
+    canonical = QUESTION_ID_WHITESPACE_RE.sub(" ", text).strip(" ")
+    if not canonical:
+        return None, "id must be a non-empty string or safe integer"
+    if utf16_code_unit_length(canonical) is None:
+        return None, "id must be well-formed Unicode"
+    return canonical, None
+
+
+def canonicalize_question_id(value: Any) -> str | None:
+    canonical, _error = parse_question_id(value)
+    return canonical
 
 
 @dataclass
@@ -210,15 +261,16 @@ class PackValidator:
             self.validate_labs(exam_id, questions_raw.get("labs"), dump_path)
         labs_value = questions_raw.get("labs") if labs_present else None
         actual_labs = len(labs_value) if isinstance(labs_value, list) else 0
-        declared_lab_count = metadata.get("labCount") if isinstance(metadata, dict) else None
-        if labs_present and declared_lab_count is None:
+        has_declared_lab_count = isinstance(metadata, dict) and "labCount" in metadata
+        declared_lab_count = metadata.get("labCount") if has_declared_lab_count else None
+        if labs_present and not has_declared_lab_count:
             self.add_issue(metadata_path, "metadata.labCount is required when dump.json contains labs")
-        elif declared_lab_count is not None and (
+        elif has_declared_lab_count and (
             not is_plain_int(declared_lab_count) or declared_lab_count != actual_labs
         ):
             self.add_issue(
                 metadata_path,
-                f"metadata labCount {declared_lab_count!r} must equal the number of labs in dump.json ({actual_labs})",
+                "metadata labCount must equal the number of labs in dump.json",
             )
 
     def validate_metadata(self, exam_id: str, metadata: Any, path: Path, questions: Any) -> None:
@@ -226,68 +278,189 @@ class PackValidator:
             self.add_issue(path, "metadata.json must be an object")
             return
 
-        pending: list[tuple[str, Any]] = [("metadata", metadata)]
+        metadata_issue_count = 0
+
+        def add_metadata_issue(message: str) -> None:
+            nonlocal metadata_issue_count
+            if metadata_issue_count >= MAX_METADATA_VALIDATION_ERRORS:
+                return
+            self.add_issue(path, message)
+            metadata_issue_count += 1
+
+        pending: list[tuple[str, Any, int]] = [("metadata", metadata, 0)]
         seen: set[int] = set()
+        node_count = 0
         while pending:
-            field_path, value = pending.pop()
-            if not isinstance(value, (dict, list)) or id(value) in seen:
+            field_path, value, depth = pending.pop()
+            is_container = isinstance(value, (dict, list))
+            if is_container and id(value) in seen:
                 continue
-            seen.add(id(value))
+            if is_container:
+                seen.add(id(value))
+
+            node_count += 1
+            if node_count > MAX_METADATA_NODES:
+                add_metadata_issue(
+                    f"metadata has too many total nodes; maximum is {MAX_METADATA_NODES}"
+                )
+                break
+            if depth > MAX_METADATA_DEPTH:
+                add_metadata_issue(
+                    f"metadata exceeds the maximum depth of {MAX_METADATA_DEPTH}"
+                )
+                continue
+
+            if isinstance(value, str):
+                value_length = utf16_code_unit_length(value)
+                if value_length is None:
+                    add_metadata_issue(f"{field_path} must be well-formed Unicode")
+                elif value_length > MAX_METADATA_STRING_LENGTH:
+                    add_metadata_issue(
+                        f"{field_path} exceeds {MAX_METADATA_STRING_LENGTH} UTF-16 code units"
+                    )
+                continue
+
+            if isinstance(value, (int, float)) and not isinstance(value, bool):
+                try:
+                    finite_number = math.isfinite(value)
+                except OverflowError:
+                    finite_number = False
+                if not finite_number:
+                    add_metadata_issue(
+                        f"{field_path} must contain a finite JSON number"
+                    )
+                continue
+
             if isinstance(value, list):
                 if len(value) > MAX_METADATA_LIST_ITEMS:
-                    self.add_issue(
-                        path,
+                    add_metadata_issue(
                         f"{field_path} has too many items; maximum is {MAX_METADATA_LIST_ITEMS}",
                     )
                 pending.extend(
-                    (f"{field_path}[{index}]", item)
+                    (f"{field_path}[{index}]", item, depth + 1)
                     for index, item in enumerate(value[:MAX_METADATA_LIST_ITEMS])
                 )
-            else:
-                pending.extend(
-                    (f"{field_path}.{field}", nested)
-                    for field, nested in value.items()
-                )
+                continue
+            if not isinstance(value, dict):
+                continue
 
-        metadata_id = metadata.get("id")
-        if metadata_id is not None and metadata_id != exam_id:
-            self.add_issue(path, f"metadata id {metadata_id!r} must match folder id {exam_id!r}")
-        if metadata_id is not None and not EXAM_ID_RE.fullmatch(str(metadata_id)):
-            self.add_issue(path, f"metadata id is invalid: {metadata_id!r}")
+            if len(value) > MAX_METADATA_OBJECT_KEYS:
+                add_metadata_issue(
+                    f"{field_path} has too many keys; maximum is {MAX_METADATA_OBJECT_KEYS}"
+                )
+            for index, (field, nested) in enumerate(value.items()):
+                if index >= MAX_METADATA_OBJECT_KEYS:
+                    break
+                if not isinstance(field, str):
+                    add_metadata_issue(f"{field_path} key {index + 1} must be a string")
+                    path_field = f"<key {index + 1}>"
+                else:
+                    key_length = utf16_code_unit_length(field)
+                    if key_length is None:
+                        add_metadata_issue(
+                            f"{field_path} key {index + 1} must be well-formed Unicode"
+                        )
+                    elif key_length > MAX_METADATA_KEY_LENGTH:
+                        add_metadata_issue(
+                            f"{field_path} key {index + 1} exceeds "
+                            f"{MAX_METADATA_KEY_LENGTH} UTF-16 code units"
+                        )
+                    path_field = (
+                        field
+                        if key_length is not None and key_length <= MAX_METADATA_KEY_LENGTH
+                        else f"<key {index + 1}>"
+                    )
+                pending.append((f"{field_path}.{path_field}", nested, depth + 1))
+
+        if "id" in metadata:
+            metadata_id = metadata["id"]
+            if not isinstance(metadata_id, str):
+                add_metadata_issue("metadata id must be a string")
+            else:
+                if metadata_id != exam_id:
+                    add_metadata_issue("metadata id must match the folder id")
+                if not EXAM_ID_RE.fullmatch(metadata_id):
+                    add_metadata_issue("metadata id is invalid")
 
         question_total = len(questions) if isinstance(questions, list) else None
-        total_questions = metadata.get("totalQuestions")
-        if total_questions is not None and question_total is not None and total_questions != question_total:
-            self.add_issue(path, f"totalQuestions {total_questions!r} must match dump question count {question_total}")
+        if "totalQuestions" in metadata:
+            total_questions = metadata["totalQuestions"]
+            if (
+                not is_plain_int(total_questions)
+                or total_questions < 1
+                or total_questions > MAX_QUESTIONS
+            ):
+                add_metadata_issue(
+                    f"totalQuestions must be an integer between 1 and {MAX_QUESTIONS}"
+                )
+            elif question_total is not None and total_questions != question_total:
+                add_metadata_issue("totalQuestions must match the dump question count")
 
-        question_count = metadata.get("questionCount")
-        if question_count is not None:
+        if "questionCount" in metadata:
+            question_count = metadata["questionCount"]
             if not is_plain_int(question_count) or question_count < 1:
-                self.add_issue(path, "questionCount must be a positive integer")
+                add_metadata_issue("questionCount must be a positive integer")
             elif question_total is not None and question_count > question_total:
-                self.add_issue(path, "questionCount cannot exceed totalQuestions")
+                add_metadata_issue("questionCount cannot exceed the dump question count")
 
-        pass_score = metadata.get("passScore")
-        if pass_score is not None and (not is_plain_number(pass_score) or pass_score < 1 or pass_score > 100):
-            self.add_issue(path, "passScore must be between 1 and 100")
+        if "passScore" in metadata:
+            pass_score = metadata["passScore"]
+            if not is_plain_number(pass_score) or pass_score < 1 or pass_score > 100:
+                add_metadata_issue("passScore must be between 1 and 100")
 
-        content_origin = metadata.get("contentOrigin")
-        if content_origin is not None and content_origin not in CONTENT_ORIGINS:
-            self.add_issue(path, f"contentOrigin must be one of {sorted(CONTENT_ORIGINS)}")
+        if "labCount" in metadata:
+            lab_count = metadata["labCount"]
+            if (
+                not is_plain_int(lab_count)
+                or lab_count < 0
+                or lab_count > MAX_LABS
+            ):
+                add_metadata_issue(f"labCount must be an integer between 0 and {MAX_LABS}")
+
+        if "contentOrigin" in metadata:
+            content_origin = metadata["contentOrigin"]
+            if not isinstance(content_origin, str) or content_origin not in CONTENT_ORIGINS:
+                add_metadata_issue("contentOrigin is invalid")
 
         has_library_taxonomy = any(field in metadata for field in TAXONOMY_TEXT_FIELDS + TAXONOMY_LIST_FIELDS)
         if has_library_taxonomy:
             for field in TAXONOMY_TEXT_FIELDS:
-                if not has_text(metadata.get(field)):
-                    self.add_issue(path, f"{field} is required for library filtering")
+                value = metadata.get(field)
+                if not has_text(value):
+                    add_metadata_issue(f"{field} is required for library filtering")
+                    continue
+                value_length = utf16_code_unit_length(value)
+                if value_length is None or value_length > MAX_METADATA_TAXONOMY_STRING_LENGTH:
+                    add_metadata_issue(
+                        f"{field} must be well-formed and contain at most "
+                        f"{MAX_METADATA_TAXONOMY_STRING_LENGTH} UTF-16 code units"
+                    )
 
             for field in TAXONOMY_LIST_FIELDS:
                 values = metadata.get(field)
-                if not isinstance(values, list) or not values or any(
-                    not has_text(value)
-                    for value in values[:MAX_METADATA_LIST_ITEMS]
-                ):
-                    self.add_issue(path, f"{field} must be a non-empty array of strings")
+                if not isinstance(values, list) or not values:
+                    add_metadata_issue(f"{field} must be a non-empty array of strings")
+                    continue
+                if len(values) > MAX_METADATA_TAXONOMY_LIST_ITEMS:
+                    add_metadata_issue(
+                        f"{field} has too many items; maximum is "
+                        f"{MAX_METADATA_TAXONOMY_LIST_ITEMS}"
+                    )
+                for index, value in enumerate(values[:MAX_METADATA_TAXONOMY_LIST_ITEMS]):
+                    value_length = (
+                        utf16_code_unit_length(value)
+                        if isinstance(value, str)
+                        else None
+                    )
+                    if (
+                        not has_text(value)
+                        or value_length is None
+                        or value_length > MAX_METADATA_TAXONOMY_STRING_LENGTH
+                    ):
+                        add_metadata_issue(
+                            f"{field}[{index}] must be a non-empty, well-formed string of at most "
+                            f"{MAX_METADATA_TAXONOMY_STRING_LENGTH} UTF-16 code units"
+                        )
 
     def validate_questions(self, exam_id: str, questions: list[Any], path: Path) -> None:
         ids = set()
@@ -297,9 +470,22 @@ class PackValidator:
                 self.add_issue(path, f"{label}: item must be an object")
                 continue
 
-            question_id = str(question.get("id", "")).strip()
-            if not question_id:
-                self.add_issue(path, f"{label}: missing id")
+            if "id" in question:
+                question_id, question_id_error = parse_question_id(question["id"])
+            else:
+                question_id, question_id_error = None, "missing id"
+            question_id_length = (
+                utf16_code_unit_length(question_id)
+                if question_id is not None
+                else None
+            )
+            if question_id_error:
+                self.add_issue(path, f"{label}: {question_id_error}")
+            elif question_id_length is not None and question_id_length > MAX_QUESTION_ID_LENGTH:
+                self.add_issue(
+                    path,
+                    f"{label}: id exceeds the {MAX_QUESTION_ID_LENGTH}-character maximum",
+                )
             elif question_id in ids:
                 self.add_issue(path, f"{label}: duplicate id {question_id!r}")
             else:

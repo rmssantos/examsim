@@ -160,6 +160,7 @@ class LabsPresenceValidationTests(unittest.TestCase):
               }
               throw new Error('runtime loader method not found');
             }
+            const validationMethodSource = extractMethod('validateRuntimeExamData');
             const methodSource = extractMethod('loadExamFromRuntime');
             const validationCalls = [];
             const context = {
@@ -202,8 +203,14 @@ class LabsPresenceValidationTests(unittest.TestCase):
                 getItem() { return null; }
               }
             };
-            const holder = vm.runInNewContext(`({${methodSource}})`, context);
-            const simulator = { examData: {} };
+            const holder = vm.runInNewContext(
+              `({${validationMethodSource},${methodSource}})`,
+              context
+            );
+            const simulator = {
+              examData: {},
+              validateRuntimeExamData: holder.validateRuntimeExamData
+            };
             const loaded = holder.loadExamFromRuntime.call(simulator, 'az104');
             console.log(JSON.stringify({
               loaded,

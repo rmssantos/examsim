@@ -1,16 +1,31 @@
 import copy
 import json
+import re
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 
+try:
+    from .node_harness import run_node_snippet
+except ImportError:  # pragma: no cover - direct test-file execution
+    from node_harness import run_node_snippet
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class Sprint1ReadinessTests(unittest.TestCase):
+    def service_worker_cache_version(self):
+        text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
+        match = re.search(
+            r"const CACHE_VERSION = '(examsim-pwa-v\d+\.\d+)';",
+            text,
+        )
+        self.assertIsNotNone(match, "service-worker CACHE_VERSION declaration is missing")
+        return match.group(1)
+
     def test_service_worker_versioned_and_network_first_for_mutable_exam_assets(self):
         text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
         core_start = text.index("const CORE_ASSETS")
@@ -61,6 +76,7 @@ class Sprint1ReadinessTests(unittest.TestCase):
 
     def test_service_worker_revalidates_app_shell_assets_before_cache_fallback(self):
         text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
+        self.service_worker_cache_version()
         start = text.index("const APP_SHELL_NETWORK_FIRST_ASSETS")
         end = text.index("\n\nfunction sameOrigin", start)
         app_shell_assets = text[start:end]
@@ -73,15 +89,197 @@ class Sprint1ReadinessTests(unittest.TestCase):
             "./assets/css/editor-styles.css",
             "./assets/js/pwa.js",
             "./assets/js/zip-import-worker.js",
+            "./assets/vendor/jszip/jszip.min.js",
         ):
             self.assertIn(asset, app_shell_assets)
-        for vendor_asset in (
-            "./assets/vendor/jszip/jszip.min.js",
+        fontawesome_assets = (
             "./assets/vendor/fontawesome/css/all.min.css",
-        ):
-            self.assertNotIn(vendor_asset, app_shell_assets)
+            "./assets/vendor/fontawesome/webfonts/fa-solid-900.woff2",
+            "./assets/vendor/fontawesome/webfonts/fa-regular-400.woff2",
+            "./assets/vendor/fontawesome/webfonts/fa-brands-400.woff2",
+        )
+        for asset in fontawesome_assets:
+            self.assertNotIn(asset, app_shell_assets)
         self.assertIn("isAppShellNetworkFirstAsset(url)", text)
         self.assertIn("cache: 'no-cache'", text)
+
+        node_script = r"""
+const fs = require('fs');
+const vm = require('vm');
+
+const listeners = {};
+const calls = [];
+let rejectNetwork = false;
+const context = {
+  URL,
+  Response,
+  Promise,
+  console,
+  self: {
+    location: {
+      origin: 'https://examplar.app',
+      href: 'https://examplar.app/'
+    },
+    addEventListener(type, listener) {
+      listeners[type] = listener;
+    },
+    skipWaiting() {},
+    clients: { claim: async () => {} }
+  },
+  caches: {
+    open: async () => ({
+      addAll: async () => {},
+      put: async () => {}
+    }),
+    match: async () => {
+      calls.push('cache-match');
+      return new Response('cached', { status: 200 });
+    },
+    keys: async () => []
+  },
+  fetch: async (_request, options) => {
+    calls.push(options?.cache === 'no-cache' ? 'network-no-cache' : 'network');
+    if (rejectNetwork) throw new Error('offline');
+    return new Response('network', { status: 200 });
+  }
+};
+context.globalThis = context;
+vm.runInNewContext(fs.readFileSync(process.argv[1], 'utf8'), context, {
+  filename: 'service-worker.js'
+});
+
+async function dispatch(pathname, options = {}) {
+  calls.length = 0;
+  rejectNetwork = options.rejectNetwork === true;
+  let responsePromise;
+  listeners.fetch({
+    request: {
+      method: 'GET',
+      mode: 'cors',
+      url: `https://examplar.app/${pathname}`
+    },
+    respondWith(value) {
+      responsePromise = Promise.resolve(value);
+    }
+  });
+  const response = await responsePromise;
+  return { calls: [...calls], body: await response.text() };
+}
+
+(async () => {
+  const jszip = await dispatch('assets/vendor/jszip/jszip.min.js');
+  const jszipOffline = await dispatch(
+    'assets/vendor/jszip/jszip.min.js',
+    { rejectNetwork: true }
+  );
+  const fontawesome = {};
+  for (const pathname of [
+    'assets/vendor/fontawesome/css/all.min.css',
+    'assets/vendor/fontawesome/webfonts/fa-solid-900.woff2',
+    'assets/vendor/fontawesome/webfonts/fa-regular-400.woff2',
+    'assets/vendor/fontawesome/webfonts/fa-brands-400.woff2'
+  ]) {
+    fontawesome[pathname] = await dispatch(pathname);
+  }
+  process.stdout.write(JSON.stringify({ jszip, jszipOffline, fontawesome }));
+})().catch(error => {
+  console.error(error);
+  process.exit(1);
+});
+"""
+        routing = run_node_snippet(ROOT / "service-worker.js", node_script)
+
+        self.assertEqual(routing["jszip"]["calls"][0], "network-no-cache")
+        self.assertEqual(routing["jszip"]["body"], "network")
+        self.assertEqual(
+            routing["jszipOffline"]["calls"],
+            ["network-no-cache", "cache-match"],
+        )
+        self.assertEqual(routing["jszipOffline"]["body"], "cached")
+        for asset in fontawesome_assets:
+            pathname = asset.removeprefix("./")
+            with self.subTest(fontawesome_asset=asset):
+                self.assertEqual(
+                    routing["fontawesome"][pathname]["calls"],
+                    ["cache-match"],
+                )
+                self.assertEqual(
+                    routing["fontawesome"][pathname]["body"],
+                    "cached",
+                )
+
+    def test_service_worker_activation_only_deletes_obsolete_examplar_caches(self):
+        cache_version = self.service_worker_cache_version()
+        node_script = r"""
+const fs = require('fs');
+const vm = require('vm');
+
+const listeners = {};
+const deleted = [];
+let claimed = 0;
+const cacheKeys = [
+  'examsim-pwa-v6.3-static',
+  'examsim-pwa-v6.4-runtime',
+  '__CURRENT_CACHE_VERSION__-static',
+  '__CURRENT_CACHE_VERSION__-runtime',
+  'another-project-v3',
+  'workbox-precache-v1'
+];
+const context = {
+  URL,
+  Response,
+  Promise,
+  console,
+  self: {
+    location: {
+      origin: 'https://examplar.app',
+      href: 'https://examplar.app/'
+    },
+    addEventListener(type, listener) {
+      listeners[type] = listener;
+    },
+    skipWaiting() {},
+    clients: {
+      async claim() { claimed++; }
+    }
+  },
+  caches: {
+    open: async () => ({ addAll: async () => {}, put: async () => {} }),
+    match: async () => null,
+    keys: async () => [...cacheKeys],
+    delete: async key => {
+      deleted.push(key);
+      return true;
+    }
+  },
+  fetch: async () => new Response('network', { status: 200 })
+};
+context.globalThis = context;
+vm.runInNewContext(fs.readFileSync(process.argv[1], 'utf8'), context, {
+  filename: 'service-worker.js'
+});
+
+let activation;
+listeners.activate({
+  waitUntil(value) {
+    activation = Promise.resolve(value);
+  }
+});
+activation.then(() => {
+  process.stdout.write(JSON.stringify({ deleted, claimed }));
+}).catch(error => {
+  console.error(error);
+  process.exit(1);
+});
+"""
+        node_script = node_script.replace("__CURRENT_CACHE_VERSION__", cache_version)
+        activation = run_node_snippet(ROOT / "service-worker.js", node_script)
+
+        self.assertCountEqual(
+            activation["deleted"],
+            ["examsim-pwa-v6.3-static", "examsim-pwa-v6.4-runtime"],
+        )
+        self.assertEqual(activation["claimed"], 1)
 
     def test_pwa_registration_exposes_update_available_prompt(self):
         text = (ROOT / "assets/js/pwa.js").read_text(encoding="utf-8")

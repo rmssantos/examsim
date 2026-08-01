@@ -884,20 +884,18 @@ record(
   validate(question(), { modules: Array(100).fill('Module'), labCount: 0 }, []),
   validate(question(), { modules: Array(101).fill('Module'), labCount: 0 }, [])
 );
-const cyclicExactMetadata = {
+const exactNestedMetadata = {
   objectiveDomains: [{ mappedModules: Array(100).fill('Module') }],
   labCount: 0
 };
-cyclicExactMetadata.self = cyclicExactMetadata;
-const cyclicOverMetadata = {
+const overNestedMetadata = {
   objectiveDomains: [{ mappedModules: Array(101).fill('Module') }],
   labCount: 0
 };
-cyclicOverMetadata.self = cyclicOverMetadata;
 record(
   'nestedMetadataLists',
-  validate(question(), cyclicExactMetadata, []),
-  validate(question(), cyclicOverMetadata, [])
+  validate(question(), exactNestedMetadata, []),
+  validate(question(), overNestedMetadata, [])
 );
 record(
   'officialLabReference',
