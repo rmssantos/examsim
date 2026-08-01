@@ -35,7 +35,7 @@ All exam questions follow a standardized JSON schema:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | number | ✅ Yes | Unique question identifier |
+| `id` | string or safe integral number | ✅ Yes | Unique canonical question identifier. Strings are trimmed and each internal whitespace run is collapsed to one ASCII space. Integral numbers in JavaScript's safe range use their canonical decimal form, so numeric `1` and string `"1"` are the same ID. The canonical ID must be well-formed Unicode and contain at most 120 UTF-16 code units. |
 | `module` | string | ⚠️ Optional | Module/category for balanced sampling (e.g., "AI_WORKLOADS") |
 | `question` | string | ✅ Yes | Question text (markdown supported) |
 | `options` | string[] | ✅ Yes | Array of answer options |
@@ -465,6 +465,12 @@ unbounded render or storage work:
 
 - A question can contain at most 50 options, 50 statements, and 50 entries in a
   `correct` array.
+- A question `id` must be a non-empty string or safe integral number. String IDs
+  are canonicalized by trimming surrounding whitespace and collapsing internal
+  whitespace runs to one ASCII space. Numeric IDs use canonical decimal text, so
+  string/number equivalents and whitespace variants count as duplicates. The
+  canonical ID must be unique, well-formed Unicode and at most 120 UTF-16 code
+  units.
 - `MULTI` and `DRAG_DROP_SELECT` answers must use unique option indices.
   `DRAG_DROP_SELECT` must declare `drag_select_required`, and it must equal the
   number of correct selections.
@@ -476,6 +482,21 @@ unbounded render or storage work:
 - Each lab can contain at most 25 prerequisites, 25 cleanup entries, and 25 official-documentation references.
 - Every metadata list can contain at most 100 items, including nested lists such
   as mapped modules or feature highlights.
+- Taxonomy lists use the tighter limit of 20 entries for taxonomy lists such as
+  `domains`.
+- Metadata taxonomy fields and taxonomy-list entries allow at most 200 UTF-16
+  code units for each taxonomy value. When present, each must be a non-empty,
+  well-formed string.
+- The generic string ceiling is 5,000 UTF-16 code units for any other metadata
+  string.
+- Metadata objects allow at most 100 keys per metadata object and 200 UTF-16
+  code units per metadata key.
+- Metadata nesting can extend at most 10 levels below the metadata root (the
+  root has depth 0), with at most 5,000 total nodes in the metadata tree.
+- Browser imports snapshot only own, enumerable, string-keyed data properties,
+  matching what JSON files can represent. Accessor properties and non-plain
+  containers are rejected before validation; symbol and non-enumerable
+  properties are not copied into the stored pack.
 
 ZIP imports are decompressed in a dedicated Web Worker using the self-hosted JSZip
 copy. The worker counts actual decompressed bytes emitted by every non-directory
@@ -484,6 +505,17 @@ an early preflight hint. Per-file and shared package/image byte limits are enfor
 while streaming, and the page terminates an extraction that exceeds its timeout.
 Only bounded JSON and image buffers return to the main thread for decoding and Blob
 creation.
+
+For recovery only, the browser can continue loading a pack read from browser
+storage that was saved by an older Examplar version when its otherwise valid
+question IDs exceed 120 units. This exception follows internal storage-read
+provenance; serialized `source` or `storage` fields cannot enable it. The browser
+shows a warning and preserves the IDs unchanged. If two distinct long canonical
+IDs produce the same historical FNV-1a-plus-80-character key, validation reports a
+legacy storage identity collision and the whole stored pack is quarantined instead
+of risking crossed progress records. New imports, editor saves and repository
+validation remain strict, so correct those IDs before re-exporting or re-importing
+the pack.
 
 Before JSZip parses the archive, the worker validates the raw end-of-directory
 and central-directory records, accepts printable ASCII entry names only, rejects

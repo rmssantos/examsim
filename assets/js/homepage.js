@@ -404,34 +404,281 @@ this.setSelectOptions(this.libraryLevelFilter, 'levels', sortValues(levels));
 this.setSelectOptions(this.libraryStatusFilter, 'status', sortValues(statuses));
 }
 
-getExamTaxonomy(examId, examData) {
-const metadata = examData?.metadata || {};
-const domains = Array.isArray(metadata.domains) ? metadata.domains : [];
+metadataLimit(name, fallback) {
+const value = window.ExamApp?.EXAM_LIMITS?.[name];
+return Number.isSafeInteger(value) && value >= 0 ? value : fallback;
+}
+
+readOwnDataProperty(record, key) {
+if (!record || (typeof record !== 'object' && typeof record !== 'function')) {
+	return { found: false, valid: false, value: undefined };
+}
+try {
+	const descriptor = Object.getOwnPropertyDescriptor(record, key);
+	if (!descriptor) return { found: false, valid: true, value: undefined };
+	if (!Object.prototype.hasOwnProperty.call(descriptor, 'value')) {
+		return { found: true, valid: false, value: undefined };
+	}
+	return { found: true, valid: true, value: descriptor.value };
+} catch (_error) {
+	return { found: false, valid: false, value: undefined };
+}
+}
+
+readMetadataCollection(metadata, field) {
+const result = this.readOwnDataProperty(metadata, field);
+return result.valid && result.found ? result.value : undefined;
+}
+
+getExamMetadataSnapshot(examData) {
+const metadataResult = this.readOwnDataProperty(examData, 'metadata');
+const metadata = metadataResult.valid && metadataResult.found
+	? metadataResult.value
+	: null;
+const snapshot = {};
+const textFields = new Set([
+	'name',
+	'fullName',
+	'description',
+	'badge',
+	'icon',
+	'vendor',
+	'certificationCode',
+	'level',
+	'productFamily',
+	'contentType',
+	'commercialStatus'
+]);
+const numberFields = new Set([
+	'duration', 'questionCount', 'totalQuestions', 'passScore', 'labCount'
+]);
+const booleanFields = new Set(['preview']);
+const collectionFields = new Set(['domains', 'modules', 'resources']);
+[
+	...textFields,
+	...numberFields,
+	...booleanFields,
+	...collectionFields,
+	'pro',
+	'recommendedPro'
+].forEach((field) => {
+	const result = this.readOwnDataProperty(metadata, field);
+	if (!result.valid || !result.found) return;
+	if (textFields.has(field)) {
+		if (typeof result.value === 'string') {
+			snapshot[field] = this.safeMetadataText(
+				result.value,
+				this.metadataLimit('maxMetadataStringLength', 5000)
+			);
+		}
+		return;
+	}
+	if (numberFields.has(field)) {
+		if (typeof result.value === 'number' && Number.isFinite(result.value)) {
+			snapshot[field] = result.value;
+		}
+		return;
+	}
+	if (booleanFields.has(field)) {
+		if (typeof result.value === 'boolean') snapshot[field] = result.value;
+		return;
+	}
+	if (collectionFields.has(field)) {
+		snapshot[field] = result.value;
+		return;
+	}
+	if (field === 'pro') snapshot.pro = this.getProSnapshot(result.value);
+	if (field === 'recommendedPro') {
+		snapshot.recommendedPro = this.getRecommendedProSnapshot(result.value);
+	}
+});
+return Object.freeze(snapshot);
+}
+
+getProSnapshot(value) {
+if (!value || typeof value !== 'object') return null;
+const snapshot = {};
+const stringLimit = this.metadataLimit('maxMetadataStringLength', 5000);
+['title', 'price', 'url'].forEach((field) => {
+	const result = this.readOwnDataProperty(value, field);
+	if (result.valid && result.found && typeof result.value === 'string') {
+		snapshot[field] = this.safeMetadataText(result.value, stringLimit);
+	}
+});
+const questions = this.readOwnDataProperty(value, 'questions');
+if (
+	questions.valid
+	&& questions.found
+	&& Number.isSafeInteger(questions.value)
+	&& questions.value >= 0
+) {
+	snapshot.questions = questions.value;
+}
+const highlights = this.readOwnDataProperty(value, 'highlights');
+if (highlights.valid && highlights.found) {
+	snapshot.highlights = this.boundedArrayDataValues(highlights.value)
+		.map(item => this.safeMetadataText(item, stringLimit).trim())
+		.filter(Boolean);
+}
+return Object.keys(snapshot).length ? Object.freeze(snapshot) : null;
+}
+
+getRecommendedProSnapshot(value) {
+if (!value || typeof value !== 'object') return null;
+const snapshot = {};
+const stringLimit = this.metadataLimit('maxMetadataStringLength', 5000);
+['examId', 'title', 'url', 'blurb'].forEach((field) => {
+	const result = this.readOwnDataProperty(value, field);
+	if (result.valid && result.found && typeof result.value === 'string') {
+		snapshot[field] = this.safeMetadataText(result.value, stringLimit);
+	}
+});
+return Object.keys(snapshot).length ? Object.freeze(snapshot) : null;
+}
+
+boundedArrayDataValues(value, maximum = this.metadataLimit('maxMetadataListItems', 100)) {
+let isArray;
+try {
+	isArray = Array.isArray(value);
+} catch (_error) {
+	return [];
+}
+if (!isArray) return [];
+
+const lengthResult = this.readOwnDataProperty(value, 'length');
+const length = lengthResult.valid ? lengthResult.value : 0;
+if (!Number.isSafeInteger(length) || length < 0) return [];
+const safeMaximum = Number.isSafeInteger(maximum) && maximum >= 0 ? maximum : 0;
+const values = [];
+for (let index = 0; index < Math.min(length, safeMaximum); index++) {
+	const item = this.readOwnDataProperty(value, String(index));
+	if (item.valid && item.found) values.push(item.value);
+}
+return values;
+}
+
+getModuleSnapshots(modules) {
+const stringLimit = this.metadataLimit('maxMetadataStringLength', 5000);
+return this.boundedArrayDataValues(modules).map((module) => {
+	let rawName = module;
+	let rawIcon = 'fas fa-check-circle';
+	if (module && typeof module === 'object') {
+		const name = this.readOwnDataProperty(module, 'name');
+		if (!name.valid || !name.found) return null;
+		rawName = name.value;
+		const icon = this.readOwnDataProperty(module, 'icon');
+		if (!icon.valid) return null;
+		if (icon.found) rawIcon = icon.value;
+	}
+	const name = this.safeMetadataText(rawName, stringLimit).trim();
+	if (!name) return null;
+	const icon = this.safeMetadataText(rawIcon, stringLimit).trim() || 'fas fa-check-circle';
+	return Object.freeze({ name, icon });
+}).filter(Boolean);
+}
+
+getResourceSnapshots(resources) {
+const stringLimit = this.metadataLimit('maxMetadataStringLength', 5000);
+return this.boundedArrayDataValues(resources).map((resource) => {
+	if (!resource || typeof resource !== 'object') return null;
+	const urlResult = this.readOwnDataProperty(resource, 'url');
+	const nameResult = this.readOwnDataProperty(resource, 'name');
+	const iconResult = this.readOwnDataProperty(resource, 'icon');
+	if (!urlResult.valid || !urlResult.found || !nameResult.valid || !iconResult.valid) {
+		return null;
+	}
+	const url = this.safeMetadataText(urlResult.value, stringLimit).trim();
+	if (!url) return null;
+	const name = this.safeMetadataText(
+		nameResult.found ? nameResult.value : 'Reference',
+		stringLimit
+	).trim() || 'Reference';
+	const icon = this.safeMetadataText(
+		iconResult.found ? iconResult.value : 'fas fa-link',
+		stringLimit
+	).trim() || 'fas fa-link';
+	return Object.freeze({ name, url, icon });
+}).filter(Boolean);
+}
+
+safeMetadataText(value, maxLength = this.metadataLimit('maxMetadataTaxonomyStringLength', 200)) {
+let text = '';
+if (typeof value === 'string') {
+	text = value;
+} else if (typeof value === 'number' && Number.isFinite(value)) {
+	text = String(value);
+} else if (typeof value === 'boolean') {
+	text = value ? 'true' : 'false';
+} else {
+	return '';
+}
+
+const limit = Number.isSafeInteger(maxLength) && maxLength >= 0 ? maxLength : 200;
+let safe = '';
+for (let index = 0; index < text.length && safe.length < limit; index++) {
+	const unit = text.charCodeAt(index);
+	if (unit >= 0xD800 && unit <= 0xDBFF) {
+		const next = text.charCodeAt(index + 1);
+		if (next >= 0xDC00 && next <= 0xDFFF) {
+			if (safe.length + 2 > limit) break;
+			safe += text[index] + text[index + 1];
+			index++;
+		} else {
+			safe += '\uFFFD';
+		}
+	} else if (unit >= 0xDC00 && unit <= 0xDFFF) {
+		safe += '\uFFFD';
+	} else {
+		safe += text[index];
+	}
+}
+return safe;
+}
+
+getExamTaxonomy(examId, examData, metadataSnapshot = null) {
+const metadata = metadataSnapshot || this.getExamMetadataSnapshot(examData);
+const taxonomyLength = this.metadataLimit('maxMetadataTaxonomyStringLength', 200);
+const taxonomyItems = this.metadataLimit('maxMetadataTaxonomyListItems', 20);
+const domains = this.boundedArrayDataValues(metadata.domains, taxonomyItems);
 const isBundledTrusted = this.isBundledTrustedExam(examData);
 const status = isBundledTrusted
 	? (metadata.commercialStatus || (metadata.preview && metadata.pro ? 'pro-preview' : metadata.preview ? 'preview' : metadata.pro ? 'pro' : 'free'))
 	: 'free';
 return {
-	vendor: String(metadata.vendor || 'Custom').trim(),
-	certificationCode: String(metadata.certificationCode || metadata.name || examId).trim(),
-	domains: domains.map(domain => String(domain || '').trim()).filter(Boolean),
-	level: String(metadata.level || (isBundledTrusted ? metadata.badge : '') || 'Custom').trim(),
-	productFamily: String(metadata.productFamily || '').trim(),
-	contentType: String(isBundledTrusted
+	vendor: this.safeMetadataText(metadata.vendor, taxonomyLength).trim() || 'Custom',
+	certificationCode: this.safeMetadataText(metadata.certificationCode, taxonomyLength).trim()
+		|| this.safeMetadataText(metadata.name, taxonomyLength).trim()
+		|| this.safeMetadataText(examId, taxonomyLength).trim(),
+	domains: domains
+		.map(domain => this.safeMetadataText(domain, taxonomyLength).trim())
+		.filter(Boolean),
+	level: this.safeMetadataText(metadata.level, taxonomyLength).trim()
+		|| this.safeMetadataText(isBundledTrusted ? metadata.badge : '', taxonomyLength).trim()
+		|| 'Custom',
+	productFamily: this.safeMetadataText(metadata.productFamily, taxonomyLength).trim(),
+	contentType: this.safeMetadataText(isBundledTrusted
 		? (metadata.contentType || (metadata.preview ? 'preview' : 'practice-exam'))
-		: 'practice-exam').trim(),
-	status: String(status || 'free').trim()
+		: 'practice-exam', taxonomyLength).trim(),
+	status: this.safeMetadataText(status || 'free', taxonomyLength).trim() || 'free'
 };
 }
 
 getExamSearchText(examId, examData) {
-const metadata = examData?.metadata || {};
-const taxonomy = this.getExamTaxonomy(examId, examData);
-const modules = this.getModuleNames(metadata.modules).join(' ');
-const resources = (Array.isArray(metadata.resources) ? metadata.resources : [])
-	.map(resource => `${resource?.name || ''} ${resource?.url || ''}`)
-	.join(' ');
-return [
+const metadata = this.getExamMetadataSnapshot(examData);
+const taxonomy = this.getExamTaxonomy(examId, examData, metadata);
+const searchLimit = this.metadataLimit('maxMetadataStringLength', 5000);
+let searchText = '';
+const appendSearchValue = (value) => {
+	if (searchText.length >= searchLimit) return;
+	const text = this.safeMetadataText(value, searchLimit).trim();
+	if (!text) return;
+	const separator = searchText ? ' ' : '';
+	const remaining = searchLimit - searchText.length - separator.length;
+	if (remaining <= 0) return;
+	searchText += separator + this.safeMetadataText(text, remaining);
+};
+
+[
 	examId,
 	metadata.name,
 	metadata.fullName,
@@ -443,10 +690,16 @@ return [
 	taxonomy.contentType,
 	taxonomy.status,
 	taxonomy.level,
-	taxonomy.domains.join(' '),
-	modules,
-	resources
-].join(' ').toLowerCase();
+	...taxonomy.domains
+].forEach(appendSearchValue);
+this.getModuleSnapshots(this.readMetadataCollection(metadata, 'modules'))
+	.forEach(module => appendSearchValue(module.name));
+this.getResourceSnapshots(this.readMetadataCollection(metadata, 'resources'))
+	.forEach((resource) => {
+		appendSearchValue(resource.name);
+		appendSearchValue(resource.url);
+	});
+return this.safeMetadataText(searchText.toLowerCase(), searchLimit);
 }
 
 getFilteredSortedExams() {
@@ -467,10 +720,10 @@ return new Map(entries);
 
 compareLibraryEntries(left, right) {
 const sort = this.libraryState.sort || 'recommended';
-const leftMetadata = left[1]?.metadata || {};
-const rightMetadata = right[1]?.metadata || {};
-const leftName = String(leftMetadata.name || left[0]).toLowerCase();
-const rightName = String(rightMetadata.name || right[0]).toLowerCase();
+const leftMetadata = this.getExamMetadataSnapshot(left[1]);
+const rightMetadata = this.getExamMetadataSnapshot(right[1]);
+const leftName = this.safeMetadataText(leftMetadata.name || left[0], 5000).toLowerCase();
+const rightName = this.safeMetadataText(rightMetadata.name || right[0], 5000).toLowerCase();
 if (sort === 'az') return leftName.localeCompare(rightName);
 if (sort === 'questions-desc') return this.getTotalQuestionCount(right[1]) - this.getTotalQuestionCount(left[1]) || leftName.localeCompare(rightName);
 if (sort === 'duration-asc') return Number(leftMetadata.duration || 0) - Number(rightMetadata.duration || 0) || leftName.localeCompare(rightName);
@@ -479,8 +732,17 @@ return 0;
 }
 
 getTotalQuestionCount(examData) {
-const metadata = examData?.metadata || {};
-return Number(metadata.totalQuestions || metadata.questionCount || examData?.questions?.length || 0);
+const metadata = this.getExamMetadataSnapshot(examData);
+const questions = this.readOwnDataProperty(examData, 'questions');
+let questionLength = 0;
+if (questions.valid && questions.found) {
+	try {
+		questionLength = Array.isArray(questions.value) ? questions.value.length : 0;
+	} catch (_error) {
+		questionLength = 0;
+	}
+}
+return Number(metadata.totalQuestions || metadata.questionCount || questionLength || 0);
 }
 
 updateLibraryResultCount(visibleCount, totalCount) {
@@ -529,9 +791,10 @@ let totalQuestions = 0;
 let hasImages = false;
 
 exams.forEach((examData) => {
-const metadata = examData.metadata || {};
+const metadata = this.getExamMetadataSnapshot(examData);
 totalQuestions += metadata.totalQuestions || metadata.questionCount || 0;
-if (examData.hasImages) {
+const imageFlag = this.readOwnDataProperty(examData, 'hasImages');
+if (imageFlag.valid && imageFlag.found && imageFlag.value === true) {
 	hasImages = true;
 }
 });
@@ -549,22 +812,35 @@ this.imageSupportFlag.classList.toggle('has-images', hasImages);
 }
 
 safeIconClass(icon, fallback = 'fas fa-book') {
-const value = String(icon || '').trim();
+const value = this.safeMetadataText(icon, 5000).trim();
 return /^[a-zA-Z0-9 _-]+$/.test(value) ? value : fallback;
 }
 
 normalizeModuleName(module) {
-return String(typeof module === 'string' ? module : module?.name || module || '').trim();
+if (module && typeof module === 'object') {
+	const name = this.readOwnDataProperty(module, 'name');
+	if (!name.valid || !name.found) return '';
+	return this.safeMetadataText(
+		name.value,
+		this.metadataLimit('maxMetadataStringLength', 5000)
+	).trim();
+}
+return this.safeMetadataText(module, this.metadataLimit('maxMetadataStringLength', 5000)).trim();
 }
 
 getModuleNames(modules) {
-return (Array.isArray(modules) ? modules : [])
-	.map(module => this.normalizeModuleName(module))
-	.filter(Boolean);
+return this.getModuleSnapshots(modules).map(module => module.name);
 }
 
 isBundledTrustedExam(examData) {
-return window.ExamApp?.isBundledTrustedExam?.(examData) === true;
+const source = this.readOwnDataProperty(examData, 'source');
+const trust = this.readOwnDataProperty(examData, 'trust');
+return source.valid
+	&& source.found
+	&& source.value === 'bundled'
+	&& trust.valid
+	&& trust.found
+	&& trust.value === 'bundled';
 }
 
 createIcon(iconClass, extraClass = '') {
@@ -655,7 +931,7 @@ return stat;
 }
 
 createExamCard(examId, examData) {
-const metadata = examData.metadata || {};
+const metadata = this.getExamMetadataSnapshot(examData);
 const isBundledTrusted = this.isBundledTrustedExam(examData);
 const questionCount = metadata.questionCount || 45;
 const declaredTotalQuestions = Number(metadata.totalQuestions);
@@ -776,7 +1052,8 @@ labsLink.addEventListener('click', (e) => e.stopPropagation());
 card.appendChild(labsLink);
 }
 
-if (examData.hasImages) {
+const imageFlag = this.readOwnDataProperty(examData, 'hasImages');
+if (imageFlag.valid && imageFlag.found && imageFlag.value === true) {
 const feature = document.createElement('div');
 feature.className = 'exam-feature';
 feature.appendChild(this.createIcon('fas fa-images'));
@@ -805,8 +1082,8 @@ showProModal(examId, examData) {
 if (!this.isBundledTrustedExam(examData)) {
 	return false;
 }
-const metadata = examData.metadata || {};
-const pro = (metadata && metadata.pro) || {};
+const metadata = this.getExamMetadataSnapshot(examData);
+const pro = metadata.pro || {};
 const returnFocus = (document.activeElement instanceof HTMLElement) ? document.activeElement : null;
 this.closeProModal();
 window.ExamApp?.analytics?.trackProModalOpened?.(examId);
@@ -973,8 +1250,14 @@ if (revealDetails) {
 try {
 	const examData = await window.ExamApp.ensureExamLoaded(examId);
 	if (window.examSimulator) {
-		const metadata = examData.metadata || {};
+		const metadata = this.getExamMetadataSnapshot(examData);
 		const isBundledTrusted = this.isBundledTrustedExam(examData);
+		const moduleSnapshots = this.getModuleSnapshots(
+			this.readMetadataCollection(metadata, 'modules')
+		);
+		const resourceSnapshots = this.getResourceSnapshots(
+			this.readMetadataCollection(metadata, 'resources')
+		);
 		window.examSimulator.currentExam = examId;
 		window.examSimulator.examData[examId] = {
 			name: metadata.name || examId.toUpperCase(),
@@ -983,8 +1266,8 @@ try {
 			questionCount: metadata.questionCount || Math.min(examData.questions.length, 45),
 			passScore: metadata.passScore || 70,
 			questions: examData.questions,
-			modules: metadata.modules || [],
-			resources: metadata.resources || [],
+			modules: moduleSnapshots,
+			resources: resourceSnapshots,
 			recommendedPro: isBundledTrusted ? (metadata.recommendedPro || null) : null,
 			pro: isBundledTrusted ? (metadata.pro || null) : null,
 			source: examData.source,
@@ -1006,7 +1289,7 @@ try {
 showExamInfo(examId) {
 const examData = window.userExams[examId];
 if (!examData) return;
-const metadata = examData.metadata || {};
+const metadata = this.getExamMetadataSnapshot(examData);
 
 const durationEl = document.getElementById('exam-duration');
 const questionsEl = document.getElementById('exam-questions');
@@ -1028,21 +1311,20 @@ imagesEl.classList.toggle('has-images', !!examData.hasImages);
 if (this.currentExamInfo) this.currentExamInfo.style.display = 'block';
 if (this.startExamCta) this.startExamCta.style.display = 'block';
 
-this.renderModules(metadata.modules);
-this.renderResources(metadata.resources, examData);
+this.renderModules(this.readMetadataCollection(metadata, 'modules'));
+this.renderResources(this.readMetadataCollection(metadata, 'resources'), examData);
 }
 
 renderModules(modules) {
 if (!this.modulesSection || !this.modulesList) return;
-if (Array.isArray(modules) && modules.length > 0) {
+const snapshots = this.getModuleSnapshots(modules);
+if (snapshots.length > 0) {
 this.modulesSection.style.display = 'block';
 this.modulesList.innerHTML = '';
-modules.forEach(module => {
+snapshots.forEach(module => {
 const li = document.createElement('li');
-const icon = typeof module === 'string' ? 'fas fa-check-circle' : module.icon || 'fas fa-check-circle';
-const name = typeof module === 'string' ? module : module.name || String(module || '');
-li.appendChild(this.createIcon(icon));
-li.appendChild(document.createTextNode(` ${name}`));
+li.appendChild(this.createIcon(module.icon));
+li.appendChild(document.createTextNode(` ${module.name}`));
 this.modulesList.appendChild(li);
 });
 } else {
@@ -1066,7 +1348,7 @@ renderResourceLinks(container, resources, examData, emptyMessage, linkClass = ''
 if (!container) return 0;
 container.innerHTML = '';
 let rendered = 0;
-(Array.isArray(resources) ? resources : []).forEach(resource => {
+this.getResourceSnapshots(resources).forEach(resource => {
 const safeHref = window.ExamApp.resourceUrlForTrust(resource.url, examData);
 if (!safeHref) return;
 const link = document.createElement('a');
@@ -1095,7 +1377,7 @@ showExamDetailsPlaceholder(examId) {
 const examData = window.userExams[examId];
 if (!examData) return;
 
-const metadata = examData.metadata || {};
+const metadata = this.getExamMetadataSnapshot(examData);
 const stats = this.getProgressStats(examId);
 const placeholder = document.getElementById('exam-details-placeholder');
 this.placeDetailsPanel(examId);
@@ -1121,7 +1403,10 @@ this.updateDetailsStudySummary(examId);
 const modulesSection = document.getElementById('details-modules-section');
 const modulesList = document.getElementById('details-modules-list');
 const resourcesList = document.getElementById('details-resources-list');
-const moduleNames = this.getModuleNames(metadata.modules);
+const moduleSnapshots = this.getModuleSnapshots(
+	this.readMetadataCollection(metadata, 'modules')
+);
+const moduleNames = moduleSnapshots.map(module => module.name);
 
 if (moduleNames.length > 0) {
 modulesSection.classList.remove('is-hidden'); // is-hidden is display:none !important; toggle the class, not inline style
@@ -1176,10 +1461,10 @@ selectControls.appendChild(selectNoneBtn);
 
 modulesList.parentNode.insertBefore(selectControls, modulesList);
 
-metadata.modules.forEach(module => {
-	const name = this.normalizeModuleName(module);
+moduleSnapshots.forEach(module => {
+	const name = module.name;
 	if (!name) return;
-	const iconClass = typeof module === 'string' ? 'fas fa-graduation-cap' : module.icon || 'fas fa-graduation-cap';
+	const iconClass = module.icon || 'fas fa-graduation-cap';
 	const qCount = moduleQuestionCounts.get(name.toLowerCase()) || 0;
 
 	const li = document.createElement('li');
@@ -1244,7 +1529,7 @@ this.updateSelectedQuestionsCount(examId);
 
 this.renderResourceLinks(
 	resourcesList,
-	metadata.resources,
+	this.readMetadataCollection(metadata, 'resources'),
 	examData,
 	'No resources available'
 );
@@ -1339,8 +1624,10 @@ async startSelectedExam(mode = 'exam', selectionPromise = null) {
 		window.showCustomAlert('Exam unavailable', `Could not load ${examId}: ${error.message}`, 'error');
 		return false;
 	}
-	const metadata = examData?.metadata || {};
-	const moduleNames = this.getModuleNames(metadata.modules);
+	const metadata = this.getExamMetadataSnapshot(examData);
+	const moduleNames = this.getModuleNames(
+		this.readMetadataCollection(metadata, 'modules')
+	);
 	const routeParams = { exam: examId };
 	if (mode === 'study') {
 		routeParams.mode = 'study';
@@ -1381,13 +1668,13 @@ updateSelectedQuestionsCount(examId) {
 	const examData = window.userExams[examId];
 	if (!examData) return;
 
-	const metadata = examData.metadata || {};
+	const metadata = this.getExamMetadataSnapshot(examData);
 	const questions = Array.isArray(examData.questions) ? examData.questions : [];
 	const modulesList = document.getElementById('details-modules-list');
 		if (!modulesList) return;
 	const checkedItems = modulesList.querySelectorAll('li.checked');
 
-	if (!metadata.modules || metadata.modules.length === 0) {
+	if (this.getModuleSnapshots(this.readMetadataCollection(metadata, 'modules')).length === 0) {
 		const total = questions.length || metadata.totalQuestions || metadata.questionCount || 0;
 		document.getElementById('details-exam-questions').textContent = `${metadata.questionCount || total}`;
 		return;
@@ -1419,7 +1706,7 @@ if (!this.previewExamName) return;
 const fallbackExamId = this.getMostRecentExamWithProgress();
 const examId = this.selectedExamId || fallbackExamId;
 const examData = examId ? (this.availableExams.get(examId) || window.userExams[examId]) : null;
-const metadata = examData?.metadata || {};
+const metadata = this.getExamMetadataSnapshot(examData);
 const stats = examId ? this.getProgressStats(examId) : null;
 
 // First-run consolidation: when there is no selection and no history, show one
@@ -1630,7 +1917,10 @@ const questionCount = metadata.questionCount || examData?.questions?.length;
 const duration = metadata.duration || 0;
 if (questionCount) chips.push(`${questionCount} questions`);
 if (duration) chips.push(`${duration} minutes`);
-if (metadata.modules?.length) chips.push(`${metadata.modules.length} modules`);
+const moduleCount = this.getModuleSnapshots(
+	this.readMetadataCollection(metadata, 'modules')
+).length;
+if (moduleCount) chips.push(`${moduleCount} modules`);
 if (examData?.hasImages) chips.push('Includes images');
 if (chips.length === 0) chips.push('Import data to unlock stats');
 this.renderPreviewChips(chips);
@@ -1776,7 +2066,8 @@ return button;
 
 getExamName(examId) {
 const examData = this.getExamDataForReview(examId);
-return examData?.metadata?.name || examId.toUpperCase();
+const metadata = this.getExamMetadataSnapshot(examData);
+return metadata.name || examId.toUpperCase();
 }
 
 getExamDataForReview(examId) {
@@ -2399,9 +2690,11 @@ throw new Error('Invalid exam id. Use letters, numbers, hyphens or underscores.'
 }
 
 const imageFiles = Array.isArray(extracted.imageFiles) ? extracted.imageFiles : [];
+const importedPack = { questions, metadata };
+if (labs !== undefined) importedPack.labs = labs;
 const imported = await this.importExamWithConflictConfirmation(
 	examId,
-	{ questions, metadata, labs },
+	importedPack,
 	imageFiles
 );
 if (!imported) {
@@ -2606,7 +2899,7 @@ const configFragment = document.createDocumentFragment();
 allExamIds.forEach(examId => {
 	const isActive = window.examManager.isExamActive(examId);
 	const examData = window.userExams[examId];
-	const metadata = (examData && examData.metadata) ? examData.metadata : { name: examId, fullName: 'Unknown' };
+	const metadata = this.getExamMetadataSnapshot(examData);
 	const hasImages = window.examImageFiles && window.examImageFiles[examId];
 	const imageCount = hasImages ? Object.keys(window.examImageFiles[examId]).length : 0;
 

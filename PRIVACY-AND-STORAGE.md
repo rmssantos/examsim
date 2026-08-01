@@ -36,7 +36,9 @@ needed.
 The public deployment can collect:
 
 - page views;
-- exam and Study Mode start/completion events;
+- exam start/completion events;
+- Study Mode session starts, one first-answer interaction per Study session, and
+  completion aggregates;
 - attempt review and missed-question study actions;
 - import success/failure and coarse file size/type buckets;
 - progress and editor import/export actions;
@@ -79,8 +81,10 @@ Examplar telemetry does not intentionally collect:
 - license keys or payment details.
 
 Sanitizers discard campaign values resembling emails, URLs, or paths.
-The first-answer event is only a bounded interaction count: it does not contain
-the question, answer, question ID, or selected response.
+Study start and first-answer events contain only bounded exam/session context.
+Study completion telemetry sends session-level question, answered, and correct counts plus coarse accuracy and duration buckets. These aggregates are not linked to question identifiers or content; however, results from very small Study sessions may be inferable. Examplar does not send individual answer events, question IDs or text, options, answer state, or selected responses.
+The Study first-answer event is emitted once per Study session; exam
+first-answer events are bounded interaction counts too.
 
 ## Analytics Choice
 

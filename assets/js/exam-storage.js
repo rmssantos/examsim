@@ -123,7 +123,7 @@
                         labs = labsRaw;
                     }
                 }
-                return {
+                const record = {
                     examId,
                     questions,
                     metadata,
@@ -132,6 +132,7 @@
                     trust: 'local-unverified',
                     storage: 'localStorage'
                 };
+                return window.ExamApp.markBrowserStoredExamRecord?.(record) || record;
             } catch (error) {
                 window.ExamApp.warn(`Failed to read legacy exam ${examId}:`, error);
                 return null;
@@ -301,13 +302,15 @@
             if (!window.ExamApp.isSafeExamId(examId)) return null;
             const record = await this.getRecord(this.examStore, examId);
             if (record && Array.isArray(record.questions)) {
-                return {
+                const storedRecord = {
                     ...record,
                     metadata: this.sanitizeLocalMetadata(record.metadata),
                     source: 'imported',
                     trust: 'local-unverified',
                     storage: 'indexedDB'
                 };
+                return window.ExamApp.markBrowserStoredExamRecord?.(storedRecord)
+                    || storedRecord;
             }
 
             const legacy = this.getLegacyExam(examId);
@@ -350,13 +353,15 @@
                             Number.isInteger(effectiveLabCount)
                             && effectiveLabCount === actualLabCount
                         );
-                    const migrationValidation = (
-                        typeof window.ExamApp.validateExamData === 'function'
-                    )
-                        ? window.ExamApp.validateExamData(
+                    const storedValidator = window.ExamApp.validateStoredExamData
+                        || window.ExamApp.validateExamData;
+                    const migrationValidation = typeof storedValidator === 'function'
+                        ? storedValidator(
                             legacy.questions,
                             migratedMetadata,
-                            migrationLabs
+                            migrationLabs,
+                            examId,
+                            legacy
                         )
                         : { valid: true };
                     if (
@@ -389,12 +394,14 @@
                     }
                     migratedLegacy.metadata = migratedMetadata;
                     window.ExamApp.analytics?.trackStorageMigration?.('exam', 'success');
-                    return {
+                    const migratedRecord = {
                         ...migratedLegacy,
                         source: 'imported',
                         trust: 'local-unverified',
                         storage: 'indexedDB'
                     };
+                    return window.ExamApp.markBrowserStoredExamRecord?.(migratedRecord)
+                        || migratedRecord;
                 } catch (error) {
                     window.ExamApp.warn(`Failed to migrate ${examId} to IndexedDB:`, error);
                     window.ExamApp.analytics?.trackStorageMigration?.('exam', this.isQuotaError(error) ? 'quota_error' : 'failed');

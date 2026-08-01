@@ -11,6 +11,81 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+function hasWellFormedUtf16(value) {
+    const text = String(value ?? '');
+    for (let index = 0; index < text.length; index++) {
+        const unit = text.charCodeAt(index);
+        if (unit >= 0xD800 && unit <= 0xDBFF) {
+            const next = text.charCodeAt(index + 1);
+            if (!(next >= 0xDC00 && next <= 0xDFFF)) return false;
+            index++;
+        } else if (unit >= 0xDC00 && unit <= 0xDFFF) {
+            return false;
+        }
+    }
+    return true;
+}
+
+const QUESTION_ID_WHITESPACE = /[ \f\n\r\t\v\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+/g;
+
+function parseQuestionId(value) {
+    let text;
+    if (typeof value === 'string') {
+        text = value;
+    } else if (typeof value === 'number' && Number.isSafeInteger(value)) {
+        text = String(value);
+    } else {
+        return {
+            valid: false,
+            value: '',
+            error: 'id must be a non-empty string or safe integer.'
+        };
+    }
+
+    const canonical = text.replace(QUESTION_ID_WHITESPACE, ' ').trim();
+    if (!canonical) {
+        return {
+            valid: false,
+            value: '',
+            error: 'id must be a non-empty string or safe integer.'
+        };
+    }
+    if (!hasWellFormedUtf16(canonical)) {
+        return {
+            valid: false,
+            value: '',
+            error: 'id must be well-formed Unicode.'
+        };
+    }
+    return { valid: true, value: canonical, error: '' };
+}
+
+function legacyLongQuestionIdIdentity(value) {
+    let hash = 2166136261;
+    for (let index = 0; index < value.length; index++) {
+        hash ^= value.charCodeAt(index);
+        hash = Math.imul(hash, 16777619);
+    }
+    const fingerprint = (hash >>> 0).toString(16).padStart(8, '0');
+    return `q_${fingerprint}_${encodeURIComponent(value).slice(0, 80)}`;
+}
+
+// Browser-storage provenance is intentionally held outside serializable exam
+// data. A record cannot obtain recovery-only validation by declaring mutable
+// source/storage fields in JSON.
+const browserStoredExamRecords = new WeakSet();
+window.ExamApp.markBrowserStoredExamRecord = function markBrowserStoredExamRecord(record) {
+    if (record && typeof record === 'object') browserStoredExamRecords.add(record);
+    return record;
+};
+window.ExamApp.isBrowserStoredExamRecord = function isBrowserStoredExamRecord(record) {
+    return Boolean(
+        record
+        && typeof record === 'object'
+        && browserStoredExamRecords.has(record)
+    );
+};
+
 window.ExamApp.EXAM_LIMITS = Object.freeze({
     maxJsonBytes: 5 * 1024 * 1024,
     maxZipBytes: 50 * 1024 * 1024,
@@ -18,6 +93,7 @@ window.ExamApp.EXAM_LIMITS = Object.freeze({
     maxZipUncompressedBytes: 120 * 1024 * 1024,
     zipWorkerTimeoutMs: 30 * 1000,
     maxQuestions: 1000,
+    maxQuestionIdLength: 120,
     maxOptions: 50,
     maxStatements: 50,
     maxCorrectAnswers: 50,
@@ -30,6 +106,13 @@ window.ExamApp.EXAM_LIMITS = Object.freeze({
     maxLabCleanup: 25,
     maxLabReferences: 25,
     maxMetadataListItems: 100,
+    maxMetadataTaxonomyListItems: 20,
+    maxMetadataTaxonomyStringLength: 200,
+    maxMetadataStringLength: 5000,
+    maxMetadataObjectKeys: 100,
+    maxMetadataKeyLength: 200,
+    maxMetadataDepth: 10,
+    maxMetadataNodes: 5000,
     maxImages: 250,
     maxImageBytes: 10 * 1024 * 1024,
     maxTotalImageBytes: 100 * 1024 * 1024,
@@ -43,6 +126,11 @@ window.ExamApp.EXAM_LIMITS = Object.freeze({
     allowedImageExtensions: Object.freeze(['jpg', 'jpeg', 'png', 'gif', 'webp']),
     allowedImageMimeTypes: Object.freeze(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
 });
+
+window.ExamApp.canonicalizeQuestionId = function canonicalizeQuestionId(value) {
+    const parsed = parseQuestionId(value);
+    return parsed.valid ? parsed.value : null;
+};
 
 // Hosts that serve the public deployment. Single source of truth shared by
 // analytics gating and local-only link hiding.
@@ -61,14 +149,75 @@ window.ExamApp.isBundledTrustedExam = function isBundledTrustedExam(exam) {
 };
 
 window.ExamApp.sanitizeExamMetadata = function sanitizeExamMetadata(metadata, options = {}) {
-    if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) return metadata || null;
+    if (!metadata || typeof metadata !== 'object') return metadata || null;
 
-    const sanitized = { ...metadata };
+    let isArray;
+    let prototype;
+    try {
+        isArray = Array.isArray(metadata);
+        prototype = Object.getPrototypeOf(metadata);
+    } catch (_) {
+        return null;
+    }
+    if (isArray) return metadata;
+    if (prototype !== Object.prototype && prototype !== null) return metadata;
+
+    const sanitized = {};
+    const maximumKeys = window.ExamApp.EXAM_LIMITS?.maxMetadataObjectKeys || 100;
+    let keyCount = 0;
+    try {
+        for (const key in metadata) {
+            if (!Object.prototype.hasOwnProperty.call(metadata, key)) continue;
+            keyCount += 1;
+            if (keyCount > maximumKeys) return metadata;
+            const descriptor = Object.getOwnPropertyDescriptor(metadata, key);
+            if (
+                !descriptor
+                || descriptor.enumerable !== true
+                || !Object.prototype.hasOwnProperty.call(descriptor, 'value')
+            ) {
+                return metadata;
+            }
+            Object.defineProperty(sanitized, key, {
+                value: descriptor.value,
+                enumerable: true,
+                configurable: true,
+                writable: true
+            });
+        }
+    } catch (_) {
+        return null;
+    }
     delete sanitized.source;
     delete sanitized.trust;
     if (options.allowCommercial !== true) {
         delete sanitized.pro;
         delete sanitized.recommendedPro;
+        delete sanitized.preview;
+
+        // Imported/local packs never inherit a commercial state. Keep a
+        // complete taxonomy useful for filtering, but normalize its status to
+        // the only state an unverified local pack can represent. A standalone
+        // forged status is removed so it cannot make otherwise valid legacy
+        // metadata fail the all-or-nothing taxonomy contract.
+        const taxonomyFields = [
+            'vendor',
+            'certificationCode',
+            'domains',
+            'level',
+            'productFamily',
+            'contentType'
+        ];
+        if (taxonomyFields.every(field => Object.prototype.hasOwnProperty.call(sanitized, field))) {
+            Object.defineProperty(sanitized, 'commercialStatus', {
+                value: 'free',
+                enumerable: true,
+                configurable: true,
+                writable: true
+            });
+        } else {
+            delete sanitized.commercialStatus;
+        }
     }
     return sanitized;
 };
@@ -455,87 +604,394 @@ window.ExamApp.validateExamMetadata = function validateExamMetadata(
     const errors = [];
     const warnings = [];
     const limits = window.ExamApp.EXAM_LIMITS;
+    const maxValidationErrors = 100;
+    const addError = (message) => {
+        if (errors.length < maxValidationErrors) errors.push(message);
+    };
 
     if (metadata === null || metadata === undefined) {
         if (Array.isArray(labs) && labs.length > 0) {
-            errors.push('Metadata with labCount is required when labs are present.');
+            addError('Metadata with labCount is required when labs are present.');
         }
         return { valid: errors.length === 0, errors, warnings };
     }
-    if (typeof metadata !== 'object' || Array.isArray(metadata)) {
-        errors.push('Metadata must be an object.');
+    if (typeof metadata !== 'object') {
+        addError('Metadata must be an object.');
         return { valid: false, errors, warnings };
     }
 
-    const pending = [{ value: metadata, path: 'Metadata' }];
+    let rootIsArray;
+    try {
+        rootIsArray = Array.isArray(metadata);
+    } catch (_error) {
+        addError('Metadata could not be inspected safely.');
+        return { valid: false, errors, warnings };
+    }
+    if (rootIsArray) {
+        addError('Metadata must be an object.');
+        return { valid: false, errors, warnings };
+    }
+
+    const containerSnapshots = new Map();
+    const inspectContainer = (value, path) => {
+        if (containerSnapshots.has(value)) return containerSnapshots.get(value);
+
+        let isArray;
+        let prototype;
+        try {
+            isArray = Array.isArray(value);
+            prototype = Object.getPrototypeOf(value);
+        } catch (_error) {
+            addError(`${path} could not be inspected safely.`);
+            const invalid = { kind: 'invalid', entries: [], fields: new Map(), items: new Map() };
+            containerSnapshots.set(value, invalid);
+            return invalid;
+        }
+
+        if (
+            (isArray && prototype !== Array.prototype)
+            || (!isArray && prototype !== Object.prototype && prototype !== null)
+        ) {
+            addError(`${path} must contain only arrays and plain objects.`);
+            const invalid = { kind: 'invalid', entries: [], fields: new Map(), items: new Map() };
+            containerSnapshots.set(value, invalid);
+            return invalid;
+        }
+
+        const readDescriptor = (key, label) => {
+            let descriptor;
+            try {
+                descriptor = Object.getOwnPropertyDescriptor(value, key);
+            } catch (_error) {
+                addError(`${label} could not be inspected safely.`);
+                return null;
+            }
+            if (!descriptor) {
+                addError(`${label} has an unstable property descriptor.`);
+                return null;
+            }
+            if (!Object.prototype.hasOwnProperty.call(descriptor, 'value')) {
+                addError(`${label} must be a data property, not an accessor.`);
+                return null;
+            }
+            return descriptor;
+        };
+
+        if (isArray) {
+            const lengthDescriptor = readDescriptor('length', `${path}.length`);
+            const length = lengthDescriptor?.value;
+            if (!Number.isSafeInteger(length) || length < 0) {
+                addError(`${path} has an invalid array length.`);
+                const invalid = { kind: 'invalid', entries: [], fields: new Map(), items: new Map() };
+                containerSnapshots.set(value, invalid);
+                return invalid;
+            }
+            if (length > limits.maxMetadataListItems) {
+                addError(`${path} has too many items; maximum is ${limits.maxMetadataListItems}.`);
+            }
+
+            let visibleKeys = 0;
+            try {
+                for (const key in value) {
+                    if (!Object.prototype.hasOwnProperty.call(value, key)) continue;
+                    visibleKeys += 1;
+                    const index = Number(key);
+                    if (
+                        !Number.isInteger(index)
+                        || index < 0
+                        || index >= length
+                        || String(index) !== key
+                    ) {
+                        addError(`${path} arrays must contain only indexed items.`);
+                    }
+                    if (visibleKeys > limits.maxMetadataListItems) break;
+                }
+            } catch (_error) {
+                addError(`${path} could not be enumerated safely.`);
+                const invalid = { kind: 'invalid', entries: [], fields: new Map(), items: new Map() };
+                containerSnapshots.set(value, invalid);
+                return invalid;
+            }
+
+            const entries = [];
+            const items = new Map();
+            const inspectedLength = Math.min(length, limits.maxMetadataListItems);
+            for (let index = 0; index < inspectedLength; index++) {
+                const descriptor = readDescriptor(String(index), `${path}[${index}]`);
+                if (!descriptor) continue;
+                if (descriptor.enumerable !== true) {
+                    addError(`${path}[${index}] must be an enumerable data property.`);
+                    continue;
+                }
+                entries.push({ value: descriptor.value, path: `${path}[${index}]` });
+                items.set(index, descriptor.value);
+            }
+            const snapshot = {
+                kind: 'array',
+                entries,
+                fields: new Map(),
+                items,
+                length
+            };
+            containerSnapshots.set(value, snapshot);
+            return snapshot;
+        }
+
+        const stringKeys = [];
+        try {
+            for (const key in value) {
+                if (!Object.prototype.hasOwnProperty.call(value, key)) continue;
+                if (stringKeys.length >= limits.maxMetadataObjectKeys) {
+                    addError(`${path} has too many keys; maximum is ${limits.maxMetadataObjectKeys}.`);
+                    break;
+                }
+                stringKeys.push(key);
+            }
+        } catch (_error) {
+            addError(`${path} could not be enumerated safely.`);
+            const invalid = { kind: 'invalid', entries: [], fields: new Map(), items: new Map() };
+            containerSnapshots.set(value, invalid);
+            return invalid;
+        }
+        const entries = [];
+        const fields = new Map();
+        stringKeys.forEach((field, index) => {
+            const wellFormedKey = hasWellFormedUtf16(field);
+            const validKey = wellFormedKey && field.length <= limits.maxMetadataKeyLength;
+            if (!wellFormedKey) {
+                addError(`${path} key ${index + 1} must be well-formed Unicode.`);
+            } else if (field.length > limits.maxMetadataKeyLength) {
+                addError(
+                    `${path} key ${index + 1} exceeds ${limits.maxMetadataKeyLength} UTF-16 code units.`
+                );
+            }
+            const pathField = validKey ? field : `<key ${index + 1}>`;
+            const descriptor = readDescriptor(field, `${path}.${pathField}`);
+            if (!descriptor) return;
+            if (descriptor.enumerable !== true) {
+                addError(`${path}.${pathField} must be an enumerable data property.`);
+                return;
+            }
+            entries.push({ value: descriptor.value, path: `${path}.${pathField}` });
+            fields.set(field, descriptor.value);
+        });
+        const snapshot = { kind: 'object', entries, fields, items: new Map() };
+        containerSnapshots.set(value, snapshot);
+        return snapshot;
+    };
+
+    const pending = [{ value: metadata, path: 'Metadata', depth: 0, exiting: false }];
     const seen = new Set();
+    const active = new Set();
+    let nodeCount = 0;
+    let rootSnapshot = null;
     while (pending.length > 0) {
         const current = pending.pop();
         const value = current.value;
-        if (!value || typeof value !== 'object' || seen.has(value)) continue;
-        seen.add(value);
-
-        if (Array.isArray(value)) {
-            if (value.length > limits.maxMetadataListItems) {
-                errors.push(`${current.path} has too many items; maximum is ${limits.maxMetadataListItems}.`);
-            }
-            value.slice(0, limits.maxMetadataListItems).forEach((item, index) => {
-                pending.push({ value: item, path: `${current.path}[${index}]` });
-            });
+        if (current.exiting) {
+            active.delete(value);
             continue;
         }
-        for (const [field, nested] of Object.entries(value)) {
-            pending.push({ value: nested, path: `${current.path}.${field}` });
+
+        const isContainer = value !== null && typeof value === 'object';
+        if (isContainer && active.has(value)) {
+            addError(`${current.path} contains a circular reference.`);
+            continue;
+        }
+        if (isContainer && seen.has(value)) continue;
+
+        nodeCount++;
+        if (nodeCount > limits.maxMetadataNodes) {
+            addError(`Metadata has too many total nodes; maximum is ${limits.maxMetadataNodes}.`);
+            break;
+        }
+        if (current.depth > limits.maxMetadataDepth) {
+            addError(`Metadata exceeds the maximum depth of ${limits.maxMetadataDepth}.`);
+            continue;
+        }
+
+        if (value === null || typeof value === 'boolean') continue;
+        if (typeof value === 'string') {
+            if (!hasWellFormedUtf16(value)) {
+                addError(`${current.path} must be well-formed Unicode.`);
+            } else if (value.length > limits.maxMetadataStringLength) {
+                addError(
+                    `${current.path} exceeds ${limits.maxMetadataStringLength} UTF-16 code units.`
+                );
+            }
+            continue;
+        }
+        if (typeof value === 'number') {
+            if (!Number.isFinite(value)) {
+                addError(`${current.path} must contain a finite JSON number.`);
+            }
+            continue;
+        }
+        if (!isContainer) {
+            addError(`${current.path} must contain only JSON-compatible values.`);
+            continue;
+        }
+
+        seen.add(value);
+        active.add(value);
+        pending.push({ value, path: current.path, depth: current.depth, exiting: true });
+        const snapshot = inspectContainer(value, current.path);
+        if (value === metadata) rootSnapshot = snapshot;
+        snapshot.entries.slice().reverse().forEach((entry) => {
+            pending.push({
+                value: entry.value,
+                path: entry.path,
+                depth: current.depth + 1,
+                exiting: false
+            });
+        });
+    }
+
+    const taxonomyTextFields = [
+        'vendor',
+        'certificationCode',
+        'level',
+        'productFamily',
+        'contentType',
+        'commercialStatus'
+    ];
+    const taxonomyListFields = ['domains'];
+    const rootFields = rootSnapshot?.kind === 'object' ? rootSnapshot.fields : new Map();
+    const hasField = field => rootFields.has(field);
+    const fieldValue = field => rootFields.get(field);
+    const hasLibraryTaxonomy = [...taxonomyTextFields, ...taxonomyListFields].some(hasField);
+
+    if (hasLibraryTaxonomy) taxonomyTextFields.forEach((field) => {
+        if (!hasField(field)) {
+            addError(`Metadata ${field} is required for library filtering.`);
+            return;
+        }
+        const value = fieldValue(field);
+        if (
+            typeof value !== 'string'
+            || value.trim().length === 0
+            || !hasWellFormedUtf16(value)
+            || value.length > limits.maxMetadataTaxonomyStringLength
+        ) {
+            addError(
+                `Metadata ${field} must be a non-empty string of at most `
+                + `${limits.maxMetadataTaxonomyStringLength} UTF-16 code units.`
+            );
+        }
+    });
+
+    if (hasLibraryTaxonomy) {
+        if (!hasField('domains')) {
+            addError('Metadata domains must be a non-empty array of strings.');
+        } else {
+            const domains = fieldValue('domains');
+            const domainsSnapshot = containerSnapshots.get(domains);
+            if (domainsSnapshot?.kind !== 'array' || domainsSnapshot.length === 0) {
+                addError('Metadata domains must be a non-empty array of strings.');
+            } else {
+                if (domainsSnapshot.length > limits.maxMetadataTaxonomyListItems) {
+                    addError(
+                        `Metadata domains has too many items; maximum is `
+                        + `${limits.maxMetadataTaxonomyListItems}.`
+                    );
+                }
+                const checkedLength = Math.min(
+                    domainsSnapshot.length,
+                    limits.maxMetadataTaxonomyListItems
+                );
+                for (let index = 0; index < checkedLength; index++) {
+                    const domain = domainsSnapshot.items.get(index);
+                    if (
+                        !domainsSnapshot.items.has(index)
+                        || typeof domain !== 'string'
+                        || domain.trim().length === 0
+                        || !hasWellFormedUtf16(domain)
+                        || domain.length > limits.maxMetadataTaxonomyStringLength
+                    ) {
+                        addError(
+                            `Metadata domains entry ${index + 1} must be a non-empty string of at most `
+                            + `${limits.maxMetadataTaxonomyStringLength} UTF-16 code units.`
+                        );
+                    }
+                }
+            }
         }
     }
 
-    if (metadata.id !== undefined && !window.ExamApp.isSafeExamId(metadata.id)) {
-        errors.push('Metadata id is invalid.');
+    if (hasField('id')) {
+        const id = fieldValue('id');
+        if (typeof id !== 'string' || !window.ExamApp.isSafeExamId(id)) {
+            addError('Metadata id is invalid.');
+        }
     }
-    if (
-        metadata.questionCount !== undefined
-        && (
-            !Number.isInteger(metadata.questionCount)
-            || metadata.questionCount < 1
-            || metadata.questionCount > limits.maxQuestions
-            || (Number.isInteger(questionTotal) && metadata.questionCount > questionTotal)
-        )
-    ) {
-        errors.push('Metadata questionCount must be between 1 and total questions.');
-    }
-    if (metadata.totalQuestions !== undefined) {
+
+    if (hasField('questionCount')) {
+        const questionCount = fieldValue('questionCount');
         if (
-            !Number.isInteger(metadata.totalQuestions)
-            || metadata.totalQuestions < 1
-            || metadata.totalQuestions > limits.maxQuestions
+            !Number.isInteger(questionCount)
+            || questionCount < 1
+            || questionCount > limits.maxQuestions
+            || (Number.isInteger(questionTotal) && questionCount > questionTotal)
         ) {
-            errors.push(`Metadata totalQuestions must be between 1 and ${limits.maxQuestions}.`);
+            addError('Metadata questionCount must be between 1 and total questions.');
+        }
+    }
+
+    if (hasField('totalQuestions')) {
+        const totalQuestions = fieldValue('totalQuestions');
+        if (
+            !Number.isInteger(totalQuestions)
+            || totalQuestions < 1
+            || totalQuestions > limits.maxQuestions
+        ) {
+            addError(`Metadata totalQuestions must be between 1 and ${limits.maxQuestions}.`);
         } else if (
             Number.isInteger(questionTotal)
-            && metadata.totalQuestions !== questionTotal
+            && totalQuestions !== questionTotal
         ) {
             warnings.push('Metadata totalQuestions does not match question count.');
         }
     }
 
-    if (
-        metadata.labCount !== undefined
-        && (
-            !Number.isInteger(metadata.labCount)
-            || metadata.labCount < 0
-            || metadata.labCount > limits.maxLabs
-        )
-    ) {
-        errors.push(`Metadata labCount must be between 0 and ${limits.maxLabs}.`);
+    if (hasField('passScore')) {
+        const passScore = fieldValue('passScore');
+        if (
+            typeof passScore !== 'number'
+            || !Number.isFinite(passScore)
+            || passScore < 1
+            || passScore > 100
+        ) {
+            addError('Metadata passScore must be between 1 and 100.');
+        }
+    }
+
+    if (hasField('contentOrigin')) {
+        const contentOrigin = fieldValue('contentOrigin');
+        if (
+            typeof contentOrigin !== 'string'
+            || !new Set(['original', 'derived-from-public', 'imported']).has(contentOrigin)
+        ) {
+            addError('Metadata contentOrigin is invalid.');
+        }
+    }
+
+    if (hasField('labCount')) {
+        const labCount = fieldValue('labCount');
+        if (
+            !Number.isInteger(labCount)
+            || labCount < 0
+            || labCount > limits.maxLabs
+        ) {
+            addError(`Metadata labCount must be between 0 and ${limits.maxLabs}.`);
+        }
     }
     if (Array.isArray(labs)) {
-        if (labs.length > 0 && metadata.labCount === undefined) {
-            errors.push('Metadata labCount is required when labs are present.');
-        } else if (
-            metadata.labCount !== undefined
-            && metadata.labCount !== labs.length
-        ) {
-            errors.push('Metadata labCount must match the number of labs.');
+        const hasLabCount = hasField('labCount');
+        const labCount = fieldValue('labCount');
+        if (labs.length > 0 && !hasLabCount) {
+            addError('Metadata labCount is required when labs are present.');
+        } else if (hasLabCount && labCount !== labs.length) {
+            addError('Metadata labCount must match the number of labs.');
         }
     }
 
@@ -678,13 +1134,17 @@ window.ExamApp.validateExamLabs = function validateExamLabs(labs) {
 window.ExamApp.validateExamData = function validateExamData(
     questions,
     metadata = null,
-    labs = undefined
+    labs = undefined,
+    validationOptions = {}
 ) {
     const errors = [];
     const warnings = [];
     const limits = window.ExamApp.EXAM_LIMITS;
     const supportedTypes = new Set(['STANDARD', 'MULTI', 'YES_NO_MATRIX', 'SEQUENCE', 'DRAG_DROP_SELECT']);
     const items = Array.isArray(questions) ? questions : null;
+    const allowLegacyLongQuestionIds = window.ExamApp.isBrowserStoredExamRecord(
+        validationOptions?.storedRecord
+    );
 
     if (!items) {
         errors.push('Exam data must be an array of questions.');
@@ -697,6 +1157,7 @@ window.ExamApp.validateExamData = function validateExamData(
     }
 
     const ids = new Set();
+    const legacyLongIdentities = new Map();
     const hasValidIndex = (index, options) => Number.isInteger(index) && Array.isArray(options) && index >= 0 && index < options.length;
     const hasText = (value, maxLength = limits.maxTextLength) => (
         typeof value === 'string'
@@ -711,10 +1172,38 @@ window.ExamApp.validateExamData = function validateExamData(
             return;
         }
 
-        const id = String(question.id ?? '').trim();
-        if (!id) errors.push(`${label}: missing id.`);
-        if (id && ids.has(id)) errors.push(`${label}: duplicate id ${id}.`);
-        if (id) ids.add(id);
+        const parsedId = Object.prototype.hasOwnProperty.call(question, 'id')
+            ? parseQuestionId(question.id)
+            : { valid: false, value: '', error: 'missing id.' };
+        const id = parsedId.value;
+        if (!parsedId.valid) {
+            errors.push(`${label}: ${parsedId.error}`);
+        } else {
+            const isLegacyLongId = id.length > limits.maxQuestionIdLength;
+            if (isLegacyLongId && !allowLegacyLongQuestionIds) {
+                errors.push(`${label}: id exceeds the ${limits.maxQuestionIdLength}-character maximum.`);
+            } else {
+                if (isLegacyLongId) {
+                    warnings.push(
+                        `${label}: grandfathered stored id exceeds ${limits.maxQuestionIdLength} UTF-16 code units.`
+                    );
+                    const legacyIdentity = legacyLongQuestionIdIdentity(id);
+                    const previous = legacyLongIdentities.get(legacyIdentity);
+                    if (previous && previous.id !== id) {
+                        errors.push(
+                            `${label}: legacy storage identity collision with ${previous.label}; the stored pack must be quarantined.`
+                        );
+                    } else if (!previous) {
+                        legacyLongIdentities.set(legacyIdentity, { id, label });
+                    }
+                }
+                if (ids.has(id)) {
+                    errors.push(`${label}: duplicate id ${id}.`);
+                } else {
+                    ids.add(id);
+                }
+            }
+        }
 
         if (!hasText(question.question)) errors.push(`${label}: question text is empty or too long.`);
         if (question.explanation !== undefined && !hasText(question.explanation)) {
@@ -889,6 +1378,27 @@ window.ExamApp.validateExamData = function validateExamData(
     }
 
     return { valid: errors.length === 0, errors, warnings };
+};
+
+window.ExamApp.validateStoredExamData = function validateStoredExamData(
+    questions,
+    metadata = null,
+    labs = undefined,
+    examId = 'unknown',
+    storedRecord = null
+) {
+    const result = window.ExamApp.validateExamData(questions, metadata, labs, {
+        storedRecord
+    });
+    const grandfatheredCount = result.warnings.filter(
+        warning => warning.includes('grandfathered stored id')
+    ).length;
+    if (result.valid && grandfatheredCount > 0) {
+        window.ExamApp.warn(
+            `Loaded stored exam "${String(examId)}" with ${grandfatheredCount} grandfathered question id(s) longer than ${window.ExamApp.EXAM_LIMITS.maxQuestionIdLength} UTF-16 code units. New imports remain limited to 120.`
+        );
+    }
+    return result;
 };
 
 window.escapeHtml = escapeHtml;

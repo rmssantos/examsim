@@ -170,6 +170,92 @@ console.log(JSON.stringify(sent.map((envelope) => envelope.data.baseData)));
         )
         return json.loads(result.stdout)
 
+    def run_study_events(self):
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("node not available")
+
+        node_script = r"""
+const fs = require('fs');
+let source = fs.readFileSync(process.argv[1], 'utf8');
+source = source.replace(
+  '__APPINSIGHTS_CONNECTION_STRING__',
+  'InstrumentationKey=test-key;IngestionEndpoint=https://example.test'
+);
+
+const sent = [];
+global.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+global.sessionStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+global.fetch = (_url, options) => {
+  sent.push(JSON.parse(options.body)[0]);
+  return Promise.resolve();
+};
+global.HTMLElement = function HTMLElement() {};
+global.document = {
+  readyState: 'loading',
+  referrer: '',
+  addEventListener() {},
+  getElementById() { return null; },
+};
+global.window = {
+  location: {
+    href: 'https://examplar.app/exams/sc900/',
+    protocol: 'https:',
+    hostname: 'examplar.app',
+    pathname: '/exams/sc900/'
+  },
+  ExamApp: {
+    isPublicSiteHost(host = 'examplar.app') {
+      return ['examplar.app', 'www.examplar.app', 'rmssantos.github.io'].includes(host);
+    }
+  }
+};
+
+eval(source);
+const analytics = window.ExamApp.analytics;
+const malicious = {
+  questionId: 'question-secret-42',
+  questionText: 'private question text',
+  options: ['private option A', 'private option B'],
+  selectedResponse: 'private selected response',
+  isCorrect: true,
+  answerState: 'answered',
+  email: 'learner@example.com'
+};
+
+analytics.trackStudyStarted('sc900', {
+  questionCount: 4,
+  dueCount: 2,
+  newCount: 1,
+  weakCount: 1,
+  ...malicious
+});
+const firstAnswerAvailable = typeof analytics.trackStudyFirstAnswered === 'function';
+if (firstAnswerAvailable) {
+  analytics.trackStudyFirstAnswered('sc900', malicious);
+}
+analytics.trackStudyCompleted('sc900', {
+  questionCount: 4,
+  answeredCount: 3,
+  correctCount: 2,
+  timeSpent: 7,
+  ...malicious
+});
+
+console.log(JSON.stringify({
+  firstAnswerAvailable,
+  events: sent.map((envelope) => envelope.data.baseData)
+}));
+"""
+        result = subprocess.run(
+            [node, "-e", node_script, str(ROOT / "assets/js/analytics.js")],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        return json.loads(result.stdout)
+
     def test_commercial_events_have_bounded_names_and_properties(self):
         events = self.run_commercial_events()
         self.assertEqual(
@@ -202,7 +288,7 @@ console.log(JSON.stringify(sent.map((envelope) => envelope.data.baseData)));
             "deployment": "github_pages",
             "page": "home",
             "path": "/",
-            "analytics_version": "1.3.0",
+            "analytics_version": "1.4.0",
         }
         for event, specific in zip(events, expected_specific):
             with self.subTest(event=event["name"]):
@@ -228,7 +314,7 @@ console.log(JSON.stringify(sent.map((envelope) => envelope.data.baseData)));
             "deployment": "github_pages",
             "page": "landing",
             "path": "/exams/sc900/",
-            "analytics_version": "1.3.0",
+            "analytics_version": "1.4.0",
         }
         self.assertEqual(
             events[0]["properties"],
@@ -313,6 +399,62 @@ console.log(JSON.stringify(sent.map((envelope) => envelope.data.baseData)));
             with self.subTest(forbidden=forbidden):
                 self.assertNotIn(forbidden, serialized)
 
+    def test_study_events_minimize_per_answer_telemetry(self):
+        payload = self.run_study_events()
+        self.assertTrue(payload["firstAnswerAvailable"])
+
+        events = payload["events"]
+        self.assertEqual(
+            [event["name"] for event in events],
+            ["study_started", "study_first_answered", "study_completed"],
+        )
+
+        common = {
+            "app": "examsim",
+            "deployment": "github_pages",
+            "page": "landing",
+            "path": "/exams/sc900/",
+            "analytics_version": "1.4.0",
+            "exam_id": "sc900",
+            "exam_source": "bundled",
+        }
+        self.assertEqual(events[0]["properties"], common)
+        self.assertEqual(events[0]["measurements"], {})
+        self.assertEqual(
+            events[1]["properties"],
+            {**common, "session_type": "study"},
+        )
+        self.assertEqual(events[1]["measurements"], {})
+        self.assertEqual(
+            events[2]["properties"],
+            {
+                **common,
+                "accuracy_bucket": "50-69",
+                "duration_bucket": "5-15m",
+            },
+        )
+        self.assertEqual(
+            events[2]["measurements"],
+            {"question_count": 4, "answered_count": 3, "correct_count": 2},
+        )
+
+        serialized = json.dumps(events)
+        for forbidden in (
+            "question-secret-42",
+            "private question text",
+            "private option A",
+            "private option B",
+            "private selected response",
+            "learner@example.com",
+            "answer_state",
+        ):
+            with self.subTest(forbidden=forbidden):
+                self.assertNotIn(forbidden, serialized)
+
+        analytics_source = (ROOT / "assets/js/analytics.js").read_text(encoding="utf-8")
+        self.assertNotIn("study_question_answered", analytics_source)
+        self.assertNotIn("trackStudyQuestionAnswered", analytics_source)
+
     def test_first_answer_is_tracked_once_per_runtime_session(self):
         node = shutil.which("node")
         if not node:
@@ -326,7 +468,9 @@ const start = source.indexOf('class MultiExamSimulator');
 const end = source.indexOf("document.addEventListener('DOMContentLoaded'");
 const classSource = source.slice(start, end);
 const tracked = [];
+const studyTracked = [];
 const started = [];
+const studyStarted = [];
 const badge = {};
 const context = {
   URL,
@@ -348,9 +492,14 @@ const context = {
         trackExamStarted(examId, details) {
           started.push({ examId, details });
         },
-        trackStudyStarted() {},
+        trackStudyStarted(examId, details) {
+          studyStarted.push({ examId, details: details ?? null });
+        },
         trackExamFirstAnswered(examId, details) {
           tracked.push({ examId, details });
+        },
+        trackStudyFirstAnswered(examId, details) {
+          studyTracked.push({ examId, details: details ?? null });
         }
       }
     }
@@ -414,7 +563,10 @@ sim.isStudyMode = function () { return this.mode === 'study'; };
   sim.handleAnswerChanged();
   sim.handleAnswerChanged();
 
-  console.log(JSON.stringify({ tracked, started }));
+  await sim.startStudyMode();
+  sim.handleAnswerChanged();
+
+  console.log(JSON.stringify({ tracked, studyTracked, started, studyStarted }));
 })().catch((error) => {
   console.error(error);
   process.exitCode = 1;
@@ -439,7 +591,20 @@ sim.isStudyMode = function () { return this.mode === 'study'; };
                 {"examId": "sc900", "details": {"sessionType": "diagnostic"}},
                 {"examId": "sc900", "details": {"sessionType": "full"}},
                 {"examId": "sc900", "details": {"sessionType": "full"}},
-                {"examId": "sc900", "details": {"sessionType": "study"}},
+            ],
+        )
+        self.assertEqual(
+            payload["studyTracked"],
+            [
+                {"examId": "sc900", "details": None},
+                {"examId": "sc900", "details": None},
+            ],
+        )
+        self.assertEqual(
+            payload["studyStarted"],
+            [
+                {"examId": "sc900", "details": None},
+                {"examId": "sc900", "details": None},
             ],
         )
         self.assertEqual(
@@ -990,6 +1155,7 @@ console.log(JSON.stringify({
 
     def test_privacy_copy_discloses_commercial_and_azure_metadata(self):
         page = (ROOT / "privacy-and-storage.html").read_text(encoding="utf-8").lower()
+        notes = (ROOT / "PRIVACY-AND-STORAGE.md").read_text(encoding="utf-8").lower()
         analytics = (ROOT / "assets/js/analytics.js").read_text(encoding="utf-8").lower()
 
         for phrase in (
@@ -1005,6 +1171,33 @@ console.log(JSON.stringify({
 
         self.assertIn("commercial interaction events", analytics)
         self.assertIn("coarse location and client metadata", analytics)
+
+        for disclosure in (page, notes, analytics):
+            with self.subTest(disclosure=disclosure[:40]):
+                self.assertIn("one first-answer interaction per study session", disclosure)
+                self.assertIn(
+                    "study start and first-answer events contain only bounded "
+                    "exam/session context",
+                    disclosure,
+                )
+                self.assertIn(
+                    "study completion telemetry sends session-level question, answered, "
+                    "and correct counts plus coarse accuracy and duration buckets",
+                    disclosure,
+                )
+                self.assertIn(
+                    "these aggregates are not linked to question identifiers or content",
+                    disclosure,
+                )
+                self.assertIn(
+                    "results from very small study sessions may be inferable",
+                    disclosure,
+                )
+                self.assertIn(
+                    "does not send individual answer events, question ids or text, "
+                    "options, answer state, or selected responses",
+                    disclosure,
+                )
 
 
 if __name__ == "__main__":

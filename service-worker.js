@@ -2,7 +2,7 @@
 // Public release history is recorded in CHANGELOG.md. Bump the vX.Y below on any
 // deploy that changes cached assets;
 // tests/test_sprint1_readiness.py enforces the examsim-pwa-vX.Y format.
-const CACHE_VERSION = 'examsim-pwa-v6.4';
+const CACHE_VERSION = 'examsim-pwa-v6.5';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -98,6 +98,7 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/js/image-storage.js',
   './assets/js/study-scheduler.js',
   './assets/js/study-storage.js',
+  './assets/vendor/jszip/jszip.min.js',
   './assets/css/exam-v2.css',
   './assets/css/home-v2.css',
   './assets/css/analytics-privacy.css',
@@ -207,7 +208,10 @@ self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(keys
-      .filter(key => ![STATIC_CACHE, RUNTIME_CACHE].includes(key))
+      .filter(key => (
+        key.startsWith('examsim-pwa-')
+        && ![STATIC_CACHE, RUNTIME_CACHE].includes(key)
+      ))
       .map(key => caches.delete(key)));
     await self.clients.claim();
   })());

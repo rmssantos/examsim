@@ -129,6 +129,7 @@ class MultiExamSimulator {
         this.localIdCounter = 0;
         this.attemptReviewDetailLimit = 10;
         this.firstAnswerTracked = false;
+        this.studyFirstAnswerTracked = false;
 
         this.init();
     }
@@ -436,6 +437,20 @@ class MultiExamSimulator {
         this._completeExamSelection(examType);
     }
 
+    validateStoredExamData(questions, metadata, labs, examId, storedRecord) {
+        const validator = window.ExamApp.validateStoredExamData
+            || window.ExamApp.validateExamData;
+        return validator(questions, metadata, labs, examId, storedRecord).valid;
+    }
+
+    validateRuntimeExamData(record, questions, metadata, labs, examId) {
+        const isBrowserStored = window.ExamApp.isBrowserStoredExamRecord?.(record)
+            === true;
+        return isBrowserStored
+            ? this.validateStoredExamData(questions, metadata, labs, examId, record)
+            : window.ExamApp.validateExamData(questions, metadata, labs).valid;
+    }
+
     async loadCustomExamIfRequested() {
         const params = new URLSearchParams(window.location.search);
         const examParam = params.get('exam');
@@ -487,7 +502,7 @@ class MultiExamSimulator {
                 if (
                     Array.isArray(data)
                     && data.length
-                    && window.ExamApp.validateExamData(data, meta, labs).valid
+                    && this.validateRuntimeExamData(runtimeExam, data, meta, labs, code)
                 ) {
                     this.examData['custom'] = {
                         name: meta.name || code.toUpperCase(),
@@ -519,10 +534,19 @@ class MultiExamSimulator {
                             labs = undefined;
                         }
                     }
+                    const storedRecord = {
+                        examId: code,
+                        questions: data,
+                        metadata: meta,
+                        labs,
+                        source: 'imported',
+                        storage: 'localStorage'
+                    };
+                    window.ExamApp.markBrowserStoredExamRecord?.(storedRecord);
                     if (
                         Array.isArray(data)
                         && data.length
-                        && window.ExamApp.validateExamData(data, meta, labs).valid
+                        && this.validateStoredExamData(data, meta, labs, code, storedRecord)
                     ) {
                         this.examData['custom'] = {
                             name: meta.name || code.toUpperCase(),
@@ -587,11 +611,13 @@ class MultiExamSimulator {
             fromMemory
             && Array.isArray(fromMemory.questions)
             && fromMemory.questions.length > 0
-            && window.ExamApp.validateExamData(
+            && this.validateRuntimeExamData(
+                fromMemory,
                 fromMemory.questions,
                 fromMemory.metadata,
-                fromMemoryLabs
-            ).valid
+                fromMemoryLabs,
+                examId
+            )
         ) {
             const metadata = fromMemory.metadata || {};
             const isBundledTrusted = window.ExamApp.isBundledTrustedExam?.(fromMemory) === true;
@@ -634,10 +660,25 @@ class MultiExamSimulator {
                     labs = undefined;
                 }
             }
+            const storedRecord = {
+                examId,
+                questions,
+                metadata,
+                labs,
+                source: 'imported',
+                storage: 'localStorage'
+            };
+            window.ExamApp.markBrowserStoredExamRecord?.(storedRecord);
             if (
                 !Array.isArray(questions)
                 || questions.length === 0
-                || !window.ExamApp.validateExamData(questions, metadata, labs).valid
+                || !this.validateStoredExamData(
+                    questions,
+                    metadata,
+                    labs,
+                    examId,
+                    storedRecord
+                )
             ) return false;
             this.examData[examId] = {
                 name: metadata.name || examId.toUpperCase(),
@@ -1079,7 +1120,7 @@ class MultiExamSimulator {
         this.startTime = new Date();
         this.studySessionId = this.generateLocalId('study_session');
         this.studySessionResults = new Map();
-        this.firstAnswerTracked = false;
+        this.studyFirstAnswerTracked = false;
 
         const examName = this.examData[this.currentExam].name;
         const badge = document.getElementById('current-exam-badge');
@@ -1108,12 +1149,7 @@ class MultiExamSimulator {
         this.showQuestion(0);
         this.showScreen('exam-screen');
 
-        window.ExamApp?.analytics?.trackStudyStarted(this.currentExam, {
-            questionCount: this.activeQuestions.length,
-            dueCount: this.studyQueueSummary?.dueReviewCount,
-            newCount: this.studyQueueSummary?.newCount,
-            weakCount: this.studyQueueSummary?.weakCount
-        });
+        window.ExamApp?.analytics?.trackStudyStarted(this.currentExam);
     }
 
     showQuestion(index) {
@@ -1952,12 +1988,17 @@ class MultiExamSimulator {
         // record a study result when the user actually answered, so study
         // accuracy and spaced-repetition scheduling are not skewed by reveals.
         if (wasAnswered) {
-            this.recordStudyAnswer(question, isCorrect, userAnswer);
+            this.recordStudyAnswer(question, isCorrect);
         }
     }
 
     handleAnswerChanged() {
-        if (!this.firstAnswerTracked) {
+        if (this.isStudyMode()) {
+            if (!this.studyFirstAnswerTracked) {
+                this.studyFirstAnswerTracked = true;
+                window.ExamApp?.analytics?.trackStudyFirstAnswered?.(this.currentExam);
+            }
+        } else if (!this.firstAnswerTracked) {
             this.firstAnswerTracked = true;
             window.ExamApp?.analytics?.trackExamFirstAnswered?.(this.currentExam, {
                 sessionType: this.getSessionType()
@@ -2019,7 +2060,7 @@ class MultiExamSimulator {
         return { questionId, answerKey: `${index}:${questionId}` };
     }
 
-    async saveStudyResult(question, index, isCorrect, userAnswer, options = {}) {
+    async saveStudyResult(question, index, isCorrect) {
         if (!this.isStudyMode()) return;
         const { questionId, answerKey } = this.getStudyAnswerKey(question, index);
 
@@ -2033,17 +2074,10 @@ class MultiExamSimulator {
         } catch (error) {
             window.ExamApp.warn('Failed to record study answer', error);
         }
-
-        if (options.trackEvent !== false) {
-            window.ExamApp?.analytics?.trackStudyQuestionAnswered(this.currentExam, {
-                isCorrect,
-                wasAnswered
-            });
-        }
     }
 
-    async recordStudyAnswer(question, isCorrect, userAnswer) {
-        await this.saveStudyResult(question, this.currentQuestionIndex, isCorrect, userAnswer);
+    async recordStudyAnswer(question, isCorrect) {
+        await this.saveStudyResult(question, this.currentQuestionIndex, isCorrect);
     }
 
     getStudyFinalSummary(questions) {
@@ -2076,7 +2110,7 @@ class MultiExamSimulator {
             const previous = this.studySessionResults.get(answerKey);
             if (previous && previous.isCorrect === isCorrect && previous.wasAnswered === true) return;
 
-            saves.push(this.saveStudyResult(question, index, isCorrect, userAnswer, { trackEvent: false }));
+            saves.push(this.saveStudyResult(question, index, isCorrect));
         });
         await Promise.all(saves);
     }

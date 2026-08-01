@@ -135,8 +135,13 @@ class ExamManager {
                     ? examData.labs
                     : undefined;
                 const metadata = examData.metadata || this.generateMetadata(examId, questions || []);
+                const isBrowserStored = window.ExamApp.isBrowserStoredExamRecord?.(examData)
+                    === true;
+                const questionValidator = isBrowserStored
+                    ? (window.ExamApp.validateStoredExamData || window.ExamApp.validateExamData)
+                    : window.ExamApp.validateExamData;
                 const validation = questions
-                    ? window.ExamApp.validateExamData(questions, metadata, labs)
+                    ? questionValidator(questions, metadata, labs, examId, examData)
                     : window.ExamApp.validateExamMetadata(metadata, null, undefined);
                 if (!validation.valid) {
                     window.ExamApp.warn(
@@ -145,7 +150,7 @@ class ExamManager {
                     );
                     return null;
                 }
-                return {
+                const loadedRecord = {
                     id: examId,
                     questions,
                     metadata,
@@ -156,6 +161,10 @@ class ExamManager {
                     trust: examData.trust,
                     storage: examData.storage
                 };
+                if (isBrowserStored) {
+                    window.ExamApp.markBrowserStoredExamRecord?.(loadedRecord);
+                }
+                return loadedRecord;
             }
         } catch (error) {
             console.error(`Error loading exam ${examId}:`, error);
@@ -180,7 +189,7 @@ class ExamManager {
                 }
                 metadata = this.sanitizeMetadata(metadata, isBundled);
 
-                return {
+                const runtimeRecord = {
                     questions: examData.questions,
                     labs: Object.prototype.hasOwnProperty.call(examData, 'labs')
                         ? examData.labs
@@ -191,6 +200,10 @@ class ExamManager {
                     trust: isBundled ? 'bundled' : 'local-unverified',
                     storage: examData.storage || (isBundled ? 'network' : 'browser')
                 };
+                if (window.ExamApp.isBrowserStoredExamRecord?.(examData)) {
+                    window.ExamApp.markBrowserStoredExamRecord?.(runtimeRecord);
+                }
+                return runtimeRecord;
             }
         } catch (error) {
             window.ExamApp.warn(`Failed to load ${examId} from user-content:`, error);
@@ -203,18 +216,22 @@ class ExamManager {
         try {
             if (window.userExams && window.userExams[examId]?.questions) {
                 const localExam = window.userExams[examId];
-                return {
+                const runtimeRecord = {
                     ...localExam,
                     metadata: this.sanitizeMetadata(localExam.metadata, false),
                     source: 'imported',
                     trust: 'local-unverified'
                 };
+                if (window.ExamApp.isBrowserStoredExamRecord?.(localExam)) {
+                    window.ExamApp.markBrowserStoredExamRecord?.(runtimeRecord);
+                }
+                return runtimeRecord;
             }
 
             if (window.ExamApp.examStorage) {
                 const stored = await window.ExamApp.examStorage.getExam(examId);
                 if (stored?.questions) {
-                    return {
+                    const runtimeRecord = {
                         questions: stored.questions,
                         labs: Object.prototype.hasOwnProperty.call(stored, 'labs')
                             ? stored.labs
@@ -224,12 +241,16 @@ class ExamManager {
                         trust: 'local-unverified',
                         storage: stored.storage || 'browser'
                     };
+                    if (window.ExamApp.isBrowserStoredExamRecord?.(stored)) {
+                        window.ExamApp.markBrowserStoredExamRecord?.(runtimeRecord);
+                    }
+                    return runtimeRecord;
                 }
             }
 
             const legacy = window.ExamApp.examStorage?.getLegacyExam(examId);
             if (legacy?.questions) {
-                return {
+                const runtimeRecord = {
                     questions: legacy.questions,
                     labs: Object.prototype.hasOwnProperty.call(legacy, 'labs')
                         ? legacy.labs
@@ -239,6 +260,10 @@ class ExamManager {
                     trust: 'local-unverified',
                     storage: 'localStorage'
                 };
+                if (window.ExamApp.isBrowserStoredExamRecord?.(legacy)) {
+                    window.ExamApp.markBrowserStoredExamRecord?.(runtimeRecord);
+                }
+                return runtimeRecord;
             }
         } catch (error) {
             window.ExamApp.warn(`Failed to load ${examId} from browser storage:`, error);
@@ -265,6 +290,163 @@ class ExamManager {
 
     sanitizeMetadata(metadata, allowCommercial = false) {
         return window.ExamApp.sanitizeExamMetadata(metadata, { allowCommercial });
+    }
+
+    snapshotImportedJson(value) {
+        const limits = window.ExamApp.EXAM_LIMITS || {};
+        const maximumArrayItems = Number.isSafeInteger(limits.maxQuestions)
+            ? limits.maxQuestions
+            : 2000;
+        const maximumObjectKeys = Number.isSafeInteger(limits.maxMetadataObjectKeys)
+            ? limits.maxMetadataObjectKeys
+            : 100;
+        // Every JSON-visible value consumes at least one byte in the source file.
+        // Reusing the upload byte budget is therefore a conservative node ceiling:
+        // it bounds programmatic callers without rejecting any pack that fits the
+        // documented JSON size limit.
+        const maximumNodes = Number.isSafeInteger(limits.maxJsonBytes)
+            ? limits.maxJsonBytes
+            : 5 * 1024 * 1024;
+        const maximumDepth = 32;
+        const active = new Set();
+        let nodeCount = 0;
+
+        const fail = (path, reason) => {
+            throw new Error(`${path} ${reason}`);
+        };
+        const clone = (source, path, depth) => {
+            nodeCount += 1;
+            if (nodeCount > maximumNodes) fail(path, 'has too many values.');
+            if (depth > maximumDepth) fail(path, 'is nested too deeply.');
+            if (
+                source === null
+                || typeof source === 'string'
+                || typeof source === 'boolean'
+            ) {
+                return source;
+            }
+            if (typeof source === 'number') {
+                if (!Number.isFinite(source)) fail(path, 'contains a non-finite number.');
+                return source;
+            }
+            if (typeof source !== 'object') {
+                fail(path, 'contains a value that JSON cannot represent.');
+            }
+            if (active.has(source)) fail(path, 'contains a circular reference.');
+
+            let isArray;
+            let prototype;
+            try {
+                isArray = Array.isArray(source);
+                prototype = Object.getPrototypeOf(source);
+            } catch (_error) {
+                fail(path, 'could not be inspected safely.');
+            }
+            if (
+                (isArray && prototype !== Array.prototype)
+                || (!isArray && prototype !== Object.prototype && prototype !== null)
+            ) {
+                fail(path, 'must contain only arrays and plain objects.');
+            }
+
+            active.add(source);
+            try {
+                if (isArray) {
+                    let lengthDescriptor;
+                    try {
+                        lengthDescriptor = Object.getOwnPropertyDescriptor(source, 'length');
+                    } catch (_error) {
+                        fail(path, 'could not be inspected safely.');
+                    }
+                    const length = lengthDescriptor?.value;
+                    if (!Number.isSafeInteger(length) || length < 0) {
+                        fail(path, 'has an invalid array length.');
+                    }
+                    if (length > maximumArrayItems) {
+                        fail(path, `has too many items; maximum is ${maximumArrayItems}.`);
+                    }
+                    const snapshot = [];
+                    for (let index = 0; index < length; index++) {
+                        let descriptor;
+                        try {
+                            descriptor = Object.getOwnPropertyDescriptor(source, String(index));
+                        } catch (_error) {
+                            fail(`${path}[${index}]`, 'could not be inspected safely.');
+                        }
+                        if (
+                            !descriptor
+                            || descriptor.enumerable !== true
+                            || !Object.prototype.hasOwnProperty.call(descriptor, 'value')
+                        ) {
+                            fail(`${path}[${index}]`, 'must be an enumerable data property.');
+                        }
+                        snapshot.push(clone(descriptor.value, `${path}[${index}]`, depth + 1));
+                    }
+                    let visibleKeys = 0;
+                    try {
+                        for (const key in source) {
+                            if (!Object.prototype.hasOwnProperty.call(source, key)) continue;
+                            visibleKeys += 1;
+                            if (visibleKeys > length) {
+                                fail(path, 'arrays must contain only indexed items.');
+                            }
+                        }
+                    } catch (_error) {
+                        fail(path, 'could not be enumerated safely.');
+                    }
+                    return snapshot;
+                }
+
+                const snapshot = {};
+                let keyCount = 0;
+                try {
+                    for (const key in source) {
+                        if (!Object.prototype.hasOwnProperty.call(source, key)) continue;
+                        keyCount += 1;
+                        if (keyCount > maximumObjectKeys) {
+                            fail(path, `has too many keys; maximum is ${maximumObjectKeys}.`);
+                        }
+                        let descriptor;
+                        try {
+                            descriptor = Object.getOwnPropertyDescriptor(source, key);
+                        } catch (_error) {
+                            fail(`${path}.${key}`, 'could not be inspected safely.');
+                        }
+                        if (
+                            !descriptor
+                            || descriptor.enumerable !== true
+                            || !Object.prototype.hasOwnProperty.call(descriptor, 'value')
+                        ) {
+                            fail(`${path}.${key}`, 'must be an enumerable data property.');
+                        }
+                        Object.defineProperty(snapshot, key, {
+                            value: clone(descriptor.value, `${path}.${key}`, depth + 1),
+                            enumerable: true,
+                            configurable: true,
+                            writable: true
+                        });
+                    }
+                } catch (error) {
+                    if (error instanceof Error && /^(Imported exam|Imported exam\.)/.test(error.message)) {
+                        throw error;
+                    }
+                    fail(path, 'could not be enumerated safely.');
+                }
+                return snapshot;
+            } finally {
+                active.delete(source);
+            }
+        };
+
+        try {
+            return { valid: true, value: clone(value, 'Imported exam', 0), error: '' };
+        } catch (error) {
+            return {
+                valid: false,
+                value: null,
+                error: error?.message || 'Imported exam could not be inspected safely.'
+            };
+        }
     }
 
     // Generate metadata for exam
@@ -367,26 +549,49 @@ class ExamManager {
             }
             examId = safeExamId;
 
+            // Snapshot only JSON-visible data properties before any semantic read.
+            // Imported files cannot represent accessors, symbols or prototypes, so
+            // those values are discarded or rejected before validation and writes.
+            const importSnapshot = this.snapshotImportedJson(examData);
+            if (!importSnapshot.valid) {
+                throw new Error(`Invalid exam pack: ${importSnapshot.error}`);
+            }
+            const importedData = importSnapshot.value;
+
             // Normalize data format
             let questions, metadata, labs;
 
-            if (Array.isArray(examData)) {
+            if (Array.isArray(importedData)) {
                 // Direct array format (dump.json is just an array)
-                questions = examData;
+                questions = importedData;
                 metadata = null;
                 labs = undefined;
-            } else if (examData.questions) {
+            } else if (
+                importedData
+                && Object.prototype.hasOwnProperty.call(importedData, 'questions')
+            ) {
                 // Object format with questions property
-                questions = examData.questions;
-                metadata = examData.metadata;
-                labs = Object.prototype.hasOwnProperty.call(examData, 'labs')
-                    ? examData.labs
+                questions = importedData.questions;
+                metadata = Object.prototype.hasOwnProperty.call(importedData, 'metadata')
+                    ? importedData.metadata
+                    : null;
+                labs = Object.prototype.hasOwnProperty.call(importedData, 'labs')
+                    ? importedData.labs
                     : undefined;
             } else {
                 throw new Error('Invalid exam data format');
             }
 
-            // Generate and store metadata
+            const rawValidation = window.ExamApp.validateExamData(
+                questions,
+                metadata,
+                labs
+            );
+            if (!rawValidation.valid) {
+                throw new Error(`Invalid exam pack: ${rawValidation.errors.slice(0, 3).join('; ')}`);
+            }
+
+            // Generate and store metadata only after the raw pack is valid.
             const sourceMetadata = metadata || this.generateMetadata(examId, questions);
             let finalMetadata;
             if (typeof window.ExamApp.sanitizeExamMetadata === 'function') {

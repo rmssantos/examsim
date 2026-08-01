@@ -119,16 +119,20 @@ window.userExams = window.ExamApp.userExams;
                     const labs = Object.prototype.hasOwnProperty.call(storedExam, 'labs')
                         ? storedExam.labs
                         : undefined;
-                    const validation = window.ExamApp.validateExamData(
+                    const validateStored = window.ExamApp.validateStoredExamData
+                        || window.ExamApp.validateExamData;
+                    const validation = validateStored(
                         storedExam.questions,
                         metadata,
-                        labs
+                        labs,
+                        examId,
+                        storedExam
                     );
                     if (!validation.valid) {
                         console.error(`Failed to load ${examId} from browser storage: invalid data`, validation.errors.slice(0, 10));
                         continue;
                     }
-                    window.userExams[examId] = {
+                    const runtimeRecord = {
                         questions: storedExam.questions,
                         labs: labs === undefined ? [] : labs,
                         metadata,
@@ -138,6 +142,10 @@ window.userExams = window.ExamApp.userExams;
                         loaded: true,
                         hasImages: hasImages(storedExam.questions)
                     };
+                    if (window.ExamApp.isBrowserStoredExamRecord?.(storedExam)) {
+                        window.ExamApp.markBrowserStoredExamRecord?.(runtimeRecord);
+                    }
+                    window.userExams[examId] = runtimeRecord;
                 } catch (error) {
                     console.error(`Failed to load ${examId} from browser storage:`, error);
                 }
