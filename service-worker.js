@@ -2,7 +2,7 @@
 // Public release history is recorded in CHANGELOG.md. Bump the vX.Y below on any
 // deploy that changes cached assets;
 // tests/test_sprint1_readiness.py enforces the examsim-pwa-vX.Y format.
-const CACHE_VERSION = 'examsim-pwa-v6.6';
+const CACHE_VERSION = 'examsim-pwa-v6.7';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -150,11 +150,20 @@ async function putRuntimeCache(cache, request, response) {
   }
 }
 
+async function matchOwnedCaches(request) {
+  const runtimeCache = await caches.open(RUNTIME_CACHE);
+  const runtimeResponse = await runtimeCache.match(request);
+  if (runtimeResponse) return runtimeResponse;
+
+  const staticCache = await caches.open(STATIC_CACHE);
+  return staticCache.match(request);
+}
+
 async function navigationFallback(pathname) {
-  const routeShell = await caches.match(cleanRouteShell(pathname));
+  const routeShell = await matchOwnedCaches(cleanRouteShell(pathname));
   if (routeShell) return routeShell;
 
-  const homeShell = await caches.match('./index.html');
+  const homeShell = await matchOwnedCaches('./index.html');
   if (homeShell) return homeShell;
 
   return new Response('<!doctype html><title>Examplar</title><p>Examplar is unavailable offline.</p>', {
@@ -164,7 +173,7 @@ async function navigationFallback(pathname) {
 }
 
 async function cacheFirst(request) {
-  const cached = await caches.match(request);
+  const cached = await matchOwnedCaches(request);
   if (cached) return cached;
   const response = await fetch(request);
   if (response.ok) {
@@ -181,7 +190,7 @@ async function networkFirst(request) {
     if (response.ok) await putRuntimeCache(cache, request, response);
     return response;
   } catch (error) {
-    const cached = await caches.match(request);
+    const cached = await matchOwnedCaches(request);
     if (cached) return cached;
     throw error;
   }
@@ -239,7 +248,7 @@ self.addEventListener('fetch', event => {
         // Fall through to the route shell cache.
       }
 
-      const cached = await caches.match(request);
+      const cached = await matchOwnedCaches(request);
       if (cached) return cached;
 
       return navigationFallback(url.pathname);

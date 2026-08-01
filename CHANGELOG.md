@@ -18,6 +18,8 @@ Notable public changes are recorded here. Dates use `YYYY-MM-DD`.
   statistics, with matching privacy documentation.
 - Revalidated JSZip through the service worker while retaining the offline
   fallback and limiting cache cleanup to Examplar-owned caches.
+- Scoped service-worker cache lookups to the current Examplar caches while
+  preserving offline fallbacks.
 
 ## 2.0.1 - 2025-12-12
 
