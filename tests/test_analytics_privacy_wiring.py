@@ -26,7 +26,7 @@ class AnalyticsPrivacyWiringTests(unittest.TestCase):
             (6, 6),
         )
 
-    def test_privacy_control_moves_clear_of_mobile_next_button(self):
+    def test_privacy_control_moves_clear_of_mobile_exam_navigation(self):
         css = (ROOT / "assets/css/analytics-privacy.css").read_text(encoding="utf-8")
 
         # Previous and Next occupy the lower edge of the mobile exam screen.
@@ -51,7 +51,10 @@ class AnalyticsPrivacyWiringTests(unittest.TestCase):
         self.assertRegex(declarations, r"(?m)^\s*left:\s*auto;")
 
         exam_html = (ROOT / "exam.html").read_text(encoding="utf-8")
-        self.assertIn('<body class="exam-runtime-page">', exam_html)
+        self.assertRegex(
+            exam_html,
+            r'<body\b[^>]*\bclass="[^"]*\bexam-runtime-page\b[^"]*"',
+        )
 
     def test_pages_loading_analytics_also_load_the_privacy_stylesheet(self):
         # analytics.js injects the "Privacy settings" button + dialog; without
