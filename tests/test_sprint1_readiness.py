@@ -46,13 +46,14 @@ class Sprint1ReadinessTests(unittest.TestCase):
         ):
             self.assertIn(path, text)
 
-    def test_service_worker_network_first_falls_back_to_all_caches(self):
+    def test_service_worker_network_first_falls_back_to_owned_caches(self):
         text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
         start = text.index("async function networkFirst")
         end = text.index("self.addEventListener('install'", start)
         network_first = text[start:end]
 
-        self.assertIn("await caches.match(request)", network_first)
+        self.assertIn("await matchOwnedCaches(request)", network_first)
+        self.assertNotIn("await caches.match(request)", network_first)
 
     def test_service_worker_serves_cached_docs_before_app_shell_fallback(self):
         text = (ROOT / "service-worker.js").read_text(encoding="utf-8")
@@ -67,10 +68,10 @@ class Sprint1ReadinessTests(unittest.TestCase):
         self.assertIn("./PRIVACY-AND-STORAGE.md", core_assets)
         self.assertNotIn("./license.html", core_assets)
         self.assertNotIn("./LICENSE", core_assets)
-        self.assertIn("const cached = await caches.match(request)", navigate_block)
+        self.assertIn("const cached = await matchOwnedCaches(request)", navigate_block)
         self.assertIn("if (cached) return cached", navigate_block)
         self.assertLess(
-            navigate_block.index("const cached = await caches.match(request)"),
+            navigate_block.index("const cached = await matchOwnedCaches(request)"),
             navigate_block.index("return navigationFallback(url.pathname)"),
         )
 
@@ -129,11 +130,14 @@ const context = {
   caches: {
     open: async () => ({
       addAll: async () => {},
-      put: async () => {}
+      put: async () => {},
+      match: async () => {
+        calls.push('cache-match');
+        return new Response('cached', { status: 200 });
+      }
     }),
     match: async () => {
-      calls.push('cache-match');
-      return new Response('cached', { status: 200 });
+      throw new Error('global cache lookup must not be used');
     },
     keys: async () => []
   },
@@ -280,6 +284,126 @@ activation.then(() => {
             ["examsim-pwa-v6.3-static", "examsim-pwa-v6.4-runtime"],
         )
         self.assertEqual(activation["claimed"], 1)
+
+    def test_service_worker_reads_only_examplar_owned_caches(self):
+        cache_version = self.service_worker_cache_version()
+        node_script = r"""
+const fs = require('fs');
+const vm = require('vm');
+
+const listeners = {};
+const calls = [];
+const staticEntries = new Map([
+  ['/assets/vendor/fontawesome/css/all.min.css', 'static-fontawesome'],
+  ['/exam.html', 'static-exam-shell']
+]);
+const runtimeEntries = new Map([
+  ['/assets/vendor/jszip/jszip.min.js', 'runtime-jszip'],
+  ['/exam', 'runtime-exam']
+]);
+
+function pathFor(request) {
+  const value = typeof request === 'string' ? request : request.url;
+  return new URL(value, 'https://examplar.app/').pathname;
+}
+
+function cacheFor(name) {
+  const entries = name === '__CURRENT_CACHE_VERSION__-runtime'
+    ? runtimeEntries
+    : staticEntries;
+  return {
+    addAll: async () => {},
+    put: async () => {},
+    match: async request => {
+      calls.push(`${name}:match:${pathFor(request)}`);
+      const body = entries.get(pathFor(request));
+      return body ? new Response(body, { status: 200 }) : undefined;
+    }
+  };
+}
+
+const context = {
+  URL,
+  Response,
+  Promise,
+  console,
+  self: {
+    location: {
+      origin: 'https://examplar.app',
+      href: 'https://examplar.app/'
+    },
+    addEventListener(type, listener) {
+      listeners[type] = listener;
+    },
+    skipWaiting() {},
+    clients: { claim: async () => {} }
+  },
+  caches: {
+    open: async name => cacheFor(name),
+    match: async request => {
+      calls.push(`global-cache-match:${pathFor(request)}`);
+      return new Response('poisoned', { status: 200 });
+    },
+    keys: async () => []
+  },
+  fetch: async () => {
+    calls.push('network');
+    throw new Error('offline');
+  }
+};
+context.globalThis = context;
+vm.runInNewContext(fs.readFileSync(process.argv[1], 'utf8'), context, {
+  filename: 'service-worker.js'
+});
+
+async function dispatch(pathname, mode = 'cors') {
+  calls.length = 0;
+  let responsePromise;
+  listeners.fetch({
+    request: {
+      method: 'GET',
+      mode,
+      url: `https://examplar.app/${pathname}`
+    },
+    respondWith(value) {
+      responsePromise = Promise.resolve(value);
+    }
+  });
+  const response = await responsePromise;
+  return { body: await response.text(), calls: [...calls] };
+}
+
+(async () => {
+  const cacheFirst = await dispatch('assets/vendor/fontawesome/css/all.min.css');
+  const networkFirst = await dispatch('assets/vendor/jszip/jszip.min.js');
+  const navigation = await dispatch('exam', 'navigate');
+  const navigationFallback = await dispatch('study', 'navigate');
+  process.stdout.write(JSON.stringify({
+    cacheFirst,
+    networkFirst,
+    navigation,
+    navigationFallback
+  }));
+})().catch(error => {
+  console.error(error);
+  process.exit(1);
+});
+"""
+        node_script = node_script.replace("__CURRENT_CACHE_VERSION__", cache_version)
+        routing = run_node_snippet(ROOT / "service-worker.js", node_script)
+
+        self.assertEqual(routing["cacheFirst"]["body"], "static-fontawesome")
+        self.assertEqual(routing["networkFirst"]["body"], "runtime-jszip")
+        self.assertEqual(routing["navigation"]["body"], "runtime-exam")
+        self.assertEqual(
+            routing["navigationFallback"]["body"],
+            "static-exam-shell",
+        )
+        for result in routing.values():
+            self.assertFalse(
+                any(call.startswith("global-cache-match:") for call in result["calls"]),
+                result["calls"],
+            )
 
     def test_pwa_registration_exposes_update_available_prompt(self):
         text = (ROOT / "assets/js/pwa.js").read_text(encoding="utf-8")
