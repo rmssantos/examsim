@@ -16,7 +16,8 @@
         }
         if (typeof text.toWellFormed === 'function') {
             try {
-                return text.toWellFormed();
+                const converted = text.toWellFormed();
+                if (typeof converted === 'string') return converted;
             } catch (_) { /* fall through to the compatible code-unit path */ }
         }
 

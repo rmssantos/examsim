@@ -57,11 +57,11 @@ class QuestionIdValidationTests(unittest.TestCase):
             try {
               Object.defineProperty(String.prototype, 'toWellFormed', {
                 configurable: true,
-                value: undefined,
+                value() { return { forged: true }; },
                 writable: true
               });
             } catch (_) {
-              String.prototype.toWellFormed = undefined;
+              String.prototype.toWellFormed = () => ({ forged: true });
             }
 
             global.window = {
@@ -1037,11 +1037,11 @@ class QuestionIdValidationTests(unittest.TestCase):
             try {
               Object.defineProperty(String.prototype, 'toWellFormed', {
                 configurable: true,
-                value: undefined,
+                value() { return { forged: true }; },
                 writable: true
               });
             } catch (_) {
-              String.prototype.toWellFormed = undefined;
+              String.prototype.toWellFormed = () => ({ forged: true });
             }
 
             global.window = {
@@ -1149,7 +1149,10 @@ class QuestionIdValidationTests(unittest.TestCase):
             const longWellFormed = 'well-formed-'.repeat(15);
             window.ExamApp.studyScheduler = scheduler;
             console.log(JSON.stringify({
-              fallbackDisabled: typeof ''.toWellFormed === 'undefined',
+              nativeReturnsNonString: (
+                typeof ''.toWellFormed === 'function'
+                && typeof ''.toWellFormed() !== 'string'
+              ),
               schedulerCases,
               storageCases,
               storageWithoutScheduler,
@@ -1165,7 +1168,7 @@ class QuestionIdValidationTests(unittest.TestCase):
             ROOT / "assets" / "js" / "study-scheduler.js",
         )
 
-        self.assertTrue(payload["fallbackDisabled"])
+        self.assertTrue(payload["nativeReturnsNonString"])
         for group_name in ("schedulerCases", "storageCases"):
             for case_name, result in payload[group_name].items():
                 with self.subTest(group=group_name, case=case_name):

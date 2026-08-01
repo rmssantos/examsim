@@ -992,6 +992,7 @@ class MetadataHardeningTests(unittest.TestCase):
             const external = window.ExamApp.examManager.snapshotImportedJson({ payload: hostile });
 
             console.log(JSON.stringify({
+              maximumKeys,
               internalError: internal.error,
               externalError: external.error
             }));
@@ -999,7 +1000,7 @@ class MetadataHardeningTests(unittest.TestCase):
         )
 
         self.assertEqual(
-            "Imported exam.payload has too many keys; maximum is 100.",
+            f"Imported exam.payload has too many keys; maximum is {payload['maximumKeys']}.",
             payload["internalError"],
         )
         self.assertEqual(
