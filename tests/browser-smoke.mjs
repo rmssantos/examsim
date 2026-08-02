@@ -33,7 +33,7 @@ try {
   for (const examId of ['az104', 'ab620']) {
     const labAction = page.locator(`.exam-card[data-exam="${examId}"] .exam-card-labs`);
     assert.equal(await labAction.count(), 1, `${examId} must advertise its free lab.`);
-    assert.match(await labAction.innerText(), /1 free \/ 8 in Complete/);
+    assert.match(await labAction.innerText(), /1 free \/ 8 Complete/);
     assert.equal(await labAction.evaluate((element) => element.tagName), 'A');
   }
   assert.equal(
