@@ -847,6 +847,7 @@ body.dragging-file .exam-library-section::after {
   background: var(--h-surface);
   border: 1px solid var(--h-line-strong);
   color: var(--h-text-soft);
+  cursor: pointer;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 .exam-card-labs:hover { border-color: var(--h-accent); color: var(--h-accent); }

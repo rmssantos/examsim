@@ -28,6 +28,36 @@ try {
     'Homepage startup must not download question dumps.'
   );
 
+  // Bundled exams start as metadata-only records. Validated labCount must expose
+  // their free lab before dump.json loads, while packs without labs stay clean.
+  for (const examId of ['az104', 'ab620']) {
+    const labAction = page.locator(`.exam-card[data-exam="${examId}"] .exam-card-labs`);
+    assert.equal(await labAction.count(), 1, `${examId} must advertise its free lab.`);
+    assert.match(await labAction.innerText(), /1 free \/ 8 in Complete/);
+    assert.equal(await labAction.evaluate((element) => element.tagName), 'A');
+  }
+  assert.equal(
+    await page.locator('.exam-card[data-exam="sc900"] .exam-card-labs').count(),
+    0,
+    'A pack without labs must not render a dead lab action.'
+  );
+
+  await page.locator('#library-filter-labs').evaluate((select) => {
+    select.value = 'available';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await page.waitForFunction(() => document.querySelectorAll('#exam-selection .exam-card').length === 2);
+  assert.deepEqual(
+    await page.locator('#exam-selection .exam-card').evaluateAll((cards) => cards.map((card) => card.dataset.exam).sort()),
+    ['ab620', 'az104'],
+    'The hands-on labs filter must include only packs with accessible or advertised labs.'
+  );
+  await page.locator('#library-filter-labs').evaluate((select) => {
+    select.value = '';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await page.waitForFunction(() => document.querySelectorAll('#exam-selection .exam-card').length >= 15);
+
   const atomicImageContract = await page.evaluate(async () => {
     const examId = 'security-atomic-images';
     const storage = window.imageStorage;

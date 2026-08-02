@@ -124,9 +124,9 @@ class PublicMessagingTests(unittest.TestCase):
             else int(item["pro"]["questions"])
             for item in metadata
         )
-        self.assertEqual(bundled_total, 1070)
+        self.assertEqual(bundled_total, 1095)
         self.assertEqual(fully_free_total, 900)
-        self.assertEqual(full_catalog_total, 2849)
+        self.assertEqual(full_catalog_total, 3129)
 
         home = (ROOT / "index.html").read_text(encoding="utf-8")
         self.assertIn("Questions available in this browser", home)

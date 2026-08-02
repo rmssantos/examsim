@@ -57,7 +57,7 @@ explicit campaign parameters replaces the previous tab attribution. Only the
 known fields above are retained; there is no visitor ID, campaign timestamp, or
 cross-tab attribution record.
 
-Bundled exam labels are restricted to `ab730`, `ab731`, `sc900`, `az900`,
+Bundled exam labels are restricted to `ab730`, `ab731`, `ab620`, `sc900`, `az900`,
 `az104`, `saac03`, `clfc02`, `ai901`, `az305`, `az400`, `dp900`, `dp700`, `ai103`, and `sc300`. Other exam IDs are reported only as `imported`.
 
 Azure Application Insights temporarily uses the sender IP to derive coarse

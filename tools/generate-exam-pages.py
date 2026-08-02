@@ -198,25 +198,35 @@ def build_labs(meta: dict, root: str = "../../") -> str:
     if not meta.get("labCount"):
         return ""
     code = exam_code(meta)
+    accessible_count = meta.get("labCount") if isinstance(meta.get("labCount"), int) else 0
+    pro = meta.get("pro") if isinstance(meta.get("pro"), dict) else {}
+    paid_count = pro.get("labCount") if isinstance(pro.get("labCount"), int) else 0
+    total_count = max(accessible_count, paid_count)
     topics = [t for t in (meta.get("labTopics") or []) if isinstance(t, str) and t.strip()]
     topics_html = ""
     if topics:
         items = "\n".join(f"      <li>{esc(t)}</li>" for t in topics)
         topics_html = '      <ul class="exam-modules">\n' + items + "\n      </ul>\n"
     labs_url = f"{root}labs.html?exam={esc(meta['id'])}"
+    if accessible_count == 1:
+        availability = "<strong>One guided lab is free to try now.</strong>"
+    else:
+        availability = f"<strong>{accessible_count} guided labs are available now.</strong>"
+    if total_count > accessible_count:
+        availability += f" The Complete pack includes {total_count} labs in total."
+
     return (
         '    <section class="exam-section" aria-labelledby="labs-h">\n'
         '      <h2 id="labs-h">Hands-on labs</h2>\n'
         f"      <p>Reading about the {esc(code)} topics is not the same as doing them. These guided "
-        "labs walk you through real tasks in your own free cloud account, step by step, so you build "
-        "the hands-on skills the exam measures. Each lab is CLI-first, scoped to the free tier, and "
-        "ends with a clean-up step so nothing is left running.</p>\n"
-        "      <p><strong>One lab is free to try now.</strong> The full pack includes the complete "
-        "set across every objective.</p>\n"
+        "labs walk you through real tasks in your own account or approved practice environment, "
+        "step by step. Every lab states its prerequisites, cost considerations, expected result, "
+        "official references, and clean-up actions.</p>\n"
+        f"      <p>{availability}</p>\n"
         f"{topics_html}"
         f'      <a class="landing-cta" href="{labs_url}"><i aria-hidden="true" class="fas fa-flask"></i> Open the free hands-on lab</a>\n'
-        "      <p>Labs run in your own cloud account. Stay within the free tier and run the clean-up "
-        "step. Your account, your cost: Examplar is not responsible for any cloud charges.</p>\n"
+        "      <p>Follow each lab's prerequisites, licensing notes, cost guidance, and clean-up "
+        "actions. Your account, your cost: Examplar is not responsible for external service charges.</p>\n"
         "    </section>"
     )
 

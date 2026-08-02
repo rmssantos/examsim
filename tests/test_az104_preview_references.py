@@ -7,6 +7,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class Az104PreviewReferenceTests(unittest.TestCase):
+    def test_preview_advertises_the_complete_lab_total(self):
+        exam_dir = ROOT / "user-content" / "exams" / "az104"
+        metadata = json.loads((exam_dir / "metadata.json").read_text(encoding="utf-8"))
+        raw = json.loads((exam_dir / "dump.json").read_text(encoding="utf-8"))
+        labs = raw.get("labs", []) if isinstance(raw, dict) else []
+
+        self.assertEqual(len(labs), 1)
+        self.assertEqual(metadata.get("labCount"), 1)
+        self.assertEqual(metadata.get("pro", {}).get("labCount"), 8)
+
     def test_preview_questions_cite_microsoft_learn(self):
         raw = json.loads(
             (ROOT / "user-content" / "exams" / "az104" / "dump.json").read_text(encoding="utf-8")

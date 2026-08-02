@@ -4,8 +4,20 @@ Notable public changes are recorded here. Dates use `YYYY-MM-DD`.
 
 ## Unreleased
 
+### Added
+
+- Added a free 25-question AB-620 preview with one guided Copilot Studio lab and
+  a Complete-pack path for 280 questions and eight labs.
+- Added a library filter for exams that include accessible or Complete-pack
+  hands-on labs.
+
 ### Changed
 
+- Show hands-on lab actions only when a pack contains accessible labs or a
+  trusted bundled preview advertises labs in its Complete pack; locked lab
+  actions now open the unlock flow instead of leading to an empty page.
+- Made lab summaries and exam landing copy vendor-neutral, including explicit
+  licensing, cost, and clean-up guidance instead of assuming an Azure free tier.
 - Clarified the distinction between local/offline use and telemetry on the
   public deployment.
 - Reduced public exam metadata to stable provenance fields.
