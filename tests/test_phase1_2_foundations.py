@@ -225,7 +225,7 @@ const sandbox = {
 
 vm.runInNewContext(source, sandbox);
 const router = sandbox.window.ExamApp.router;
-const homeWithoutController = router.buildUrl('home');
+const homeWithoutController = router.buildUrl('home', { utm_source: 'labs' });
 sandbox.window.location.pathname = '/examplar/labs.html';
 const labsHomeWithoutController = router.buildUrl('home');
 sandbox.window.location.pathname = '/examplar/index.html';
@@ -239,7 +239,7 @@ console.log(JSON.stringify({ homeWithoutController, labsHomeWithoutController, w
 """
         payload = run_node_snippet(script_path, node_script)
 
-        self.assertEqual("/examplar/", payload["homeWithoutController"])
+        self.assertEqual("/examplar/?utm_source=labs", payload["homeWithoutController"])
         self.assertEqual("/examplar/", payload["labsHomeWithoutController"])
         self.assertEqual("roadmaps.html", payload["withoutController"])
         self.assertEqual("/examplar/roadmaps", payload["withController"])

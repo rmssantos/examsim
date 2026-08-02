@@ -15,7 +15,10 @@
       var routeIndex = segments.findIndex(function (segment) {
         return segment === 'editor' || segment === 'exam' || segment === 'study' || segment === 'privacy-and-storage' || segment === 'roadmaps';
       });
-      var base = '/' + (routeIndex > 0 ? segments.slice(0, routeIndex).join('/') + '/' : '');
+      var baseSegments = routeIndex > 0
+        ? segments.slice(0, routeIndex)
+        : (routeIndex === -1 ? segments.slice(0, -1) : []);
+      var base = '/' + (baseSegments.length ? baseSegments.join('/') + '/' : '');
       var route = routeIndex >= 0 ? segments[routeIndex] : '';
       var params = new URLSearchParams(window.location.search);
       var target = '';

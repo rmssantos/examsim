@@ -320,10 +320,15 @@ try {
   const labsHomeHrefs = await labsPage.locator('a[data-route="home"]').evaluateAll(
     (links) => links.map((link) => link.getAttribute('href'))
   );
+  const siteRootUrl = new URL('/', labsPage.url());
   assert.equal(labsHomeHrefs.length, 2, 'The labs page must expose both Home actions through the router.');
   for (const href of labsHomeHrefs) {
     assert.ok(href, 'A labs Home action must have a destination.');
-    assert.doesNotMatch(href, /index\.html/, 'Hosted labs Home actions must not expose index.html.');
+    assert.equal(
+      new URL(href, labsPage.url()).href,
+      siteRootUrl.href,
+      'Hosted labs Home actions must route to the clean site root.'
+    );
   }
   const importedLabHrefs = await labsPage.locator('.lab-refs a').evaluateAll(
     (links) => links.map((link) => link.href)

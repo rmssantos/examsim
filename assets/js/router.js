@@ -44,7 +44,10 @@
 
         // The hosted homepage always resolves at the base path, even before a
         // service worker controls the page. Keep index.html only for file mode.
-        if (!isFileMode() && page === 'home') return withBase('');
+        if (!isFileMode() && page === 'home') {
+            const homeUrl = withBase('');
+            return queryString ? `${homeUrl}?${queryString}` : homeUrl;
+        }
 
         if (!cleanRoutesSupported()) {
             const fileMap = {
