@@ -7,7 +7,6 @@ import textwrap
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -22,6 +21,7 @@ def _run_node(script: str) -> dict:
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         timeout=20,
+        check=False,
     )
     if result.returncode != 0:
         raise AssertionError(result.stdout)
@@ -29,6 +29,45 @@ def _run_node(script: str) -> dict:
 
 
 class LabDiscoveryTests(unittest.TestCase):
+    def test_lab_count_ignores_holes_and_accessors_without_reading_values(self):
+        payload = _run_node(
+            textwrap.dedent(
+                r"""
+                const fs = require('fs');
+                const vm = require('vm');
+                global.window = {
+                  location: { hostname: 'localhost', search: '', href: 'http://localhost/', protocol: 'http:' },
+                  ExamApp: { EXAM_LIMITS: {} }
+                };
+                global.document = {
+                  baseURI: 'http://localhost/',
+                  createElement() { return { appendChild() {}, textContent: '', value: '' }; },
+                  createTextNode(value) { return { value }; },
+                  getElementById() { return null; },
+                  querySelector() { return null; },
+                  querySelectorAll() { return []; },
+                  addEventListener() {}
+                };
+                global.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+                vm.runInThisContext(`${fs.readFileSync(process.argv[1], 'utf8')}\nwindow.HomePageForTest = HomePage;`);
+                const pageUnderTest = Object.create(window.HomePageForTest.prototype);
+                const labs = [];
+                labs.length = 5;
+                labs[0] = { id: 'lab-1' };
+                labs[3] = { id: 'lab-2' };
+                Object.defineProperty(labs, '4', {
+                  enumerable: true,
+                  get() { throw new Error('lab accessor must not run'); }
+                });
+                console.log(JSON.stringify({
+                  count: pageUnderTest.boundedArrayDataCount(labs, 100)
+                }));
+                """
+            )
+        )
+
+        self.assertEqual(payload["count"], 2)
+
     def test_availability_uses_loaded_labs_and_paid_total(self):
         payload = _run_node(
             textwrap.dedent(

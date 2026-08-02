@@ -225,16 +225,25 @@ const sandbox = {
 
 vm.runInNewContext(source, sandbox);
 const router = sandbox.window.ExamApp.router;
+const homeWithoutController = router.buildUrl('home', { utm_source: 'labs' });
+sandbox.window.location.pathname = '/examplar/labs.html';
+const labsHomeWithoutController = router.buildUrl('home');
+sandbox.window.location.pathname = '/examplar/index.html';
 const withoutController = router.buildUrl('roadmaps');
 sandbox.navigator.serviceWorker.controller = {};
 const withController = router.buildUrl('roadmaps');
+sandbox.window.location.protocol = 'file:';
+const fileHome = router.buildUrl('home');
 
-console.log(JSON.stringify({ withoutController, withController }));
+console.log(JSON.stringify({ homeWithoutController, labsHomeWithoutController, withoutController, withController, fileHome }));
 """
         payload = run_node_snippet(script_path, node_script)
 
+        self.assertEqual("/examplar/?utm_source=labs", payload["homeWithoutController"])
+        self.assertEqual("/examplar/", payload["labsHomeWithoutController"])
         self.assertEqual("roadmaps.html", payload["withoutController"])
         self.assertEqual("/examplar/roadmaps", payload["withController"])
+        self.assertEqual("index.html", payload["fileHome"])
 
 
 if __name__ == "__main__":

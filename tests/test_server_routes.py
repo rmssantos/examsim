@@ -138,6 +138,8 @@ function resolve(pathname, search) {
 }
 
 console.log(JSON.stringify({
+  home: resolve('/missing-page', '?utm_source=linkedin&empty='),
+  projectHome: resolve('/examplar/missing-page', '?utm_campaign=refresh'),
   root: resolve('/roadmaps', '?utm_source=linkedin&empty='),
   project: resolve('/examplar/roadmaps', '?utm_campaign=refresh')
 }));
@@ -151,6 +153,14 @@ console.log(JSON.stringify({
         )
         payload = json.loads(result.stdout)
 
+        self.assertEqual(
+            "/?utm_source=linkedin&empty=",
+            payload["home"],
+        )
+        self.assertEqual(
+            "/examplar/?utm_campaign=refresh",
+            payload["projectHome"],
+        )
         self.assertEqual(
             "/roadmaps.html?utm_source=linkedin&empty=",
             payload["root"],

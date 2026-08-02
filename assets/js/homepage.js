@@ -553,9 +553,9 @@ return Object.keys(snapshot).length ? Object.freeze(snapshot) : null;
 getLabAvailability(examData, metadataSnapshot = null) {
 const metadata = metadataSnapshot || this.getExamMetadataSnapshot(examData);
 const labsResult = this.readOwnDataProperty(examData, 'labs');
-const labs = labsResult.valid && labsResult.found
-	? this.boundedArrayDataValues(labsResult.value, this.metadataLimit('maxLabs', 100))
-	: [];
+const labCount = labsResult.valid && labsResult.found
+	? this.boundedArrayDataCount(labsResult.value, this.metadataLimit('maxLabs', 100))
+	: 0;
 const trusted = this.isBundledTrustedExam(examData);
 const declaredAccessible = trusted && Number.isSafeInteger(metadata?.labCount)
 	? Math.max(0, metadata.labCount)
@@ -568,7 +568,7 @@ const isMetadataOnly = trusted
 // ExamManager deliberately normalizes a metadata-first bundled record to
 // `labs: []` and `loaded: false`. Only that explicit trusted state may use the
 // validator-backed metadata count; loaded content always uses the real array.
-const accessible = isMetadataOnly ? declaredAccessible : labs.length;
+const accessible = isMetadataOnly ? declaredAccessible : labCount;
 const advertised = trusted && Number.isSafeInteger(metadata?.pro?.labCount)
 	? Math.max(0, metadata.pro.labCount)
 	: 0;
@@ -643,6 +643,27 @@ for (let index = 0; index < Math.min(length, safeMaximum); index++) {
 	if (item.valid && item.found) values.push(item.value);
 }
 return values;
+}
+
+boundedArrayDataCount(value, maximum = this.metadataLimit('maxMetadataListItems', 100)) {
+let isArray;
+try {
+	isArray = Array.isArray(value);
+} catch (_error) {
+	return 0;
+}
+if (!isArray) return 0;
+
+const lengthResult = this.readOwnDataProperty(value, 'length');
+const length = lengthResult.valid && lengthResult.found ? lengthResult.value : 0;
+if (!Number.isSafeInteger(length) || length < 0) return 0;
+const safeMaximum = Number.isSafeInteger(maximum) && maximum >= 0 ? maximum : 0;
+let count = 0;
+for (let index = 0; index < Math.min(length, safeMaximum); index++) {
+	const item = this.readOwnDataProperty(value, String(index));
+	if (item.valid && item.found) count += 1;
+}
+return count;
 }
 
 getModuleSnapshots(modules) {
@@ -1141,7 +1162,9 @@ if (labAvailability.accessible > 0) {
 }
 labsLink.appendChild(this.createIcon('fas fa-flask'));
 const labSummary = labAvailability.locked > 0
-	? `${labAvailability.accessible ? `${labAvailability.accessible} free / ` : ''}${labAvailability.total} in Complete`
+	? (labAvailability.accessible > 0
+		? `${labAvailability.accessible} free / ${labAvailability.total} Complete`
+		: `${labAvailability.total} in Complete`)
 	: `${labAvailability.accessible}`;
 labsLink.appendChild(document.createTextNode(` Hands-on labs (${labSummary})`));
 labsLink.addEventListener('click', (e) => {

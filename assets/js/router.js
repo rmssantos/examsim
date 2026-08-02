@@ -10,7 +10,7 @@
 
     function getBasePath() {
         const path = window.location.pathname || '/';
-        const knownFiles = ['index.html', 'exam.html', 'editor.html', 'privacy-and-storage.html', 'roadmaps.html', '404.html'];
+        const knownFiles = ['index.html', 'exam.html', 'labs.html', 'editor.html', 'privacy-and-storage.html', 'roadmaps.html', '404.html'];
         const segments = path.split('/').filter(Boolean);
 
         if (segments.length > 0 && knownFiles.includes(segments[segments.length - 1])) {
@@ -41,6 +41,13 @@
             }
         });
         const queryString = query.toString();
+
+        // The hosted homepage always resolves at the base path, even before a
+        // service worker controls the page. Keep index.html only for file mode.
+        if (!isFileMode() && page === 'home') {
+            const homeUrl = withBase('');
+            return queryString ? `${homeUrl}?${queryString}` : homeUrl;
+        }
 
         if (!cleanRoutesSupported()) {
             const fileMap = {
