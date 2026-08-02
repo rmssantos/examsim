@@ -317,6 +317,14 @@ try {
   const labsPage = await page.context().newPage();
   await labsPage.goto(`${baseUrl}/labs.html?exam=${importedPackIds[0]}`, { waitUntil: 'domcontentloaded' });
   await labsPage.waitForSelector('.lab-detail', { timeout: 8000 });
+  const labsHomeHrefs = await labsPage.locator('a[data-route="home"]').evaluateAll(
+    (links) => links.map((link) => link.getAttribute('href'))
+  );
+  assert.equal(labsHomeHrefs.length, 2, 'The labs page must expose both Home actions through the router.');
+  for (const href of labsHomeHrefs) {
+    assert.ok(href, 'A labs Home action must have a destination.');
+    assert.doesNotMatch(href, /index\.html/, 'Hosted labs Home actions must not expose index.html.');
+  }
   const importedLabHrefs = await labsPage.locator('.lab-refs a').evaluateAll(
     (links) => links.map((link) => link.href)
   );

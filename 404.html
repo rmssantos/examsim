@@ -18,7 +18,7 @@
       var base = '/' + (routeIndex > 0 ? segments.slice(0, routeIndex).join('/') + '/' : '');
       var route = routeIndex >= 0 ? segments[routeIndex] : '';
       var params = new URLSearchParams(window.location.search);
-      var target = 'index.html';
+      var target = '';
 
       if (route === 'editor') {
         target = 'editor.html';

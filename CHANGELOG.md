@@ -13,6 +13,8 @@ Notable public changes are recorded here. Dates use `YYYY-MM-DD`.
 
 ### Changed
 
+- Kept all hosted Home links on the clean site root instead of exposing
+  `index.html`, including the hands-on labs header and Back to Home action.
 - Show hands-on lab actions only when a pack contains accessible labs or a
   trusted bundled preview advertises labs in its Complete pack; locked lab
   actions now open the unlock flow instead of leading to an empty page.
