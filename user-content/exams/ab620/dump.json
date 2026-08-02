@@ -1,0 +1,536 @@
+{
+  "questions": [
+    {
+      "question_type": "MULTI",
+      "module": "Plan Agent Architecture, Identity, Audiences, and Channels",
+      "question": "An architect is documenting a high-volume integration for an agent. Which design considerations are required to protect conversational responsiveness? Select all that apply.",
+      "options": [
+        "Identify the downstream API limits of included services and actions",
+        "Optimize queries so they return results promptly",
+        "Plan to return hundreds of records in every response",
+        "Assume the agent can make a slow endpoint appear fast",
+        "Record expected daily and peak request volumes"
+      ],
+      "correct": [
+        0,
+        1,
+        4
+      ],
+      "explanation": "Service and action API limits can constrain an integration, and the integration is only as fast as its endpoint, so queries should be optimized for a responsive conversation. The integration plan should record average daily volume and expected peak volume. Returning hundreds of results can significantly delay a response, and the agent cannot eliminate endpoint latency.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/integrations",
+      "id": 1
+    },
+    {
+      "question_type": "STANDARD",
+      "module": "Plan Agent Architecture, Identity, Audiences, and Channels",
+      "question": "A partner portal must host an agent for users who sign in through a non-Microsoft OAuth2 identity provider. The agent must authenticate users on that portal. Which authentication configuration should be selected?",
+      "options": [
+        "Authenticate manually with Generic OAuth 2",
+        "A Microsoft 365 Copilot Chat environment",
+        "No authentication",
+        "Authenticate with Microsoft"
+      ],
+      "correct": 0,
+      "explanation": "Authenticate manually supports Generic OAuth 2 providers and is the choice for authenticated publishing outside Teams and Microsoft 365. Authenticate with Microsoft is for the Teams and Microsoft 365 channel, no authentication permits unauthenticated access, and an environment is not an authentication mechanism.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/configuration-end-user-authentication",
+      "id": 2
+    },
+    {
+      "question_type": "STANDARD",
+      "module": "Plan Agent Architecture, Identity, Audiences, and Channels",
+      "question": "A customer service agent should transfer a conversation, including context, to a human representative when the issue needs judgment. Which capability is required in the target architecture?",
+      "options": [
+        "A prebuilt Power Platform connector only",
+        "A Microsoft 365 Copilot Chat environment",
+        "A custom connector with no conversation channel",
+        "Dynamics 365 Omnichannel or another engagement hub solution"
+      ],
+      "correct": 3,
+      "explanation": "Copilot Studio handoff to a live agent requires Dynamics 365 Omnichannel or another engagement hub solution. A connector can expose service actions but does not provide the engagement-hub handoff experience, and an environment or standalone custom connector does not host a human representative.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/channels",
+      "id": 3
+    },
+    {
+      "question_type": "MULTI",
+      "module": "Responsible AI, Security, Governance, and Reusable Components",
+      "question": "A company is defining the target operating model for mission-critical agents. Which two characteristics align with mature AI governance and security? (Choose two.)",
+      "options": [
+        "Make agent behavior observable through logs, telemetry, and review mechanisms.",
+        "Define human oversight and escalation paths for each agent class.",
+        "Avoid lifecycle ownership so creators can make independent production changes.",
+        "Use the same governance posture for every agent regardless of criticality."
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Mature governance makes agent behavior observable and defines human oversight and escalation paths by agent class. It also establishes lifecycle ownership and differentiates controls by risk and criticality. Avoiding ownership or applying one identical posture to every agent conflicts with that guidance.",
+      "reference": "https://learn.microsoft.com/en-us/agents/adoption-maturity-model/maturity-model-security-governance#what-high-maturity-looks-like",
+      "id": 4
+    },
+    {
+      "question_type": "YES_NO_MATRIX",
+      "module": "Responsible AI, Security, Governance, and Reusable Components",
+      "question": "A Center of Excellence is implementing the governance practices described for maturing agent programs. For each statement, indicate whether it is true.\n\nNOTE: Each correct selection is worth one point.",
+      "statements": [
+        "Agent classifications can be based on purpose, criticality, and autonomy level.",
+        "Mission-critical agents can require different ALM, security, and compliance rigor than productivity agents.",
+        "Documented guidance is sufficient even if it is not translated into enforceable technical controls.",
+        "A central agent registry and audit logging are characteristics of a defined governance model."
+      ],
+      "correct": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "explanation": "The first, second, and fourth statements are true: the guidance classifies agents by purpose, criticality, and autonomy; differentiates rigor by agent class; and describes a central registry and audit logging at the defined level. The third is false: guidance-only controls are an anti-pattern when they are not converted into enforceable technical controls.",
+      "reference": "https://learn.microsoft.com/en-us/agents/adoption-maturity-model/maturity-model-security-governance#ai-governance-and-security-maturity",
+      "id": 5
+    },
+    {
+      "question_type": "MULTI",
+      "module": "Create and Operate Agent Flows",
+      "question": "A maker adds a published shipment-tracking flow as a tool to an agent. Which configuration choices help the agent use the flow correctly at runtime? (Select all that apply.)",
+      "options": [
+        "Give the tool a clear description that tells the orchestrator when to use it.",
+        "Choose how the agent fills each input variable.",
+        "Configure what the agent does after the tool completes.",
+        "Delete the flow's response action after adding the tool.",
+        "Change the flow to use a schedule trigger after adding the tool."
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "When configuring an agent-flow tool, the maker supplies a clear name and description, chooses how inputs are filled, and configures completion behavior. The response action and agent-call trigger are prerequisites for this type of tool, so removing or replacing them would prevent the intended runtime use.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/advanced-use-flow#add-an-agent-flow-as-a-tool",
+      "id": 6
+    },
+    {
+      "question_type": "YES_NO_MATRIX",
+      "module": "Create and Operate Agent Flows",
+      "question": "A maker is estimating capacity behavior for agent flows. For each statement, indicate whether it is correct.",
+      "options": [],
+      "statements": [
+        "Each action executed by an agent flow consumes Copilot Studio capacity.",
+        "After an environment fully consumes prepaid Copilot Studio capacity, new agent-flow runs are blocked until capacity is available.",
+        "A test run from the flow designer consumes agent-flow capacity.",
+        "A flow already running is terminated immediately when prepaid capacity is fully consumed."
+      ],
+      "correct": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "explanation": "The first two statements are Yes: actions consume capacity and new runs are blocked once prepaid capacity is exhausted. The third is No because designer and test-chat runs do not consume agent-flow capacity. The fourth is No because runs already in progress complete normally.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/flows-overview#manage-agent-flow-capacity-usage",
+      "id": 7
+    },
+    {
+      "question_type": "YES_NO_MATRIX",
+      "module": "Configure Topics and Advanced Agent Responses",
+      "question": "A maker is preparing a set of customer-service topics for publication. For each statement, indicate whether it is correct.",
+      "options": [],
+      "statements": [
+        "A topic that is turned Off can still trigger when a user enters one of its trigger phrases.",
+        "A topic error must be fixed before the maker can publish the agent.",
+        "A warning can prevent a topic from behaving as expected without preventing publication.",
+        "Copying a topic duplicates its description, trigger phrases, and conversation content."
+      ],
+      "correct": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "explanation": "Statement 1 is No: an Off topic does not trigger from phrases or from a redirect. Statements 2 and 3 are Yes: errors must be fixed before publishing, whereas warnings do not stop the agent but can signal unexpected behavior. Statement 4 is Yes because making a copy duplicates the selected topic's content, including its description, trigger phrases, and conversation.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-topic-management",
+      "id": 8
+    },
+    {
+      "question_type": "MULTI",
+      "module": "Configure Topics and Advanced Agent Responses",
+      "question": "An agent uses generative orchestration and has several topics with related purposes. Which authoring practices reduce the chance that the wrong topic is selected? (Select all that apply.)",
+      "options": [
+        "Give each topic a concise description of what it does and the user intent it handles.",
+        "Use specific language that distinguishes similar topics.",
+        "Test the agent and revise descriptions that overlap.",
+        "Give all related topics the same generic description to make their behavior consistent.",
+        "Remove topic descriptions so selection relies only on historical conversation data."
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Microsoft recommends clear, specific descriptions, distinctive language for similar capabilities, and testing followed by revision of overlapping descriptions. Generic or missing descriptions make it harder for generative orchestration to associate an intent with the correct topic.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/advanced-generative-actions#best-practices",
+      "id": 9
+    },
+    {
+      "question_type": "STANDARD",
+      "module": "Connect Enterprise Knowledge Sources",
+      "question": "A travel agent should answer from a public, continually updated government travel-advisory site. The team wants the agent to use information indexed from that site rather than copying pages into a document upload. Which knowledge source is appropriate?",
+      "options": [
+        "A public website knowledge source",
+        "An environment variable containing the site's home page",
+        "A Power Platform action that creates a ticket",
+        "A Copilot connector for a private database"
+      ],
+      "correct": 0,
+      "explanation": "A public website knowledge source uses Grounding with Bing Search to return information from the web. A private-database connector, a transactional action, and an environment variable do not provide web-content grounding.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/knowledge-add-public-website",
+      "id": 10
+    },
+    {
+      "question_type": "MULTI",
+      "module": "Connect Enterprise Knowledge Sources",
+      "question": "Which statements describe knowledge-source suggestions when adding knowledge to an existing agent? Select all that apply.",
+      "options": [
+        "Adding a suggested source creates a copy that becomes part of the agent",
+        "Suggestions are available for files, SharePoint, public websites, and Dataverse sources",
+        "A suggested Dataverse source retains its synonym and glossary configuration",
+        "Suggestions are available for every knowledge-source type, including Azure AI Search",
+        "Adding a suggestion changes the source configuration in the agent where it was originally used"
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "A suggested knowledge source is copied into the current agent. Suggestions are documented for files, SharePoint, public websites, and Dataverse, and Dataverse synonym and glossary settings are preserved. Azure AI Search isn't listed as a suggested type, and adding a copy does not modify the original agent's source.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/knowledge-add-existing-copilot",
+      "id": 11
+    },
+    {
+      "question_type": "YES_NO_MATRIX",
+      "module": "Connect Enterprise Knowledge Sources",
+      "question": "For each statement about public website knowledge sources, determine whether the statement is true.",
+      "statements": [
+        "Public website knowledge sources use Grounding with Bing Search to return web information.",
+        "A website that requires authentication is supported as a public website knowledge source.",
+        "If a specified URL redirects to another top-level site, content from either URL isn't included in results.",
+        "Using a variable in the URL removes the public-website URL requirements."
+      ],
+      "correct": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "explanation": "Public website knowledge uses Grounding with Bing Search. Authenticated sites aren't supported, and a redirect to another top-level site excludes content from both URLs. A URL variable changes the target at runtime but doesn't remove the URL structure or support requirements.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/knowledge-add-public-website",
+      "id": 12
+    },
+    {
+      "question_type": "MULTI",
+      "module": "Add and Govern Agent Tools",
+      "question": "A maker is configuring a computer use tool that updates a web portal. Which configuration elements are required when the tool is added? Select all that apply.",
+      "options": [
+        "A descriptive name",
+        "A description explaining what the tool does and when to use it",
+        "A model for the tool to use",
+        "Instructions that describe the task",
+        "A manually authored topic trigger phrase"
+      ],
+      "correct": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "explanation": "The computer use configuration requires a name, description, model, and instructions. A manually authored topic trigger phrase is not one of those required computer use fields; generative orchestration can select the tool from its description.",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-copilot-studio/computer-use",
+        "https://learn.microsoft.com/en-us/microsoft-copilot-studio/computer-use",
+        "https://learn.microsoft.com/en-us/microsoft-copilot-studio/computer-use",
+        "https://learn.microsoft.com/en-us/microsoft-copilot-studio/computer-use"
+      ],
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/computer-use",
+      "id": 13
+    },
+    {
+      "question_type": "STANDARD",
+      "module": "Add and Govern Agent Tools",
+      "question": "A team is modernizing an MCP server connection for Copilot Studio. Which transport should the team implement?",
+      "options": [
+        "FTP transport",
+        "Streamable transport",
+        "Server-Sent Events transport",
+        "A browser automation transport"
+      ],
+      "correct": 1,
+      "explanation": "Copilot Studio supports the Streamable transport type. Microsoft states that SSE is deprecated and is no longer supported for MCP in Copilot Studio after August 2025; FTP and browser automation are not MCP transports for this connection.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-add-existing-server-to-agent",
+      "id": 14
+    },
+    {
+      "question_type": "STANDARD",
+      "module": "Add and Govern Agent Tools",
+      "question": "Before a custom connector can be used by an agent in the organization, which permission expectation must be met?",
+      "options": [
+        "The connector has view and share permissions for the organization",
+        "The connector is stored only in the maker's personal browser",
+        "The connector is converted into a knowledge source",
+        "The connector is published as a computer use tool"
+      ],
+      "correct": 0,
+      "explanation": "Microsoft states that a custom connector needs view and share permissions for the organization for an agent to use it. Personal browser storage, knowledge conversion, and computer use publication do not provide those permissions.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/add-tools-custom-agent",
+      "id": 15
+    },
+    {
+      "question_type": "MULTI",
+      "module": "Design Multi-Agent Collaboration",
+      "question": "A company is deciding whether to separate its travel, expense, and procurement capabilities into connected agents. Which requirements support that decision? Select all that apply.",
+      "options": [
+        "Different teams must manage the capabilities independently",
+        "Each capability needs its own application lifecycle management process",
+        "The capabilities must be reusable by more than one main agent",
+        "The main agent must avoid all latency from orchestration",
+        "The capabilities must share exactly the same settings and release cycle"
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Connected agents are appropriate when teams manage agents independently, agents need independent ALM, or an agent must be reusable by more than one main agent. Multi-agent orchestration adds hops and can increase latency, so eliminating latency is not a reason to use it. Identical settings and lifecycle do not require separation.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-add-other-agents#when-to-consider-breaking-your-agent-into-multiple-connected-agents",
+      "id": 16
+    },
+    {
+      "question_type": "YES_NO_MATRIX",
+      "module": "Design Multi-Agent Collaboration",
+      "question": "For each statement about child agents, select Yes if the statement is correct; otherwise select No.",
+      "statements": [
+        "A child agent is a lightweight agent that exists within the context of its main agent.",
+        "Child agents are designed to require separate deployment capabilities from the main agent.",
+        "A child agent can have its own tools and knowledge.",
+        "A child agent uses the same orchestration limits as its parent because it has no orchestration of its own."
+      ],
+      "correct": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "explanation": "Child agents are lightweight agents in the main-agent context and can have their own tools and knowledge. They are not the choice when separate deployment is required. A child agent has its own orchestration and its own tool limits, so it does not simply share the parent's limits.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/add-agent-child-agent",
+      "id": 17
+    },
+    {
+      "question_type": "STANDARD",
+      "module": "Integrate Agents with Azure and Observability",
+      "question": "A support organization wants to investigate why users abandon conversations. It needs session-level information such as resolution, escalation, satisfaction, and feedback rather than only technical response-time data. Which data source in Agent Insights Hub provides that information?",
+      "options": [
+        "Conversation transcripts",
+        "The Foundry model catalog",
+        "Azure AI Search index metadata",
+        "Azure Application Insights telemetry"
+      ],
+      "correct": 0,
+      "explanation": "Agent Insights Hub uses conversation transcripts for session-level engagement, resolution, escalation, CSAT, and feedback. Application Insights supplies operational telemetry such as response times and tool calls, while the search index and model catalog do not provide conversation outcomes.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/kit-agent-insights-hub",
+      "id": 18
+    },
+    {
+      "question_type": "MULTI",
+      "module": "Integrate Agents with Azure and Observability",
+      "question": "Which statements describe supported ways to author a custom prompt in Copilot Studio? Select all that apply.",
+      "options": [
+        "A maker can create a prompt from New tool on the Tools page",
+        "A maker can create a prompt in a topic by adding a New prompt node",
+        "A maker can write instructions or use Copilot to suggest a prompt",
+        "A custom prompt can be authored only after the agent is published",
+        "A custom prompt requires a public website knowledge source"
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Copilot Studio supports creating a prompt from the Tools page or in a topic through a New prompt node. Makers can write their own instructions or use Copilot to suggest a prompt. Publication and a public-website knowledge source aren't prerequisites for authoring a prompt.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/bring-your-own-model-prompts",
+      "id": 19
+    },
+    {
+      "question_type": "MULTI",
+      "module": "Evaluate Agent Performance",
+      "question": "A maker is creating a single-response test set from scratch. Which supported ways can the maker use to populate test cases? (Select all that apply.)",
+      "options": [
+        "Write test questions manually",
+        "Import test cases from a file",
+        "Generate cases with Copilot Studio",
+        "Populate a set from the latest test-chat conversation",
+        "Convert an Application Insights trace directly into a test set without using themes"
+      ],
+      "correct": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "explanation": "Copilot Studio supports manual authoring, importing a file, AI generation, and populating from the latest test-chat conversation. Production data can also be used through analytics themes, but a raw Application Insights trace is not a documented direct population method.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/analytics-agent-evaluation-create",
+      "id": 20
+    },
+    {
+      "question_type": "YES_NO_MATRIX",
+      "module": "Evaluate Agent Performance",
+      "question": "For each statement about Custom evaluations, indicate whether it is correct.",
+      "options": [],
+      "statements": [
+        "Custom evaluation instructions should describe the goal of the test.",
+        "A Custom test can use labels to categorize answers.",
+        "Custom test labels cannot be assigned pass or fail outcomes.",
+        "A Custom test is available for single-response and conversation test sets."
+      ],
+      "correct": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "explanation": "The first, second, and fourth statements are Yes. Custom evaluation instructions state the goal, labels categorize results, and Custom is available for both test-set types. The third is No because each label is assigned a Pass or Fail result.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/analytics-agent-evaluation-overview",
+      "id": 21
+    },
+    {
+      "question_type": "STANDARD",
+      "module": "Evaluate Agent Performance",
+      "question": "A director and an intern should be evaluated against the same agent, but each can access different knowledge and tools. What should the maker configure to simulate the two access contexts?",
+      "options": [
+        "Two CSV exports",
+        "Different user profiles",
+        "Different activity-map filters",
+        "Different Exact match pass scores"
+      ],
+      "correct": 1,
+      "explanation": "User profiles let makers run evaluations using different authenticated accounts and simulate different user experiences. This affects the knowledge sources and tools the agent can access during testing.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/analytics-agent-evaluation-edit",
+      "id": 22
+    },
+    {
+      "question_type": "MULTI",
+      "module": "Implement Agent ALM with Solutions and Pipelines",
+      "question": "After an agent solution is imported into production, which actions are needed before users can share and use the imported agent? Select all that apply.",
+      "options": [
+        "Configure user authentication again",
+        "Publish the imported agent",
+        "Assume its channel details are completely transferred",
+        "Export the production solution again",
+        "Remove all environment variables"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "Authentication must be configured again after import, and the imported agent must be published before it can be shared. Channel details might be empty after import, so they cannot be assumed to transfer unchanged.",
+      "reference": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-solutions-import-export#import-the-solution-with-your-agent",
+      "references": [
+        "https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-solutions-import-export#import-the-solution-with-your-agent",
+        "https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-solutions-import-export#import-the-solution-with-your-agent"
+      ],
+      "id": 23
+    },
+    {
+      "question_type": "STANDARD",
+      "module": "Implement Agent ALM with Solutions and Pipelines",
+      "question": "During solution import, an endpoint variable has no default value and no existing target value. What should the deployment owner expect?",
+      "options": [
+        "A prompt to provide a value",
+        "Automatic reuse of the development value",
+        "Automatic creation of a connection reference",
+        "A guaranteed successful deployment with an empty value"
+      ],
+      "correct": 0,
+      "explanation": "Environment variables without a default value or value prompt for a value during solution import or pipeline deployment. Components depending on unset values can fail.",
+      "reference": "https://learn.microsoft.com/en-us/power-apps/maker/data-platform/environmentvariables#enter-new-values-while-importing-solutions",
+      "id": 24
+    },
+    {
+      "question_type": "STANDARD",
+      "module": "Implement Agent ALM with Solutions and Pipelines",
+      "question": "During pipeline deployment, a solution with connection references and environment variables pauses. What should the release owner do?",
+      "options": [
+        "Publish the agent before supplying values",
+        "Convert the target environment to default",
+        "Delete all dependencies from the solution",
+        "Provide the prompted connection-reference and environment-variable values"
+      ],
+      "correct": 3,
+      "explanation": "Pipeline deployment prompts for connection references and environment variables, just as manual solution import does.",
+      "reference": "https://learn.microsoft.com/en-us/power-platform/alm/run-pipeline#run-a-pipeline",
+      "id": 25
+    }
+  ],
+  "labs": [
+    {
+      "id": "lab-ab620-create-agent",
+      "domain": "AB620-D1",
+      "title": "Create, instruct, test, and publish a Copilot Studio agent",
+      "objective": "Build a small support agent from a clear purpose statement, refine its instructions, test both in-scope and out-of-scope prompts, and publish a version. This establishes the agent lifecycle used by the remaining labs.",
+      "prerequisites": [
+        "A Microsoft work or school account with access to Microsoft Copilot Studio",
+        "A paid Copilot Studio license or tenant capacity that permits publishing; a trial can create and test agents but cannot complete the publish step",
+        "Permission to create and publish agents in a non-production Power Platform environment",
+        "Use English for the agent so the supplied test prompts and expected results are comparable"
+      ],
+      "freeTierOnly": false,
+      "estCost": "Expected incremental cost: ~0 EUR when completed in an existing paid Copilot Studio test environment with allocated capacity. A trial can complete the create and test steps but cannot publish. Licensing, capacity, and tenant policies vary; do not enable paid channels or external services for this lab.",
+      "steps": [
+        {
+          "n": 1,
+          "instruction": "Open Copilot Studio at `https://copilotstudio.microsoft.com`, select your non-production environment, and create a new agent named `AB620 Service Guide`.",
+          "expected": "The new agent opens in Copilot Studio and its name is AB620 Service Guide."
+        },
+        {
+          "n": 2,
+          "instruction": "Set the description to `Answers questions about the fictional Contoso Device Care service and routes unsupported requests safely.`",
+          "expected": "The Overview page shows a concise description that identifies the agent's scope."
+        },
+        {
+          "n": 3,
+          "instruction": "Set the agent instructions to: `You are the Contoso Device Care assistant. Answer only questions about device setup, warranty, repair, and service appointments. If information is unavailable, say so and offer a service representative. Do not invent policies, prices, or customer records. Keep answers concise.` Save the agent.",
+          "expected": "The instructions are saved without validation errors and define purpose, boundaries, fallback behavior, and response style."
+        },
+        {
+          "n": 4,
+          "instruction": "In the test pane, start a new test session and send `What can you help me with?`",
+          "expected": "The response stays within device setup, warranty, repair, or service appointment scenarios."
+        },
+        {
+          "n": 5,
+          "instruction": "Send the out-of-scope prompt `Give me a guaranteed investment return for next month.`",
+          "expected": "The agent does not invent financial advice and indicates that the request is outside its support scope."
+        },
+        {
+          "n": 6,
+          "instruction": "Select Publish, publish the current agent, and wait for the success confirmation. Do not add a public channel in this lab.",
+          "expected": "Copilot Studio reports that the current version is published; no external channel has been enabled."
+        }
+      ],
+      "expectedResult": "A published test agent has clear instructions and safe scope boundaries, and its test-chat behavior matches both an in-scope and an out-of-scope acceptance check.",
+      "cleanup": [
+        "Keep AB620 Service Guide in the test environment for the remaining labs, or delete it from the Agents list after completing the full lab series.",
+        "If you enabled any channel accidentally, remove or disable that channel before leaving the lab."
+      ],
+      "references": [
+        {
+          "label": "Quickstart: Create and deploy an agent (Microsoft Learn)",
+          "url": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/fundamentals-get-started"
+        },
+        {
+          "label": "Write agent instructions (Microsoft Learn)",
+          "url": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-instructions"
+        }
+      ],
+      "sourceVerifiedOn": "2026-08-02",
+      "objectiveVersion": "AB-620 study guide last updated April 21, 2026"
+    }
+  ]
+}

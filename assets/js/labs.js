@@ -197,7 +197,7 @@
     const selected = labs.find((l) => l.id === selectedId) || labs[0];
     const name = (metadata && (metadata.name || metadata.certificationCode)) || examId.toUpperCase();
     if (packBadge) packBadge.textContent = `${name} hands-on labs`;
-    if (packSub) packSub.textContent = `${labs.length} lab${labs.length === 1 ? '' : 's'} in your own free-tier account`;
+    if (packSub) packSub.textContent = `${labs.length} guided hands-on lab${labs.length === 1 ? '' : 's'}`;
 
     nav.innerHTML = navMarkup(labs, examId, selected.id);
     workspace.innerHTML = workspaceMarkup(selected, examId, examData);

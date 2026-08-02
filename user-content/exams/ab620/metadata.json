@@ -1,0 +1,156 @@
+{
+  "id": "ab620",
+  "name": "AB-620",
+  "fullName": "Designing and Building Integrated AI Agent Solutions in Copilot Studio",
+  "description": "Free 25-question preview of the AB-620 Complete practice pack. Original scenario questions aligned to current Microsoft Learn documentation. Not real exam questions.",
+  "duration": 120,
+  "questionCount": 25,
+  "passScore": 70,
+  "language": "en",
+  "schemaVersion": "1.1",
+  "badge": "Associate",
+  "icon": "fas fa-robot",
+  "vendor": "Microsoft",
+  "certificationCode": "AB-620",
+  "domains": [
+    "Microsoft Copilot Studio",
+    "AI Agents",
+    "Associate"
+  ],
+  "level": "Associate",
+  "productFamily": "Microsoft Copilot Studio",
+  "contentType": "preview",
+  "commercialStatus": "pro-preview",
+  "contentOrigin": "original",
+  "objectiveDomains": [
+    {
+      "code": "AB620-D1",
+      "name": "Plan and configure agent solutions",
+      "weightRange": "30-35%",
+      "source": "Microsoft AB-620 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-620",
+      "mappedModules": [
+        "Plan Agent Architecture, Identity, Audiences, and Channels",
+        "Responsible AI, Security, Governance, and Reusable Components",
+        "Create and Operate Agent Flows",
+        "Configure Topics and Advanced Agent Responses"
+      ]
+    },
+    {
+      "code": "AB620-D2",
+      "name": "Integrate and extend agents in Copilot Studio",
+      "weightRange": "40-45%",
+      "source": "Microsoft AB-620 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-620",
+      "mappedModules": [
+        "Connect Enterprise Knowledge Sources",
+        "Add and Govern Agent Tools",
+        "Design Multi-Agent Collaboration",
+        "Integrate Agents with Azure and Observability"
+      ]
+    },
+    {
+      "code": "AB620-D3",
+      "name": "Test and manage agents",
+      "weightRange": "20-25%",
+      "source": "Microsoft AB-620 study guide",
+      "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-620",
+      "mappedModules": [
+        "Evaluate Agent Performance",
+        "Implement Agent ALM with Solutions and Pipelines"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "icon": "fas fa-compass-drafting",
+      "name": "Plan Agent Architecture, Identity, Audiences, and Channels"
+    },
+    {
+      "icon": "fas fa-shield-halved",
+      "name": "Responsible AI, Security, Governance, and Reusable Components"
+    },
+    {
+      "icon": "fas fa-diagram-project",
+      "name": "Create and Operate Agent Flows"
+    },
+    {
+      "icon": "fas fa-comments",
+      "name": "Configure Topics and Advanced Agent Responses"
+    },
+    {
+      "icon": "fas fa-book-open",
+      "name": "Connect Enterprise Knowledge Sources"
+    },
+    {
+      "icon": "fas fa-screwdriver-wrench",
+      "name": "Add and Govern Agent Tools"
+    },
+    {
+      "icon": "fas fa-people-arrows",
+      "name": "Design Multi-Agent Collaboration"
+    },
+    {
+      "icon": "fas fa-chart-line",
+      "name": "Integrate Agents with Azure and Observability"
+    },
+    {
+      "icon": "fas fa-vial-circle-check",
+      "name": "Evaluate Agent Performance"
+    },
+    {
+      "icon": "fas fa-code-branch",
+      "name": "Implement Agent ALM with Solutions and Pipelines"
+    }
+  ],
+  "contentReview": {
+    "lastReviewed": "2026-08-02",
+    "sourceOfTruth": "Microsoft AB-620 study guide, last updated April 21, 2026",
+    "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-620",
+    "objectiveVersion": "AB-620 study guide last updated April 21, 2026"
+  },
+  "resources": [
+    {
+      "icon": "fas fa-book",
+      "name": "Microsoft AB-620 Study Guide",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-620"
+    },
+    {
+      "icon": "fas fa-certificate",
+      "name": "Microsoft Certified: AI Agent Builder Associate",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/ai-agent-builder-associate/"
+    },
+    {
+      "icon": "fas fa-laptop-code",
+      "name": "Microsoft Copilot Studio documentation",
+      "url": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/"
+    }
+  ],
+  "totalQuestions": 25,
+  "labCount": 1,
+  "labTopics": [
+    "Create, instruct, test, and publish an agent (free sample)",
+    "Build topic routing with variables and conditions",
+    "Create and call an agent flow",
+    "Ground an agent with public website knowledge",
+    "Add and govern a connector tool",
+    "Build a two-agent delegation pattern",
+    "Run an evaluation test set",
+    "Package and export an agent solution"
+  ],
+  "preview": true,
+  "pro": {
+    "title": "AB-620 Complete",
+    "questions": 280,
+    "labCount": 8,
+    "price": "19 EUR",
+    "url": "https://examplar.gumroad.com/l/ab620-complete",
+    "highlights": [
+      "280 original scenario questions across every AB-620 objective",
+      "8 guided hands-on Copilot Studio labs",
+      "Detailed explanations with Microsoft Learn references",
+      "Mixed practice formats for agent design, integration, testing, and ALM",
+      "Free updates when the certification content changes"
+    ]
+  }
+}

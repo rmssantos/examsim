@@ -504,6 +504,24 @@ class AnalyticsWiringTests(unittest.TestCase):
             ["az104", "az104"],
         )
 
+    def test_lab_copy_is_vendor_neutral_and_advertises_complete_count(self):
+        meta = dict(
+            SAMPLE_PRO,
+            id="ab620",
+            certificationCode="AB-620",
+            labCount=1,
+            labTopics=["Create and publish an agent (free sample)"],
+            pro={**SAMPLE_PRO["pro"], "labCount": 8},
+        )
+
+        page = self._render(meta)
+
+        self.assertIn("One guided lab is free to try now", page)
+        self.assertIn("8 labs", page)
+        self.assertNotIn("free cloud account", page)
+        self.assertNotIn("CLI-first", page)
+        self.assertNotIn("free tier", page)
+
 
 class KeywordCoverageTests(unittest.TestCase):
     def test_page_covers_both_query_phrasings(self):

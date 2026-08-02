@@ -125,6 +125,7 @@ this.libraryVendorFilter = document.getElementById('library-filter-vendor');
 this.libraryDomainFilter = document.getElementById('library-filter-domain');
 this.libraryLevelFilter = document.getElementById('library-filter-level');
 this.libraryStatusFilter = document.getElementById('library-filter-status');
+this.libraryLabsFilter = document.getElementById('library-filter-labs');
 this.librarySort = document.getElementById('library-sort');
 this.libraryClearFilters = document.getElementById('library-clear-filters');
 this.libraryFilterToggle = document.getElementById('library-filter-toggle');
@@ -273,6 +274,7 @@ return {
 	domain: '',
 	level: '',
 	status: '',
+	labs: '',
 	sort: 'recommended',
 	filtersCollapsed: true
 };
@@ -285,7 +287,7 @@ try {
 	// A persisted filter silently narrows the library ("1 of 14") with no visible
 	// cause when the panel is collapsed. Reveal the panel on load whenever a
 	// filter is active so the pre-filled search term and Clear button are shown.
-	if (['query', 'vendor', 'domain', 'level', 'status'].some((key) => state[key])) {
+	if (['query', 'vendor', 'domain', 'level', 'status', 'labs'].some((key) => state[key])) {
 		state.filtersCollapsed = false;
 	}
 	return state;
@@ -308,6 +310,7 @@ if (this.libraryVendorFilter) this.libraryVendorFilter.value = this.libraryState
 if (this.libraryDomainFilter) this.libraryDomainFilter.value = this.libraryState.domain || '';
 if (this.libraryLevelFilter) this.libraryLevelFilter.value = this.libraryState.level || '';
 if (this.libraryStatusFilter) this.libraryStatusFilter.value = this.libraryState.status || '';
+if (this.libraryLabsFilter) this.libraryLabsFilter.value = this.libraryState.labs || '';
 if (this.librarySort) this.librarySort.value = this.libraryState.sort || 'recommended';
 this.updateLibraryFilterPanel();
 }
@@ -320,13 +323,14 @@ this.libraryState = {
 	domain: this.libraryDomainFilter?.value || '',
 	level: this.libraryLevelFilter?.value || '',
 	status: this.libraryStatusFilter?.value || '',
+	labs: this.libraryLabsFilter?.value || '',
 	sort: this.librarySort?.value || 'recommended',
 	filtersCollapsed
 };
 }
 
 getActiveLibraryFilterCount() {
-return ['query', 'vendor', 'domain', 'level', 'status'].reduce((count, key) => count + (this.libraryState[key] ? 1 : 0), 0);
+return ['query', 'vendor', 'domain', 'level', 'status', 'labs'].reduce((count, key) => count + (this.libraryState[key] ? 1 : 0), 0);
 }
 
 updateLibraryFilterPanel() {
@@ -528,6 +532,15 @@ if (
 ) {
 	snapshot.questions = questions.value;
 }
+const labCount = this.readOwnDataProperty(value, 'labCount');
+if (
+	labCount.valid
+	&& labCount.found
+	&& Number.isSafeInteger(labCount.value)
+	&& labCount.value >= 0
+) {
+	snapshot.labCount = labCount.value;
+}
 const highlights = this.readOwnDataProperty(value, 'highlights');
 if (highlights.valid && highlights.found) {
 	snapshot.highlights = this.boundedArrayDataValues(highlights.value)
@@ -535,6 +548,67 @@ if (highlights.valid && highlights.found) {
 		.filter(Boolean);
 }
 return Object.keys(snapshot).length ? Object.freeze(snapshot) : null;
+}
+
+getLabAvailability(examData, metadataSnapshot = null) {
+const metadata = metadataSnapshot || this.getExamMetadataSnapshot(examData);
+const labsResult = this.readOwnDataProperty(examData, 'labs');
+const labs = labsResult.valid && labsResult.found
+	? this.boundedArrayDataValues(labsResult.value, this.metadataLimit('maxLabs', 100))
+	: [];
+const trusted = this.isBundledTrustedExam(examData);
+const declaredAccessible = trusted && Number.isSafeInteger(metadata?.labCount)
+	? Math.max(0, metadata.labCount)
+	: 0;
+const loadedResult = this.readOwnDataProperty(examData, 'loaded');
+const isMetadataOnly = trusted
+	&& loadedResult.valid
+	&& loadedResult.found
+	&& loadedResult.value === false;
+// ExamManager deliberately normalizes a metadata-first bundled record to
+// `labs: []` and `loaded: false`. Only that explicit trusted state may use the
+// validator-backed metadata count; loaded content always uses the real array.
+const accessible = isMetadataOnly ? declaredAccessible : labs.length;
+const advertised = trusted && Number.isSafeInteger(metadata?.pro?.labCount)
+	? Math.max(0, metadata.pro.labCount)
+	: 0;
+const total = Math.max(accessible, advertised);
+return Object.freeze({
+	accessible,
+	total,
+	locked: Math.max(0, total - accessible),
+	hasLabs: total > 0
+});
+}
+
+configureDetailsLabsAction(labsLink, examId, examData) {
+if (!labsLink) return;
+const availability = this.getLabAvailability(examData);
+labsLink.onclick = null;
+labsLink.removeAttribute('href');
+if (!availability.hasLabs) {
+	labsLink.classList.add('is-hidden');
+	return;
+}
+
+labsLink.classList.remove('is-hidden');
+const labsLabel = labsLink.querySelector('span');
+if (availability.accessible > 0) {
+	labsLink.href = `labs.html?exam=${encodeURIComponent(examId)}`;
+	if (labsLabel) {
+		labsLabel.textContent = availability.locked > 0
+			? `Hands-on labs (${availability.accessible} free / ${availability.total} Complete)`
+			: `Hands-on labs (${availability.accessible})`;
+	}
+	return;
+}
+
+labsLink.href = '#';
+if (labsLabel) labsLabel.textContent = `Hands-on labs (${availability.total} in Complete)`;
+labsLink.onclick = (event) => {
+	event.preventDefault();
+	this.showProModal(examId, examData);
+};
 }
 
 getRecommendedProSnapshot(value) {
@@ -725,6 +799,7 @@ const entries = Array.from(this.availableExams.entries()).filter(([examId, examD
 	if (this.libraryState.domain && !taxonomy.domains.includes(this.libraryState.domain)) return false;
 	if (this.libraryState.level && taxonomy.level !== this.libraryState.level) return false;
 	if (this.libraryState.status && taxonomy.status !== this.libraryState.status) return false;
+	if (this.libraryState.labs === 'available' && !this.getLabAvailability(examData).hasLabs) return false;
 	return true;
 });
 
@@ -1055,14 +1130,26 @@ actions.appendChild(studyButton);
 }
 card.appendChild(actions);
 
-const labCount = Number(metadata.labCount) || 0;
-if (labCount > 0) {
-const labsLink = document.createElement('a');
+const labAvailability = this.getLabAvailability(examData, metadata);
+if (labAvailability.hasLabs) {
+const labsLink = document.createElement(labAvailability.accessible > 0 ? 'a' : 'button');
 labsLink.className = 'exam-card-labs';
-labsLink.href = `labs.html?exam=${encodeURIComponent(examId)}`;
+if (labAvailability.accessible > 0) {
+	labsLink.href = `labs.html?exam=${encodeURIComponent(examId)}`;
+} else {
+	labsLink.type = 'button';
+}
 labsLink.appendChild(this.createIcon('fas fa-flask'));
-labsLink.appendChild(document.createTextNode(` Hands-on labs (${labCount})`));
-labsLink.addEventListener('click', (e) => e.stopPropagation());
+const labSummary = labAvailability.locked > 0
+	? `${labAvailability.accessible ? `${labAvailability.accessible} free / ` : ''}${labAvailability.total} in Complete`
+	: `${labAvailability.accessible}`;
+labsLink.appendChild(document.createTextNode(` Hands-on labs (${labSummary})`));
+labsLink.addEventListener('click', (e) => {
+	e.stopPropagation();
+	if (labAvailability.accessible === 0) {
+		this.showProModal(examId, examData);
+	}
+});
 card.appendChild(labsLink);
 }
 
@@ -1578,20 +1665,8 @@ this.openAttemptHistory(examId);
 };
 }
 
-// Hands-on labs: only when the pack advertises labs (metadata.labCount).
 const labsLink = document.getElementById('details-hands-on-labs');
-if (labsLink) {
-const labCount = Number(metadata.labCount) || 0;
-if (labCount > 0) {
-labsLink.href = `labs.html?exam=${encodeURIComponent(examId)}`;
-labsLink.classList.remove('is-hidden');
-const labsLabel = labsLink.querySelector('span');
-if (labsLabel) labsLabel.textContent = `Hands-on labs (${labCount})`;
-} else {
-labsLink.classList.add('is-hidden');
-labsLink.removeAttribute('href');
-}
-}
+this.configureDetailsLabsAction(labsLink, examId, examData);
 
 // Setup close button
 const closeBtn = document.getElementById('btn-close-details');
@@ -2413,6 +2488,7 @@ this.libraryVendorFilter?.addEventListener('change', refreshLibraryFromControls)
 this.libraryDomainFilter?.addEventListener('change', refreshLibraryFromControls);
 this.libraryLevelFilter?.addEventListener('change', refreshLibraryFromControls);
 this.libraryStatusFilter?.addEventListener('change', refreshLibraryFromControls);
+this.libraryLabsFilter?.addEventListener('change', refreshLibraryFromControls);
 this.librarySort?.addEventListener('change', refreshLibraryFromControls);
 this.libraryFilterToggle?.addEventListener('click', () => {
 	this.libraryState.filtersCollapsed = !this.libraryState.filtersCollapsed;
