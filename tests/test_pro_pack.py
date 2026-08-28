@@ -58,6 +58,23 @@ class ProPackTests(unittest.TestCase):
         # The "import & activate" path reuses the existing import (which decrypts envelopes).
         self.assertIn("triggerFileImport", js)
 
+    def test_homepage_renders_launch_offer(self):
+        js = (ROOT / "assets/js/homepage.js").read_text(encoding="utf-8")
+        css = (ROOT / "assets/css/home-v2.css").read_text(encoding="utf-8")
+
+        self.assertIn("getPromotionOffer", js)
+        for class_name in (
+            "exam-card-offer",
+            "offer-price-old",
+            "offer-price-new",
+            "offer-code",
+            "pro-modal-offer",
+        ):
+            self.assertIn(class_name, js)
+            self.assertIn(f".{class_name}", css)
+        self.assertIn("Limited launch offer", js)
+        self.assertIn("discountPercent", js)
+
     def test_homepage_exposes_metadata_driven_library_filters(self):
         html = (ROOT / "index.html").read_text(encoding="utf-8")
         js = (ROOT / "assets/js/homepage.js").read_text(encoding="utf-8")

@@ -1032,6 +1032,34 @@ chips.forEach(([kind, label, iconClass, title]) => {
 return wrapper;
 }
 
+getPromotionOffer(pro) {
+if (!pro || typeof pro !== 'object') return null;
+const promotion = pro.promotion;
+if (!promotion || typeof promotion !== 'object') return null;
+
+const discountPercent = Number(promotion.discountPercent);
+const code = String(promotion.code || '').trim();
+const priceMatch = String(pro.price || '').trim().match(/^(\d+(?:[.,]\d+)?)\s+([A-Z]{3})$/);
+if (!Number.isFinite(discountPercent) || discountPercent <= 0 || discountPercent >= 100 || !code || !priceMatch) {
+	return null;
+}
+
+const baseAmount = Number(priceMatch[1].replace(',', '.'));
+if (!Number.isFinite(baseAmount) || baseAmount <= 0) return null;
+const currency = priceMatch[2];
+const currencyLabel = currency === 'EUR' ? '€' : `${currency} `;
+const formatAmount = amount => `${currencyLabel}${amount.toFixed(2)}`;
+
+return {
+	label: String(promotion.label || 'Offer').trim() || 'Offer',
+	discountPercent,
+	code,
+	limited: promotion.limited === true,
+	basePrice: formatAmount(baseAmount),
+	offerPrice: formatAmount(baseAmount * (100 - discountPercent) / 100)
+};
+}
+
 createExamStat(number, label) {
 const stat = document.createElement('div');
 stat.className = 'exam-stat';
@@ -1047,6 +1075,7 @@ const questionCount = metadata.questionCount || 45;
 const declaredTotalQuestions = Number(metadata.totalQuestions);
 const hasDeclaredTotalQuestions = Number.isFinite(declaredTotalQuestions) && Number.isInteger(declaredTotalQuestions) && declaredTotalQuestions > 0;
 const totalQuestions = hasDeclaredTotalQuestions ? declaredTotalQuestions : questionCount;
+const promotion = isBundledTrusted ? this.getPromotionOffer(metadata.pro) : null;
 
 const card = document.createElement('div');
 card.className = `exam-card ${this.getCardClass(examId)}`;
@@ -1108,6 +1137,31 @@ studyInfo.dataset.studySummaryFor = examId;
 studyInfo.textContent = 'Study: —';
 card.appendChild(studyInfo);
 
+if (promotion) {
+const offer = document.createElement('div');
+offer.className = 'exam-card-offer';
+const offerTop = document.createElement('div');
+offerTop.className = 'offer-topline';
+this.appendTextElement(offerTop, 'span', 'offer-label', promotion.label);
+this.appendTextElement(offerTop, 'strong', 'offer-discount', `${promotion.discountPercent}% off`);
+offer.appendChild(offerTop);
+
+const offerPrices = document.createElement('div');
+offerPrices.className = 'offer-prices';
+this.appendTextElement(offerPrices, 'span', 'offer-price-old', promotion.basePrice);
+this.appendTextElement(offerPrices, 'span', 'offer-price-arrow', '→');
+this.appendTextElement(offerPrices, 'strong', 'offer-price-new', promotion.offerPrice);
+offer.appendChild(offerPrices);
+
+const offerMeta = document.createElement('div');
+offerMeta.className = 'offer-meta';
+offerMeta.appendChild(document.createTextNode('Code '));
+this.appendTextElement(offerMeta, 'code', 'offer-code', promotion.code);
+if (promotion.limited) offerMeta.appendChild(document.createTextNode(' · Limited launch offer'));
+offer.appendChild(offerMeta);
+card.appendChild(offer);
+}
+
 const actions = document.createElement('div');
 actions.className = 'exam-card-actions';
 
@@ -1139,7 +1193,7 @@ const unlockButton = document.createElement('button');
 unlockButton.type = 'button';
 unlockButton.className = 'exam-card-unlock';
 unlockButton.appendChild(this.createIcon('fas fa-unlock'));
-unlockButton.appendChild(document.createTextNode(' Unlock'));
+unlockButton.appendChild(document.createTextNode(promotion ? ` Unlock ${promotion.offerPrice}` : ' Unlock'));
 unlockButton.addEventListener('click', (e) => {
 e.stopPropagation();
 window.ExamApp?.analytics?.trackProUnlockClicked?.(examId);
@@ -1208,6 +1262,7 @@ if (!this.isBundledTrustedExam(examData)) {
 }
 const metadata = this.getExamMetadataSnapshot(examData);
 const pro = metadata.pro || {};
+const promotion = this.getPromotionOffer(pro);
 const returnFocus = (document.activeElement instanceof HTMLElement) ? document.activeElement : null;
 this.closeProModal();
 window.ExamApp?.analytics?.trackProModalOpened?.(examId);
@@ -1240,6 +1295,31 @@ sub.className = 'pro-modal-sub';
 sub.textContent = `You are practicing the free preview. Unlock the complete ${metadata.name || 'exam'} pack.`;
 dialog.appendChild(sub);
 
+if (promotion) {
+const offer = document.createElement('div');
+offer.className = 'pro-modal-offer';
+const offerTop = document.createElement('div');
+offerTop.className = 'offer-topline';
+this.appendTextElement(offerTop, 'span', 'offer-label', promotion.label);
+this.appendTextElement(offerTop, 'strong', 'offer-discount', `${promotion.discountPercent}% off`);
+offer.appendChild(offerTop);
+
+const offerPrices = document.createElement('div');
+offerPrices.className = 'offer-prices';
+this.appendTextElement(offerPrices, 'span', 'offer-price-old', promotion.basePrice);
+this.appendTextElement(offerPrices, 'span', 'offer-price-arrow', '→');
+this.appendTextElement(offerPrices, 'strong', 'offer-price-new', promotion.offerPrice);
+offer.appendChild(offerPrices);
+
+const offerMeta = document.createElement('div');
+offerMeta.className = 'offer-meta';
+offerMeta.appendChild(document.createTextNode('Use code '));
+this.appendTextElement(offerMeta, 'code', 'offer-code', promotion.code);
+if (promotion.limited) offerMeta.appendChild(document.createTextNode(' · Limited launch offer'));
+offer.appendChild(offerMeta);
+dialog.appendChild(offer);
+}
+
 if (Array.isArray(pro.highlights) && pro.highlights.length) {
 const list = document.createElement('ul');
 list.className = 'pro-modal-list';
@@ -1258,7 +1338,9 @@ buy.href = window.ExamApp.safeExternalUrl(pro.url) || '#';
 buy.target = '_blank';
 buy.rel = 'noopener noreferrer';
 buy.appendChild(this.createIcon('fas fa-store'));
-buy.appendChild(document.createTextNode(' Get the full pack' + (pro.price ? ' (' + pro.price + ')' : '')));
+buy.appendChild(document.createTextNode(
+	promotion ? ` Get the full pack — ${promotion.offerPrice}` : ' Get the full pack' + (pro.price ? ' (' + pro.price + ')' : '')
+));
 buy.addEventListener('click', () => {
 window.ExamApp?.analytics?.trackProPurchaseClicked?.(examId);
 });
