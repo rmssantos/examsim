@@ -10,6 +10,34 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ProPackTests(unittest.TestCase):
+    def test_all_pro_packs_share_launch_promotion(self):
+        exam_ids = (
+            "ab620",
+            "ai103",
+            "az104",
+            "az305",
+            "az400",
+            "dp700",
+            "saac03",
+            "sc300",
+        )
+        expected = {
+            "label": "Launch offer",
+            "discountPercent": 30,
+            "code": "EXAMPLAR30",
+            "limited": True,
+        }
+
+        for exam_id in exam_ids:
+            with self.subTest(exam_id=exam_id):
+                meta = json.loads(
+                    (ROOT / f"user-content/exams/{exam_id}/metadata.json").read_text(encoding="utf-8")
+                )
+                pro = meta["pro"]
+                self.assertEqual(pro.get("promotion"), expected)
+                self.assertTrue(pro["url"].startswith("https://examplar.gumroad.com/"))
+                self.assertIn("EXAMPLAR30", pro["url"])
+
     def test_az104_is_a_preview_pack(self):
         meta = json.loads((ROOT / "user-content/exams/az104/metadata.json").read_text(encoding="utf-8"))
         self.assertTrue(meta.get("preview"), "az104 should be flagged as a preview pack")

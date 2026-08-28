@@ -144,7 +144,13 @@
     "questions": 280,
     "labCount": 8,
     "price": "19 EUR",
-    "url": "https://examplar.gumroad.com/l/ab620-complete",
+    "url": "https://examplar.gumroad.com/l/ab620-complete/EXAMPLAR30",
+    "promotion": {
+      "label": "Launch offer",
+      "discountPercent": 30,
+      "code": "EXAMPLAR30",
+      "limited": true
+    },
     "highlights": [
       "280 original scenario questions across every AB-620 objective",
       "8 guided hands-on Copilot Studio labs",

@@ -170,7 +170,13 @@
     "title": "AZ-305 Complete",
     "questions": 279,
     "price": "19 EUR",
-    "url": "https://examplar.gumroad.com/l/az305-complete",
+    "url": "https://examplar.gumroad.com/l/az305-complete/EXAMPLAR30",
+    "promotion": {
+      "label": "Launch offer",
+      "discountPercent": 30,
+      "code": "EXAMPLAR30",
+      "limited": true
+    },
     "highlights": [
       "279 original design-scenario questions across every exam objective",
       "Detailed explanation for the correct answer and every distractor",

@@ -187,7 +187,13 @@
     "title": "AI-103 Complete",
     "questions": 280,
     "price": "17 EUR",
-    "url": "https://examplar.gumroad.com/l/ai103-complete",
+    "url": "https://examplar.gumroad.com/l/ai103-complete/EXAMPLAR30",
+    "promotion": {
+      "label": "Launch offer",
+      "discountPercent": 30,
+      "code": "EXAMPLAR30",
+      "limited": true
+    },
     "highlights": [
       "280 original scenario questions across every exam objective",
       "Detailed explanation for the correct answer and every distractor",

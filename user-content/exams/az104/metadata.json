@@ -187,7 +187,13 @@
     "questions": 300,
     "labCount": 8,
     "price": "19 EUR",
-    "url": "https://examplar.gumroad.com/l/az104-complete",
+    "url": "https://examplar.gumroad.com/l/az104-complete/EXAMPLAR30",
+    "promotion": {
+      "label": "Launch offer",
+      "discountPercent": 30,
+      "code": "EXAMPLAR30",
+      "limited": true
+    },
     "highlights": [
       "300+ original questions across every exam objective",
       "8 guided hands-on Azure CLI labs",

@@ -151,7 +151,13 @@
     "title": "SAA-C03 Complete",
     "questions": 250,
     "price": "19 EUR",
-    "url": "https://examplar.gumroad.com/l/SAA-C03-complete",
+    "url": "https://examplar.gumroad.com/l/SAA-C03-complete/EXAMPLAR30",
+    "promotion": {
+      "label": "Launch offer",
+      "discountPercent": 30,
+      "code": "EXAMPLAR30",
+      "limited": true
+    },
     "highlights": [
       "250+ original questions across all four SAA-C03 domains",
       "Rotating mock exams so every attempt feels fresh",
