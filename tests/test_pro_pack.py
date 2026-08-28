@@ -43,6 +43,26 @@ class ProPackTests(unittest.TestCase):
                 self.assertTrue(pro["url"].startswith("https://examplar.gumroad.com/"))
                 self.assertIn("EXAMPLAR30", pro["url"])
 
+    def test_recommended_paid_packs_share_the_target_launch_offer(self):
+        source_ids = ("ai901", "clfc02", "dp900", "sc900")
+
+        for source_id in source_ids:
+            with self.subTest(source_id=source_id):
+                source = json.loads(
+                    (ROOT / f"user-content/exams/{source_id}/metadata.json").read_text(
+                        encoding="utf-8"
+                    )
+                )
+                recommendation = source["recommendedPro"]
+                target = json.loads(
+                    (ROOT / f"user-content/exams/{recommendation['examId']}/metadata.json").read_text(
+                        encoding="utf-8"
+                    )
+                )["pro"]
+                self.assertEqual(recommendation.get("price"), target["price"])
+                self.assertEqual(recommendation.get("promotion"), target["promotion"])
+                self.assertEqual(recommendation["url"], target["url"])
+
     def test_az104_is_a_preview_pack(self):
         meta = json.loads((ROOT / "user-content/exams/az104/metadata.json").read_text(encoding="utf-8"))
         self.assertTrue(meta.get("preview"), "az104 should be flagged as a preview pack")

@@ -6,6 +6,8 @@ Notable public changes are recorded here. Dates use `YYYY-MM-DD`.
 
 ### Added
 
+- Added a limited 30% launch offer across paid-preview cards, purchase modals,
+  roadmaps, results upsells, and exam landing pages.
 - Added a free 25-question AB-620 preview with one guided Copilot Studio lab and
   a Complete-pack path for 280 questions and eight labs.
 - Added a library filter for exams that include accessible or Complete-pack

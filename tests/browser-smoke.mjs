@@ -28,6 +28,54 @@ try {
     'Homepage startup must not download question dumps.'
   );
 
+  // Trusted paid previews must carry the launch offer from metadata all the
+  // way through the defensive homepage snapshot and into the purchase modal.
+  const az104Offer = page.locator('.exam-card[data-exam="az104"] .exam-card-offer');
+  assert.equal(await az104Offer.count(), 1, 'AZ-104 must show the launch offer on its card.');
+  assert.match(await az104Offer.innerText(), /30% off/i);
+  assert.match(await az104Offer.innerText(), /€19\.00/);
+  assert.match(await az104Offer.innerText(), /€13\.30/);
+  assert.match(await az104Offer.innerText(), /EXAMPLAR30/);
+  assert.match(await az104Offer.innerText(), /Limited launch offer/i);
+  assert.match(
+    await page.locator('.exam-card[data-exam="az104"] .exam-card-unlock').innerText(),
+    /€13\.30/,
+    'The card CTA must use the discounted price.'
+  );
+  await page.locator('.exam-card[data-exam="az104"] .exam-card-unlock').click();
+  await page.waitForSelector('#pro-modal-overlay');
+  assert.match(await page.locator('#pro-modal-overlay .pro-modal-offer').innerText(), /EXAMPLAR30/);
+  assert.match(await page.locator('#pro-modal-overlay .pro-modal-buy').innerText(), /€13\.30/);
+  assert.match(
+    await page.locator('#pro-modal-overlay .pro-modal-buy').getAttribute('href'),
+    /\/EXAMPLAR30$/,
+    'The purchase URL must auto-apply the launch code.'
+  );
+  await page.locator('#pro-modal-overlay .pro-modal-close').click();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobileOfferLayout = await page.locator('.exam-card[data-exam="az104"]').evaluate((card) => {
+    const offer = card.querySelector('.exam-card-offer');
+    const cardBox = card.getBoundingClientRect();
+    const offerBox = offer?.getBoundingClientRect();
+    return offerBox ? {
+      cardLeft: cardBox.left,
+      cardRight: cardBox.right,
+      offerLeft: offerBox.left,
+      offerRight: offerBox.right
+    } : null;
+  });
+  assert.ok(mobileOfferLayout, 'The mobile card must keep the promotion visible.');
+  assert.ok(mobileOfferLayout.offerLeft >= mobileOfferLayout.cardLeft - 1);
+  assert.ok(mobileOfferLayout.offerRight <= mobileOfferLayout.cardRight + 1);
+  await page.locator('.exam-card[data-exam="az104"] .exam-card-unlock').click();
+  const mobileModalWidth = await page.locator('#pro-modal-overlay .pro-modal').evaluate(
+    (dialog) => dialog.getBoundingClientRect().width
+  );
+  assert.ok(mobileModalWidth <= 390, 'The promotion modal must fit a phone viewport.');
+  await page.locator('#pro-modal-overlay .pro-modal-close').click();
+  await page.setViewportSize({ width: 1280, height: 720 });
+
   // Bundled exams start as metadata-only records. Validated labCount must expose
   // their free lab before dump.json loads, while packs without labs stay clean.
   for (const examId of ['az104', 'ab620']) {
@@ -283,8 +331,28 @@ try {
     const bundled = {
       source: 'bundled',
       trust: 'bundled',
-      pro: { title: 'Official', url: 'https://example.com/buy' },
-      recommendedPro: { title: 'Official', url: 'https://example.com/next' }
+      pro: {
+        title: 'Official',
+        url: 'https://example.com/buy/EXAMPLAR30',
+        price: '19 EUR',
+        promotion: {
+          label: 'Launch offer',
+          discountPercent: 30,
+          code: 'EXAMPLAR30',
+          limited: true
+        }
+      },
+      recommendedPro: {
+        title: 'Official',
+        url: 'https://example.com/next/EXAMPLAR30',
+        price: '17 EUR',
+        promotion: {
+          label: 'Launch offer',
+          discountPercent: 30,
+          code: 'EXAMPLAR30',
+          limited: true
+        }
+      }
     };
     return {
       importedPro: simulator.renderProUpsell(imported),
@@ -302,7 +370,13 @@ try {
   assert.equal(simulatorSinkResults.importedPro, '', 'Results pro CTA must reject imported metadata.');
   assert.equal(simulatorSinkResults.importedRecommended, '', 'Results recommendation CTA must reject imported metadata.');
   assert.match(simulatorSinkResults.bundledPro, /results-pro-cta/, 'Trusted bundled pro CTA must remain available.');
+  assert.match(simulatorSinkResults.bundledPro, /results-pro-offer/, 'Trusted results must show the launch offer.');
+  assert.match(simulatorSinkResults.bundledPro, /EXAMPLAR30/);
+  assert.match(simulatorSinkResults.bundledPro, /€13\.30/);
   assert.match(simulatorSinkResults.bundledRecommended, /recommended-pro-cta/, 'Trusted bundled recommendation must remain available.');
+  assert.match(simulatorSinkResults.bundledRecommended, /results-pro-offer/);
+  assert.match(simulatorSinkResults.bundledRecommended, /EXAMPLAR30/);
+  assert.match(simulatorSinkResults.bundledRecommended, /€11\.90/);
   assert.doesNotMatch(
     simulatorSinkResults.credentialMarkdown,
     /href=/,
@@ -1139,10 +1213,18 @@ try {
 
   // Pro node: "Unlock full" opens the pro modal (highlights + Gumroad + import/license
   // instruction), instead of jumping straight to Gumroad.
+  assert.match(
+    await page.locator('.roadmap-node[data-pack="az400"] .rn-unlock').innerText(),
+    /30% off/i,
+    'Paid roadmap nodes must surface the launch discount.'
+  );
   await page.locator('.roadmap-node[data-pack="az400"] .rn-unlock').click();
   await page.waitForSelector('#pro-modal-overlay', { timeout: 2000 });
   const proBuyHref = await page.locator('#pro-modal-overlay .pro-modal-buy').getAttribute('href');
   assert.ok(proBuyHref && proBuyHref.includes('gumroad'), `Pro modal must link to Gumroad, got "${proBuyHref}".`);
+  assert.match(proBuyHref, /\/EXAMPLAR30$/, 'The roadmap purchase URL must auto-apply the launch code.');
+  assert.match(await page.locator('#pro-modal-overlay .pro-modal-offer').innerText(), /EXAMPLAR30/);
+  assert.match(await page.locator('#pro-modal-overlay .pro-modal-buy').innerText(), /€13\.30/);
   assert.equal(
     await page.locator('#pro-modal-overlay .pro-modal-activate-text').count(), 1,
     'Pro modal must include the import/license-key instruction (not a bare Gumroad jump).'

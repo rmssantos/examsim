@@ -144,7 +144,14 @@
   "recommendedPro": {
     "examId": "dp700",
     "title": "DP-700 Complete",
-    "url": "https://examplar.gumroad.com/l/dp700-complete",
+    "url": "https://examplar.gumroad.com/l/dp700-complete/EXAMPLAR30",
+    "price": "17 EUR",
+    "promotion": {
+      "label": "Launch offer",
+      "discountPercent": 30,
+      "code": "EXAMPLAR30",
+      "limited": true
+    },
     "blurb": "Passed the Data Fundamentals? Level up to Fabric Data Engineer with the DP-700 Complete pack."
   }
 }

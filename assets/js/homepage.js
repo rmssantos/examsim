@@ -547,6 +547,36 @@ if (highlights.valid && highlights.found) {
 		.map(item => this.safeMetadataText(item, stringLimit).trim())
 		.filter(Boolean);
 }
+const promotion = this.readOwnDataProperty(value, 'promotion');
+if (promotion.valid && promotion.found) {
+	snapshot.promotion = this.getPromotionSnapshot(promotion.value);
+}
+return Object.keys(snapshot).length ? Object.freeze(snapshot) : null;
+}
+
+getPromotionSnapshot(value) {
+if (!value || typeof value !== 'object') return null;
+const snapshot = {};
+const stringLimit = this.metadataLimit('maxMetadataStringLength', 5000);
+['label', 'code'].forEach((field) => {
+	const result = this.readOwnDataProperty(value, field);
+	if (result.valid && result.found && typeof result.value === 'string') {
+		snapshot[field] = this.safeMetadataText(result.value, stringLimit);
+	}
+});
+const discountPercent = this.readOwnDataProperty(value, 'discountPercent');
+if (
+	discountPercent.valid
+	&& discountPercent.found
+	&& typeof discountPercent.value === 'number'
+	&& Number.isFinite(discountPercent.value)
+) {
+	snapshot.discountPercent = discountPercent.value;
+}
+const limited = this.readOwnDataProperty(value, 'limited');
+if (limited.valid && limited.found && typeof limited.value === 'boolean') {
+	snapshot.limited = limited.value;
+}
 return Object.keys(snapshot).length ? Object.freeze(snapshot) : null;
 }
 
@@ -615,12 +645,16 @@ getRecommendedProSnapshot(value) {
 if (!value || typeof value !== 'object') return null;
 const snapshot = {};
 const stringLimit = this.metadataLimit('maxMetadataStringLength', 5000);
-['examId', 'title', 'url', 'blurb'].forEach((field) => {
+['examId', 'title', 'url', 'blurb', 'price'].forEach((field) => {
 	const result = this.readOwnDataProperty(value, field);
 	if (result.valid && result.found && typeof result.value === 'string') {
 		snapshot[field] = this.safeMetadataText(result.value, stringLimit);
 	}
 });
+const promotion = this.readOwnDataProperty(value, 'promotion');
+if (promotion.valid && promotion.found) {
+	snapshot.promotion = this.getPromotionSnapshot(promotion.value);
+}
 return Object.keys(snapshot).length ? Object.freeze(snapshot) : null;
 }
 

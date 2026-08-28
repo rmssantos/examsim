@@ -1549,7 +1549,12 @@ class MultiExamSimulator {
         if (!url) return '';
         const title = this.escapeHtml(rec.title || 'Recommended pack');
         const blurb = this.escapeHtml(rec.blurb || '');
-        return `<div class="recommended-pro"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> <strong>${title}</strong><p>${blurb}</p><a class="recommended-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener noreferrer">View pack</a></div>`;
+        const promotion = window.ExamApp.getPromotionOffer?.(rec);
+        const offer = promotion
+            ? `<div class="results-pro-offer"><span class="results-pro-offer-label">${this.escapeHtml(promotion.label)} · ${this.escapeHtml(String(promotion.discountPercent))}% off</span><span class="results-pro-offer-prices"><s>${this.escapeHtml(promotion.basePrice)}</s> <span aria-hidden="true">→</span> <strong>${this.escapeHtml(promotion.offerPrice)}</strong></span><span class="results-pro-offer-meta">Code <code>${this.escapeHtml(promotion.code)}</code>${promotion.limited ? ' · Limited launch offer' : ''}</span></div>`
+            : '';
+        const price = promotion ? ` — ${this.escapeHtml(promotion.offerPrice)}` : '';
+        return `<div class="recommended-pro"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> <strong>${title}</strong><p>${blurb}</p>${offer}<a class="recommended-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener noreferrer">View pack${price}</a></div>`;
     }
 
     displayOptions(question) {
