@@ -1153,6 +1153,20 @@ console.log(JSON.stringify({
             with self.subTest(call=call):
                 self.assertEqual(runtime.count(call), 1)
 
+    def test_secondary_purchase_surfaces_render_launch_offer(self):
+        roadmaps = (ROOT / "assets/js/roadmaps.js").read_text(encoding="utf-8")
+        runtime = (ROOT / "assets/js/script-multi-exam.js").read_text(encoding="utf-8")
+        exam_css = (ROOT / "assets/css/exam-v2.css").read_text(encoding="utf-8")
+        landing_css = (ROOT / "assets/css/exam-landing.css").read_text(encoding="utf-8")
+
+        self.assertIn("window.ExamApp.getPromotionOffer", roadmaps)
+        self.assertIn("pro-modal-offer", roadmaps)
+        self.assertIn("window.ExamApp.getPromotionOffer", runtime)
+        self.assertIn("results-pro-offer", runtime)
+        self.assertIn("Limited launch offer", runtime)
+        self.assertIn(".results-pro-offer", exam_css)
+        self.assertIn(".pro-offer", landing_css)
+
     def test_privacy_copy_discloses_commercial_and_azure_metadata(self):
         page = (ROOT / "privacy-and-storage.html").read_text(encoding="utf-8").lower()
         notes = (ROOT / "PRIVACY-AND-STORAGE.md").read_text(encoding="utf-8").lower()

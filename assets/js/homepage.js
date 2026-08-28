@@ -1033,31 +1033,7 @@ return wrapper;
 }
 
 getPromotionOffer(pro) {
-if (!pro || typeof pro !== 'object') return null;
-const promotion = pro.promotion;
-if (!promotion || typeof promotion !== 'object') return null;
-
-const discountPercent = Number(promotion.discountPercent);
-const code = String(promotion.code || '').trim();
-const priceMatch = String(pro.price || '').trim().match(/^(\d+(?:[.,]\d+)?)\s+([A-Z]{3})$/);
-if (!Number.isFinite(discountPercent) || discountPercent <= 0 || discountPercent >= 100 || !code || !priceMatch) {
-	return null;
-}
-
-const baseAmount = Number(priceMatch[1].replace(',', '.'));
-if (!Number.isFinite(baseAmount) || baseAmount <= 0) return null;
-const currency = priceMatch[2];
-const currencyLabel = currency === 'EUR' ? '€' : `${currency} `;
-const formatAmount = amount => `${currencyLabel}${amount.toFixed(2)}`;
-
-return {
-	label: String(promotion.label || 'Offer').trim() || 'Offer',
-	discountPercent,
-	code,
-	limited: promotion.limited === true,
-	basePrice: formatAmount(baseAmount),
-	offerPrice: formatAmount(baseAmount * (100 - discountPercent) / 100)
-};
+return window.ExamApp.getPromotionOffer?.(pro) || null;
 }
 
 createExamStat(number, label) {

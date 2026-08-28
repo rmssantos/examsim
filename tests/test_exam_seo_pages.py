@@ -87,7 +87,13 @@ SAMPLE_PRO = {
         "title": "AZ-104 Complete",
         "questions": 300,
         "price": "19 EUR",
-        "url": "https://examplar.gumroad.com/l/az104-complete",
+        "url": "https://examplar.gumroad.com/l/az104-complete/EXAMPLAR30",
+        "promotion": {
+            "label": "Launch offer",
+            "discountPercent": 30,
+            "code": "EXAMPLAR30",
+            "limited": True,
+        },
         "highlights": ["300+ original questions", "Detailed explanations"],
     },
 }
@@ -388,6 +394,17 @@ class PricingTests(unittest.TestCase):
         self.assertIn("AZ-104 Complete", page)    # pro pack name
         self.assertIn("Unlock the full pack", page)
         self.assertNotIn("completely free", page)  # must not over-claim
+
+    def test_preview_pack_shows_limited_launch_discount(self):
+        page = self._render(SAMPLE_PRO)
+
+        self.assertIn('class="pro-offer"', page)
+        self.assertIn("30% off", page)
+        self.assertIn("19 EUR", page)
+        self.assertIn("13.30 EUR", page)
+        self.assertIn("EXAMPLAR30", page)
+        self.assertIn("Limited launch offer", page)
+        self.assertIn("/az104-complete/EXAMPLAR30", page)
 
     def test_preview_jsonld_has_free_and_paid_offers(self):
         payload = json.loads(gen.build_jsonld(SAMPLE_PRO))

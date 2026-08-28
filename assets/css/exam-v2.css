@@ -1693,6 +1693,29 @@ button { font-family: inherit; }
   border-color: var(--accent-chip-border);
   background: var(--accent-tint);
 }
+.results-pro-offer {
+  display: grid;
+  gap: 0.2rem;
+  max-width: 360px;
+  margin: 0.65rem 0 0.8rem;
+  padding: 0.65rem 0.75rem;
+  background: var(--flag-tint, #fdf6e7);
+  border: 1px solid var(--flag-line, #ecdcb8);
+  border-left: 3px solid var(--flag, #b07d2b);
+  border-radius: var(--radius);
+}
+.results-pro-offer-label {
+  color: var(--flag, #9b6c23);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.results-pro-offer-prices { display: flex; align-items: baseline; gap: 0.45rem; }
+.results-pro-offer-prices s { color: var(--text-faint); font-size: 0.8rem; }
+.results-pro-offer-prices strong { font-family: var(--font-num); font-size: 1.08rem; color: var(--text); }
+.results-pro-offer-meta { color: var(--text-soft); font-size: 0.72rem; }
+.results-pro-offer-meta code { color: var(--flag, #9b6c23); font-weight: 800; }
 .results-pro-cta {
   display: inline-block;
   padding: 0.55rem 1.1rem;

@@ -5,6 +5,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
+try:
+    from .node_harness import run_node_snippet, utils_bootstrap
+except ImportError:
+    from node_harness import run_node_snippet, utils_bootstrap
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -74,6 +79,40 @@ class ProPackTests(unittest.TestCase):
             self.assertIn(f".{class_name}", css)
         self.assertIn("Limited launch offer", js)
         self.assertIn("discountPercent", js)
+
+    def test_shared_promotion_offer_derives_prices_and_rejects_bad_data(self):
+        payload = run_node_snippet(
+            ROOT / "assets/js/utils.js",
+            utils_bootstrap(
+                r"""
+                const helper = window.ExamApp.getPromotionOffer;
+                const valid = typeof helper === 'function' ? helper({
+                  price: '19 EUR',
+                  promotion: {
+                    label: 'Launch offer',
+                    discountPercent: 30,
+                    code: 'EXAMPLAR30',
+                    limited: true
+                  }
+                }) : null;
+                const malformed = typeof helper === 'function'
+                  ? helper({ price: 'free', promotion: { discountPercent: 30, code: 'X' } })
+                  : null;
+                console.log(JSON.stringify({
+                  available: typeof helper === 'function',
+                  valid,
+                  malformed
+                }));
+                """
+            ),
+        )
+
+        self.assertTrue(payload["available"])
+        self.assertTrue(payload["valid"]["basePrice"].endswith("19.00"))
+        self.assertTrue(payload["valid"]["offerPrice"].endswith("13.30"))
+        self.assertEqual(payload["valid"]["discountPercent"], 30)
+        self.assertEqual(payload["valid"]["code"], "EXAMPLAR30")
+        self.assertIsNone(payload["malformed"])
 
     def test_homepage_exposes_metadata_driven_library_filters(self):
         html = (ROOT / "index.html").read_text(encoding="utf-8")

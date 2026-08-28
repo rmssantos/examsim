@@ -13,6 +13,7 @@ from __future__ import annotations
 import html
 import json
 import re
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from string import Template
 
@@ -359,6 +360,34 @@ def _parse_price(price: str) -> tuple:
     return amount, currency
 
 
+def promotion_offer(pro: dict) -> dict | None:
+    """Return normalized promotion display data, or None for malformed input."""
+    if not isinstance(pro, dict) or not isinstance(pro.get("promotion"), dict):
+        return None
+    promotion = pro["promotion"]
+    code = str(promotion.get("code") or "").strip()
+    try:
+        discount = Decimal(str(promotion.get("discountPercent")))
+        amount_text, currency = _parse_price(pro.get("price", ""))
+        base_amount = Decimal(amount_text.replace(",", "."))
+    except (InvalidOperation, TypeError, ValueError):
+        return None
+    if not code or discount <= 0 or discount >= 100 or base_amount <= 0:
+        return None
+    offer_amount = (base_amount * (Decimal("100") - discount) / Decimal("100")).quantize(Decimal("0.01"))
+    discount_text = format(discount, "f")
+    if "." in discount_text:
+        discount_text = discount_text.rstrip("0").rstrip(".")
+    return {
+        "label": str(promotion.get("label") or "Offer").strip() or "Offer",
+        "discount": f"{discount_text}% off",
+        "code": code,
+        "limited": promotion.get("limited") is True,
+        "base_price": f"{base_amount:.2f} {currency}",
+        "offer_price": f"{offer_amount:.2f} {currency}",
+    }
+
+
 def build_pro(meta: dict) -> str:
     """Upsell section for pro/preview packs; empty string for fully free packs."""
     if is_free(meta):
@@ -370,6 +399,7 @@ def build_pro(meta: dict) -> str:
     title = esc(pro.get("title", f"{code} Complete"))
     price = esc(pro.get("price", ""))
     url = esc(http_url(pro.get("url"), "#"))
+    promotion = promotion_offer(pro)
     questions = pro.get("questions")
     qs_txt = f"all {esc(questions)} questions" if questions else "the complete question bank"
     highlights = [h for h in (pro.get("highlights") or []) if h]
@@ -378,15 +408,31 @@ def build_pro(meta: dict) -> str:
         highlights_html = f'    <ul class="pro-highlights">\n{items}\n    </ul>\n'
     else:
         highlights_html = ""
-    price_html = f' One-time <span class="pro-price">{price}</span>.' if price else ""
+    price_html = f' One-time <span class="pro-price">{price}</span>.' if price and not promotion else ""
+    if promotion:
+        limited = " · Limited launch offer" if promotion["limited"] else ""
+        offer_html = (
+            '      <div class="pro-offer">\n'
+            f'        <div class="pro-offer-top"><span>{esc(promotion["label"])}</span>'
+            f'<strong>{esc(promotion["discount"])}</strong></div>\n'
+            f'        <div class="pro-offer-prices"><s>{esc(promotion["base_price"])}</s>'
+            f'<span aria-hidden="true">→</span><strong>{esc(promotion["offer_price"])}</strong></div>\n'
+            f'        <div class="pro-offer-meta">Code <code>{esc(promotion["code"])}</code>{limited}</div>\n'
+            '      </div>\n'
+        )
+        cta_label = f'Unlock the full pack — {esc(promotion["offer_price"])}'
+    else:
+        offer_html = ""
+        cta_label = "Unlock the full pack"
     return (
         '    <section class="exam-pro" aria-labelledby="pro-h">\n'
         f"      <h2 id=\"pro-h\">Get {title}</h2>\n"
         f"      <p>Unlock {qs_txt} with detailed explanations for every answer and "
         f"study mode.{price_html}</p>\n"
+        f"{offer_html}"
         f"{highlights_html}"
         f'      <a class="pro-cta" href="{url}" rel="nofollow noopener" target="_blank">'
-        "Unlock the full pack</a>\n"
+        f"{cta_label}</a>\n"
         "    </section>"
     )
 

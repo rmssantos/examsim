@@ -306,6 +306,34 @@ window.ExamApp.safeExternalUrl = function safeExternalUrl(value) {
     }
 };
 
+window.ExamApp.getPromotionOffer = function getPromotionOffer(pro) {
+    if (!pro || typeof pro !== 'object') return null;
+    const promotion = pro.promotion;
+    if (!promotion || typeof promotion !== 'object') return null;
+
+    const discountPercent = Number(promotion.discountPercent);
+    const code = String(promotion.code || '').trim();
+    const priceMatch = String(pro.price || '').trim().match(/^(\d+(?:[.,]\d+)?)\s+([A-Z]{3})$/);
+    if (!Number.isFinite(discountPercent) || discountPercent <= 0 || discountPercent >= 100 || !code || !priceMatch) {
+        return null;
+    }
+
+    const baseAmount = Number(priceMatch[1].replace(',', '.'));
+    if (!Number.isFinite(baseAmount) || baseAmount <= 0) return null;
+    const currency = priceMatch[2];
+    const currencyLabel = currency === 'EUR' ? '€' : `${currency} `;
+    const formatAmount = amount => `${currencyLabel}${amount.toFixed(2)}`;
+
+    return Object.freeze({
+        label: String(promotion.label || 'Offer').trim() || 'Offer',
+        discountPercent,
+        code,
+        limited: promotion.limited === true,
+        basePrice: formatAmount(baseAmount),
+        offerPrice: formatAmount(baseAmount * (100 - discountPercent) / 100)
+    });
+};
+
 window.ExamApp.resourceUrlForTrust = function resourceUrlForTrust(value, exam) {
     const safeUrl = window.ExamApp.safeExternalUrl(value);
     if (!safeUrl) return null;

@@ -277,6 +277,47 @@ body.exam-landing.dark-mode {
 }
 .exam-landing .exam-pro h2 { margin-top: 0; }
 .exam-landing .pro-price { font-weight: 800; color: var(--primary); }
+.exam-landing .pro-offer {
+  max-width: 520px;
+  margin: 14px 0 16px;
+  padding: 12px 14px;
+  color: var(--ink);
+  background: #fdf6e7;
+  border: 1px solid #ecdcb8;
+  border-left: 4px solid #b07d2b;
+  border-radius: 8px;
+}
+.exam-landing.dark-mode .pro-offer {
+  background: #2e271a;
+  border-color: #4a3e26;
+  border-left-color: #d3aa64;
+}
+.exam-landing .pro-offer-top,
+.exam-landing .pro-offer-prices { display: flex; align-items: baseline; }
+.exam-landing .pro-offer-top { justify-content: space-between; gap: 14px; }
+.exam-landing .pro-offer-top span {
+  color: #9b6c23;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.exam-landing.dark-mode .pro-offer-top span { color: #d3aa64; }
+.exam-landing .pro-offer-top strong { color: #9b6c23; }
+.exam-landing.dark-mode .pro-offer-top strong { color: #d3aa64; }
+.exam-landing .pro-offer-prices { gap: 9px; margin-top: 3px; }
+.exam-landing .pro-offer-prices s { color: var(--muted); font-size: 0.85rem; }
+.exam-landing .pro-offer-prices strong { font-size: 1.2rem; }
+.exam-landing .pro-offer-meta { margin-top: 5px; color: var(--muted); font-size: 0.76rem; }
+.exam-landing .pro-offer-meta code {
+  color: #9b6c23;
+  background: rgba(176, 125, 43, 0.1);
+  border: 1px dashed #d7bd89;
+  border-radius: 4px;
+  padding: 1px 4px;
+  font-weight: 800;
+}
+.exam-landing.dark-mode .pro-offer-meta code { color: #d3aa64; border-color: #4a3e26; }
 .exam-landing .pro-highlights { margin: 12px 0 18px; padding-left: 20px; }
 .exam-landing .pro-highlights li { margin: 6px 0; color: var(--muted); }
 .exam-landing .pro-cta {
