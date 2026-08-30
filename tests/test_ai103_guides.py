@@ -127,7 +127,9 @@ class AI103GuideTests(unittest.TestCase):
             self.assertIn(f"https://examplar.app/guides/{slug}/", sitemap)
             self.assertIn(f"guides/{slug}/index.html", artifact.PUBLIC_FILES)
 
-        with tempfile.TemporaryDirectory(dir=ROOT / "build") as tmp:
+        build_root = ROOT / "build"
+        build_root.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=build_root) as tmp:
             output = artifact.build(Path(tmp))
             for slug in GUIDES:
                 self.assertTrue((output / "guides" / slug / "index.html").is_file())
