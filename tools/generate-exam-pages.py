@@ -13,6 +13,7 @@ from __future__ import annotations
 import html
 import json
 import re
+from datetime import date
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from string import Template
@@ -40,6 +41,10 @@ TEMPLATE_PATH = ROOT / "tools" / "exam-page-template.html"
 SITE = "https://examplar.app"
 OG_IMAGE = f"{SITE}/assets/media/og-image.png"
 THEME_COLOR = "#1e3c72"
+GUIDE_PATHS = (
+    "ai-102-to-ai-103",
+    "ai-103-study-plan",
+)
 
 
 def esc(value) -> str:
@@ -146,6 +151,57 @@ def build_domains(meta: dict) -> str:
     )
 
 
+def _human_date(value) -> str:
+    try:
+        parsed = date.fromisoformat(str(value or ""))
+    except ValueError:
+        return str(value or "").strip()
+    return f"{parsed.strftime('%B')} {parsed.day}, {parsed.year}"
+
+
+def build_landing_proof(meta: dict) -> str:
+    """Render an optional blueprint proof panel inside a featured hero."""
+    positioning = meta.get("landingPositioning")
+    if not isinstance(positioning, dict):
+        return ""
+
+    domains = meta.get("objectiveDomains") or []
+    domain_rows = []
+    for domain in domains:
+        name = str(domain.get("name") or "").strip()
+        weight = str(domain.get("weightRange") or "").strip()
+        if not name or not weight:
+            continue
+        domain_rows.append(
+            '          <li class="readiness-domain">'
+            f'<span>{esc(name)}</span><strong>{esc(weight)}</strong></li>'
+        )
+    if not domain_rows:
+        return ""
+
+    review = meta.get("contentReview")
+    if not isinstance(review, dict):
+        review = {}
+    objective_version = str(review.get("objectiveVersion") or "").strip()
+    reviewed = _human_date(review.get("lastReviewed"))
+    eyebrow = positioning.get("proofEyebrow") or f"{exam_code(meta)} readiness trace"
+    status = positioning.get("proofStatus") or "Blueprint current"
+
+    return (
+        '        <aside class="readiness-trace" aria-labelledby="readiness-trace-h">\n'
+        '          <div class="readiness-trace-head">\n'
+        f'            <span>{esc(eyebrow)}</span><strong>{esc(status)}</strong>\n'
+        '          </div>\n'
+        '          <h2 id="readiness-trace-h">Objective coverage before test day</h2>\n'
+        f'          <p class="readiness-version">{esc(objective_version)}</p>\n'
+        '          <ol class="readiness-domains">\n'
+        + "\n".join(domain_rows)
+        + "\n          </ol>\n"
+        f'          <p class="readiness-reviewed">Last reviewed {esc(reviewed)}</p>\n'
+        '        </aside>'
+    )
+
+
 def build_modules(meta: dict) -> str:
     modules = meta.get("modules") or []
     items = "\n".join(
@@ -185,6 +241,34 @@ def build_resources(meta: dict) -> str:
         '      <ul class="exam-resources">\n'
         f"{body}\n"
         "      </ul>\n"
+        "    </section>"
+    )
+
+
+def build_related_guides(meta: dict, root: str = "../../") -> str:
+    cards = []
+    for guide in meta.get("relatedGuides") or []:
+        if not isinstance(guide, dict):
+            continue
+        slug = str(guide.get("slug") or "").strip()
+        title = str(guide.get("title") or "").strip()
+        description = str(guide.get("description") or "").strip()
+        if not SAFE_ID.match(slug) or not title or not description:
+            continue
+        cards.append(
+            f'      <li><a class="guide-card" href="{root}guides/{esc(slug)}/">'
+            f'<span class="guide-card-label">AI-103 field guide</span>'
+            f'<strong>{esc(title)}</strong><span>{esc(description)}</span>'
+            '<i aria-hidden="true" class="fas fa-arrow-right"></i></a></li>'
+        )
+    if not cards:
+        return ""
+    return (
+        '    <section class="exam-section related-guides" aria-labelledby="guides-h">\n'
+        '      <h2 id="guides-h">Plan your AI-103 preparation</h2>\n'
+        '      <ul class="guide-cards">\n'
+        + "\n".join(cards)
+        + "\n      </ul>\n"
         "    </section>"
     )
 
@@ -272,8 +356,8 @@ def faq_pairs(meta: dict) -> list:
         ),
         (
             f"Can I use this as a timed {code} practice test?",
-            f"Yes. Exam mode runs a timed {code} practice test that mirrors the real "
-            "exam format, and study mode adds instant feedback with spaced repetition.",
+            f"Yes. Exam mode runs timed practice based on the public {code} objectives, "
+            "and study mode adds instant feedback with spaced repetition.",
         ),
         (
             "Does my data stay private?",
@@ -509,6 +593,9 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
     # (file://), served via server.py, or deployed at the domain root.
     root = "../../"
     full = meta.get("fullName") or code
+    positioning = meta.get("landingPositioning")
+    if not isinstance(positioning, dict):
+        positioning = {}
     if is_free(meta):
         intro = (
             f"Practice for {full} with original, syllabus-aligned questions. No account "
@@ -528,6 +615,9 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
             f"{preview_txt}Original, syllabus-aligned questions you can run in your browser, "
             f"with no account and offline access after the app is cached. {unlock_txt}"
         )
+    intro = str(positioning.get("intro") or intro)
+    hero_proof = build_landing_proof(meta)
+    trust_line = str(positioning.get("trustLine") or "").strip()
     title = esc(page_title(meta))
     description = esc(page_description(meta))
     mapping = {
@@ -542,22 +632,33 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
         "theme_color": THEME_COLOR,
         "exam_code": esc(code),
         "exam_id": esc(meta["id"]),
+        "hero_class": " landing-hero-featured" if hero_proof else "",
+        "hero_title": esc(positioning.get("headline") or f"{code} Practice Exam"),
         "full_name": esc(full),
         "intro": esc(intro),
         "kicker": esc(page_kicker(meta)),
+        "hero_proof": hero_proof,
+        "trust_line": (
+            f'          <p class="landing-trust-line">{esc(trust_line)}</p>'
+            if trust_line
+            else ""
+        ),
         "root": root,
         "diagnostic_cta_url": (
             f"{root}exam.html?exam={esc(meta['id'])}"
             "&amp;session=diagnostic&amp;count=10"
         ),
         "full_cta_url": f"{root}exam.html?exam={esc(meta['id'])}",
-        "full_cta_label": (
-            "Start full practice"
-            if is_free(meta)
-            else "Start full preview"
+        "diagnostic_cta_label": esc(
+            positioning.get("diagnosticCtaLabel") or "Start 10-question diagnostic"
+        ),
+        "full_cta_label": esc(
+            positioning.get("fullCtaLabel")
+            or ("Start full practice" if is_free(meta) else "Start full preview")
         ),
         "facts": build_facts(meta),
         "domains": build_domains(meta),
+        "guides": build_related_guides(meta, root),
         "modules": build_modules(meta),
         "resources": build_resources(meta),
         "labs": build_labs(meta, root),
@@ -575,6 +676,7 @@ def render_sitemap(all_exams: list) -> str:
         (f"{SITE}/exams/", "0.9"),
         (f"{SITE}/roadmaps.html", "0.8"),
     ]
+    entries += [(f"{SITE}/guides/{slug}/", "0.8") for slug in GUIDE_PATHS]
     entries += [(f"{SITE}/exams/{e['id']}/", "0.8") for e in all_exams]
     entries.append((f"{SITE}/privacy-and-storage.html", "0.3"))
     body = "\n".join(

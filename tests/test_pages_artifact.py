@@ -37,6 +37,7 @@ class PagesArtifactTests(unittest.TestCase):
             "editor.html",
             "exam.html",
             "exams",
+            "guides",
             "index.html",
             "labs.html",
             "manifest.webmanifest",

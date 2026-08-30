@@ -1275,6 +1275,28 @@ try {
     );
   }
 
+  // Full-bleed landing chrome must not create sideways scrolling when the
+  // vertical scrollbar reduces the layout viewport on a phone-sized screen.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`${baseUrl}/exams/ai103/index.html`, { waitUntil: 'domcontentloaded' });
+  const ai103MobileViewport = await page.evaluate(() => {
+    // Headless Chromium uses overlay scrollbars, so reserve a real gutter to
+    // reproduce desktop/mobile browsers where 100vw includes scrollbar width.
+    document.documentElement.style.scrollbarGutter = 'stable';
+    const topbar = document.querySelector('.cr-topbar').getBoundingClientRect();
+    return {
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      topbarLeft: topbar.left,
+      topbarRight: topbar.right
+    };
+  });
+  assert.ok(
+    ai103MobileViewport.topbarLeft >= -0.5
+      && ai103MobileViewport.topbarRight <= ai103MobileViewport.clientWidth + 0.5,
+    `AI-103 landing top bar must remain inside the mobile layout viewport: ${JSON.stringify(ai103MobileViewport)}`
+  );
+
   console.log('Browser smoke passed.');
 } finally {
   await browser.close();

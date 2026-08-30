@@ -45,8 +45,7 @@ body.exam-landing.dark-mode {
   position: sticky;
   top: 0;
   z-index: 50;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
+  width: 100%;
   margin-bottom: 18px;
   background: var(--rail-bg);
   color: var(--rail-text);
@@ -142,6 +141,12 @@ body.exam-landing.dark-mode {
   border-radius: 16px;
   box-shadow: none;
 }
+.exam-landing .landing-hero-grid { display: grid; gap: 28px; }
+.exam-landing .landing-hero-featured .landing-hero-grid {
+  grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+  align-items: stretch;
+}
+.exam-landing .landing-hero-copy { min-width: 0; }
 .exam-landing .landing-hero h1,
 .exam-landing .landing-hero strong { color: #e8ebf0; }
 .exam-landing .landing-kicker {
@@ -163,6 +168,13 @@ body.exam-landing.dark-mode {
 .exam-landing .landing-subhead { margin: 0 0 14px; font-size: 1.15rem; opacity: 0.92; }
 .exam-landing .landing-intro { margin: 0; max-width: 640px; font-size: 1.02rem; opacity: 0.94; }
 .exam-landing .hero-cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.exam-landing .landing-trust-line {
+  margin: 16px 0 0;
+  color: #c5ccd8;
+  font-size: 0.78rem;
+  font-family: 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace;
+  letter-spacing: -0.01em;
+}
 .exam-landing .landing-cta {
   display: inline-flex;
   align-items: center;
@@ -191,6 +203,54 @@ body.exam-landing.dark-mode {
   transition: border-color .12s ease;
 }
 .exam-landing .landing-cta-ghost:hover { border-color: #aab2c0; background: transparent; }
+
+/* AI readiness trace: the public exam blueprint presented as a developer-facing
+   evaluation panel, not a generic marketing-stat card. */
+.exam-landing .readiness-trace {
+  align-self: stretch;
+  padding: 18px;
+  color: #cbd5e1;
+  background: #151b25;
+  border: 1px solid #3a4658;
+  border-radius: 12px;
+  font-family: 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace;
+  box-shadow: inset 3px 0 0 #9da8ff;
+}
+.exam-landing .readiness-trace-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #2f3948;
+  color: #9da8ff;
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.exam-landing .readiness-trace-head strong { color: #74e7d7; font-size: inherit; }
+.exam-landing .readiness-trace h2 {
+  margin: 14px 0 3px;
+  color: #f5f7fb;
+  font-family: 'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+.exam-landing .readiness-version,
+.exam-landing .readiness-reviewed { margin: 0; color: #93a0b4; font-size: 0.69rem; }
+.exam-landing .readiness-domains { list-style: none; margin: 14px 0; padding: 0; }
+.exam-landing .readiness-domain {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid #283241;
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+.exam-landing .readiness-domain:first-child { border-top: 0; }
+.exam-landing .readiness-domain span { color: #cbd5e1; }
+.exam-landing .readiness-domain strong { color: #74e7d7; font-size: 0.69rem; white-space: nowrap; }
 
 /* Section cards */
 .exam-landing .exam-section {
@@ -252,6 +312,86 @@ body.exam-landing.dark-mode {
 .exam-landing .exam-modules { columns: 2; column-gap: 28px; }
 .exam-landing .domain-weight { color: var(--primary); font-weight: 700; }
 .exam-landing a { color: var(--primary); }
+
+/* Editorial field guides and their entry cards */
+.exam-landing .guide-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.exam-landing .guide-card {
+  position: relative;
+  display: grid;
+  gap: 5px;
+  min-height: 128px;
+  padding: 18px 48px 18px 18px;
+  color: var(--ink);
+  background: rgba(157, 168, 255, 0.07);
+  border: 1px solid rgba(111, 124, 225, 0.28);
+  border-radius: 10px;
+  text-decoration: none;
+}
+.exam-landing .guide-card:hover { border-color: #7b87e8; }
+.exam-landing .guide-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.exam-landing .guide-card-label {
+  color: #6874cf;
+  font: 700 0.68rem/1.3 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.exam-landing.dark-mode .guide-card-label { color: #aeb6ff; }
+.exam-landing .guide-card strong { font-size: 1rem; line-height: 1.35; }
+.exam-landing .guide-card span:last-of-type { color: var(--muted); font-size: 0.84rem; }
+.exam-landing .guide-card i { position: absolute; top: 20px; right: 18px; color: #7b87e8; }
+
+.exam-landing .guide-article { max-width: 800px; margin: 0 auto; }
+.exam-landing .guide-hero {
+  margin-bottom: 22px;
+  padding: 34px 36px;
+  color: #cbd5e1;
+  background: #1d232f;
+  border: 1px solid #313947;
+  border-radius: 16px;
+  box-shadow: inset 4px 0 0 #9da8ff;
+}
+.exam-landing .guide-hero .landing-kicker { margin-bottom: 18px; color: #aeb6ff; border-color: rgba(157, 168, 255, 0.45); background: rgba(157, 168, 255, 0.08); }
+.exam-landing .guide-hero h1 { margin: 0 0 14px; color: #f5f7fb; font-size: clamp(2rem, 5vw, 3.35rem); line-height: 1.04; letter-spacing: -0.04em; }
+.exam-landing .guide-hero p { margin: 0; max-width: 680px; font-size: 1.05rem; }
+.exam-landing .guide-updated { margin-top: 16px; color: #9ca8ba; font: 0.72rem/1.4 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace; }
+.exam-landing .guide-section {
+  margin-top: 18px;
+  padding: 24px 28px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+}
+.exam-landing .guide-section h2 { margin: 0 0 12px; font-size: 1.4rem; line-height: 1.25; }
+.exam-landing .guide-section h3 { margin: 22px 0 8px; font-size: 1.05rem; }
+.exam-landing .guide-section p { margin: 10px 0; }
+.exam-landing .guide-section li { margin: 8px 0; }
+.exam-landing .guide-verdict { border-left: 4px solid #9da8ff; }
+.exam-landing .guide-verdict strong { color: #606dcc; }
+.exam-landing.dark-mode .guide-verdict strong { color: #b9c0ff; }
+.exam-landing .guide-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+.exam-landing .guide-table th,
+.exam-landing .guide-table td { padding: 11px 12px; text-align: left; vertical-align: top; border: 1px solid var(--card-border); }
+.exam-landing .guide-table th { background: rgba(157, 168, 255, 0.08); }
+.exam-landing .guide-step {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid var(--card-border);
+}
+.exam-landing .guide-step:first-of-type { border-top: 0; }
+.exam-landing .guide-step-label { color: #6874cf; font: 800 0.72rem/1.4 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace; text-transform: uppercase; }
+.exam-landing.dark-mode .guide-step-label { color: #aeb6ff; }
+.exam-landing .guide-step h3 { margin: 0 0 6px; }
+.exam-landing .guide-cta-block { text-align: center; background: rgba(15, 118, 110, 0.06); }
+.exam-landing .guide-cta-block p { max-width: 600px; margin: 0 auto 16px; }
 
 /* FAQ */
 .exam-landing .faq-item { border-top: 1px solid var(--card-border); padding: 12px 0; }
@@ -388,5 +528,19 @@ body.exam-landing.dark-mode {
 @media (max-width: 640px) {
   .exam-landing .landing-hero { padding: 28px 22px; }
   .exam-landing .landing-hero h1 { font-size: 1.8rem; }
+  .exam-landing .landing-hero-featured .landing-hero-grid { grid-template-columns: 1fr; }
   .exam-landing .exam-modules { columns: 1; }
+  .exam-landing .guide-cards { grid-template-columns: 1fr; }
+  .exam-landing .guide-hero { padding: 28px 22px; }
+  .exam-landing .guide-step { grid-template-columns: 1fr; gap: 4px; }
+  .exam-landing .guide-table { display: block; overflow-x: auto; }
+}
+
+@media (min-width: 641px) and (max-width: 860px) {
+  .exam-landing .landing-hero-featured .landing-hero-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exam-landing .landing-cta,
+  .exam-landing .landing-cta-ghost { transition: none; }
 }
