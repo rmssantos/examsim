@@ -349,7 +349,7 @@
 				(Array.isArray(pro.highlights) && pro.highlights.length
 					? '<ul class="pro-modal-list">' + pro.highlights.map(h => '<li><i class="fas fa-check" aria-hidden="true"></i> ' + escapeHtml(h) + '</li>').join('') + '</ul>'
 					: '') +
-				'<a class="pro-modal-buy" href="' + escapeHtml(window.ExamApp.safeExternalUrl(pro.url) || '#') + '" target="_blank" rel="noopener noreferrer">' +
+				'<a class="pro-modal-buy" href="' + escapeHtml(window.ExamApp.safeExternalUrl(pro.url) || '#') + '" target="_blank" rel="noopener" data-analytics-event="pro_purchase_clicked" data-analytics-exam="' + escapeHtml(node.id) + '" data-analytics-placement="roadmap_modal">' +
 					'<i class="fas fa-store" aria-hidden="true"></i> Get the full pack' +
 					(promotion ? ' — ' + escapeHtml(promotion.offerPrice) : (pro.price ? ' (' + escapeHtml(pro.price) + ')' : '')) + '</a>' +
 				'<div class="pro-modal-divider"></div>' +
@@ -359,9 +359,6 @@
 		document.body.appendChild(overlay);
 		overlay.addEventListener('click', (e) => { if (e.target === overlay) closeProModal(); });
 		overlay.querySelector('.pro-modal-close')?.addEventListener('click', closeProModal);
-		overlay.querySelector('.pro-modal-buy')?.addEventListener('click', () => {
-			window.ExamApp?.analytics?.trackEvent?.('roadmap_pro_purchase', { exam: node.id });
-		});
 		document.addEventListener('keydown', onProKeydown);
 		window.ExamApp?.analytics?.trackEvent?.('roadmap_pro_modal', { exam: node.id });
 	}

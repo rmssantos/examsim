@@ -431,7 +431,9 @@ def build_pro(meta: dict) -> str:
         f"study mode.{price_html}</p>\n"
         f"{offer_html}"
         f"{highlights_html}"
-        f'      <a class="pro-cta" href="{url}" rel="nofollow noopener" target="_blank">'
+        f'      <a class="pro-cta" href="{url}" rel="nofollow noopener" target="_blank" '
+        f'data-analytics-event="pro_purchase_clicked" data-analytics-exam="{esc(meta["id"])}" '
+        'data-analytics-placement="exam_landing">'
         f"{cta_label}</a>\n"
         "    </section>"
     )
