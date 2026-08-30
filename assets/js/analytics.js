@@ -777,6 +777,20 @@
         });
     }
 
+    const originalPurchaseUrls = new WeakMap();
+    const decoratedPurchaseCtas = new Set();
+
+    function restorePurchaseUrl(cta) {
+        const originalUrl = originalPurchaseUrls.get(cta);
+        if (originalUrl) cta.href = originalUrl;
+        originalPurchaseUrls.delete(cta);
+        decoratedPurchaseCtas.delete(cta);
+    }
+
+    function restoreDecoratedPurchaseUrls() {
+        Array.from(decoratedPurchaseCtas).forEach(restorePurchaseUrl);
+    }
+
     function setOptOut(disabled) {
         const persisted = disabled
             ? safeLocalStorageSet(CONFIG.optOutKey, 'true')
@@ -784,6 +798,7 @@
         if (disabled) {
             safeSessionStorageRemove(CONFIG.attributionKey);
             safeSessionStorageRemove(CONFIG.googleAdsClickIdsKey);
+            restoreDecoratedPurchaseUrls();
         }
         if (persisted) updatePrivacyButtonState();
         return persisted;
@@ -833,7 +848,7 @@
         dialog.appendChild(title);
 
         const description = document.createElement('p');
-        description.textContent = 'The online version collects limited visit, campaign attribution, exam usage, and commercial interaction events. Study telemetry is limited to session start, one first-answer interaction per Study session, and completion aggregates. Study start and first-answer events contain only bounded exam/session context. Study completion telemetry sends session-level question, answered, and correct counts plus coarse accuracy and duration buckets. These aggregates are not linked to question identifiers or content; however, results from very small Study sessions may be inferable. Examplar does not send individual answer events, question IDs or text, options, answer state, or selected responses. Azure can add coarse location and client metadata. It does not collect imported files, filenames, names, emails, full referrer URLs, or a persistent visitor ID.';
+        description.textContent = 'The online version collects limited visit, campaign attribution, exam usage, and commercial interaction events. Study telemetry is limited to session start, one first-answer interaction per Study session, and completion aggregates. Study start and first-answer events contain only bounded exam/session context. Study completion telemetry sends session-level question, answered, and correct counts plus coarse accuracy and duration buckets. These aggregates are not linked to question identifiers or content; however, results from very small Study sessions may be inferable. Examplar does not send individual answer events, question IDs or text, options, answer state, or selected responses. Azure can add coarse location and client metadata. For Google Ads visits, bounded Google Ads click identifiers are kept only in the current tab, forwarded only with a Gumroad purchase link, and not added to Azure product telemetry. It does not collect imported files, filenames, names, emails, full referrer URLs, or a persistent visitor ID.';
         dialog.appendChild(description);
 
         const status = document.createElement('div');
@@ -930,7 +945,6 @@
     }
 
     let ctaHandlerInstalled = false;
-    const originalPurchaseUrls = new WeakMap();
 
     function installCtaTracking() {
         if (ctaHandlerInstalled) return;
@@ -957,8 +971,10 @@
             const decorated = decorateGumroadUrl(originalUrl);
             if (decorated) {
                 cta.href = decorated;
+                decoratedPurchaseCtas.add(cta);
+                setTimeout(() => restorePurchaseUrl(cta), 0);
             } else if (originalUrl) {
-                cta.href = originalUrl;
+                restorePurchaseUrl(cta);
             }
             trackProPurchaseClicked(cta.dataset?.analyticsExam, {
                 placement: cta.dataset?.analyticsPlacement,

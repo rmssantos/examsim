@@ -234,6 +234,7 @@ let embeddedClickId = null;
 let storedGoogleClickIds = null;
 let clickIdsAfterInvalid = null;
 let clickIdTelemetryProperties = null;
+let clickIdBoundaryValues = null;
 let optedOut = null;
 let optOutCleared = false;
 let googleClickOptOutCleared = false;
@@ -255,6 +256,12 @@ if (available) {
   storedGoogleClickIds = tab.get('exam_google_ads_click_ids') || null;
   clickIdTelemetryProperties = window.ExamApp.analytics._private
     .buildPageViewEnvelope().data.baseData.properties;
+  const sanitizeClickId = window.ExamApp.analytics._private.sanitizeGoogleAdsClickId;
+  clickIdBoundaryValues = {
+    accepted256: sanitizeClickId('A'.repeat(256)),
+    rejected257: sanitizeClickId('A'.repeat(257)),
+    rejectedPunctuation: sanitizeClickId('abc/def')
+  };
   window.location.href = 'https://examplar.app/roadmaps.html';
   persistedGoogleClick = helper(product);
 
@@ -296,6 +303,7 @@ console.log(JSON.stringify({
   storedGoogleClickIds,
   clickIdsAfterInvalid,
   clickIdTelemetryProperties,
+  clickIdBoundaryValues,
   optedOut,
   optOutCleared,
   googleClickOptOutCleared,
@@ -490,6 +498,13 @@ console.log(JSON.stringify({
         self.assertNotIn("gclid", properties)
         self.assertNotIn("gbraid", properties)
         self.assertNotIn("wbraid", properties)
+
+    def test_google_ads_click_ids_have_strict_length_and_character_bounds(self):
+        boundaries = self.run_gumroad_decorations()["clickIdBoundaryValues"]
+
+        self.assertEqual(boundaries["accepted256"], "A" * 256)
+        self.assertEqual(boundaries["rejected257"], "")
+        self.assertEqual(boundaries["rejectedPunctuation"], "")
 
     def test_gumroad_links_are_not_decorated_outside_the_public_site(self):
         payload = self.run_gumroad_decorations()
@@ -1358,7 +1373,7 @@ global.fetch = (_url, options) => {
 global.HTMLElement = function HTMLElement() {};
 global.document = {
   readyState: 'loading',
-  referrer: 'https://www.reddit.com/r/AzureCertification/',
+  referrer: 'https://www.google.com/search?q=ai-103',
   addEventListener(type, handler) { handlers[type] = handler; },
   getElementById(id) {
     return id === 'analytics-privacy-button' ? {} : null;
@@ -1366,7 +1381,7 @@ global.document = {
 };
 global.window = {
   location: {
-    href: 'https://examplar.app/exams/az104/?utm_source=reddit',
+    href: 'https://examplar.app/exams/az104/?utm_source=google_ads&gclid=Click_ID-123_ABC',
     protocol: 'https:',
     hostname: 'examplar.app',
     pathname: '/exams/az104/'
@@ -1394,6 +1409,7 @@ handlers.click({
 });
 const decoratedHref = cta.href;
 window.ExamApp.analytics.setOptOut(true);
+const hrefImmediatelyAfterOptOut = cta.href;
 handlers.click({
   target: {
     closest(selector) {
@@ -1405,6 +1421,7 @@ handlers.click({
 console.log(JSON.stringify({
   prevented,
   decoratedHref,
+  hrefImmediatelyAfterOptOut,
   href: cta.href,
   events: sent
     .filter((envelope) => envelope.data.baseType === 'EventData')
@@ -1422,7 +1439,14 @@ console.log(JSON.stringify({
         self.assertFalse(payload["prevented"])
         self.assertEqual(
             parse_qs(urlparse(payload["decoratedHref"]).query),
-            {"referrer": ["https://www.reddit.com"]},
+            {
+                "referrer": ["https://www.google.com"],
+                "gclid": ["Click_ID-123_ABC"],
+            },
+        )
+        self.assertEqual(
+            parse_qs(urlparse(payload["hrefImmediatelyAfterOptOut"]).query),
+            {},
         )
         self.assertEqual(parse_qs(urlparse(payload["href"]).query), {})
         self.assertEqual(
@@ -1525,6 +1549,9 @@ console.log(JSON.stringify({
                 self.assertIn("wbraid", disclosure)
                 self.assertIn("google ads", disclosure)
                 self.assertIn("current tab", disclosure)
+        self.assertIn("google ads click identifiers", analytics)
+        self.assertIn("current tab", analytics)
+        self.assertIn("not added to azure product telemetry", analytics)
 
         for disclosure in (page, notes, analytics):
             with self.subTest(disclosure=disclosure[:40]):
