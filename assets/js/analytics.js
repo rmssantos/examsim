@@ -23,6 +23,8 @@
     });
     const campaignPropertyNames = new Set(Object.values(campaignParameters));
     const googleAdsClickIdParameters = Object.freeze(['gclid', 'gbraid', 'wbraid']);
+    const gumroadPurchaseHost = 'examplar.gumroad.com';
+    const gumroadPurchasePath = /^\/l\/[^/]+(?:\/[^/]+)?\/?$/;
     const commerceReferrerHosts = Object.freeze({
         google: 'www.google.com',
         googleads: 'www.google.com',
@@ -375,7 +377,8 @@
                 || url.username
                 || url.password
                 || url.port
-                || (hostname !== 'gumroad.com' && !hostname.endsWith('.gumroad.com'))
+                || hostname !== gumroadPurchaseHost
+                || !gumroadPurchasePath.test(url.pathname)
             ) {
                 return null;
             }

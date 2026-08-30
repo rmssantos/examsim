@@ -226,6 +226,9 @@ let reddit = null;
 let google = null;
 let direct = null;
 let rejected = null;
+let rejectedGumroadProfile = null;
+let rejectedGumroadReceipt = null;
+let rejectedOtherGumroadStore = null;
 let googleClick = null;
 let persistedGoogleClick = null;
 let braidClick = null;
@@ -248,6 +251,9 @@ if (available) {
   window.location.href = 'https://examplar.app/';
   direct = helper(product);
   rejected = helper('https://evil.example/checkout');
+  rejectedGumroadProfile = helper('https://examplar.gumroad.com/profile');
+  rejectedGumroadReceipt = helper('https://app.gumroad.com/receipt/example');
+  rejectedOtherGumroadStore = helper('https://another-store.gumroad.com/l/example');
   embeddedClickId = helper(`${product}?gclid=Untrusted_Target-Click`);
 
   tab.clear();
@@ -295,6 +301,9 @@ console.log(JSON.stringify({
   google,
   direct,
   rejected,
+  rejectedGumroadProfile,
+  rejectedGumroadReceipt,
+  rejectedOtherGumroadStore,
   googleClick,
   persistedGoogleClick,
   braidClick,
@@ -462,6 +471,9 @@ console.log(JSON.stringify({
                 self.assertEqual(parse_qs(parsed.query), {"referrer": [referrer]})
 
         self.assertIsNone(payload["rejected"])
+        self.assertIsNone(payload["rejectedGumroadProfile"])
+        self.assertIsNone(payload["rejectedGumroadReceipt"])
+        self.assertIsNone(payload["rejectedOtherGumroadStore"])
 
     def test_gumroad_links_honor_analytics_opt_out(self):
         payload = self.run_gumroad_decorations()
