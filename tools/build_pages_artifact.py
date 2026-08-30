@@ -2,6 +2,7 @@
 """Build the exact static artifact that may be published to GitHub Pages."""
 
 import argparse
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -36,16 +37,21 @@ def resolve_output(value):
     output = Path(value)
     if not output.is_absolute():
         output = ROOT / output
-    if output.is_symlink():
-        raise ValueError("output must not be a symbolic link")
-    output = output.resolve()
-    build_root = (ROOT / "build").resolve()
-    default_output = (ROOT / "_site").resolve()
+    output = Path(os.path.abspath(output))
+    build_root = ROOT / "build"
+    default_output = ROOT / "_site"
     if output != default_output and build_root not in output.parents:
         raise ValueError(
             "output must be inside the repository build directory or be _site"
         )
-    return output
+
+    current = ROOT
+    for component in output.relative_to(ROOT).parts:
+        current /= component
+        if current.is_symlink():
+            raise ValueError("output path must not contain a symbolic link")
+
+    return output.resolve()
 
 
 def tracked_files_under(prefix):

@@ -94,6 +94,40 @@ class PagesArtifactTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "symbolic link"):
                     build_pages_artifact.resolve_output("_site")
 
+    def test_builder_rejects_a_symlink_in_an_existing_output_parent(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            fake_root = Path(temp_dir)
+            build_parent = fake_root / "build"
+            output = build_parent / "site"
+
+            with (
+                mock.patch.object(build_pages_artifact, "ROOT", fake_root),
+                mock.patch.object(
+                    Path,
+                    "is_symlink",
+                    autospec=True,
+                    side_effect=lambda path: path == build_parent,
+                ),
+            ):
+                with self.assertRaisesRegex(ValueError, "symbolic link"):
+                    build_pages_artifact.resolve_output(output)
+
+    def test_builder_rejects_a_real_parent_symlink_when_supported(self):
+        with (
+            tempfile.TemporaryDirectory() as root_dir,
+            tempfile.TemporaryDirectory() as external_dir,
+        ):
+            fake_root = Path(root_dir)
+            build_parent = fake_root / "build"
+            try:
+                build_parent.symlink_to(external_dir, target_is_directory=True)
+            except OSError as error:
+                self.skipTest(f"directory symlinks are unavailable: {error}")
+
+            with mock.patch.object(build_pages_artifact, "ROOT", fake_root):
+                with self.assertRaisesRegex(ValueError, "symbolic link"):
+                    build_pages_artifact.resolve_output(build_parent / "site")
+
     def test_pages_workflow_builds_and_uploads_only_the_artifact(self):
         workflow = (ROOT / ".github" / "workflows" / "deploy-pages.yml").read_text(
             encoding="utf-8"
