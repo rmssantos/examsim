@@ -21,6 +21,30 @@
         utm_content: 'campaign_content'
     });
     const campaignPropertyNames = new Set(Object.values(campaignParameters));
+    const commerceReferrerHosts = Object.freeze({
+        google: 'www.google.com',
+        googleads: 'www.google.com',
+        'google-ads': 'www.google.com',
+        google_ads: 'www.google.com',
+        reddit: 'www.reddit.com',
+        linkedin: 'www.linkedin.com',
+        bing: 'www.bing.com',
+        'microsoft-ads': 'www.bing.com',
+        microsoft_ads: 'www.bing.com',
+        facebook: 'www.facebook.com',
+        meta: 'www.facebook.com',
+        twitter: 'x.com',
+        x: 'x.com',
+        producthunt: 'www.producthunt.com',
+        'product-hunt': 'www.producthunt.com'
+    });
+    const purchasePlacements = new Set([
+        'homepage_modal',
+        'roadmap_modal',
+        'results_pro_upsell',
+        'results_recommended_pro',
+        'exam_landing'
+    ]);
 
     function parseConnectionString(value) {
         return String(value || '').split(';').reduce((result, part) => {
@@ -251,6 +275,37 @@
         return referrerHost
             ? writeStoredAttribution({ referrer_host: referrerHost })
             : {};
+    }
+
+    function commerceReferrerUrl() {
+        const attribution = attributionProperties();
+        const source = attribution.campaign_source || attribution.acquisition_ref || '';
+        const mappedHost = Object.prototype.hasOwnProperty.call(commerceReferrerHosts, source)
+            ? commerceReferrerHosts[source]
+            : '';
+        const attributedHost = sanitizeReferrerHostname(attribution.referrer_host);
+        const hostname = mappedHost || attributedHost || 'examplar.app';
+        return `https://${hostname}`;
+    }
+
+    function decorateGumroadUrl(value) {
+        try {
+            const url = new URL(String(value || ''));
+            const hostname = url.hostname.toLowerCase();
+            if (
+                url.protocol !== 'https:'
+                || url.username
+                || url.password
+                || url.port
+                || (hostname !== 'gumroad.com' && !hostname.endsWith('.gumroad.com'))
+            ) {
+                return null;
+            }
+            url.searchParams.set('referrer', commerceReferrerUrl());
+            return url.href;
+        } catch (_) {
+            return null;
+        }
     }
 
     function normalizeString(value, maxLength = 80) {
@@ -533,11 +588,22 @@
         return trackEvent('pro_modal_opened', getExamProperties(examId));
     }
 
-    function trackProPurchaseClicked(examId) {
-        return trackEvent('pro_purchase_clicked', {
+    function trackProPurchaseClicked(examId, details = {}) {
+        const properties = {
             ...getExamProperties(examId),
             store: 'gumroad'
-        });
+        };
+        const placement = String(details?.placement || '');
+        if (purchasePlacements.has(placement)) properties.placement = placement;
+        const sourceExam = getExamProperties(details?.sourceExam);
+        if (
+            details?.sourceExam
+            && sourceExam.exam_source === 'bundled'
+            && sourceExam.exam_id !== properties.exam_id
+        ) {
+            properties.source_exam_id = sourceExam.exam_id;
+        }
+        return trackEvent('pro_purchase_clicked', properties);
     }
 
     function trackProImportClicked(examId) {
@@ -780,25 +846,39 @@
         updatePrivacyButtonState();
     }
 
-    let landingCtaHandlerInstalled = false;
+    let ctaHandlerInstalled = false;
 
-    function installLandingCtaTracking() {
-        if (landingCtaHandlerInstalled) return;
-        landingCtaHandlerInstalled = true;
+    function installCtaTracking() {
+        if (ctaHandlerInstalled) return;
+        ctaHandlerInstalled = true;
         document.addEventListener('click', (event) => {
             const target = event.target;
             if (!target || typeof target.closest !== 'function') return;
-            const cta = target.closest('[data-analytics-event="landing_cta_clicked"]');
+            const cta = target.closest('[data-analytics-event]');
             if (!cta) return;
-            trackLandingCtaClicked(
-                cta.dataset?.analyticsExam,
-                cta.dataset?.analyticsAction
+            const analyticsEvent = cta.dataset?.analyticsEvent;
+            if (analyticsEvent === 'landing_cta_clicked') {
+                trackLandingCtaClicked(
+                    cta.dataset?.analyticsExam,
+                    cta.dataset?.analyticsAction
+                );
+                return;
+            }
+            if (analyticsEvent !== 'pro_purchase_clicked') return;
+
+            const decorated = decorateGumroadUrl(
+                cta.getAttribute?.('href') || cta.href
             );
+            if (decorated) cta.href = decorated;
+            trackProPurchaseClicked(cta.dataset?.analyticsExam, {
+                placement: cta.dataset?.analyticsPlacement,
+                sourceExam: cta.dataset?.analyticsSourceExam
+            });
         });
     }
 
     function init() {
-        installLandingCtaTracking();
+        installCtaTracking();
         injectPrivacyButton();
         trackPageView();
     }
@@ -840,6 +920,7 @@
             privacyNotesUrl,
             attributionProperties,
             sanitizeAttributionValue,
+            decorateGumroadUrl,
             buildEnvelope,
             buildPageViewEnvelope
         })

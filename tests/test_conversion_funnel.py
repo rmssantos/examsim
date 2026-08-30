@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import unittest
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -170,6 +171,77 @@ console.log(JSON.stringify(sent.map((envelope) => envelope.data.baseData)));
         )
         return json.loads(result.stdout)
 
+    def run_gumroad_decorations(self):
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("node not available")
+
+        node_script = r"""
+const fs = require('fs');
+let source = fs.readFileSync(process.argv[1], 'utf8');
+source = source.replace(
+  '__APPINSIGHTS_CONNECTION_STRING__',
+  'InstrumentationKey=test-key;IngestionEndpoint=https://example.test'
+);
+
+const tab = new Map();
+global.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+global.sessionStorage = {
+  getItem(key) { return tab.has(key) ? tab.get(key) : null; },
+  setItem(key, value) { tab.set(key, String(value)); },
+  removeItem(key) { tab.delete(key); }
+};
+global.fetch = () => Promise.resolve();
+global.HTMLElement = function HTMLElement() {};
+global.document = {
+  readyState: 'loading',
+  referrer: '',
+  addEventListener() {},
+  getElementById() { return null; },
+};
+global.window = {
+  location: {
+    href: 'https://examplar.app/?utm_source=Reddit&utm_campaign=launch',
+    protocol: 'https:',
+    hostname: 'examplar.app',
+    pathname: '/'
+  },
+  ExamApp: {
+    isPublicSiteHost(host = 'examplar.app') {
+      return ['examplar.app', 'www.examplar.app', 'rmssantos.github.io'].includes(host);
+    }
+  }
+};
+
+eval(source);
+const helper = window.ExamApp.analytics?._private?.decorateGumroadUrl;
+const available = typeof helper === 'function';
+const product = 'https://examplar.gumroad.com/l/az104-complete/EXAMPLAR30';
+let reddit = null;
+let google = null;
+let direct = null;
+let rejected = null;
+if (available) {
+  reddit = helper(product);
+  tab.clear();
+  window.location.href = 'https://examplar.app/?utm_source=google_ads';
+  google = helper(product);
+  tab.clear();
+  window.location.href = 'https://examplar.app/';
+  direct = helper(product);
+  rejected = helper('https://evil.example/checkout');
+}
+console.log(JSON.stringify({ available, reddit, google, direct, rejected }));
+"""
+        result = subprocess.run(
+            [node, "-e", node_script, str(ROOT / "assets/js/analytics.js")],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        return json.loads(result.stdout)
+
     def run_study_events(self):
         node = shutil.which("node")
         if not node:
@@ -294,6 +366,25 @@ console.log(JSON.stringify({
             with self.subTest(event=event["name"]):
                 self.assertEqual(event["properties"], {**common, **specific})
                 self.assertEqual(event["measurements"], {})
+
+    def test_gumroad_links_keep_discount_and_forward_only_a_coarse_referrer(self):
+        payload = self.run_gumroad_decorations()
+        self.assertTrue(payload["available"])
+
+        expected = {
+            "reddit": "https://www.reddit.com",
+            "google": "https://www.google.com",
+            "direct": "https://examplar.app",
+        }
+        for name, referrer in expected.items():
+            with self.subTest(name=name):
+                parsed = urlparse(payload[name])
+                self.assertEqual(parsed.scheme, "https")
+                self.assertEqual(parsed.netloc, "examplar.gumroad.com")
+                self.assertEqual(parsed.path, "/l/az104-complete/EXAMPLAR30")
+                self.assertEqual(parse_qs(parsed.query), {"referrer": [referrer]})
+
+        self.assertIsNone(payload["rejected"])
 
     def test_activation_events_have_bounded_properties_and_measurements(self):
         events = self.run_activation_events()
@@ -1092,7 +1183,7 @@ const cta = {
 handlers.click({
   target: {
     closest(selector) {
-      if (selector !== '[data-analytics-event="landing_cta_clicked"]') {
+      if (selector !== '[data-analytics-event]') {
         throw new Error(`unexpected selector: ${selector}`);
       }
       return cta;
@@ -1123,12 +1214,116 @@ console.log(JSON.stringify({
         expected_calls = (
             "trackProUnlockClicked?.(examId)",
             "trackProModalOpened?.(examId)",
-            "trackProPurchaseClicked?.(examId)",
             "trackProImportClicked?.(examId)",
         )
         for call in expected_calls:
             with self.subTest(call=call):
                 self.assertEqual(source.count(call), 1)
+
+    def test_purchase_cta_uses_delegated_tracking_and_decorates_before_navigation(self):
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("node not available")
+
+        node_script = r"""
+const fs = require('fs');
+let source = fs.readFileSync(process.argv[1], 'utf8');
+source = source.replace(
+  '__APPINSIGHTS_CONNECTION_STRING__',
+  'InstrumentationKey=test-key;IngestionEndpoint=https://example.test'
+);
+const handlers = {};
+const sent = [];
+let prevented = false;
+global.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+global.sessionStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+global.fetch = (_url, options) => {
+  sent.push(JSON.parse(options.body)[0]);
+  return Promise.resolve();
+};
+global.HTMLElement = function HTMLElement() {};
+global.document = {
+  readyState: 'loading',
+  referrer: 'https://www.reddit.com/r/AzureCertification/',
+  addEventListener(type, handler) { handlers[type] = handler; },
+  getElementById(id) {
+    return id === 'analytics-privacy-button' ? {} : null;
+  }
+};
+global.window = {
+  location: {
+    href: 'https://examplar.app/exams/az104/?utm_source=reddit',
+    protocol: 'https:',
+    hostname: 'examplar.app',
+    pathname: '/exams/az104/'
+  },
+  ExamApp: { isPublicSiteHost() { return true; } }
+};
+eval(source);
+handlers.DOMContentLoaded();
+
+const cta = {
+  href: 'https://examplar.gumroad.com/l/az104-complete/EXAMPLAR30',
+  dataset: {
+    analyticsEvent: 'pro_purchase_clicked',
+    analyticsExam: 'az104',
+    analyticsPlacement: 'exam_landing'
+  }
+};
+handlers.click({
+  target: {
+    closest(selector) {
+      return selector === '[data-analytics-event]' ? cta : null;
+    }
+  },
+  preventDefault() { prevented = true; }
+});
+console.log(JSON.stringify({
+  prevented,
+  href: cta.href,
+  events: sent
+    .filter((envelope) => envelope.data.baseType === 'EventData')
+    .map((envelope) => envelope.data.baseData)
+}));
+"""
+        result = subprocess.run(
+            [node, "-e", node_script, str(ROOT / "assets/js/analytics.js")],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        payload = json.loads(result.stdout)
+        self.assertFalse(payload["prevented"])
+        self.assertEqual(
+            parse_qs(urlparse(payload["href"]).query),
+            {"referrer": ["https://www.reddit.com"]},
+        )
+        self.assertEqual([event["name"] for event in payload["events"]], ["pro_purchase_clicked"])
+        self.assertEqual(payload["events"][0]["properties"]["exam_id"], "az104")
+        self.assertEqual(payload["events"][0]["properties"]["placement"], "exam_landing")
+
+    def test_every_purchase_surface_uses_the_shared_commerce_contract(self):
+        sources = {
+            "homepage_modal": (ROOT / "assets/js/homepage.js").read_text(encoding="utf-8"),
+            "roadmap_modal": (ROOT / "assets/js/roadmaps.js").read_text(encoding="utf-8"),
+            "results_pro_upsell": (ROOT / "assets/js/script-multi-exam.js").read_text(encoding="utf-8"),
+            "results_recommended_pro": (ROOT / "assets/js/script-multi-exam.js").read_text(encoding="utf-8"),
+            "exam_landing": (ROOT / "tools/generate-exam-pages.py").read_text(encoding="utf-8"),
+        }
+        for placement, source in sources.items():
+            with self.subTest(placement=placement):
+                self.assertIn("pro_purchase_clicked", source)
+                self.assertIn(placement, source)
+
+        for path in (
+            ROOT / "assets/js/homepage.js",
+            ROOT / "assets/js/roadmaps.js",
+            ROOT / "assets/js/script-multi-exam.js",
+        ):
+            with self.subTest(path=path.name):
+                source = path.read_text(encoding="utf-8")
+                self.assertNotIn('rel="nofollow noopener noreferrer"', source)
 
     def test_results_screen_wires_trusted_pro_upsell_and_pass_story(self):
         runtime = (ROOT / "assets/js/script-multi-exam.js").read_text(encoding="utf-8")
@@ -1146,12 +1341,12 @@ console.log(JSON.stringify({
         self.assertIn("renderProUpsell", runtime)
         self.assertIn("github.com/rmssantos/examsim/discussions/77", runtime)
 
-        for call in (
-            "trackProResultsCtaClicked?.(this.currentExam)",
-            "trackPassStoryClicked?.(this.currentExam)",
-        ):
-            with self.subTest(call=call):
-                self.assertEqual(runtime.count(call), 1)
+        self.assertIn('data-analytics-placement="results_pro_upsell"', runtime)
+        self.assertIn('data-analytics-placement="results_recommended_pro"', runtime)
+        self.assertEqual(
+            runtime.count("trackPassStoryClicked?.(this.currentExam)"),
+            1,
+        )
 
     def test_secondary_purchase_surfaces_render_launch_offer(self):
         roadmaps = (ROOT / "assets/js/roadmaps.js").read_text(encoding="utf-8")

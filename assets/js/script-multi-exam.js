@@ -1531,7 +1531,7 @@ class MultiExamSimulator {
         const price = promotion
             ? ` — ${this.escapeHtml(promotion.offerPrice)}`
             : (pro.price ? ` (${this.escapeHtml(String(pro.price))})` : '');
-        return `<div class="recommended-pro results-pro-upsell"><i class="fas fa-unlock" aria-hidden="true"></i> <strong>${title}</strong><p>You practiced the free preview. The full pack covers ${scope} with detailed explanations and free updates.</p>${offer}<a class="results-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener noreferrer">Get the full pack${price}</a></div>`;
+        return `<div class="recommended-pro results-pro-upsell"><i class="fas fa-unlock" aria-hidden="true"></i> <strong>${title}</strong><p>You practiced the free preview. The full pack covers ${scope} with detailed explanations and free updates.</p>${offer}<a class="results-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener" data-analytics-event="pro_purchase_clicked" data-analytics-exam="${this.escapeHtml(this.currentExam)}" data-analytics-placement="results_pro_upsell">Get the full pack${price}</a></div>`;
     }
 
     // Invite candidates who passed the real exam to share their story.
@@ -1554,7 +1554,8 @@ class MultiExamSimulator {
             ? `<div class="results-pro-offer"><span class="results-pro-offer-label">${this.escapeHtml(promotion.label)} · ${this.escapeHtml(String(promotion.discountPercent))}% off</span><span class="results-pro-offer-prices"><s>${this.escapeHtml(promotion.basePrice)}</s> <span aria-hidden="true">→</span> <strong>${this.escapeHtml(promotion.offerPrice)}</strong></span><span class="results-pro-offer-meta">Code <code>${this.escapeHtml(promotion.code)}</code>${promotion.limited ? ' · Limited launch offer' : ''}</span></div>`
             : '';
         const price = promotion ? ` — ${this.escapeHtml(promotion.offerPrice)}` : '';
-        return `<div class="recommended-pro"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> <strong>${title}</strong><p>${blurb}</p>${offer}<a class="recommended-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener noreferrer">View pack${price}</a></div>`;
+        const targetExam = rec.examId || this.currentExam;
+        return `<div class="recommended-pro"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> <strong>${title}</strong><p>${blurb}</p>${offer}<a class="recommended-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener" data-analytics-event="pro_purchase_clicked" data-analytics-exam="${this.escapeHtml(targetExam)}" data-analytics-source-exam="${this.escapeHtml(this.currentExam)}" data-analytics-placement="results_recommended_pro">View pack${price}</a></div>`;
     }
 
     displayOptions(question) {
@@ -2647,20 +2648,6 @@ class MultiExamSimulator {
         if (recSlot) {
             const upsell = this.renderProUpsell(recMeta);
             recSlot.innerHTML = (upsell || this.renderRecommendedPro(recMeta)) + this.renderPassStoryInvite();
-            const proCta = recSlot.querySelector('.results-pro-cta');
-            if (proCta) {
-                proCta.addEventListener('click', () => {
-                    window.ExamApp?.analytics?.trackProResultsCtaClicked?.(this.currentExam);
-                });
-            }
-            const cta = recSlot.querySelector('.recommended-pro-cta');
-            if (cta) {
-                // Attribute the click to the source exam (the one just completed); the
-                // 'results_recommended_pro' placement already identifies it as the cross-sell.
-                cta.addEventListener('click', () => {
-                    window.ExamApp?.analytics?.trackRecommendedPackClicked?.(this.currentExam);
-                });
-            }
             const passStory = recSlot.querySelector('.pass-story-link');
             if (passStory) {
                 passStory.addEventListener('click', () => {

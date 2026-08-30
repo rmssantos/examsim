@@ -86,6 +86,20 @@ Study completion telemetry sends session-level question, answered, and correct c
 The Study first-answer event is emitted once per Study session; exam
 first-answer events are bounded interaction counts too.
 
+## External Checkout
+
+Purchase links open Gumroad in a new tab. On that click, the browser contacts
+Gumroad and sends the normal checkout request. Examplar adds one coarse
+`referrer` domain so a later sale can be attributed to a channel: an allowlisted
+campaign source such as Google or Reddit, the sanitized external referrer
+hostname, or `examplar.app` when no source is available. It does not forward the
+incoming page URL, referrer path, campaign name/content, answers, progress,
+email, or a visitor identifier. When analytics is disabled, stored campaign
+attribution is cleared and is not forwarded to the checkout.
+
+Gumroad separately processes the information needed to display and complete its
+checkout, including payment and buyer details entered there.
+
 ## Analytics Choice
 
 The public site initializes analytics by default. Use the Privacy settings

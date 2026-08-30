@@ -469,9 +469,15 @@ class AnalyticsWiringTests(unittest.TestCase):
         parser = _AnalyticsElementParser()
         parser.feed(page)
 
-        self.assertEqual(len(parser.tracked), 2)
-        primary_tag, primary = parser.tracked[0]
-        secondary_tag, secondary = parser.tracked[1]
+        practice_ctas = [
+            tracked
+            for tracked in parser.tracked
+            if tracked[1]["data-analytics-event"] == "landing_cta_clicked"
+        ]
+
+        self.assertEqual(len(practice_ctas), 2)
+        primary_tag, primary = practice_ctas[0]
+        secondary_tag, secondary = practice_ctas[1]
         self.assertEqual(primary_tag, "a")
         self.assertEqual(secondary_tag, "a")
         self.assertEqual(primary["class"], "landing-cta")
@@ -498,10 +504,31 @@ class AnalyticsWiringTests(unittest.TestCase):
         secondary = parser.tracked[1][1]
         self.assertEqual(secondary["data-analytics-action"], "full")
         self.assertEqual(secondary["href"], "../../exam.html?exam=az104")
+
+    def test_paid_landing_tracks_the_purchase_without_suppressing_referrer(self):
+        page = self._render(SAMPLE_PRO)
+        parser = _AnalyticsElementParser()
+        parser.feed(page)
+        purchases = [
+            attributes
+            for _tag, attributes in parser.tracked
+            if attributes["data-analytics-event"] == "pro_purchase_clicked"
+        ]
+
+        self.assertEqual(len(purchases), 1)
+        purchase = purchases[0]
+        self.assertEqual(purchase["data-analytics-exam"], "az104")
+        self.assertEqual(purchase["data-analytics-placement"], "exam_landing")
+        self.assertEqual(
+            purchase["href"],
+            "https://examplar.gumroad.com/l/az104-complete/EXAMPLAR30",
+        )
+        self.assertIn("noopener", purchase["rel"].split())
+        self.assertNotIn("noreferrer", purchase["rel"].split())
         self.assertIn("Start full preview", page)
         self.assertNotIn("Start full practice", page)
 
-    def test_lab_and_commercial_ctas_are_not_activation_ctas(self):
+    def test_lab_is_untracked_and_purchase_is_not_an_activation_cta(self):
         meta = dict(
             SAMPLE_PRO,
             labCount=1,
@@ -511,15 +538,27 @@ class AnalyticsWiringTests(unittest.TestCase):
         parser = _AnalyticsElementParser()
         parser.feed(page)
 
-        self.assertEqual(len(parser.tracked), 2)
+        activation = [
+            attributes
+            for _, attributes in parser.tracked
+            if attributes["data-analytics-event"] == "landing_cta_clicked"
+        ]
+        purchases = [
+            attributes
+            for _, attributes in parser.tracked
+            if attributes["data-analytics-event"] == "pro_purchase_clicked"
+        ]
+        self.assertEqual(len(activation), 2)
+        self.assertEqual(len(purchases), 1)
         self.assertEqual(
-            [attributes["data-analytics-action"] for _, attributes in parser.tracked],
+            [attributes["data-analytics-action"] for attributes in activation],
             ["diagnostic", "full"],
         )
         self.assertEqual(
-            [attributes["data-analytics-exam"] for _, attributes in parser.tracked],
+            [attributes["data-analytics-exam"] for attributes in activation],
             ["az104", "az104"],
         )
+        self.assertEqual(purchases[0]["data-analytics-exam"], "az104")
 
     def test_lab_copy_is_vendor_neutral_and_advertises_complete_count(self):
         meta = dict(

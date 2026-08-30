@@ -1346,14 +1346,14 @@ const buy = document.createElement('a');
 buy.className = 'pro-modal-buy';
 buy.href = window.ExamApp.safeExternalUrl(pro.url) || '#';
 buy.target = '_blank';
-buy.rel = 'noopener noreferrer';
+buy.rel = 'noopener';
+buy.setAttribute('data-analytics-event', 'pro_purchase_clicked');
+buy.setAttribute('data-analytics-exam', examId);
+buy.setAttribute('data-analytics-placement', 'homepage_modal');
 buy.appendChild(this.createIcon('fas fa-store'));
 buy.appendChild(document.createTextNode(
 	promotion ? ` Get the full pack — ${promotion.offerPrice}` : ' Get the full pack' + (pro.price ? ' (' + pro.price + ')' : '')
 ));
-buy.addEventListener('click', () => {
-window.ExamApp?.analytics?.trackProPurchaseClicked?.(examId);
-});
 dialog.appendChild(buy);
 
 const divider = document.createElement('div');

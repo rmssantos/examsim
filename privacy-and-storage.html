@@ -77,6 +77,9 @@
         <li>The analytics workspace is configured with 30-day retention.</li>
       </ul>
 
+      <h2>External checkout</h2>
+      <p>Purchase links open Gumroad in a new tab. On that click, Examplar adds one coarse <code>referrer</code> domain so a later sale can be attributed to a channel: an allowlisted campaign source such as Google or Reddit, the sanitized external referrer hostname, or <code>examplar.app</code> when no source is available. The incoming page URL, referrer path, campaign name/content, answers, progress, email, and visitor identifiers are not forwarded. When analytics is disabled, stored campaign attribution is cleared and is not forwarded to checkout. Gumroad separately processes the buyer and payment details entered on its checkout.</p>
+
       <h2>Imports and editor changes</h2>
       <p>Dragging an exam file into the app or saving changes in the editor updates only that browser profile. To publish corrections for everyone, export the corrected JSON and open a pull request or GitHub issue.</p>
 
