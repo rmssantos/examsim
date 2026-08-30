@@ -7,7 +7,8 @@
         connectionString: '__APPINSIGHTS_CONNECTION_STRING__',
         optOutKey: 'exam_analytics_opt_out',
         attributionKey: 'exam_analytics_attribution',
-        analyticsVersion: '1.4.0',
+        googleAdsClickIdsKey: 'exam_google_ads_click_ids',
+        analyticsVersion: '1.5.0',
         publicExamIds: Object.freeze(['ab730', 'ab731', 'ab620', 'sc900', 'az900', 'az104', 'saac03', 'clfc02', 'ai901', 'az305', 'az400', 'dp900', 'dp700', 'ai103', 'sc300'])
     });
 
@@ -21,6 +22,7 @@
         utm_content: 'campaign_content'
     });
     const campaignPropertyNames = new Set(Object.values(campaignParameters));
+    const googleAdsClickIdParameters = Object.freeze(['gclid', 'gbraid', 'wbraid']);
     const commerceReferrerHosts = Object.freeze({
         google: 'www.google.com',
         googleads: 'www.google.com',
@@ -288,9 +290,80 @@
         return `https://${hostname}`;
     }
 
+    function sanitizeGoogleAdsClickId(value) {
+        const raw = String(value ?? '').trim();
+        return /^[A-Za-z0-9_-]{1,256}$/.test(raw) ? raw : '';
+    }
+
+    function sanitizeGoogleAdsClickIdRecord(value) {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+        return googleAdsClickIdParameters.reduce((result, parameter) => {
+            const sanitized = sanitizeGoogleAdsClickId(value[parameter]);
+            if (sanitized) result[parameter] = sanitized;
+            return result;
+        }, {});
+    }
+
+    function readStoredGoogleAdsClickIds() {
+        const raw = safeSessionStorageGet(CONFIG.googleAdsClickIdsKey);
+        if (!raw) return {};
+        try {
+            const clickIds = sanitizeGoogleAdsClickIdRecord(JSON.parse(raw));
+            if (Object.keys(clickIds).length === 0) {
+                safeSessionStorageRemove(CONFIG.googleAdsClickIdsKey);
+                return {};
+            }
+            const sanitized = JSON.stringify(clickIds);
+            if (sanitized !== raw) {
+                safeSessionStorageSet(CONFIG.googleAdsClickIdsKey, sanitized);
+            }
+            return clickIds;
+        } catch (_) {
+            safeSessionStorageRemove(CONFIG.googleAdsClickIdsKey);
+            return {};
+        }
+    }
+
+    function writeStoredGoogleAdsClickIds(value) {
+        const clickIds = sanitizeGoogleAdsClickIdRecord(value);
+        if (Object.keys(clickIds).length === 0) {
+            safeSessionStorageRemove(CONFIG.googleAdsClickIdsKey);
+            return {};
+        }
+        safeSessionStorageSet(CONFIG.googleAdsClickIdsKey, JSON.stringify(clickIds));
+        return clickIds;
+    }
+
+    function googleAdsClickIds() {
+        if (!isPublicSiteHost() || isOptedOut()) {
+            safeSessionStorageRemove(CONFIG.googleAdsClickIdsKey);
+            return {};
+        }
+
+        let params = null;
+        try {
+            params = new URL(window.location.href).searchParams;
+        } catch (_) {
+            // Malformed URLs can still inherit previously validated click IDs.
+        }
+
+        const hasExplicitClickId = Boolean(
+            params && googleAdsClickIdParameters.some(parameter => params.has(parameter))
+        );
+        if (!hasExplicitClickId) return readStoredGoogleAdsClickIds();
+
+        const clickIds = {};
+        googleAdsClickIdParameters.forEach((parameter) => {
+            const sanitized = sanitizeGoogleAdsClickId(params.get(parameter));
+            if (sanitized) clickIds[parameter] = sanitized;
+        });
+        return writeStoredGoogleAdsClickIds(clickIds);
+    }
+
     function decorateGumroadUrl(value) {
         if (!isPublicSiteHost() || isOptedOut()) {
             safeSessionStorageRemove(CONFIG.attributionKey);
+            safeSessionStorageRemove(CONFIG.googleAdsClickIdsKey);
             return null;
         }
 
@@ -307,6 +380,10 @@
                 return null;
             }
             url.searchParams.set('referrer', commerceReferrerUrl());
+            googleAdsClickIdParameters.forEach(parameter => url.searchParams.delete(parameter));
+            Object.entries(googleAdsClickIds()).forEach(([parameter, value]) => {
+                url.searchParams.set(parameter, value);
+            });
             return url.href;
         } catch (_) {
             return null;
@@ -706,6 +783,7 @@
             : safeLocalStorageRemove(CONFIG.optOutKey);
         if (disabled) {
             safeSessionStorageRemove(CONFIG.attributionKey);
+            safeSessionStorageRemove(CONFIG.googleAdsClickIdsKey);
         }
         if (persisted) updatePrivacyButtonState();
         return persisted;
@@ -852,6 +930,7 @@
     }
 
     let ctaHandlerInstalled = false;
+    const originalPurchaseUrls = new WeakMap();
 
     function installCtaTracking() {
         if (ctaHandlerInstalled) return;
@@ -871,10 +950,16 @@
             }
             if (analyticsEvent !== 'pro_purchase_clicked') return;
 
-            const decorated = decorateGumroadUrl(
-                cta.getAttribute?.('href') || cta.href
-            );
-            if (decorated) cta.href = decorated;
+            if (!originalPurchaseUrls.has(cta)) {
+                originalPurchaseUrls.set(cta, cta.getAttribute?.('href') || cta.href || '');
+            }
+            const originalUrl = originalPurchaseUrls.get(cta);
+            const decorated = decorateGumroadUrl(originalUrl);
+            if (decorated) {
+                cta.href = decorated;
+            } else if (originalUrl) {
+                cta.href = originalUrl;
+            }
             trackProPurchaseClicked(cta.dataset?.analyticsExam, {
                 placement: cta.dataset?.analyticsPlacement,
                 sourceExam: cta.dataset?.analyticsSourceExam
@@ -883,6 +968,7 @@
     }
 
     function init() {
+        googleAdsClickIds();
         installCtaTracking();
         injectPrivacyButton();
         trackPageView();
@@ -925,6 +1011,8 @@
             privacyNotesUrl,
             attributionProperties,
             sanitizeAttributionValue,
+            googleAdsClickIds,
+            sanitizeGoogleAdsClickId,
             decorateGumroadUrl,
             buildEnvelope,
             buildPageViewEnvelope

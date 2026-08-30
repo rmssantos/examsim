@@ -78,7 +78,7 @@
       </ul>
 
       <h2>External checkout</h2>
-      <p>Purchase links open Gumroad in a new tab. On that click, Examplar adds one coarse <code>referrer</code> domain so a later sale can be attributed to a channel: an allowlisted campaign source such as Google or Reddit, the sanitized external referrer hostname, or <code>examplar.app</code> when no source is available. The incoming page URL, referrer path, campaign name/content, answers, progress, email, and visitor identifiers are not forwarded. When analytics is disabled, stored campaign attribution is cleared and Examplar does not add the extra <code>referrer</code> parameter to the checkout URL. The parameter is also not added outside the public site. Gumroad separately processes the buyer and payment details entered on its checkout.</p>
+      <p>Purchase links open Gumroad in a new tab. On that click, Examplar adds one coarse <code>referrer</code> domain so a later sale can be attributed to a channel: an allowlisted campaign source such as Google or Reddit, the sanitized external referrer hostname, or <code>examplar.app</code> when no source is available. For a Google Ads visit, Examplar also accepts the bounded click identifiers <code>gclid</code>, <code>gbraid</code>, and <code>wbraid</code>, keeps them in <code>sessionStorage</code> for the current tab, and forwards them only to the Gumroad purchase URL. They are not added to Azure product telemetry or persisted across tabs. Gumroad runs the Google Ads purchase tag on its receipt page to attribute a completed order and report its value, currency, and order ID; enhanced conversions are disabled, so Examplar does not configure that tag to send a buyer email. The incoming page URL, referrer path, campaign name/content, answers, progress, and email are not forwarded by Examplar. When analytics is disabled, stored campaign attribution and Google Ads click identifiers are cleared, and Examplar does not add the extra <code>referrer</code> parameter or Google Ads click identifiers to the checkout URL. The parameters are also not added outside the public site. Gumroad separately processes the buyer and payment details entered on its checkout.</p>
 
       <h2>Imports and editor changes</h2>
       <p>Dragging an exam file into the app or saving changes in the editor updates only that browser profile. To publish corrections for everyone, export the corrected JSON and open a pull request or GitHub issue.</p>
@@ -93,7 +93,7 @@
       <ul>
         <li><strong>IndexedDB:</strong> imported exam content, images, image metadata, progress, and recent attempt review summaries.</li>
         <li><strong>localStorage:</strong> theme, analytics opt-out, exam activation settings, and legacy compatibility mirrors.</li>
-        <li><strong>sessionStorage:</strong> sanitized campaign attribution for the current browser tab on the public site.</li>
+        <li><strong>sessionStorage:</strong> sanitized campaign attribution and bounded Google Ads click identifiers for the current browser tab on the public site.</li>
         <li><strong>Cache Storage:</strong> app shell files needed for offline use.</li>
       </ul>
 
