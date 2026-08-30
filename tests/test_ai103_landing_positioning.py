@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import locale
 import unittest
 from pathlib import Path
 
@@ -51,6 +52,29 @@ class AI103LandingPositioningTests(unittest.TestCase):
         for domain in self.meta["objectiveDomains"]:
             self.assertIn(domain["name"], self.page)
             self.assertIn(domain["weightRange"], self.page)
+
+    def test_human_date_remains_english_under_a_non_english_locale(self):
+        original_locale = locale.setlocale(locale.LC_TIME)
+        portuguese_locales = (
+            "Portuguese_Portugal.1252",
+            "Portuguese_Portugal",
+            "pt_PT.UTF-8",
+            "pt_PT.utf8",
+            "pt_PT",
+        )
+        try:
+            for candidate in portuguese_locales:
+                try:
+                    locale.setlocale(locale.LC_TIME, candidate)
+                    break
+                except locale.Error:
+                    continue
+            else:
+                self.skipTest("Portuguese locale is not installed")
+
+            self.assertEqual(gen._human_date("2026-06-12"), "June 12, 2026")
+        finally:
+            locale.setlocale(locale.LC_TIME, original_locale)
 
     def test_copy_does_not_claim_to_mirror_the_live_exam(self):
         self.assertNotIn("mirrors the real exam format", self.page)

@@ -81,6 +81,25 @@ class AI103GuideTests(unittest.TestCase):
         for slug in GUIDES:
             self.assertIn(f"../../guides/{slug}/", landing)
 
+    def test_related_guides_use_the_exam_code_from_metadata(self):
+        guides = gen.build_related_guides(
+            {
+                "id": "az104",
+                "certificationCode": "AZ-104",
+                "relatedGuides": [
+                    {
+                        "slug": "sample-guide",
+                        "title": "Sample guide",
+                        "description": "Sample description",
+                    }
+                ],
+            }
+        )
+
+        self.assertIn("AZ-104 field guide", guides)
+        self.assertIn("Plan your AZ-104 preparation", guides)
+        self.assertNotIn("AI-103", guides)
+
     def test_relative_directory_links_support_file_mode(self):
         pages = [ROOT / "exams" / "ai103" / "index.html"]
         pages.extend(ROOT / "guides" / slug / "index.html" for slug in GUIDES)

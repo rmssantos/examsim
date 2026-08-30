@@ -41,6 +41,20 @@ TEMPLATE_PATH = ROOT / "tools" / "exam-page-template.html"
 SITE = "https://examplar.app"
 OG_IMAGE = f"{SITE}/assets/media/og-image.png"
 THEME_COLOR = "#1e3c72"
+ENGLISH_MONTHS = (
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+)
 GUIDE_PATHS = (
     "ai-102-to-ai-103",
     "ai-103-study-plan",
@@ -156,7 +170,7 @@ def _human_date(value) -> str:
         parsed = date.fromisoformat(str(value or ""))
     except ValueError:
         return str(value or "").strip()
-    return f"{parsed.strftime('%B')} {parsed.day}, {parsed.year}"
+    return f"{ENGLISH_MONTHS[parsed.month - 1]} {parsed.day}, {parsed.year}"
 
 
 def build_landing_proof(meta: dict) -> str:
@@ -246,6 +260,7 @@ def build_resources(meta: dict) -> str:
 
 
 def build_related_guides(meta: dict, root: str = "../../") -> str:
+    code = esc(exam_code(meta))
     cards = []
     for guide in meta.get("relatedGuides") or []:
         if not isinstance(guide, dict):
@@ -257,7 +272,7 @@ def build_related_guides(meta: dict, root: str = "../../") -> str:
             continue
         cards.append(
             f'      <li><a class="guide-card" href="{root}guides/{esc(slug)}/" data-file-index>'
-            f'<span class="guide-card-label">AI-103 field guide</span>'
+            f'<span class="guide-card-label">{code} field guide</span>'
             f'<strong>{esc(title)}</strong><span>{esc(description)}</span>'
             '<i aria-hidden="true" class="fas fa-arrow-right"></i></a></li>'
         )
@@ -265,7 +280,7 @@ def build_related_guides(meta: dict, root: str = "../../") -> str:
         return ""
     return (
         '    <section class="exam-section related-guides" aria-labelledby="guides-h">\n'
-        '      <h2 id="guides-h">Plan your AI-103 preparation</h2>\n'
+        f'      <h2 id="guides-h">Plan your {code} preparation</h2>\n'
         '      <ul class="guide-cards">\n'
         + "\n".join(cards)
         + "\n      </ul>\n"
