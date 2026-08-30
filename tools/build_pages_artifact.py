@@ -36,6 +36,8 @@ def resolve_output(value):
     output = Path(value)
     if not output.is_absolute():
         output = ROOT / output
+    if output.is_symlink():
+        raise ValueError("output must not be a symbolic link")
     output = output.resolve()
     build_root = (ROOT / "build").resolve()
     default_output = (ROOT / "_site").resolve()

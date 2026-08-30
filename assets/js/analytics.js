@@ -289,6 +289,11 @@
     }
 
     function decorateGumroadUrl(value) {
+        if (!isPublicSiteHost() || isOptedOut()) {
+            safeSessionStorageRemove(CONFIG.attributionKey);
+            return null;
+        }
+
         try {
             const url = new URL(String(value || ''));
             const hostname = url.hostname.toLowerCase();

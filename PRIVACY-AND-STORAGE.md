@@ -95,7 +95,8 @@ campaign source such as Google or Reddit, the sanitized external referrer
 hostname, or `examplar.app` when no source is available. It does not forward the
 incoming page URL, referrer path, campaign name/content, answers, progress,
 email, or a visitor identifier. When analytics is disabled, stored campaign
-attribution is cleared and is not forwarded to the checkout.
+attribution is cleared and Examplar does not add the extra `referrer` parameter
+to the checkout URL. The parameter is also not added outside the public site.
 
 Gumroad separately processes the information needed to display and complete its
 checkout, including payment and buyer details entered there.
