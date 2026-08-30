@@ -1119,6 +1119,11 @@ try {
 
   // Career roadmaps: seed local progress, then verify node states + up-next + structure.
   await page.goto(`${baseUrl}/roadmaps.html`, { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(
+    () => window.Roadmaps?.ready === true,
+    null,
+    { timeout: 8000 }
+  );
   await page.evaluate(async () => {
     const az900 = { attempts: [{ score: 92, passed: true }], bestScore: 92, totalPassed: 1 };
     const az104 = { attempts: [{ score: 40, passed: false }], bestScore: 40, totalPassed: 0 };
@@ -1274,6 +1279,32 @@ try {
       `${path} top bar must include the control-room nav links.`
     );
   }
+
+  // Full-bleed landing chrome must not create sideways scrolling when the
+  // vertical scrollbar reduces the layout viewport on a phone-sized screen.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`${baseUrl}/exams/ai103/index.html`, { waitUntil: 'domcontentloaded' });
+  const ai103MobileViewport = await page.evaluate(() => {
+    // Headless Chromium uses overlay scrollbars, so reserve a real gutter to
+    // reproduce desktop/mobile browsers where 100vw includes scrollbar width.
+    document.documentElement.style.scrollbarGutter = 'stable';
+    const topbar = document.querySelector('.cr-topbar').getBoundingClientRect();
+    return {
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      topbarLeft: topbar.left,
+      topbarRight: topbar.right
+    };
+  });
+  assert.ok(
+    ai103MobileViewport.topbarLeft >= -0.5
+      && ai103MobileViewport.topbarRight <= ai103MobileViewport.clientWidth + 0.5,
+    `AI-103 landing top bar must remain inside the mobile layout viewport: ${JSON.stringify(ai103MobileViewport)}`
+  );
+  assert.ok(
+    ai103MobileViewport.scrollWidth <= ai103MobileViewport.clientWidth,
+    `AI-103 landing must not scroll horizontally on mobile: ${JSON.stringify(ai103MobileViewport)}`
+  );
 
   console.log('Browser smoke passed.');
 } finally {

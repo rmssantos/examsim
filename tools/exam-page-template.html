@@ -56,19 +56,26 @@ $jsonld
       <a href="${root}exams/" data-file-index>Exams</a> <span aria-hidden="true">/</span>
       <span aria-current="page">$exam_code</span>
     </nav>
-    <header class="landing-hero">
-      <span class="landing-kicker"><i aria-hidden="true" class="fas fa-circle-check"></i> $kicker</span>
-      <h1>$exam_code Practice Exam</h1>
-      <p class="landing-subhead">$full_name</p>
-      <p class="landing-intro">$intro</p>
-      <div class="hero-cta-row">
-        <a class="landing-cta" href="$diagnostic_cta_url" data-analytics-event="landing_cta_clicked" data-analytics-exam="$exam_id" data-analytics-action="diagnostic"><i aria-hidden="true" class="fas fa-stethoscope"></i> Start 10-question diagnostic</a>
-        <a class="landing-cta-ghost landing-cta-secondary" href="$full_cta_url" data-analytics-event="landing_cta_clicked" data-analytics-exam="$exam_id" data-analytics-action="full"><i aria-hidden="true" class="fas fa-play"></i> $full_cta_label</a>
-        <a class="landing-cta-ghost" href="${root}exams/" data-file-index><i aria-hidden="true" class="fas fa-layer-group"></i> Browse all exams</a>
+    <header class="landing-hero$hero_class">
+      <div class="landing-hero-grid">
+        <div class="landing-hero-copy">
+          <span class="landing-kicker"><i aria-hidden="true" class="fas fa-circle-check"></i> $kicker</span>
+          <h1>$hero_title</h1>
+          <p class="landing-subhead">$full_name</p>
+          <p class="landing-intro">$intro</p>
+          <div class="hero-cta-row">
+            <a class="landing-cta" href="$diagnostic_cta_url" data-analytics-event="landing_cta_clicked" data-analytics-exam="$exam_id" data-analytics-action="diagnostic"><i aria-hidden="true" class="fas fa-stethoscope"></i> $diagnostic_cta_label</a>
+            <a class="landing-cta-ghost landing-cta-secondary" href="$full_cta_url" data-analytics-event="landing_cta_clicked" data-analytics-exam="$exam_id" data-analytics-action="full"><i aria-hidden="true" class="fas fa-play"></i> $full_cta_label</a>
+            <a class="landing-cta-ghost" href="${root}exams/" data-file-index><i aria-hidden="true" class="fas fa-layer-group"></i> Browse all exams</a>
+          </div>
+$trust_line
+        </div>
+$hero_proof
       </div>
     </header>
 $facts
 $domains
+$guides
 $modules
 $resources
 $labs

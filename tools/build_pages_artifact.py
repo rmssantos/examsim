@@ -15,6 +15,8 @@ PUBLIC_FILES = (
     "PRIVACY-AND-STORAGE.md",
     "editor.html",
     "exam.html",
+    "guides/ai-102-to-ai-103/index.html",
+    "guides/ai-103-study-plan/index.html",
     "index.html",
     "labs.html",
     "manifest.webmanifest",
