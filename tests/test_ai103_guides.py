@@ -1,4 +1,5 @@
 import importlib.util
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -20,6 +21,27 @@ def _load_module(name, path):
 
 gen = _load_module("generate_exam_pages", ROOT / "tools" / "generate-exam-pages.py")
 artifact = _load_module("build_pages_artifact", ROOT / "tools" / "build_pages_artifact.py")
+
+
+def _relative_luminance(rgb):
+    def channel(value):
+        value /= 255
+        return value / 12.92 if value <= 0.04045 else ((value + 0.055) / 1.055) ** 2.4
+
+    red, green, blue = (channel(value) for value in rgb)
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue
+
+
+def _contrast_ratio(foreground, background):
+    foreground_luminance = _relative_luminance(foreground)
+    background_luminance = _relative_luminance(background)
+    lighter = max(foreground_luminance, background_luminance)
+    darker = min(foreground_luminance, background_luminance)
+    return (lighter + 0.05) / (darker + 0.05)
+
+
+def _hex_rgb(value):
+    return tuple(int(value[index:index + 2], 16) for index in (1, 3, 5))
 
 
 class AI103GuideTests(unittest.TestCase):
@@ -58,6 +80,46 @@ class AI103GuideTests(unittest.TestCase):
         landing = (ROOT / "exams" / "ai103" / "index.html").read_text(encoding="utf-8")
         for slug in GUIDES:
             self.assertIn(f"../../guides/{slug}/", landing)
+
+    def test_relative_directory_links_support_file_mode(self):
+        pages = [ROOT / "exams" / "ai103" / "index.html"]
+        pages.extend(ROOT / "guides" / slug / "index.html" for slug in GUIDES)
+
+        for page_path in pages:
+            page = page_path.read_text(encoding="utf-8")
+            for anchor in re.findall(r"<a\b[^>]*>", page):
+                href_match = re.search(r'href="([^"]+)"', anchor)
+                if not href_match:
+                    continue
+                href = href_match.group(1)
+                if href.startswith(("http://", "https://", "#")):
+                    continue
+                if href.split("#", 1)[0].split("?", 1)[0].endswith("/"):
+                    self.assertIn(
+                        "data-file-index",
+                        anchor,
+                        f"directory link must support file:// in {page_path}: {anchor}",
+                    )
+
+    def test_small_guide_labels_meet_wcag_aa_contrast(self):
+        css = (ROOT / "assets" / "css" / "exam-landing.css").read_text(
+            encoding="utf-8"
+        )
+        selectors = ("guide-card-label", "guide-step-label")
+        light_backgrounds = ((255, 255, 255), (248, 249, 255))
+
+        for selector in selectors:
+            block = re.search(rf"\.{selector}\s*\{{([^}}]+)\}}", css)
+            self.assertIsNotNone(block, f"missing .{selector} CSS block")
+            color_match = re.search(r"color:\s*(#[0-9a-fA-F]{6})", block.group(1))
+            self.assertIsNotNone(color_match, f"missing .{selector} text color")
+            foreground = _hex_rgb(color_match.group(1))
+            for background in light_backgrounds:
+                self.assertGreaterEqual(
+                    _contrast_ratio(foreground, background),
+                    4.5,
+                    f".{selector} must meet WCAG AA on {background}",
+                )
 
     def test_sitemap_and_pages_artifact_include_guides(self):
         sitemap = gen.render_sitemap([])

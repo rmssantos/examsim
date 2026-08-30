@@ -1296,6 +1296,10 @@ try {
       && ai103MobileViewport.topbarRight <= ai103MobileViewport.clientWidth + 0.5,
     `AI-103 landing top bar must remain inside the mobile layout viewport: ${JSON.stringify(ai103MobileViewport)}`
   );
+  assert.ok(
+    ai103MobileViewport.scrollWidth <= ai103MobileViewport.clientWidth,
+    `AI-103 landing must not scroll horizontally on mobile: ${JSON.stringify(ai103MobileViewport)}`
+  );
 
   console.log('Browser smoke passed.');
 } finally {

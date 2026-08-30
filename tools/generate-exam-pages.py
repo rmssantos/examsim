@@ -256,7 +256,7 @@ def build_related_guides(meta: dict, root: str = "../../") -> str:
         if not SAFE_ID.match(slug) or not title or not description:
             continue
         cards.append(
-            f'      <li><a class="guide-card" href="{root}guides/{esc(slug)}/">'
+            f'      <li><a class="guide-card" href="{root}guides/{esc(slug)}/" data-file-index>'
             f'<span class="guide-card-label">AI-103 field guide</span>'
             f'<strong>{esc(title)}</strong><span>{esc(description)}</span>'
             '<i aria-hidden="true" class="fas fa-arrow-right"></i></a></li>'
