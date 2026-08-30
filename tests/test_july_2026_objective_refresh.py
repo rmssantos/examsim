@@ -1,6 +1,5 @@
 import hashlib
 import json
-import re
 import unittest
 from pathlib import Path
 
@@ -276,40 +275,22 @@ class Dp700July2026RefreshTests(unittest.TestCase):
         self.assertEqual(self.meta["questionCount"], 25)
 
 
-class July2026SourceLedgerTests(unittest.TestCase):
-    def test_public_source_ledger_records_all_six_official_guides(self):
-        ledger_path = ROOT / "docs" / "content" / "2026-07-30-objective-refresh-ledger.md"
-        self.assertTrue(ledger_path.is_file(), "July 2026 objective source ledger is missing")
-        ledger = ledger_path.read_text(encoding="utf-8")
+class July2026PublicProvenanceTests(unittest.TestCase):
+    def test_public_metadata_records_all_six_official_guides(self):
         expected = {
-            "SC-900": ("July 28, 2026", "sc-900"),
-            "AB-730": ("July 22, 2026", "ab-730"),
-            "AB-731": ("July 22, 2026", "ab-731"),
-            "AZ-400": ("July 27, 2026", "az-400"),
-            "DP-900": ("July 21, 2026", "dp-900"),
-            "DP-700": ("July 21, 2026", "dp-700"),
-        }
-        sections = {
-            match.group(1).strip(): match.group(2)
-            for match in re.finditer(
-                r"^## ([^\r\n]+)\r?\n(.*?)(?=^## |\Z)",
-                ledger,
-                flags=re.MULTILINE | re.DOTALL,
-            )
+            "sc900": ("July 28, 2026", "sc-900"),
+            "ab730": ("July 22, 2026", "ab-730"),
+            "ab731": ("July 22, 2026", "ab-731"),
+            "az400": ("July 27, 2026", "az-400"),
+            "dp900": ("July 21, 2026", "dp-900"),
+            "dp700": ("July 21, 2026", "dp-700"),
         }
         for exam_id, (date, slug) in expected.items():
             with self.subTest(exam_id=exam_id):
-                self.assertIn(exam_id, sections)
-                section = sections[exam_id]
-                self.assertIn(date, section)
-                self.assertIn(f"{STUDY_GUIDE_ROOT}/{slug}", section)
-        self.assertIn(
-            "local module label is now “Microsoft Foundry and Foundry Tools”",
-            ledger,
-        )
-        self.assertIn("official objective name “Foundry Tools”", ledger)
-        self.assertIn("Metadata only; no answer change", ledger)
-        self.assertNotRegex(ledger, r"[A-Za-z]:\\")
+                _, metadata = load_pack(exam_id)
+                review = metadata["contentReview"]
+                self.assertIn(date, review["objectiveVersion"])
+                self.assertEqual(f"{STUDY_GUIDE_ROOT}/{slug}", review["sourceUrl"])
 
 
 if __name__ == "__main__":
