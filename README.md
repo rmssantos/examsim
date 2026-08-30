@@ -193,6 +193,7 @@ Production response-header guidance is documented in
 
 ## License
 
-The simulator source is available under the [MIT License](LICENSE). Exam content
-and third-party assets may have separate terms; verify redistribution rights
-before publishing them.
+The simulator source is available under the [MIT License](LICENSE). Authored
+practice questions, explanations, lab guides, editorial metadata, and original
+branded media follow the separate [Examplar content terms](CONTENT-LICENSE.md).
+Third-party assets retain their own terms.
