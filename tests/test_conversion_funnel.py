@@ -185,7 +185,12 @@ source = source.replace(
 );
 
 const tab = new Map();
-global.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+const localData = new Map();
+global.localStorage = {
+  getItem(key) { return localData.has(key) ? localData.get(key) : null; },
+  setItem(key, value) { localData.set(key, String(value)); },
+  removeItem(key) { localData.delete(key); }
+};
 global.sessionStorage = {
   getItem(key) { return tab.has(key) ? tab.get(key) : null; },
   setItem(key, value) { tab.set(key, String(value)); },
@@ -207,7 +212,7 @@ global.window = {
     pathname: '/'
   },
   ExamApp: {
-    isPublicSiteHost(host = 'examplar.app') {
+    isPublicSiteHost(host = window.location.hostname) {
       return ['examplar.app', 'www.examplar.app', 'rmssantos.github.io'].includes(host);
     }
   }
@@ -221,6 +226,9 @@ let reddit = null;
 let google = null;
 let direct = null;
 let rejected = null;
+let optedOut = null;
+let optOutCleared = false;
+let local = null;
 if (available) {
   reddit = helper(product);
   tab.clear();
@@ -230,8 +238,30 @@ if (available) {
   window.location.href = 'https://examplar.app/';
   direct = helper(product);
   rejected = helper('https://evil.example/checkout');
+
+  tab.set('exam_analytics_attribution', JSON.stringify({ campaign_source: 'reddit' }));
+  localData.set('exam_analytics_opt_out', 'true');
+  optedOut = helper(product);
+  optOutCleared = !tab.has('exam_analytics_attribution');
+
+  localData.clear();
+  tab.clear();
+  window.location.href = 'http://localhost:8000/';
+  window.location.protocol = 'http:';
+  window.location.hostname = 'localhost';
+  window.location.pathname = '/';
+  local = helper(product);
 }
-console.log(JSON.stringify({ available, reddit, google, direct, rejected }));
+console.log(JSON.stringify({
+  available,
+  reddit,
+  google,
+  direct,
+  rejected,
+  optedOut,
+  optOutCleared,
+  local
+}));
 """
         result = subprocess.run(
             [node, "-e", node_script, str(ROOT / "assets/js/analytics.js")],
@@ -385,6 +415,15 @@ console.log(JSON.stringify({
                 self.assertEqual(parse_qs(parsed.query), {"referrer": [referrer]})
 
         self.assertIsNone(payload["rejected"])
+
+    def test_gumroad_links_honor_analytics_opt_out(self):
+        payload = self.run_gumroad_decorations()
+        self.assertIsNone(payload["optedOut"])
+        self.assertTrue(payload["optOutCleared"])
+
+    def test_gumroad_links_are_not_decorated_outside_the_public_site(self):
+        payload = self.run_gumroad_decorations()
+        self.assertIsNone(payload["local"])
 
     def test_activation_events_have_bounded_properties_and_measurements(self):
         events = self.run_activation_events()
@@ -1380,6 +1419,14 @@ console.log(JSON.stringify({
 
         self.assertIn("commercial interaction events", analytics)
         self.assertIn("coarse location and client metadata", analytics)
+        self.assertIn(
+            "does not add the extra `referrer` parameter",
+            notes,
+        )
+        self.assertIn(
+            "does not add the extra <code>referrer</code> parameter",
+            page,
+        )
 
         for disclosure in (page, notes, analytics):
             with self.subTest(disclosure=disclosure[:40]):
