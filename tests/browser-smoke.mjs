@@ -1119,6 +1119,11 @@ try {
 
   // Career roadmaps: seed local progress, then verify node states + up-next + structure.
   await page.goto(`${baseUrl}/roadmaps.html`, { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(
+    () => window.Roadmaps?.ready === true,
+    null,
+    { timeout: 8000 }
+  );
   await page.evaluate(async () => {
     const az900 = { attempts: [{ score: 92, passed: true }], bestScore: 92, totalPassed: 1 };
     const az104 = { attempts: [{ score: 40, passed: false }], bestScore: 40, totalPassed: 0 };
