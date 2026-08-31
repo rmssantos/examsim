@@ -226,8 +226,21 @@ let reddit = null;
 let google = null;
 let direct = null;
 let rejected = null;
+let rejectedGumroadProfile = null;
+let rejectedGumroadReceipt = null;
+let rejectedOtherGumroadStore = null;
+let googleClick = null;
+let persistedGoogleClick = null;
+let braidClick = null;
+let invalidGoogleClick = null;
+let embeddedClickId = null;
+let storedGoogleClickIds = null;
+let clickIdsAfterInvalid = null;
+let clickIdTelemetryProperties = null;
+let clickIdBoundaryValues = null;
 let optedOut = null;
 let optOutCleared = false;
+let googleClickOptOutCleared = false;
 let local = null;
 if (available) {
   reddit = helper(product);
@@ -238,11 +251,41 @@ if (available) {
   window.location.href = 'https://examplar.app/';
   direct = helper(product);
   rejected = helper('https://evil.example/checkout');
+  rejectedGumroadProfile = helper('https://examplar.gumroad.com/profile');
+  rejectedGumroadReceipt = helper('https://app.gumroad.com/receipt/example');
+  rejectedOtherGumroadStore = helper('https://another-store.gumroad.com/l/example');
+  embeddedClickId = helper(`${product}?gclid=Untrusted_Target-Click`);
+
+  tab.clear();
+  window.location.href = 'https://examplar.app/exams/ai103/?utm_source=google_ads&gclid=Click_ID-123_ABC';
+  googleClick = helper(product);
+  storedGoogleClickIds = tab.get('exam_google_ads_click_ids') || null;
+  clickIdTelemetryProperties = window.ExamApp.analytics._private
+    .buildPageViewEnvelope().data.baseData.properties;
+  const sanitizeClickId = window.ExamApp.analytics._private.sanitizeGoogleAdsClickId;
+  clickIdBoundaryValues = {
+    accepted256: sanitizeClickId('A'.repeat(256)),
+    rejected257: sanitizeClickId('A'.repeat(257)),
+    rejectedPunctuation: sanitizeClickId('abc/def')
+  };
+  window.location.href = 'https://examplar.app/roadmaps.html';
+  persistedGoogleClick = helper(product);
+
+  tab.clear();
+  window.location.href = 'https://examplar.app/exams/ai103/?gbraid=Braid_123-ABC&wbraid=Wbraid_456-DEF';
+  braidClick = helper(product);
+
+  tab.clear();
+  window.location.href = 'https://examplar.app/exams/ai103/?gclid=https%3A%2F%2Fevil.example%2Fid';
+  invalidGoogleClick = helper(product);
+  clickIdsAfterInvalid = tab.get('exam_google_ads_click_ids') || null;
 
   tab.set('exam_analytics_attribution', JSON.stringify({ campaign_source: 'reddit' }));
+  tab.set('exam_google_ads_click_ids', JSON.stringify({ gclid: 'Must_Be-Cleared' }));
   localData.set('exam_analytics_opt_out', 'true');
   optedOut = helper(product);
   optOutCleared = !tab.has('exam_analytics_attribution');
+  googleClickOptOutCleared = !tab.has('exam_google_ads_click_ids');
 
   localData.clear();
   tab.clear();
@@ -258,8 +301,21 @@ console.log(JSON.stringify({
   google,
   direct,
   rejected,
+  rejectedGumroadProfile,
+  rejectedGumroadReceipt,
+  rejectedOtherGumroadStore,
+  googleClick,
+  persistedGoogleClick,
+  braidClick,
+  invalidGoogleClick,
+  embeddedClickId,
+  storedGoogleClickIds,
+  clickIdsAfterInvalid,
+  clickIdTelemetryProperties,
+  clickIdBoundaryValues,
   optedOut,
   optOutCleared,
+  googleClickOptOutCleared,
   local
 }));
 """
@@ -390,7 +446,7 @@ console.log(JSON.stringify({
             "deployment": "github_pages",
             "page": "home",
             "path": "/",
-            "analytics_version": "1.4.0",
+            "analytics_version": "1.5.0",
         }
         for event, specific in zip(events, expected_specific):
             with self.subTest(event=event["name"]):
@@ -415,11 +471,52 @@ console.log(JSON.stringify({
                 self.assertEqual(parse_qs(parsed.query), {"referrer": [referrer]})
 
         self.assertIsNone(payload["rejected"])
+        self.assertIsNone(payload["rejectedGumroadProfile"])
+        self.assertIsNone(payload["rejectedGumroadReceipt"])
+        self.assertIsNone(payload["rejectedOtherGumroadStore"])
 
     def test_gumroad_links_honor_analytics_opt_out(self):
         payload = self.run_gumroad_decorations()
         self.assertIsNone(payload["optedOut"])
         self.assertTrue(payload["optOutCleared"])
+        self.assertTrue(payload["googleClickOptOutCleared"])
+
+    def test_google_ads_click_ids_are_forwarded_only_for_the_current_tab(self):
+        payload = self.run_gumroad_decorations()
+
+        google = parse_qs(urlparse(payload["googleClick"]).query)
+        persisted = parse_qs(urlparse(payload["persistedGoogleClick"]).query)
+        braids = parse_qs(urlparse(payload["braidClick"]).query)
+        invalid = parse_qs(urlparse(payload["invalidGoogleClick"]).query)
+
+        self.assertEqual(google["gclid"], ["Click_ID-123_ABC"])
+        self.assertEqual(persisted["gclid"], ["Click_ID-123_ABC"])
+        self.assertEqual(
+            json.loads(payload["storedGoogleClickIds"]),
+            {"gclid": "Click_ID-123_ABC"},
+        )
+        self.assertEqual(braids["gbraid"], ["Braid_123-ABC"])
+        self.assertEqual(braids["wbraid"], ["Wbraid_456-DEF"])
+        self.assertNotIn("gclid", invalid)
+        self.assertNotIn(
+            "gclid",
+            parse_qs(urlparse(payload["embeddedClickId"]).query),
+        )
+        self.assertIsNone(payload["clickIdsAfterInvalid"])
+
+    def test_google_ads_click_ids_never_enter_product_telemetry(self):
+        properties = self.run_gumroad_decorations()["clickIdTelemetryProperties"]
+
+        self.assertNotIn("gclid", properties)
+        self.assertNotIn("gbraid", properties)
+        self.assertNotIn("wbraid", properties)
+
+    def test_google_ads_click_ids_have_strict_length_and_character_bounds(self):
+        boundaries = self.run_gumroad_decorations()["clickIdBoundaryValues"]
+
+        self.assertEqual(boundaries["accepted256"], "A" * 256)
+        self.assertEqual(boundaries["rejected257"], "")
+        self.assertEqual(boundaries["rejectedPunctuation"], "")
 
     def test_gumroad_links_are_not_decorated_outside_the_public_site(self):
         payload = self.run_gumroad_decorations()
@@ -444,7 +541,7 @@ console.log(JSON.stringify({
             "deployment": "github_pages",
             "page": "landing",
             "path": "/exams/sc900/",
-            "analytics_version": "1.4.0",
+            "analytics_version": "1.5.0",
         }
         self.assertEqual(
             events[0]["properties"],
@@ -544,7 +641,7 @@ console.log(JSON.stringify({
             "deployment": "github_pages",
             "page": "landing",
             "path": "/exams/sc900/",
-            "analytics_version": "1.4.0",
+            "analytics_version": "1.5.0",
             "exam_id": "sc900",
             "exam_source": "bundled",
         }
@@ -1274,7 +1371,12 @@ source = source.replace(
 const handlers = {};
 const sent = [];
 let prevented = false;
-global.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+const localData = new Map();
+global.localStorage = {
+  getItem(key) { return localData.has(key) ? localData.get(key) : null; },
+  setItem(key, value) { localData.set(key, String(value)); },
+  removeItem(key) { localData.delete(key); }
+};
 global.sessionStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
 global.fetch = (_url, options) => {
   sent.push(JSON.parse(options.body)[0]);
@@ -1283,7 +1385,7 @@ global.fetch = (_url, options) => {
 global.HTMLElement = function HTMLElement() {};
 global.document = {
   readyState: 'loading',
-  referrer: 'https://www.reddit.com/r/AzureCertification/',
+  referrer: 'https://www.google.com/search?q=ai-103',
   addEventListener(type, handler) { handlers[type] = handler; },
   getElementById(id) {
     return id === 'analytics-privacy-button' ? {} : null;
@@ -1291,7 +1393,7 @@ global.document = {
 };
 global.window = {
   location: {
-    href: 'https://examplar.app/exams/az104/?utm_source=reddit',
+    href: 'https://examplar.app/exams/az104/?utm_source=google_ads&gclid=Click_ID-123_ABC',
     protocol: 'https:',
     hostname: 'examplar.app',
     pathname: '/exams/az104/'
@@ -1317,8 +1419,21 @@ handlers.click({
   },
   preventDefault() { prevented = true; }
 });
+const decoratedHref = cta.href;
+window.ExamApp.analytics.setOptOut(true);
+const hrefImmediatelyAfterOptOut = cta.href;
+handlers.click({
+  target: {
+    closest(selector) {
+      return selector === '[data-analytics-event]' ? cta : null;
+    }
+  },
+  preventDefault() { prevented = true; }
+});
 console.log(JSON.stringify({
   prevented,
+  decoratedHref,
+  hrefImmediatelyAfterOptOut,
   href: cta.href,
   events: sent
     .filter((envelope) => envelope.data.baseType === 'EventData')
@@ -1335,8 +1450,20 @@ console.log(JSON.stringify({
         payload = json.loads(result.stdout)
         self.assertFalse(payload["prevented"])
         self.assertEqual(
-            parse_qs(urlparse(payload["href"]).query),
-            {"referrer": ["https://www.reddit.com"]},
+            parse_qs(urlparse(payload["decoratedHref"]).query),
+            {
+                "referrer": ["https://www.google.com"],
+                "gclid": ["Click_ID-123_ABC"],
+            },
+        )
+        self.assertEqual(
+            parse_qs(urlparse(payload["hrefImmediatelyAfterOptOut"]).query),
+            {},
+        )
+        self.assertEqual(parse_qs(urlparse(payload["href"]).query), {})
+        self.assertEqual(
+            urlparse(payload["href"]).path,
+            "/l/az104-complete/EXAMPLAR30",
         )
         self.assertEqual([event["name"] for event in payload["events"]], ["pro_purchase_clicked"])
         self.assertEqual(payload["events"][0]["properties"]["exam_id"], "az104")
@@ -1427,6 +1554,16 @@ console.log(JSON.stringify({
             "does not add the extra <code>referrer</code> parameter",
             page,
         )
+        for disclosure in (page, notes):
+            with self.subTest(click_id_disclosure=disclosure[:40]):
+                self.assertIn("gclid", disclosure)
+                self.assertIn("gbraid", disclosure)
+                self.assertIn("wbraid", disclosure)
+                self.assertIn("google ads", disclosure)
+                self.assertIn("current tab", disclosure)
+        self.assertIn("google ads click identifiers", analytics)
+        self.assertIn("current tab", analytics)
+        self.assertIn("not added to azure product telemetry", analytics)
 
         for disclosure in (page, notes, analytics):
             with self.subTest(disclosure=disclosure[:40]):

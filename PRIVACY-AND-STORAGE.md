@@ -23,8 +23,8 @@ Examplar uses:
   records;
 - localStorage for small settings, analytics opt-out, activation state, and
   legacy compatibility;
-- sessionStorage for sanitized campaign attribution during the current browser
-  tab only;
+- sessionStorage for sanitized campaign attribution and bounded Google Ads click
+  identifiers during the current browser tab only;
 - Cache Storage for app files needed for offline access.
 
 Browser storage is isolated by site origin and browser profile. Clearing site
@@ -92,11 +92,22 @@ Purchase links open Gumroad in a new tab. On that click, the browser contacts
 Gumroad and sends the normal checkout request. Examplar adds one coarse
 `referrer` domain so a later sale can be attributed to a channel: an allowlisted
 campaign source such as Google or Reddit, the sanitized external referrer
-hostname, or `examplar.app` when no source is available. It does not forward the
-incoming page URL, referrer path, campaign name/content, answers, progress,
-email, or a visitor identifier. When analytics is disabled, stored campaign
-attribution is cleared and Examplar does not add the extra `referrer` parameter
-to the checkout URL. The parameter is also not added outside the public site.
+hostname, or `examplar.app` when no source is available.
+
+For a Google Ads visit, Examplar also accepts the bounded click identifiers
+`gclid`, `gbraid`, and `wbraid`. It keeps them in sessionStorage for the current
+tab and forwards them only to the Gumroad purchase URL. These click identifiers
+are not added to Azure product telemetry or persisted across tabs. Gumroad runs
+the Google Ads purchase tag on its receipt page so a completed order can be
+attributed with its value, currency, and order ID. Enhanced
+conversions are disabled, so Examplar does not configure that tag to send a
+buyer email.
+
+Examplar does not forward the incoming page URL, referrer path, campaign
+name/content, answers, progress, or email. When analytics is disabled, stored
+campaign attribution and Google Ads click identifiers are cleared, and Examplar
+does not add the extra `referrer` parameter or Google Ads click identifiers to
+the checkout URL. The parameters are also not added outside the public site.
 
 Gumroad separately processes the information needed to display and complete its
 checkout, including payment and buyer details entered there.
@@ -110,8 +121,9 @@ control to opt out. The preference is stored in:
 localStorage['exam_analytics_opt_out'] = 'true'
 ```
 
-Opting out also clears campaign attribution from the current tab. Changing or
-clearing browser storage can reset the persistent opt-out preference.
+Opting out also clears campaign attribution and Google Ads click identifiers
+from the current tab. Changing or clearing browser storage can reset the
+persistent opt-out preference.
 
 ## Local and Self-Hosted Use
 
