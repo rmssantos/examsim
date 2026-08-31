@@ -6,12 +6,12 @@
   </a>
 </p>
 
-Examplar is an open-source, local-first certification exam simulator. Practise
-in the browser with original questions, guided labs, and detailed review tools.
+Examplar is an open-source, local-first certification exam simulator. Practice
+in the browser with original questions, hands-on labs, and detailed review tools.
 No account is required, and your progress stays on your device.
 
 **[Try Examplar](https://examplar.app/)** ·
-**[Browse 15 practice exams](https://examplar.app/exams/)** ·
+**[Browse practice exams](https://examplar.app/exams/)** ·
 **[Read the privacy model](PRIVACY-AND-STORAGE.md)**
 
 > If Examplar helps you study or gives you ideas for your own local-first app,
@@ -21,7 +21,7 @@ No account is required, and your progress stays on your device.
 ## Why Examplar
 
 - **Start immediately:** open a free preview without creating an account
-- **Practise realistically:** timed sessions, multiple question types, and
+- **Practice realistically:** timed sessions, multiple question types, and
   configurable pass scores
 - **Learn from mistakes:** detailed review, weak-area practice, and spaced
   repetition
