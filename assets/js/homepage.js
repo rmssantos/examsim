@@ -1204,7 +1204,7 @@ const unlockButton = document.createElement('button');
 unlockButton.type = 'button';
 unlockButton.className = 'exam-card-unlock';
 unlockButton.appendChild(this.createIcon('fas fa-unlock'));
-unlockButton.appendChild(document.createTextNode(promotion ? ` Unlock ${promotion.offerPrice}` : ' Unlock'));
+unlockButton.appendChild(document.createTextNode(promotion ? ` Unlock ${promotion.offerPrice} + taxes` : ' Unlock'));
 unlockButton.addEventListener('click', (e) => {
 e.stopPropagation();
 window.ExamApp?.analytics?.trackProUnlockClicked?.(examId);
@@ -1354,7 +1354,7 @@ buy.setAttribute('data-analytics-exam', examId);
 buy.setAttribute('data-analytics-placement', 'homepage_modal');
 buy.appendChild(this.createIcon('fas fa-store'));
 buy.appendChild(document.createTextNode(
-	promotion ? ` Get the full pack — ${promotion.offerPrice}` : ' Get the full pack' + (pro.price ? ' (' + pro.price + ')' : '')
+	promotion ? ` Get the full pack — ${promotion.offerPrice} + taxes` : ' Get the full pack' + (pro.price ? ' (' + pro.price + ')' : '')
 ));
 dialog.appendChild(buy);
 

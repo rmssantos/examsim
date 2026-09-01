@@ -1529,7 +1529,7 @@ class MultiExamSimulator {
             ? `<div class="results-pro-offer"><span class="results-pro-offer-label">${this.escapeHtml(promotion.label)} · ${this.escapeHtml(String(promotion.discountPercent))}% off</span><span class="results-pro-offer-prices"><s>${this.escapeHtml(promotion.basePrice)}</s> <span aria-hidden="true">→</span> <strong>${this.escapeHtml(promotion.offerPrice)}</strong> + taxes</span><span class="results-pro-offer-meta">Code <code>${this.escapeHtml(promotion.code)}</code>${promotion.limited ? ' · Limited launch offer' : ''}</span></div>`
             : '';
         const price = promotion
-            ? ` — ${this.escapeHtml(promotion.offerPrice)}`
+            ? ` — ${this.escapeHtml(promotion.offerPrice)} + taxes`
             : (pro.price ? ` (${this.escapeHtml(String(pro.price))})` : '');
         return `<div class="recommended-pro results-pro-upsell"><i class="fas fa-unlock" aria-hidden="true"></i> <strong>${title}</strong><p>You practiced the free preview. The full pack covers ${scope} with detailed explanations and free updates.</p>${offer}<a class="results-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener" data-analytics-event="pro_purchase_clicked" data-analytics-exam="${this.escapeHtml(this.currentExam)}" data-analytics-placement="results_pro_upsell">Get the full pack${price}</a></div>`;
     }
@@ -1553,7 +1553,7 @@ class MultiExamSimulator {
         const offer = promotion
             ? `<div class="results-pro-offer"><span class="results-pro-offer-label">${this.escapeHtml(promotion.label)} · ${this.escapeHtml(String(promotion.discountPercent))}% off</span><span class="results-pro-offer-prices"><s>${this.escapeHtml(promotion.basePrice)}</s> <span aria-hidden="true">→</span> <strong>${this.escapeHtml(promotion.offerPrice)}</strong> + taxes</span><span class="results-pro-offer-meta">Code <code>${this.escapeHtml(promotion.code)}</code>${promotion.limited ? ' · Limited launch offer' : ''}</span></div>`
             : '';
-        const price = promotion ? ` — ${this.escapeHtml(promotion.offerPrice)}` : '';
+        const price = promotion ? ` — ${this.escapeHtml(promotion.offerPrice)} + taxes` : '';
         const targetExam = rec.examId || this.currentExam;
         return `<div class="recommended-pro"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> <strong>${title}</strong><p>${blurb}</p>${offer}<a class="recommended-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener" data-analytics-event="pro_purchase_clicked" data-analytics-exam="${this.escapeHtml(targetExam)}" data-analytics-source-exam="${this.escapeHtml(this.currentExam)}" data-analytics-placement="results_recommended_pro">View pack${price}</a></div>`;
     }

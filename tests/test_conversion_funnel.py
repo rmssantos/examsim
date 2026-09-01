@@ -1530,9 +1530,9 @@ console.log(JSON.stringify({
 
     def test_dynamic_purchase_offers_label_prices_plus_taxes(self):
         expected_surfaces = {
-            ROOT / "assets/js/homepage.js": 2,
-            ROOT / "assets/js/roadmaps.js": 1,
-            ROOT / "assets/js/script-multi-exam.js": 2,
+            ROOT / "assets/js/homepage.js": 4,
+            ROOT / "assets/js/roadmaps.js": 2,
+            ROOT / "assets/js/script-multi-exam.js": 4,
         }
 
         for path, expected_count in expected_surfaces.items():
@@ -1542,6 +1542,16 @@ console.log(JSON.stringify({
                     source.count(" + taxes"),
                     expected_count,
                 )
+
+        homepage = (ROOT / "assets/js/homepage.js").read_text(encoding="utf-8")
+        roadmaps = (ROOT / "assets/js/roadmaps.js").read_text(encoding="utf-8")
+        results = (ROOT / "assets/js/script-multi-exam.js").read_text(encoding="utf-8")
+        self.assertEqual(homepage.count("${promotion.offerPrice} + taxes"), 2)
+        self.assertIn("escapeHtml(promotion.offerPrice) + ' + taxes'", roadmaps)
+        self.assertEqual(
+            results.count("${this.escapeHtml(promotion.offerPrice)} + taxes"),
+            2,
+        )
 
     def test_privacy_copy_discloses_commercial_and_azure_metadata(self):
         page = (ROOT / "privacy-and-storage.html").read_text(encoding="utf-8").lower()
