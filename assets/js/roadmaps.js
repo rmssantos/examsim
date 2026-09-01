@@ -331,7 +331,7 @@
 				'<div class="offer-topline"><span class="offer-label">' + escapeHtml(promotion.label) + '</span>' +
 				'<strong class="offer-discount">' + escapeHtml(promotion.discountPercent + '% off') + '</strong></div>' +
 				'<div class="offer-prices"><span class="offer-price-old">' + escapeHtml(promotion.basePrice) + '</span>' +
-				'<span class="offer-price-arrow">→</span><strong class="offer-price-new">' + escapeHtml(promotion.offerPrice) + '</strong></div>' +
+				'<span class="offer-price-arrow">→</span><strong class="offer-price-new">' + escapeHtml(promotion.offerPrice) + '</strong> + taxes</div>' +
 				'<div class="offer-meta">Use code <code class="offer-code">' + escapeHtml(promotion.code) + '</code>' +
 				(promotion.limited ? ' · Limited launch offer' : '') + '</div></div>'
 			: '';

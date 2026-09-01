@@ -406,6 +406,14 @@ class PricingTests(unittest.TestCase):
         self.assertIn("Limited launch offer", page)
         self.assertIn("/az104-complete/EXAMPLAR30", page)
 
+    def test_preview_pack_labels_the_offer_price_plus_taxes(self):
+        page = self._render(SAMPLE_PRO)
+
+        offer_start = page.index('class="pro-offer"')
+        purchase_cta = page.index('data-analytics-event="pro_purchase_clicked"')
+        offer = page[offer_start:purchase_cta]
+        self.assertIn("<strong>13.30 EUR</strong> + taxes", offer)
+
     def test_preview_jsonld_has_free_and_paid_offers(self):
         payload = json.loads(gen.build_jsonld(SAMPLE_PRO))
         course = next(n for n in payload["@graph"] if n["@type"] == "Course")

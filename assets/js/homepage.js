@@ -1161,6 +1161,7 @@ offerPrices.className = 'offer-prices';
 this.appendTextElement(offerPrices, 'span', 'offer-price-old', promotion.basePrice);
 this.appendTextElement(offerPrices, 'span', 'offer-price-arrow', '→');
 this.appendTextElement(offerPrices, 'strong', 'offer-price-new', promotion.offerPrice);
+offerPrices.appendChild(document.createTextNode(' + taxes'));
 offer.appendChild(offerPrices);
 
 const offerMeta = document.createElement('div');
@@ -1319,6 +1320,7 @@ offerPrices.className = 'offer-prices';
 this.appendTextElement(offerPrices, 'span', 'offer-price-old', promotion.basePrice);
 this.appendTextElement(offerPrices, 'span', 'offer-price-arrow', '→');
 this.appendTextElement(offerPrices, 'strong', 'offer-price-new', promotion.offerPrice);
+offerPrices.appendChild(document.createTextNode(' + taxes'));
 offer.appendChild(offerPrices);
 
 const offerMeta = document.createElement('div');

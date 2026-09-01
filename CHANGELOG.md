@@ -17,6 +17,8 @@ Notable public changes are recorded here. Dates use `YYYY-MM-DD`.
 
 ### Changed
 
+- Labelled every promotional Complete-pack price as `price + taxes` so the
+  advertised amount remains clear across countries and tax regimes.
 - Kept all hosted Home links on the clean site root instead of exposing
   `index.html`, including the hands-on labs header and Back to Home action.
 - Show hands-on lab actions only when a pack contains accessible labs or a

@@ -1528,6 +1528,21 @@ console.log(JSON.stringify({
         self.assertIn(".results-pro-offer", exam_css)
         self.assertIn(".pro-offer", landing_css)
 
+    def test_dynamic_purchase_offers_label_prices_plus_taxes(self):
+        expected_surfaces = {
+            ROOT / "assets/js/homepage.js": 2,
+            ROOT / "assets/js/roadmaps.js": 1,
+            ROOT / "assets/js/script-multi-exam.js": 2,
+        }
+
+        for path, expected_count in expected_surfaces.items():
+            with self.subTest(path=path.name):
+                source = path.read_text(encoding="utf-8")
+                self.assertEqual(
+                    source.count(" + taxes"),
+                    expected_count,
+                )
+
     def test_privacy_copy_discloses_commercial_and_azure_metadata(self):
         page = (ROOT / "privacy-and-storage.html").read_text(encoding="utf-8").lower()
         notes = (ROOT / "PRIVACY-AND-STORAGE.md").read_text(encoding="utf-8").lower()

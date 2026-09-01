@@ -515,7 +515,7 @@ def build_pro(meta: dict) -> str:
             f'        <div class="pro-offer-top"><span>{esc(promotion["label"])}</span>'
             f'<strong>{esc(promotion["discount"])}</strong></div>\n'
             f'        <div class="pro-offer-prices"><s>{esc(promotion["base_price"])}</s>'
-            f'<span aria-hidden="true">→</span><strong>{esc(promotion["offer_price"])}</strong></div>\n'
+            f'<span aria-hidden="true">→</span><strong>{esc(promotion["offer_price"])}</strong> + taxes</div>\n'
             f'        <div class="pro-offer-meta">Code <code>{esc(promotion["code"])}</code>{limited}</div>\n'
             '      </div>\n'
         )
