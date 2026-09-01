@@ -331,7 +331,7 @@
 				'<div class="offer-topline"><span class="offer-label">' + escapeHtml(promotion.label) + '</span>' +
 				'<strong class="offer-discount">' + escapeHtml(promotion.discountPercent + '% off') + '</strong></div>' +
 				'<div class="offer-prices"><span class="offer-price-old">' + escapeHtml(promotion.basePrice) + '</span>' +
-				'<span class="offer-price-arrow">→</span><strong class="offer-price-new">' + escapeHtml(promotion.offerPrice) + '</strong></div>' +
+				'<span class="offer-price-arrow">→</span><strong class="offer-price-new">' + escapeHtml(promotion.offerPrice) + '</strong> + taxes</div>' +
 				'<div class="offer-meta">Use code <code class="offer-code">' + escapeHtml(promotion.code) + '</code>' +
 				(promotion.limited ? ' · Limited launch offer' : '') + '</div></div>'
 			: '';
@@ -351,7 +351,7 @@
 					: '') +
 				'<a class="pro-modal-buy" href="' + escapeHtml(window.ExamApp.safeExternalUrl(pro.url) || '#') + '" target="_blank" rel="noopener" data-analytics-event="pro_purchase_clicked" data-analytics-exam="' + escapeHtml(node.id) + '" data-analytics-placement="roadmap_modal">' +
 					'<i class="fas fa-store" aria-hidden="true"></i> Get the full pack' +
-					(promotion ? ' — ' + escapeHtml(promotion.offerPrice) : (pro.price ? ' (' + escapeHtml(pro.price) + ')' : '')) + '</a>' +
+					(promotion ? ' — ' + escapeHtml(promotion.offerPrice) + ' + taxes' : (pro.price ? ' (' + escapeHtml(pro.price) + ')' : '')) + '</a>' +
 				'<div class="pro-modal-divider"></div>' +
 				'<p class="pro-modal-activate-text">Already purchased? Import your pack file and enter your license key on the homepage to activate it on this device.</p>' +
 				'<a class="pro-modal-import" href="' + escapeHtml((window.ExamApp?.router?.buildUrl?.('home')) || 'index.html') + '"><i class="fas fa-file-import" aria-hidden="true"></i> Import on the homepage</a>' +
