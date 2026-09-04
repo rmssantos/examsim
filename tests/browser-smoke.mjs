@@ -1296,8 +1296,8 @@ try {
   assert.ok(privacyBrandHref, 'The privacy logo must be a link to home.');
   assert.equal(privacyBrandHref, privacyHomeNavHref, 'Privacy logo must link to the same home target as the Home nav link.');
 
-  // SEO landing pages (hub + a generated exam page) wear the same control-room sticky bar.
-  for (const path of ['/exams/index.html', '/exams/az900/index.html']) {
+  // SEO landing pages (hubs + a generated exam page) wear the same control-room sticky bar.
+  for (const path of ['/exams/index.html', '/guides/index.html', '/exams/az900/index.html']) {
     await page.goto(`${baseUrl}${path}`, { waitUntil: 'domcontentloaded' });
     assert.equal(
       await page.locator('.cr-topbar').evaluate(el => getComputedStyle(el).position), 'sticky',
@@ -1333,6 +1333,27 @@ try {
   assert.ok(
     ai103MobileViewport.scrollWidth <= ai103MobileViewport.clientWidth,
     `AI-103 landing must not scroll horizontally on mobile: ${JSON.stringify(ai103MobileViewport)}`
+  );
+
+  await page.goto(`${baseUrl}/guides/index.html`, { waitUntil: 'domcontentloaded' });
+  const guidesMobileViewport = await page.evaluate(() => {
+    document.documentElement.style.scrollbarGutter = 'stable';
+    const topbar = document.querySelector('.cr-topbar').getBoundingClientRect();
+    return {
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      topbarLeft: topbar.left,
+      topbarRight: topbar.right
+    };
+  });
+  assert.ok(
+    guidesMobileViewport.topbarLeft >= -0.5
+      && guidesMobileViewport.topbarRight <= guidesMobileViewport.clientWidth + 0.5,
+    `Guides hub top bar must remain inside the mobile layout viewport: ${JSON.stringify(guidesMobileViewport)}`
+  );
+  assert.ok(
+    guidesMobileViewport.scrollWidth <= guidesMobileViewport.clientWidth,
+    `Guides hub must not scroll horizontally on mobile: ${JSON.stringify(guidesMobileViewport)}`
   );
 
   console.log('Browser smoke passed.');

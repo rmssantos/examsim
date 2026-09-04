@@ -174,7 +174,10 @@ class AI103GuideTests(unittest.TestCase):
         self.assertNotIn("AI-103", guides)
 
     def test_relative_directory_links_support_file_mode(self):
-        pages = [ROOT / "exams" / "ai103" / "index.html"]
+        pages = [
+            ROOT / "exams" / "ai103" / "index.html",
+            ROOT / "guides" / "index.html",
+        ]
         pages.extend(ROOT / "guides" / slug / "index.html" for slug in GUIDES)
 
         for page_path in pages:

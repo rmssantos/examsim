@@ -49,12 +49,20 @@
             return queryString ? `${homeUrl}?${queryString}` : homeUrl;
         }
 
+        // Guides are real static pages rather than service-worker shell routes.
+        // Keep the hosted URL canonical while preserving a usable file:// fallback.
+        if (!isFileMode() && page === 'guides') {
+            const guidesUrl = withBase('guides/');
+            return queryString ? `${guidesUrl}?${queryString}` : guidesUrl;
+        }
+
         if (!cleanRoutesSupported()) {
             const fileMap = {
                 home: 'index.html',
                 editor: 'editor.html',
                 exam: 'exam.html',
                 study: 'exam.html',
+                guides: 'guides/index.html',
                 'privacy-and-storage': 'privacy-and-storage.html',
                 roadmaps: 'roadmaps.html'
             };
