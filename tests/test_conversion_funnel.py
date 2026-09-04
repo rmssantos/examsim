@@ -159,6 +159,8 @@ analytics.trackProPurchaseClicked('az104', malicious);
 analytics.trackProImportClicked('saac03', malicious);
 analytics.trackProResultsCtaClicked('az104', malicious);
 analytics.trackPassStoryClicked('az104', malicious);
+analytics.trackGithubRepositoryClicked('az104', 'results_end', malicious);
+analytics.trackGithubRepositoryClicked('customer@example.com', 'profile', malicious);
 
 console.log(JSON.stringify(sent.map((envelope) => envelope.data.baseData)));
 """
@@ -425,6 +427,7 @@ console.log(JSON.stringify({
                 "pro_import_clicked",
                 "pro_purchase_clicked",
                 "pass_story_clicked",
+                "github_repository_clicked",
             ],
         )
 
@@ -440,13 +443,14 @@ console.log(JSON.stringify({
                 "placement": "results_pro_upsell",
             },
             {"exam_id": "az104", "exam_source": "bundled", "placement": "results"},
+            {"exam_id": "az104", "exam_source": "bundled", "placement": "results_end"},
         ]
         common = {
             "app": "examsim",
             "deployment": "github_pages",
             "page": "home",
             "path": "/",
-            "analytics_version": "1.5.0",
+            "analytics_version": "1.6.0",
         }
         for event, specific in zip(events, expected_specific):
             with self.subTest(event=event["name"]):
@@ -541,7 +545,7 @@ console.log(JSON.stringify({
             "deployment": "github_pages",
             "page": "landing",
             "path": "/exams/sc900/",
-            "analytics_version": "1.5.0",
+            "analytics_version": "1.6.0",
         }
         self.assertEqual(
             events[0]["properties"],
@@ -641,7 +645,7 @@ console.log(JSON.stringify({
             "deployment": "github_pages",
             "page": "landing",
             "path": "/exams/sc900/",
-            "analytics_version": "1.5.0",
+            "analytics_version": "1.6.0",
             "exam_id": "sc900",
             "exam_source": "bundled",
         }
@@ -1514,6 +1518,28 @@ console.log(JSON.stringify({
             1,
         )
 
+    def test_github_star_path_appears_after_exam_value_not_in_study_results(self):
+        runtime = (ROOT / "assets/js/script-multi-exam.js").read_text(encoding="utf-8")
+        analytics = (ROOT / "assets/js/analytics.js").read_text(encoding="utf-8")
+
+        self.assertIn("https://github.com/rmssantos/examsim", runtime)
+        self.assertIn("Found this useful?", runtime)
+        self.assertIn("Star Examplar on GitHub", runtime)
+        self.assertIn('data-analytics-event="github_repository_clicked"', runtime)
+        self.assertIn('data-analytics-placement="results_end"', runtime)
+        self.assertIn('rel="noopener noreferrer"', runtime)
+
+        study_start = runtime.index("    showStudyResults(")
+        study_results = runtime[
+            study_start : runtime.index("    showResults(", study_start)
+        ]
+        self.assertIn("results-recommended-pro", study_results)
+        self.assertIn("innerHTML = ''", study_results)
+
+        self.assertIn("function trackGithubRepositoryClicked", analytics)
+        self.assertIn("github_repository_clicked", analytics)
+        self.assertIn("'results_end', 'guide_end'", analytics)
+
     def test_secondary_purchase_surfaces_render_launch_offer(self):
         roadmaps = (ROOT / "assets/js/roadmaps.js").read_text(encoding="utf-8")
         runtime = (ROOT / "assets/js/script-multi-exam.js").read_text(encoding="utf-8")
@@ -1561,6 +1587,7 @@ console.log(JSON.stringify({
         for phrase in (
             "unlock, pro modal, purchase-link, and import-activation counts",
             "results-screen upsell and pass-story link counts",
+            "github repository link counts",
             "country, region, and city",
             "browser, operating system, device type, and device model",
             "temporarily uses the sender ip",

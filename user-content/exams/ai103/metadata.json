@@ -202,6 +202,11 @@
       "slug": "ai-103-study-plan",
       "title": "A 30-day AI-103 readiness plan",
       "description": "Turn the five objective domains into four focused weeks with clear readiness checks."
+    },
+    {
+      "slug": "ai-103-labs-and-foundry-practice",
+      "title": "AI-103 labs and Foundry practice",
+      "description": "Separate confirmed lab rules from guesswork, then practise the hands-on Foundry skills in the current blueprint."
     }
   ],
   "pro": {

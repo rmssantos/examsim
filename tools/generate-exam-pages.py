@@ -57,7 +57,9 @@ ENGLISH_MONTHS = (
 )
 GUIDE_PATHS = (
     "ai-102-to-ai-103",
+    "ai-103-labs-and-foundry-practice",
     "ai-103-study-plan",
+    "ai-900-to-ai-901",
 )
 
 

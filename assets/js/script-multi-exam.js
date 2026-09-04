@@ -2,6 +2,7 @@
 // Supports categorized images (question images vs explanation images)
 
 const PASS_STORY_DISCUSSION_URL = 'https://github.com/rmssantos/examsim/discussions/77';
+const GITHUB_REPOSITORY_URL = 'https://github.com/rmssantos/examsim';
 
 class TimerManager {
     constructor(now = () => Date.now()) {
@@ -241,10 +242,96 @@ class MultiExamSimulator {
         return copy.slice(0, Math.min(count, copy.length));
     }
 
-    // Helper: sample N items with rough balance across q.module buckets
-    sampleBalancedQuestions(all, count) {
+    // Helper: sample N items against trusted objective weights when available,
+    // otherwise retain rough balance across q.module buckets.
+    sampleBalancedQuestions(all, count, objectiveDomains = []) {
         if (!Array.isArray(all) || all.length === 0) return [];
-        if (all.length <= count) return [...all];
+        const targetCount = Math.min(Math.max(0, Math.floor(Number(count) || 0)), all.length);
+        if (all.length <= targetCount) return [...all];
+        const domainDefinitions = Array.isArray(objectiveDomains)
+            ? objectiveDomains.map((domain, index) => {
+                const modules = Array.isArray(domain?.mappedModules)
+                    ? domain.mappedModules
+                        .map(moduleName => String(moduleName || '').trim().toLowerCase())
+                        .filter(Boolean)
+                    : [];
+                const weightMatch = String(domain?.weightRange || '').match(
+                    /(\d+(?:\.\d+)?)\s*(?:-\s*(\d+(?:\.\d+)?))?\s*%/
+                );
+                const minimumWeight = weightMatch ? Number(weightMatch[1]) : 0;
+                const maximumWeight = weightMatch && weightMatch[2]
+                    ? Number(weightMatch[2])
+                    : minimumWeight;
+                const weight = minimumWeight > 0 && maximumWeight > 0
+                    ? (minimumWeight + maximumWeight) / 2
+                    : 1;
+                return { index, modules, weight, questions: [] };
+            }).filter(domain => domain.modules.length > 0)
+            : [];
+
+        if (domainDefinitions.length > 0 && targetCount > 0) {
+            const moduleToDomain = new Map();
+            domainDefinitions.forEach((domain, domainIndex) => {
+                domain.modules.forEach(moduleName => {
+                    if (!moduleToDomain.has(moduleName)) moduleToDomain.set(moduleName, domainIndex);
+                });
+            });
+
+            const unmatched = [];
+            all.forEach(question => {
+                const moduleName = String(question?.module || '').trim().toLowerCase();
+                const domainIndex = moduleToDomain.get(moduleName);
+                if (domainIndex === undefined) {
+                    unmatched.push(question);
+                    return;
+                }
+                domainDefinitions[domainIndex].questions.push(question);
+            });
+
+            const activeDomains = domainDefinitions.filter(domain => domain.questions.length > 0);
+            if (activeDomains.length > 0) {
+                activeDomains.forEach(domain => this.shuffle(domain.questions));
+                const totalWeight = activeDomains.reduce((sum, domain) => sum + domain.weight, 0);
+                const idealCounts = activeDomains.map(domain => targetCount * (domain.weight / totalWeight));
+                const allocations = new Array(activeDomains.length).fill(0);
+                let remaining = targetCount;
+
+                // A short diagnostic is useful only if it exposes every objective.
+                if (targetCount >= activeDomains.length) {
+                    allocations.fill(1);
+                    remaining -= activeDomains.length;
+                }
+
+                // Add each remaining slot to the domain furthest below its weighted ideal.
+                while (remaining > 0) {
+                    let bestIndex = -1;
+                    let bestDeficit = Number.NEGATIVE_INFINITY;
+                    for (let i = 0; i < activeDomains.length; i++) {
+                        if (allocations[i] >= activeDomains[i].questions.length) continue;
+                        const deficit = idealCounts[i] - allocations[i];
+                        if (deficit > bestDeficit) {
+                            bestDeficit = deficit;
+                            bestIndex = i;
+                        }
+                    }
+                    if (bestIndex < 0) break;
+                    allocations[bestIndex] += 1;
+                    remaining -= 1;
+                }
+
+                const selected = [];
+                const leftovers = [...unmatched];
+                activeDomains.forEach((domain, index) => {
+                    selected.push(...domain.questions.slice(0, allocations[index]));
+                    leftovers.push(...domain.questions.slice(allocations[index]));
+                });
+                if (selected.length < targetCount) {
+                    this.shuffle(leftovers);
+                    selected.push(...leftovers.slice(0, targetCount - selected.length));
+                }
+                return this.shuffle(selected);
+            }
+        }
 
         // Group by module (null/undefined -> 'Uncategorized') using copies
         const buckets = new Map();
@@ -261,8 +348,8 @@ class MultiExamSimulator {
         groups.sort((a,b)=>b[1].length - a[1].length);
 
         const k = groups.length;
-        const base = Math.floor(count / k);
-        let remainder = count % k;
+        const base = Math.floor(targetCount / k);
+        let remainder = targetCount % k;
         const selected = [];
         // Track how many items consumed from each group (avoids mutating arrays)
         const consumed = new Array(groups.length).fill(0);
@@ -279,7 +366,7 @@ class MultiExamSimulator {
         // If still short (due to small buckets), fill round-robin from remaining groups
         let idx = 0;
         let activeGroups = groups.filter((_, i) => consumed[i] < groups[i][1].length).length;
-        while (selected.length < count && activeGroups > 0) {
+        while (selected.length < targetCount && activeGroups > 0) {
             const gi = idx % groups.length;
             const arr = groups[gi][1];
             if (consumed[gi] < arr.length) {
@@ -1083,13 +1170,14 @@ class MultiExamSimulator {
         document.getElementById('current-exam-badge').className = 'exam-badge';
 
     // Build the active session question set: random sample + randomized options
-    const full = this.examData[this.currentExam].questions || [];
+    const exam = this.examData[this.currentExam];
+    const full = exam.questions || [];
     // Target questions per exam
-    const desired = this.examData[this.currentExam].questionCount;
+    const desired = exam.questionCount;
     let targetCount = 50;
     if (typeof desired === 'number') targetCount = desired;
     // Use balanced sampling across modules
-    const sampled = this.sampleBalancedQuestions(full, targetCount);
+    const sampled = this.sampleBalancedQuestions(full, targetCount, exam.objectiveDomains);
     this.activeQuestions = sampled.map(q => this.randomizeQuestionOptions(q));
 
     // Start timer and render
@@ -1534,11 +1622,12 @@ class MultiExamSimulator {
         return `<div class="recommended-pro results-pro-upsell"><i class="fas fa-unlock" aria-hidden="true"></i> <strong>${title}</strong><p>You practiced the free preview. The full pack covers ${scope} with detailed explanations and free updates.</p>${offer}<a class="results-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener" data-analytics-event="pro_purchase_clicked" data-analytics-exam="${this.escapeHtml(this.currentExam)}" data-analytics-placement="results_pro_upsell">Get the full pack${price}</a></div>`;
     }
 
-    // Invite candidates who passed the real exam to share their story.
+    // Ask for community support only after the learner has completed an exam.
     renderPassStoryInvite() {
         const url = this.safeUrl(PASS_STORY_DISCUSSION_URL);
-        if (!url) return '';
-        return `<div class="pass-story-invite"><i class="fas fa-trophy" aria-hidden="true"></i> Passed your real exam with Examplar? <a class="pass-story-link" href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer">Share your pass story</a></div>`;
+        const repositoryUrl = this.safeUrl(GITHUB_REPOSITORY_URL);
+        if (!url || !repositoryUrl) return '';
+        return `<div class="pass-story-invite"><span><i class="fas fa-star" aria-hidden="true"></i> Found this useful? <a class="github-repository-link" href="${this.escapeHtml(repositoryUrl)}" target="_blank" rel="noopener noreferrer" data-analytics-event="github_repository_clicked" data-analytics-exam="${this.escapeHtml(this.currentExam)}" data-analytics-placement="results_end">Star Examplar on GitHub</a></span><span class="community-divider" aria-hidden="true">·</span><span><i class="fas fa-trophy" aria-hidden="true"></i> Passed your real exam? <a class="pass-story-link" href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer">Share your story</a></span></div>`;
     }
 
     // Cross-sell a recommended paid pack on the results screen (e.g. CLF-C02 -> SAA-C03).
@@ -2505,6 +2594,11 @@ class MultiExamSimulator {
 
     showStudyResults(accuracy, correct, incorrect, reviewed, total, timeSpent) {
         this.setResultsCopy('study');
+
+        // Study mode can follow an exam in the same runtime. Do not leave the
+        // exam-only upsell or community request visible on its results screen.
+        const recSlot = document.getElementById('results-recommended-pro');
+        if (recSlot) recSlot.innerHTML = '';
 
         const statusIcon = document.getElementById('result-status-icon');
         const statusText = document.getElementById('result-status');

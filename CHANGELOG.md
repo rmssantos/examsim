@@ -8,15 +8,23 @@ Notable public changes are recorded here. Dates use `YYYY-MM-DD`.
 
 - Added an AI-103 readiness-focused landing experience and two preparation
   guides covering the 30-day study path and the AI-102-to-AI-103 transition.
+- Added an AI-103 labs and Foundry practice guide, plus an AI-900-to-AI-901
+  transition guide grounded in Microsoft's current exam guidance.
 - Added a limited 30% launch offer across paid-preview cards, purchase modals,
   roadmaps, results upsells, and exam landing pages.
 - Added a free 25-question AB-620 preview with one guided Copilot Studio lab and
   a Complete-pack path for 280 questions and eight labs.
 - Added a library filter for exams that include accessible or Complete-pack
   hands-on labs.
+- Added a post-result and guide CTA that lets satisfied learners support the
+  project on GitHub, with privacy-bounded repository-click measurement.
 
 ### Changed
 
+- Balanced trusted exam sessions against their published objective-domain
+  weights, so the 10-question AI-103 diagnostic now covers all five domains.
+- Refreshed the bundled AI-901 metadata for the April 15, 2026 two-domain
+  skills outline and linked the new transition guide from its exam landing.
 - Labelled every promotional Complete-pack price as `price + taxes` so the
   advertised amount remains clear across countries and tax regimes.
 - Kept all hosted Home links on the clean site root instead of exposing
