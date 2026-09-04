@@ -137,6 +137,73 @@ console.log(JSON.stringify(sampled.map((question) => question.id)));
             simulator_source,
         )
 
+    def test_runtime_loader_preserves_domains_only_for_trusted_records(self):
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("node not available")
+
+        node_script = r"""
+const fs = require('fs');
+const vm = require('vm');
+const source = fs.readFileSync(process.argv[1], 'utf8');
+const start = source.indexOf('class MultiExamSimulator');
+const end = source.indexOf("document.addEventListener('DOMContentLoaded'");
+const objectiveDomains = [{ code: 'D1', weightRange: '100%', mappedModules: ['M1'] }];
+const makeRecord = (sourceName, trust) => ({
+  source: sourceName,
+  trust,
+  questions: [{ id: 'q1', module: 'M1' }],
+  metadata: { name: 'Runtime exam', questionCount: 1, objectiveDomains }
+});
+const context = {
+  URL,
+  URLSearchParams,
+  console,
+  document: {},
+  localStorage: { getItem: () => null },
+  window: {
+    userExams: {
+      trusted: makeRecord('bundled', 'bundled'),
+      imported: makeRecord('imported', 'local-unverified')
+    },
+    ExamApp: {
+      isSafeExamId: () => true,
+      isBrowserStoredExamRecord: () => false,
+      isBundledTrustedExam: (record) => record.source === 'bundled' && record.trust === 'bundled',
+      validateExamData: () => ({ valid: true }),
+      warn: () => {}
+    }
+  }
+};
+vm.runInNewContext(
+  source.slice(start, end) + '\n;globalThis.MultiExamSimulator = MultiExamSimulator;',
+  context,
+  { filename: 'script-multi-exam.js' }
+);
+const simulator = Object.create(context.MultiExamSimulator.prototype);
+simulator.examData = {};
+simulator.loadExamFromRuntime('trusted');
+simulator.loadExamFromRuntime('imported');
+console.log(JSON.stringify({
+  trustedDomains: simulator.examData.trusted.objectiveDomains ?? null,
+  importedDomains: simulator.examData.imported.objectiveDomains ?? null
+}));
+"""
+        result = subprocess.run(
+            [node, "-e", node_script, str(ROOT / "assets/js/script-multi-exam.js")],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        payload = json.loads(result.stdout)
+
+        self.assertEqual(
+            payload["trustedDomains"],
+            [{"code": "D1", "weightRange": "100%", "mappedModules": ["M1"]}],
+        )
+        self.assertEqual(payload["importedDomains"], [])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -137,6 +137,13 @@ class AI103GuideTests(unittest.TestCase):
         self.assertIn("aiskillsnavigator.microsoft.com/credentials/", transition)
         self.assertIn("sign-in is required", transition)
 
+    def test_new_guide_copy_avoids_prohibited_terms(self):
+        for slug in ("ai-103-labs-and-foundry-practice", "ai-900-to-ai-901"):
+            page = (ROOT / "guides" / slug / "index.html").read_text(encoding="utf-8")
+            with self.subTest(slug=slug):
+                self.assertNotIn("—", page)
+                self.assertNotRegex(page.lower(), r"\bdumps?\b")
+
     def test_exam_landings_link_to_their_guides(self):
         landing = (ROOT / "exams" / "ai103" / "index.html").read_text(encoding="utf-8")
         for slug in AI103_GUIDES:

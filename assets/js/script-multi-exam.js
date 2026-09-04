@@ -729,6 +729,9 @@ class MultiExamSimulator {
                 questions: fromMemory.questions,
                 labs: fromMemoryLabs === undefined ? [] : fromMemoryLabs,
                 modules: metadata.modules || [],
+                objectiveDomains: isBundledTrusted && Array.isArray(metadata.objectiveDomains)
+                    ? metadata.objectiveDomains
+                    : [],
                 recommendedPro: isBundledTrusted ? (metadata.recommendedPro || null) : null,
                 pro: isBundledTrusted ? (metadata.pro || null) : null,
                 resources: metadata.resources || [],
