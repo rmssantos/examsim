@@ -691,6 +691,7 @@ def render_sitemap(all_exams: list) -> str:
     entries = [
         (f"{SITE}/", "1.0"),
         (f"{SITE}/exams/", "0.9"),
+        (f"{SITE}/guides/", "0.9"),
         (f"{SITE}/roadmaps.html", "0.8"),
     ]
     entries += [(f"{SITE}/guides/{slug}/", "0.8") for slug in GUIDE_PATHS]
@@ -761,6 +762,7 @@ def render_hub(all_exams: list) -> str:
       </a>
       <nav class="cr-topnav-links" aria-label="Site links">
         <a href="{root}" data-file-index>Home</a>
+        <a href="{root}guides/" data-file-index>Guides</a>
         <a href="{root}roadmaps.html">Roadmaps</a>
         <a href="https://github.com/rmssantos/examsim" target="_blank" rel="noopener noreferrer">GitHub</a>
         <div class="theme-controls">

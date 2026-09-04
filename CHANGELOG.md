@@ -10,6 +10,8 @@ Notable public changes are recorded here. Dates use `YYYY-MM-DD`.
   guides covering the 30-day study path and the AI-102-to-AI-103 transition.
 - Added an AI-103 labs and Foundry practice guide, plus an AI-900-to-AI-901
   transition guide grounded in Microsoft's current exam guidance.
+- Added a public study-guides hub for discovering the AI-103 and AI-901
+  preparation paths from the main navigation.
 - Added a limited 30% launch offer across paid-preview cards, purchase modals,
   roadmaps, results upsells, and exam landing pages.
 - Added a free 25-question AB-620 preview with one guided Copilot Studio lab and
