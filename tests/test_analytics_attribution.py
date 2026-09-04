@@ -188,7 +188,7 @@ console.log(JSON.stringify({
         )
         self.assertEqual("producthunt", result["pageProperties"]["acquisition_ref"])
         self.assertEqual("www.producthunt.com", result["pageProperties"]["referrer_host"])
-        self.assertEqual("1.5.0", result["pageProperties"]["analytics_version"])
+        self.assertEqual("1.6.0", result["pageProperties"]["analytics_version"])
         self.assertEqual("https://examplar.app/", result["pageUrl"])
 
     def test_only_approved_campaign_parameters_are_collected(self):

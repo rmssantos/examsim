@@ -524,6 +524,16 @@ body.exam-landing.dark-mode {
 .exam-landing .landing-footer a { color: var(--muted); text-decoration: none; }
 .exam-landing .landing-footer a:hover { color: var(--primary); }
 
+.exam-landing .guide-community-cta {
+  margin: 22px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--card-border);
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.exam-landing .guide-community-cta a { color: var(--primary); font-weight: 700; }
+.exam-landing .guide-community-cta a:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: 2px; }
+
 /* Responsive */
 @media (max-width: 640px) {
   .exam-landing .landing-hero { padding: 28px 22px; }

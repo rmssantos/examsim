@@ -767,6 +767,21 @@ try {
     const sim = window.ExamApp?.examSimulator || window.examSimulator;
     sim.finishExam(true);
   });
+  const githubResultCta = page.locator(
+    '#results-recommended-pro a[data-analytics-event="github_repository_clicked"][data-analytics-placement="results_end"]'
+  );
+  assert.equal(
+    await githubResultCta.count(),
+    1,
+    'A completed diagnostic must offer one post-value GitHub repository CTA.'
+  );
+  assert.equal(
+    await githubResultCta.getAttribute('href'),
+    'https://github.com/rmssantos/examsim',
+    'The post-result CTA must point to the public repository.'
+  );
+  assert.equal(await githubResultCta.getAttribute('target'), '_blank');
+  assert.equal(await githubResultCta.getAttribute('rel'), 'noopener noreferrer');
   await page.waitForFunction(() => {
     const progress = JSON.parse(localStorage.getItem('az900_progress') || '{"attempts":[]}');
     return progress.attempts.at(-1)?.sessionType === 'diagnostic';
@@ -904,6 +919,20 @@ try {
     fullRuntime,
     { activeCount: 40, sessionType: 'full', configuredCount: 40, duration: 45 },
     'Full practice must keep the normal AZ-900 count, type, and duration.'
+  );
+
+  // Study results can follow exam results in the same runtime. They must clear
+  // any stale exam-only upsell or repository CTA from the shared results slot.
+  await page.evaluate(() => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    const slot = document.getElementById('results-recommended-pro');
+    slot.innerHTML = '<a data-analytics-event="github_repository_clicked">stale CTA</a>';
+    sim.showStudyResults(100, 1, 0, 1, 1, 0);
+  });
+  assert.equal(
+    await page.locator('#results-recommended-pro').evaluate((slot) => slot.childElementCount),
+    0,
+    'Study results must clear stale exam-only calls to action.'
   );
 
   // The fixed privacy control must clear both navigation actions on mobile.

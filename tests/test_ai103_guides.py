@@ -7,9 +7,31 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 GUIDES = {
-    "ai-102-to-ai-103": "AI-102 Is Retired: What Changed in AI-103",
-    "ai-103-study-plan": "AI-103 Study Plan: A 30-Day Readiness Path",
+    "ai-102-to-ai-103": {
+        "heading": "AI-102 Is Retired: What Changed in AI-103",
+        "exam_id": "ai103",
+        "cta_label": "Start the free AI-103 diagnostic",
+    },
+    "ai-103-study-plan": {
+        "heading": "AI-103 Study Plan: A 30-Day Readiness Path",
+        "exam_id": "ai103",
+        "cta_label": "Start the free AI-103 diagnostic",
+    },
+    "ai-103-labs-and-foundry-practice": {
+        "heading": "AI-103 Labs: What to Expect and How to Practise in Foundry",
+        "exam_id": "ai103",
+        "cta_label": "Start the free AI-103 diagnostic",
+    },
+    "ai-900-to-ai-901": {
+        "heading": "AI-900 to AI-901: What Changed and How to Prepare",
+        "exam_id": "ai901",
+        "cta_label": "Start free AI-901 practice",
+    },
 }
+
+AI103_GUIDES = tuple(
+    slug for slug, guide in GUIDES.items() if guide["exam_id"] == "ai103"
+)
 
 
 def _load_module(name, path):
@@ -46,21 +68,33 @@ def _hex_rgb(value):
 
 class AI103GuideTests(unittest.TestCase):
     def test_guides_are_publishable_search_pages_with_one_diagnostic_goal(self):
-        for slug, heading in GUIDES.items():
+        for slug, guide in GUIDES.items():
             page_path = ROOT / "guides" / slug / "index.html"
             self.assertTrue(page_path.is_file(), f"missing {page_path}")
             page = page_path.read_text(encoding="utf-8")
 
-            self.assertIn(f"<h1>{heading}</h1>", page)
+            self.assertIn(f'<h1>{guide["heading"]}</h1>', page)
             self.assertIn(
                 f'<link rel="canonical" href="https://examplar.app/guides/{slug}/">',
                 page,
             )
             self.assertIn("assets/js/analytics.js", page)
             self.assertEqual(page.count('data-analytics-event="landing_cta_clicked"'), 1)
-            self.assertIn("exam.html?exam=ai103&amp;session=diagnostic&amp;count=10", page)
-            self.assertIn("Start the free AI-103 diagnostic", page)
+            self.assertIn(
+                f'exam.html?exam={guide["exam_id"]}&amp;session=diagnostic&amp;count=10',
+                page,
+            )
+            self.assertIn(guide["cta_label"], page)
             self.assertNotIn("real exam questions", page.lower())
+            self.assertEqual(
+                page.count('data-analytics-event="github_repository_clicked"'),
+                1,
+            )
+            self.assertIn('href="https://github.com/rmssantos/examsim"', page)
+            self.assertIn('data-analytics-placement="guide_end"', page)
+            self.assertIn(f'data-analytics-exam="{guide["exam_id"]}"', page)
+            self.assertIn('target="_blank" rel="noopener noreferrer"', page)
+            self.assertIn("Found this guide useful?", page)
 
     def test_guides_cite_current_microsoft_sources_and_transition_date(self):
         transition = (
@@ -76,10 +110,49 @@ class AI103GuideTests(unittest.TestCase):
             self.assertIn("resources/study-guides/ai-103", page)
             self.assertIn("Skills measured as of April 16, 2026", page)
 
-    def test_ai103_landing_links_to_both_guides(self):
+    def test_labs_guide_sets_honest_expectations_and_uses_official_sources(self):
+        labs = (
+            ROOT / "guides" / "ai-103-labs-and-foundry-practice" / "index.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("credentials/certifications/frequently-asked-questions", labs)
+        self.assertIn("resources/study-guides/ai-103", labs)
+        self.assertIn("training/azure/ai-foundry", labs)
+        self.assertIn("does not publish a fixed lab schedule for AI-103", labs)
+        self.assertIn("between 7–15 tasks", labs)
+        self.assertIn("Examplar does not provide a live Azure lab", labs)
+
+    def test_ai900_transition_guide_uses_current_ai901_blueprint_and_sources(self):
+        transition = (
+            ROOT / "guides" / "ai-900-to-ai-901" / "index.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("credentials/support/retired-certification-exams", transition)
+        self.assertIn("resources/study-guides/ai-901", transition)
+        self.assertIn("June 30, 2026", transition)
+        self.assertIn("Identify AI concepts and capabilities", transition)
+        self.assertIn("40–45%", transition)
+        self.assertIn("55–60%", transition)
+        self.assertIn("Python", transition)
+        self.assertIn("aiskillsnavigator.microsoft.com/credentials/", transition)
+        self.assertIn("sign-in is required", transition)
+
+    def test_new_guide_copy_avoids_prohibited_terms(self):
+        for slug in ("ai-103-labs-and-foundry-practice", "ai-900-to-ai-901"):
+            page = (ROOT / "guides" / slug / "index.html").read_text(encoding="utf-8")
+            with self.subTest(slug=slug):
+                self.assertNotIn("—", page)
+                self.assertNotRegex(page.lower(), r"\bdumps?\b")
+
+    def test_exam_landings_link_to_their_guides(self):
         landing = (ROOT / "exams" / "ai103" / "index.html").read_text(encoding="utf-8")
-        for slug in GUIDES:
+        for slug in AI103_GUIDES:
             self.assertIn(f"../../guides/{slug}/", landing)
+
+        ai901_landing = (ROOT / "exams" / "ai901" / "index.html").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("../../guides/ai-900-to-ai-901/", ai901_landing)
 
     def test_related_guides_use_the_exam_code_from_metadata(self):
         guides = gen.build_related_guides(

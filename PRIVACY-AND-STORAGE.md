@@ -44,6 +44,7 @@ The public deployment can collect:
 - progress and editor import/export actions;
 - unlock, pro modal, purchase-link, and import-activation counts;
 - results-screen upsell and pass-story link counts;
+- GitHub repository link counts from post-result and guide CTAs;
 - generated landing-page CTA, configured session, and first-answer interaction
   counts;
 - pass/fail, coarse score and duration buckets;
