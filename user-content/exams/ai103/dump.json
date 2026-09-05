@@ -6,13 +6,13 @@
     "question": "A retail chatbot team needs a Foundry model for a high-traffic customer-service endpoint where every reply must return with the lowest possible latency and the workload is dominated by short, simple turns. Which model family is the best starting point?",
     "options": [
       "GPT-5, because it applies the deepest reasoning to every request",
-      "DeepSeek-R1, because open-weight reasoning models always respond fastest",
+      "DeepSeek-V4-Pro, because open-weight reasoning models always respond fastest",
       "GPT-4.1 mini, because it targets low-latency, high-throughput scenarios",
       "Phi-4, because small language models are designed for large cloud chat APIs"
     ],
     "correct": 2,
-    "explanation": "GPT-4.1 mini is positioned as the fastest family for low-latency, high-throughput scenarios, which matches a high-traffic endpoint dominated by short turns. GPT-5 is the most capable family for complex reasoning and multimodal work, but that depth adds latency that this simple workload does not need. DeepSeek-R1 is an open-weight reasoning model optimized for reasoning at scale, not for minimal latency. Phi-4 is a small language model intended for on-device or resource-constrained environments rather than a large cloud service endpoint.",
-    "reference": "https://learn.microsoft.com/azure/foundry/what-is-foundry#available-models"
+    "explanation": "The GPT-4.1 family, including GPT-4.1 mini, is optimized for low-latency, high-throughput workloads such as real-time chat and customer support, which matches a high-traffic endpoint dominated by short turns. GPT-5 is the reasoning family for complex work, but that depth adds latency that this simple workload does not need. DeepSeek-V4-Pro, which Microsoft names as the replacement for the retired DeepSeek-R1 reasoning model, does not make the workload faster: reasoning-style models trade latency for depth, so they are not the minimal-latency choice. Phi-4 is a small language model intended for on-device or resource-constrained environments rather than a large cloud service endpoint.",
+    "reference": "https://learn.microsoft.com/azure/foundry/foundry-models/how-to/model-choice-guide"
   },
   {
     "id": 2,
@@ -31,7 +31,7 @@
       3
     ],
     "explanation": "Models sold by Azure are hosted and sold by Microsoft under Microsoft Product Terms, covered by Azure service-level agreements, and they include all Azure OpenAI models plus selected provider models; some also offer fungible provisioned throughput so quota and reservations can be used flexibly across those models. The statement that they are supported only by the third-party provider is wrong, because that describes Models from partners and community, which are maintained by their providers rather than by Microsoft.",
-    "reference": "https://learn.microsoft.com/azure/foundry/concepts/foundry-models-overview#models-sold-by-azure"
+    "reference": "https://learn.microsoft.com/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure"
   },
   {
     "id": 3,
@@ -163,16 +163,16 @@
   {
     "question_type": "STANDARD",
     "module": "Set Up AI Solutions in Foundry",
-    "question": "You created an Azure AI Foundry project and want an application to call a model through a standard deployment. Which condition must be satisfied before your application code can successfully send inference requests?",
+    "question": "You created a Microsoft Foundry project and want an application to call a model through a standard deployment. Which condition must be satisfied before your application code can successfully send inference requests?",
     "options": [
       "A resource connection to Azure AI Search must be created before any model can be called",
-      "A model deployment exists in the project and the application has the project's inference endpoint and a credential such as an API key or Microsoft Entra token",
+      "A model deployment exists on the Foundry resource and the application calls the resource's inference endpoint with the deployment name and a credential such as an API key or Microsoft Entra token",
       "A custom domain must be assigned to the project before its inference endpoint becomes active",
       "The model must be fine-tuned before it can be served through a standard deployment"
     ],
     "correct": 1,
-    "explanation": "Before an application can call a model, a deployment of that model must exist in the project and the application needs the project's inference endpoint plus a credential, either an API key or a Microsoft Entra token. Creating the project is a prerequisite, but a resource connection, for example to Azure AI Search or Storage, is only required for specific scenarios such as agents or retrieval, not for a basic model call. A custom domain is not required for the endpoint to work, and fine-tuning is optional rather than a prerequisite for a standard deployment.",
-    "reference": "https://learn.microsoft.com/azure/foundry/concepts/deployments-overview",
+    "explanation": "Before an application can call a model, a deployment of that model must exist on the Foundry resource behind the project, and the application needs that resource's inference endpoint (the /openai/v1/ route, passing the deployment name in the model field) plus a credential, either an API key or a Microsoft Entra token; keyless Microsoft Entra authentication is the recommended choice for production. Creating the project is a prerequisite, but a resource connection, for example to Azure AI Search or Storage, is only required for specific scenarios such as agents or retrieval, not for a basic model call. A custom domain is not required for the endpoint to work, and fine-tuning is optional rather than a prerequisite for a standard deployment.",
+    "reference": "https://learn.microsoft.com/azure/foundry/foundry-models/concepts/endpoints#azure-openai-inference-endpoint",
     "id": 10
   },
   {
@@ -182,13 +182,13 @@
     "question": "A production application starts receiving HTTP 429 responses from a model deployment during peak traffic. What does this indicate, and how should the team respond?",
     "options": [
       "A 500 error meaning the model is permanently offline; recreate the resource",
-      "A 429 Too Many Requests error meaning the rate limit was exceeded; request a quota increase or retry with backoff",
+      "A 429 Too Many Requests response; check the error details, because it means either the deployment's TPM or RPM rate limit was exceeded (raise the TPM allocation or request more quota) or temporary capacity throttling (retry after the retry-after delay with backoff)",
       "A success code that requires no action at all",
       "A 404 meaning the deployment was deleted; redeploy immediately"
     ],
     "correct": 1,
-    "explanation": "A 429 Too Many Requests error means the request rate exceeded the allowed limit for the current quota, so the team can request a quota increase or retry after the suggested time using backoff. It is not a 500 offline error, not a benign success code, and not a 404 indicating deletion, so those responses would misdiagnose the situation.",
-    "reference": "https://learn.microsoft.com/azure/foundry/openai/quotas-limits"
+    "explanation": "A 429 Too Many Requests response means the service rejected the request because a rate limit was exceeded or it cannot process the request right now, and not all 429 responses share a root cause, so the error message and headers must be checked. If the message says the rate limit was exceeded, the deployment's allocated TPM or RPM quota was hit, so the team should increase the deployment's TPM allocation, rebalance quota across deployments, or request a quota increase. If it indicates system capacity throttling or a temporary rate-limit adjustment, the correct action is to retry after the retry-after-ms delay with backoff and consider provisioned throughput for consistent capacity. It is not a 500 offline error, not a benign success code, and not a 404 indicating deletion.",
+    "reference": "https://learn.microsoft.com/azure/foundry/openai/how-to/quota#understanding-429-throttling-errors-and-what-to-do"
   },
   {
     "id": 12,
@@ -278,7 +278,7 @@
     ],
     "correct": 0,
     "explanation": "Temperature controls randomness, and higher values such as 0.8 make output more random and creative, which suits varied marketing copy. Setting it to 0 makes output more deterministic, lower values reduce rather than increase randomness, and temperature does affect randomness, so the other options are wrong.",
-    "reference": "https://learn.microsoft.com/azure/foundry/openai/reference"
+    "reference": "https://learn.microsoft.com/azure/foundry/openai/concepts/prompt-engineering#temperature-and-top_p-parameters"
   },
   {
     "id": 18,
@@ -392,12 +392,12 @@
     "question": "A team needs to extract the text lines, words, their locations, and detected languages from scanned documents. Which Document Intelligence model should they use?",
     "options": [
       "The Read model",
-      "A custom neural voice",
+      "A custom voice",
       "The prebuilt invoice model",
       "A knowledge store"
     ],
     "correct": 0,
-    "explanation": "The Read model detects and extracts lines, words, their locations, and languages from images and documents. A custom neural voice is a Speech feature, the prebuilt invoice model targets invoice fields, and a knowledge store is an Azure AI Search feature.",
+    "explanation": "The Read model detects and extracts lines, words, their locations, and languages from images and documents. A custom voice is a Speech feature, the prebuilt invoice model targets invoice fields, and a knowledge store is an Azure AI Search feature.",
     "reference": "https://learn.microsoft.com/azure/ai-services/document-intelligence/prebuilt/read?view=doc-intel-4.0.0"
   }
 ]

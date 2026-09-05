@@ -36,8 +36,8 @@
     "proofStatus": "Blueprint current"
   },
   "contentReview": {
-    "lastReviewed": "2026-06-12",
-    "sourceOfTruth": "Microsoft Learn AI-103 study guide and Azure AI Foundry documentation",
+    "lastReviewed": "2026-09-05",
+    "sourceOfTruth": "Microsoft Learn AI-103 study guide and Microsoft Foundry documentation",
     "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103",
     "objectiveVersion": "Skills measured as of April 16, 2026"
   },
@@ -183,13 +183,13 @@
     },
     {
       "icon": "fas fa-robot",
-      "name": "Azure AI Foundry documentation",
-      "url": "https://learn.microsoft.com/azure/ai-foundry/"
+      "name": "Microsoft Foundry documentation",
+      "url": "https://learn.microsoft.com/azure/foundry/what-is-foundry"
     },
     {
       "icon": "fas fa-file-lines",
-      "name": "Azure AI services documentation",
-      "url": "https://learn.microsoft.com/azure/ai-services/"
+      "name": "Foundry Tools documentation",
+      "url": "https://learn.microsoft.com/azure/ai-services/what-are-ai-services"
     }
   ],
   "relatedGuides": [

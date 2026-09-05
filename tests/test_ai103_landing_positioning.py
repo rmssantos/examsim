@@ -47,7 +47,7 @@ class AI103LandingPositioningTests(unittest.TestCase):
         self.assertIn('class="readiness-trace"', self.page)
         self.assertIn("AI-103 readiness trace", self.page)
         self.assertIn("Skills measured as of April 16, 2026", self.page)
-        self.assertIn("Last reviewed June 12, 2026", self.page)
+        self.assertIn("Last reviewed September 5, 2026", self.page)
 
         for domain in self.meta["objectiveDomains"]:
             self.assertIn(domain["name"], self.page)
