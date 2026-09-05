@@ -5,11 +5,64 @@ import tempfile
 import unittest
 from pathlib import Path
 
+try:
+    from .node_harness import run_node_snippet, utils_bootstrap
+except ImportError:
+    from node_harness import run_node_snippet, utils_bootstrap
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class ProPackTests(unittest.TestCase):
+    def test_all_pro_packs_share_launch_promotion(self):
+        exam_ids = (
+            "ab620",
+            "ai103",
+            "az104",
+            "az305",
+            "az400",
+            "dp700",
+            "saac03",
+            "sc300",
+        )
+        expected = {
+            "label": "Launch offer",
+            "discountPercent": 30,
+            "code": "EXAMPLAR30",
+            "limited": True,
+        }
+
+        for exam_id in exam_ids:
+            with self.subTest(exam_id=exam_id):
+                meta = json.loads(
+                    (ROOT / f"user-content/exams/{exam_id}/metadata.json").read_text(encoding="utf-8")
+                )
+                pro = meta["pro"]
+                self.assertEqual(pro.get("promotion"), expected)
+                self.assertTrue(pro["url"].startswith("https://examplar.gumroad.com/"))
+                self.assertIn("EXAMPLAR30", pro["url"])
+
+    def test_recommended_paid_packs_share_the_target_launch_offer(self):
+        source_ids = ("ai901", "clfc02", "dp900", "sc900")
+
+        for source_id in source_ids:
+            with self.subTest(source_id=source_id):
+                source = json.loads(
+                    (ROOT / f"user-content/exams/{source_id}/metadata.json").read_text(
+                        encoding="utf-8"
+                    )
+                )
+                recommendation = source["recommendedPro"]
+                target = json.loads(
+                    (ROOT / f"user-content/exams/{recommendation['examId']}/metadata.json").read_text(
+                        encoding="utf-8"
+                    )
+                )["pro"]
+                self.assertEqual(recommendation.get("price"), target["price"])
+                self.assertEqual(recommendation.get("promotion"), target["promotion"])
+                self.assertEqual(recommendation["url"], target["url"])
+
     def test_az104_is_a_preview_pack(self):
         meta = json.loads((ROOT / "user-content/exams/az104/metadata.json").read_text(encoding="utf-8"))
         self.assertTrue(meta.get("preview"), "az104 should be flagged as a preview pack")
@@ -29,6 +82,57 @@ class ProPackTests(unittest.TestCase):
         self.assertIn("showProModal", js)
         # The "import & activate" path reuses the existing import (which decrypts envelopes).
         self.assertIn("triggerFileImport", js)
+
+    def test_homepage_renders_launch_offer(self):
+        js = (ROOT / "assets/js/homepage.js").read_text(encoding="utf-8")
+        css = (ROOT / "assets/css/home-v2.css").read_text(encoding="utf-8")
+
+        self.assertIn("getPromotionOffer", js)
+        for class_name in (
+            "exam-card-offer",
+            "offer-price-old",
+            "offer-price-new",
+            "offer-code",
+            "pro-modal-offer",
+        ):
+            self.assertIn(class_name, js)
+            self.assertIn(f".{class_name}", css)
+        self.assertIn("Limited launch offer", js)
+        self.assertIn("discountPercent", js)
+
+    def test_shared_promotion_offer_derives_prices_and_rejects_bad_data(self):
+        payload = run_node_snippet(
+            ROOT / "assets/js/utils.js",
+            utils_bootstrap(
+                r"""
+                const helper = window.ExamApp.getPromotionOffer;
+                const valid = typeof helper === 'function' ? helper({
+                  price: '19 EUR',
+                  promotion: {
+                    label: 'Launch offer',
+                    discountPercent: 30,
+                    code: 'EXAMPLAR30',
+                    limited: true
+                  }
+                }) : null;
+                const malformed = typeof helper === 'function'
+                  ? helper({ price: 'free', promotion: { discountPercent: 30, code: 'X' } })
+                  : null;
+                console.log(JSON.stringify({
+                  available: typeof helper === 'function',
+                  valid,
+                  malformed
+                }));
+                """
+            ),
+        )
+
+        self.assertTrue(payload["available"])
+        self.assertTrue(payload["valid"]["basePrice"].endswith("19.00"))
+        self.assertTrue(payload["valid"]["offerPrice"].endswith("13.30"))
+        self.assertEqual(payload["valid"]["discountPercent"], 30)
+        self.assertEqual(payload["valid"]["code"], "EXAMPLAR30")
+        self.assertIsNone(payload["malformed"])
 
     def test_homepage_exposes_metadata_driven_library_filters(self):
         html = (ROOT / "index.html").read_text(encoding="utf-8")

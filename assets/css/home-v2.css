@@ -800,6 +800,73 @@ body.dragging-file .exam-library-section::after {
   color: var(--h-text-faint);
 }
 .exam-total-info, .exam-study-info { font-size: 0.74rem; color: var(--h-text-faint); }
+.exam-card-offer,
+.pro-modal-offer {
+  position: relative;
+  overflow: hidden;
+  background: var(--h-flag-tint);
+  border: 1px solid var(--h-flag-line);
+  border-left: 3px solid var(--h-flag);
+  border-radius: var(--h-radius);
+  color: var(--h-text);
+}
+.exam-card-offer {
+  margin-top: 0.45rem;
+  padding: 0.58rem 0.65rem 0.55rem;
+}
+.pro-modal-offer {
+  margin: 0 0 1rem;
+  padding: 0.72rem 0.8rem 0.68rem;
+}
+.offer-topline,
+.offer-prices {
+  display: flex;
+  align-items: baseline;
+}
+.offer-topline { justify-content: space-between; gap: 0.7rem; }
+.offer-label {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--h-flag);
+}
+.offer-discount {
+  font-family: var(--h-font-num);
+  font-size: 0.78rem;
+  color: var(--h-flag);
+}
+.offer-prices { gap: 0.45rem; margin-top: 0.18rem; }
+.offer-price-old {
+  font-family: var(--h-font-num);
+  font-size: 0.78rem;
+  color: var(--h-text-faint);
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+}
+.offer-price-arrow { color: var(--h-text-faint); font-size: 0.72rem; }
+.offer-price-new {
+  font-family: var(--h-font-num);
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--h-text);
+  font-variant-numeric: tabular-nums;
+}
+.offer-meta {
+  margin-top: 0.32rem;
+  font-size: 0.68rem;
+  color: var(--h-text-soft);
+}
+.offer-code {
+  font-family: var(--h-font-num);
+  font-size: 0.67rem;
+  font-weight: 800;
+  color: var(--h-flag);
+  background: color-mix(in srgb, var(--h-flag) 10%, transparent);
+  border: 1px dashed var(--h-flag-line);
+  border-radius: 4px;
+  padding: 0.08rem 0.24rem;
+}
 .exam-feature {
   font-size: 0.72rem;
   color: var(--h-text-faint);

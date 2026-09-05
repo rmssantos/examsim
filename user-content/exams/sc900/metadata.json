@@ -133,7 +133,14 @@
   "recommendedPro": {
     "examId": "sc300",
     "title": "SC-300 Complete",
-    "url": "https://examplar.gumroad.com/l/sc300-complete",
+    "url": "https://examplar.gumroad.com/l/sc300-complete/EXAMPLAR30",
+    "price": "17 EUR",
+    "promotion": {
+      "label": "Launch offer",
+      "discountPercent": 30,
+      "code": "EXAMPLAR30",
+      "limited": true
+    },
     "blurb": "Passed the security fundamentals? Level up to Identity and Access Administrator with the SC-300 Complete pack."
   }
 }

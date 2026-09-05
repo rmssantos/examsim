@@ -36,6 +36,21 @@ class Ai901PackTests(unittest.TestCase):
         codes = {d["code"] for d in self.meta.get("objectiveDomains", [])}
         self.assertEqual(codes, {"AI901-D1", "AI901-D2"})
 
+    def test_metadata_matches_the_current_ai901_objectives(self):
+        review = self.meta["contentReview"]
+        self.assertEqual(review["lastReviewed"], "2026-09-04")
+        self.assertEqual(
+            review["objectiveVersion"],
+            "Skills measured as of April 15, 2026",
+        )
+        self.assertNotIn("beta", review["objectiveVersion"].lower())
+
+        domains = {domain["code"]: domain for domain in self.meta["objectiveDomains"]}
+        self.assertEqual(
+            domains["AI901-D1"]["name"],
+            "Identify AI concepts and capabilities",
+        )
+
     def test_free_microsoft_taxonomy(self):
         self.assertEqual(self.meta.get("commercialStatus"), "free")
         self.assertEqual(self.meta.get("vendor"), "Microsoft")

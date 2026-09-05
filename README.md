@@ -1,11 +1,40 @@
 # Examplar
 
-Examplar is a local-first, offline-capable certification exam simulator built
-with vanilla HTML, CSS, JavaScript, and a small optional Python server.
+<p align="center">
+  <a href="https://examplar.app/">
+    <img src="assets/media/og-image.png" alt="Examplar — local-first certification exam practice" width="800">
+  </a>
+</p>
 
-[Open Examplar](https://examplar.app) |
-[Browse practice exams](https://examplar.app/exams/) |
-[Privacy and storage](PRIVACY-AND-STORAGE.md)
+Examplar is an open-source, local-first certification exam simulator. Practice
+in the browser with original questions, hands-on labs, and detailed review tools.
+No account is required, and your progress stays on your device.
+
+**[Try Examplar](https://examplar.app/)** ·
+**[Browse practice exams](https://examplar.app/exams/)** ·
+**[Read the privacy model](PRIVACY-AND-STORAGE.md)**
+
+> If Examplar helps you study or gives you ideas for your own local-first app,
+> consider starring the repository. It helps other learners and contributors
+> discover the project.
+
+## Why Examplar
+
+- **Start immediately:** open a free preview without creating an account
+- **Practice realistically:** timed sessions, multiple question types, and
+  configurable pass scores
+- **Learn from mistakes:** detailed review, weak-area practice, and spaced
+  repetition
+- **Keep control of your data:** progress and imported content remain in browser
+  storage
+- **Study anywhere:** install it as a PWA and continue offline after the app is
+  cached
+- **Use trustworthy material:** original educational questions based on public
+  exam objectives, not dumps
+
+The current library covers Microsoft Azure, Azure AI, Copilot Studio, Microsoft
+Fabric, AWS, and CompTIA certifications. You can also import or create your own
+packs.
 
 ## What It Provides
 
@@ -193,6 +222,7 @@ Production response-header guidance is documented in
 
 ## License
 
-The simulator source is available under the [MIT License](LICENSE). Exam content
-and third-party assets may have separate terms; verify redistribution rights
-before publishing them.
+The simulator source is available under the [MIT License](LICENSE). Authored
+practice questions, explanations, lab guides, editorial metadata, and original
+branded media follow the separate [Examplar content terms](CONTENT-LICENSE.md).
+Third-party assets retain their own terms.

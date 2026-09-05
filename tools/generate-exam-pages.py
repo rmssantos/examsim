@@ -13,6 +13,8 @@ from __future__ import annotations
 import html
 import json
 import re
+from datetime import date
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from string import Template
 
@@ -39,6 +41,26 @@ TEMPLATE_PATH = ROOT / "tools" / "exam-page-template.html"
 SITE = "https://examplar.app"
 OG_IMAGE = f"{SITE}/assets/media/og-image.png"
 THEME_COLOR = "#1e3c72"
+ENGLISH_MONTHS = (
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+)
+GUIDE_PATHS = (
+    "ai-102-to-ai-103",
+    "ai-103-labs-and-foundry-practice",
+    "ai-103-study-plan",
+    "ai-900-to-ai-901",
+)
 
 
 def esc(value) -> str:
@@ -145,6 +167,57 @@ def build_domains(meta: dict) -> str:
     )
 
 
+def _human_date(value) -> str:
+    try:
+        parsed = date.fromisoformat(str(value or ""))
+    except ValueError:
+        return str(value or "").strip()
+    return f"{ENGLISH_MONTHS[parsed.month - 1]} {parsed.day}, {parsed.year}"
+
+
+def build_landing_proof(meta: dict) -> str:
+    """Render an optional blueprint proof panel inside a featured hero."""
+    positioning = meta.get("landingPositioning")
+    if not isinstance(positioning, dict):
+        return ""
+
+    domains = meta.get("objectiveDomains") or []
+    domain_rows = []
+    for domain in domains:
+        name = str(domain.get("name") or "").strip()
+        weight = str(domain.get("weightRange") or "").strip()
+        if not name or not weight:
+            continue
+        domain_rows.append(
+            '          <li class="readiness-domain">'
+            f'<span>{esc(name)}</span><strong>{esc(weight)}</strong></li>'
+        )
+    if not domain_rows:
+        return ""
+
+    review = meta.get("contentReview")
+    if not isinstance(review, dict):
+        review = {}
+    objective_version = str(review.get("objectiveVersion") or "").strip()
+    reviewed = _human_date(review.get("lastReviewed"))
+    eyebrow = positioning.get("proofEyebrow") or f"{exam_code(meta)} readiness trace"
+    status = positioning.get("proofStatus") or "Blueprint current"
+
+    return (
+        '        <aside class="readiness-trace" aria-labelledby="readiness-trace-h">\n'
+        '          <div class="readiness-trace-head">\n'
+        f'            <span>{esc(eyebrow)}</span><strong>{esc(status)}</strong>\n'
+        '          </div>\n'
+        '          <h2 id="readiness-trace-h">Objective coverage before test day</h2>\n'
+        f'          <p class="readiness-version">{esc(objective_version)}</p>\n'
+        '          <ol class="readiness-domains">\n'
+        + "\n".join(domain_rows)
+        + "\n          </ol>\n"
+        f'          <p class="readiness-reviewed">Last reviewed {esc(reviewed)}</p>\n'
+        '        </aside>'
+    )
+
+
 def build_modules(meta: dict) -> str:
     modules = meta.get("modules") or []
     items = "\n".join(
@@ -184,6 +257,35 @@ def build_resources(meta: dict) -> str:
         '      <ul class="exam-resources">\n'
         f"{body}\n"
         "      </ul>\n"
+        "    </section>"
+    )
+
+
+def build_related_guides(meta: dict, root: str = "../../") -> str:
+    code = esc(exam_code(meta))
+    cards = []
+    for guide in meta.get("relatedGuides") or []:
+        if not isinstance(guide, dict):
+            continue
+        slug = str(guide.get("slug") or "").strip()
+        title = str(guide.get("title") or "").strip()
+        description = str(guide.get("description") or "").strip()
+        if not SAFE_ID.match(slug) or not title or not description:
+            continue
+        cards.append(
+            f'      <li><a class="guide-card" href="{root}guides/{esc(slug)}/" data-file-index>'
+            f'<span class="guide-card-label">{code} field guide</span>'
+            f'<strong>{esc(title)}</strong><span>{esc(description)}</span>'
+            '<i aria-hidden="true" class="fas fa-arrow-right"></i></a></li>'
+        )
+    if not cards:
+        return ""
+    return (
+        '    <section class="exam-section related-guides" aria-labelledby="guides-h">\n'
+        f'      <h2 id="guides-h">Plan your {code} preparation</h2>\n'
+        '      <ul class="guide-cards">\n'
+        + "\n".join(cards)
+        + "\n      </ul>\n"
         "    </section>"
     )
 
@@ -271,8 +373,8 @@ def faq_pairs(meta: dict) -> list:
         ),
         (
             f"Can I use this as a timed {code} practice test?",
-            f"Yes. Exam mode runs a timed {code} practice test that mirrors the real "
-            "exam format, and study mode adds instant feedback with spaced repetition.",
+            f"Yes. Exam mode runs timed practice based on the public {code} objectives, "
+            "and study mode adds instant feedback with spaced repetition.",
         ),
         (
             "Does my data stay private?",
@@ -359,6 +461,34 @@ def _parse_price(price: str) -> tuple:
     return amount, currency
 
 
+def promotion_offer(pro: dict) -> dict | None:
+    """Return normalized promotion display data, or None for malformed input."""
+    if not isinstance(pro, dict) or not isinstance(pro.get("promotion"), dict):
+        return None
+    promotion = pro["promotion"]
+    code = str(promotion.get("code") or "").strip()
+    try:
+        discount = Decimal(str(promotion.get("discountPercent")))
+        amount_text, currency = _parse_price(pro.get("price", ""))
+        base_amount = Decimal(amount_text.replace(",", "."))
+    except (InvalidOperation, TypeError, ValueError):
+        return None
+    if not code or discount <= 0 or discount >= 100 or base_amount <= 0:
+        return None
+    offer_amount = (base_amount * (Decimal("100") - discount) / Decimal("100")).quantize(Decimal("0.01"))
+    discount_text = format(discount, "f")
+    if "." in discount_text:
+        discount_text = discount_text.rstrip("0").rstrip(".")
+    return {
+        "label": str(promotion.get("label") or "Offer").strip() or "Offer",
+        "discount": f"{discount_text}% off",
+        "code": code,
+        "limited": promotion.get("limited") is True,
+        "base_price": f"{base_amount:.2f} {currency}",
+        "offer_price": f"{offer_amount:.2f} {currency}",
+    }
+
+
 def build_pro(meta: dict) -> str:
     """Upsell section for pro/preview packs; empty string for fully free packs."""
     if is_free(meta):
@@ -370,6 +500,7 @@ def build_pro(meta: dict) -> str:
     title = esc(pro.get("title", f"{code} Complete"))
     price = esc(pro.get("price", ""))
     url = esc(http_url(pro.get("url"), "#"))
+    promotion = promotion_offer(pro)
     questions = pro.get("questions")
     qs_txt = f"all {esc(questions)} questions" if questions else "the complete question bank"
     highlights = [h for h in (pro.get("highlights") or []) if h]
@@ -378,15 +509,33 @@ def build_pro(meta: dict) -> str:
         highlights_html = f'    <ul class="pro-highlights">\n{items}\n    </ul>\n'
     else:
         highlights_html = ""
-    price_html = f' One-time <span class="pro-price">{price}</span>.' if price else ""
+    price_html = f' One-time <span class="pro-price">{price}</span>.' if price and not promotion else ""
+    if promotion:
+        limited = " · Limited launch offer" if promotion["limited"] else ""
+        offer_html = (
+            '      <div class="pro-offer">\n'
+            f'        <div class="pro-offer-top"><span>{esc(promotion["label"])}</span>'
+            f'<strong>{esc(promotion["discount"])}</strong></div>\n'
+            f'        <div class="pro-offer-prices"><s>{esc(promotion["base_price"])}</s>'
+            f'<span aria-hidden="true">→</span><strong>{esc(promotion["offer_price"])}</strong> + taxes</div>\n'
+            f'        <div class="pro-offer-meta">Code <code>{esc(promotion["code"])}</code>{limited}</div>\n'
+            '      </div>\n'
+        )
+        cta_label = f'Unlock the full pack — {esc(promotion["offer_price"])} + taxes'
+    else:
+        offer_html = ""
+        cta_label = "Unlock the full pack"
     return (
         '    <section class="exam-pro" aria-labelledby="pro-h">\n'
         f"      <h2 id=\"pro-h\">Get {title}</h2>\n"
         f"      <p>Unlock {qs_txt} with detailed explanations for every answer and "
         f"study mode.{price_html}</p>\n"
+        f"{offer_html}"
         f"{highlights_html}"
-        f'      <a class="pro-cta" href="{url}" rel="nofollow noopener" target="_blank">'
-        "Unlock the full pack</a>\n"
+        f'      <a class="pro-cta" href="{url}" rel="nofollow noopener" target="_blank" '
+        f'data-analytics-event="pro_purchase_clicked" data-analytics-exam="{esc(meta["id"])}" '
+        'data-analytics-placement="exam_landing">'
+        f"{cta_label}</a>\n"
         "    </section>"
     )
 
@@ -461,6 +610,9 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
     # (file://), served via server.py, or deployed at the domain root.
     root = "../../"
     full = meta.get("fullName") or code
+    positioning = meta.get("landingPositioning")
+    if not isinstance(positioning, dict):
+        positioning = {}
     if is_free(meta):
         intro = (
             f"Practice for {full} with original, syllabus-aligned questions. No account "
@@ -480,6 +632,9 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
             f"{preview_txt}Original, syllabus-aligned questions you can run in your browser, "
             f"with no account and offline access after the app is cached. {unlock_txt}"
         )
+    intro = str(positioning.get("intro") or intro)
+    hero_proof = build_landing_proof(meta)
+    trust_line = str(positioning.get("trustLine") or "").strip()
     title = esc(page_title(meta))
     description = esc(page_description(meta))
     mapping = {
@@ -494,22 +649,33 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
         "theme_color": THEME_COLOR,
         "exam_code": esc(code),
         "exam_id": esc(meta["id"]),
+        "hero_class": " landing-hero-featured" if hero_proof else "",
+        "hero_title": esc(positioning.get("headline") or f"{code} Practice Exam"),
         "full_name": esc(full),
         "intro": esc(intro),
         "kicker": esc(page_kicker(meta)),
+        "hero_proof": hero_proof,
+        "trust_line": (
+            f'          <p class="landing-trust-line">{esc(trust_line)}</p>'
+            if trust_line
+            else ""
+        ),
         "root": root,
         "diagnostic_cta_url": (
             f"{root}exam.html?exam={esc(meta['id'])}"
             "&amp;session=diagnostic&amp;count=10"
         ),
         "full_cta_url": f"{root}exam.html?exam={esc(meta['id'])}",
-        "full_cta_label": (
-            "Start full practice"
-            if is_free(meta)
-            else "Start full preview"
+        "diagnostic_cta_label": esc(
+            positioning.get("diagnosticCtaLabel") or "Start 10-question diagnostic"
+        ),
+        "full_cta_label": esc(
+            positioning.get("fullCtaLabel")
+            or ("Start full practice" if is_free(meta) else "Start full preview")
         ),
         "facts": build_facts(meta),
         "domains": build_domains(meta),
+        "guides": build_related_guides(meta, root),
         "modules": build_modules(meta),
         "resources": build_resources(meta),
         "labs": build_labs(meta, root),
@@ -525,8 +691,10 @@ def render_sitemap(all_exams: list) -> str:
     entries = [
         (f"{SITE}/", "1.0"),
         (f"{SITE}/exams/", "0.9"),
+        (f"{SITE}/guides/", "0.9"),
         (f"{SITE}/roadmaps.html", "0.8"),
     ]
+    entries += [(f"{SITE}/guides/{slug}/", "0.8") for slug in GUIDE_PATHS]
     entries += [(f"{SITE}/exams/{e['id']}/", "0.8") for e in all_exams]
     entries.append((f"{SITE}/privacy-and-storage.html", "0.3"))
     body = "\n".join(
@@ -594,6 +762,7 @@ def render_hub(all_exams: list) -> str:
       </a>
       <nav class="cr-topnav-links" aria-label="Site links">
         <a href="{root}" data-file-index>Home</a>
+        <a href="{root}guides/" data-file-index>Guides</a>
         <a href="{root}roadmaps.html">Roadmaps</a>
         <a href="https://github.com/rmssantos/examsim" target="_blank" rel="noopener noreferrer">GitHub</a>
         <div class="theme-controls">

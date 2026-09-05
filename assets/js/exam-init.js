@@ -230,6 +230,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         passScore: metadata.passScore || 70,
         questions: questions,
         modules: metadata.modules || [],
+        objectiveDomains: isBundledTrusted ? (metadata.objectiveDomains || []) : [],
         resources: metadata.resources || [],
         recommendedPro: isBundledTrusted ? (metadata.recommendedPro || null) : null,
         pro: isBundledTrusted ? (metadata.pro || null) : null,

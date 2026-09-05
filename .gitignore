@@ -76,6 +76,7 @@ node_modules/
 # Build artifacts
 dist/
 build/
+_site/
 *.zip
 *.tar.gz
 

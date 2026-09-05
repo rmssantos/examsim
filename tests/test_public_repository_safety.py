@@ -91,6 +91,20 @@ class PublicRepositoryBoundaryTests(unittest.TestCase):
 
         self.assertEqual(matches, [])
 
+    def test_operational_document_directories_are_not_publicly_tracked(self):
+        forbidden_prefixes = (
+            "docs/content/",
+            "docs/marketing/",
+            "docs/plans/",
+        )
+        matches = [
+            path.as_posix()
+            for path in self.tracked_files
+            if path.as_posix().startswith(forbidden_prefixes)
+            and (ROOT / path).exists()
+        ]
+        self.assertEqual([], matches)
+
 
 class PublicMessagingTests(unittest.TestCase):
     def test_manifest_uses_qualified_local_first_language(self):
@@ -160,36 +174,6 @@ class PublicMessagingTests(unittest.TestCase):
                 with self.subTest(path=path.relative_to(ROOT), phrase=phrase):
                     self.assertNotIn(phrase, text)
 
-    def test_linkedin_drafts_have_one_destination_and_no_private_snapshots(self):
-        draft_paths = sorted(
-            (ROOT / "docs" / "marketing" / "linkedin-posts").glob("*.md")
-        )
-        self.assertEqual(8, len(draft_paths))
-
-        forbidden_private_markers = (
-            "urn:li:activity",
-            "members reached",
-            "followers gained",
-            "aggregate linkedin analytics supplied",
-            "top supplied post snapshot",
-        )
-        for path in draft_paths:
-            text = path.read_text(encoding="utf-8")
-            front_matter = text.split("---", 2)[1]
-            cta_match = re.search(r'^cta_url:\s*"([^"]+)"$', front_matter, re.M)
-            self.assertIsNotNone(cta_match, path.name)
-
-            draft_copy = text.split("## Draft copy", 1)[1].split(
-                "## Editorial notes", 1
-            )[0]
-            urls = re.findall(r"https://[^\s]+", draft_copy)
-            self.assertEqual([cta_match.group(1)], urls, path.name)
-
-            lowered = text.lower()
-            for marker in forbidden_private_markers:
-                with self.subTest(path=path.name, marker=marker):
-                    self.assertNotIn(marker, lowered)
-
     def test_public_privacy_page_describes_access_without_internal_tools(self):
         text = (ROOT / "privacy-and-storage.html").read_text(encoding="utf-8")
         lowered = text.lower()
@@ -224,6 +208,16 @@ class PublicMetadataTests(unittest.TestCase):
 
 
 class PublicDocumentationTests(unittest.TestCase):
+    def test_code_and_content_licenses_have_an_explicit_boundary(self):
+        code_license = (ROOT / "LICENSE").read_text(encoding="utf-8")
+        content_license = (ROOT / "CONTENT-LICENSE.md").read_text(encoding="utf-8")
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+
+        self.assertIn("Content excluded from this license", code_license)
+        self.assertIn("not licensed under the MIT License", content_license)
+        self.assertIn("does not revoke permissions", content_license)
+        self.assertIn("CONTENT-LICENSE.md", readme)
+
     def test_obsolete_duplicate_guides_are_removed(self):
         self.assertFalse((ROOT / "QUICKSTART.md").exists())
         self.assertFalse((ROOT / "docs" / "Troubleshooting.md").exists())

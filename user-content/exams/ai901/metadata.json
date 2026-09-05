@@ -25,7 +25,7 @@
   "objectiveDomains": [
     {
       "code": "AI901-D1",
-      "name": "Identify AI concepts and responsibilities",
+      "name": "Identify AI concepts and capabilities",
       "weightRange": "40-45%",
       "source": "Microsoft AI-901 study guide",
       "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-901",
@@ -80,10 +80,10 @@
     }
   ],
   "contentReview": {
-    "lastReviewed": "2026-06-09",
+    "lastReviewed": "2026-09-04",
     "sourceOfTruth": "Microsoft AI-901 study guide (skills measured as of April 15, 2026)",
     "sourceUrl": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-901",
-    "objectiveVersion": "AI-901 skills measured as of April 15, 2026 (beta)"
+    "objectiveVersion": "Skills measured as of April 15, 2026"
   },
   "resources": [
     {
@@ -102,11 +102,25 @@
       "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-azure-ai-foundry"
     }
   ],
+  "relatedGuides": [
+    {
+      "slug": "ai-900-to-ai-901",
+      "title": "AI-900 to AI-901: what changed",
+      "description": "See what still transfers, what Microsoft Foundry adds, and how to rebuild your preparation around the current two-domain blueprint."
+    }
+  ],
   "totalQuestions": 130,
   "recommendedPro": {
     "examId": "ai103",
     "title": "AI-103 Complete",
-    "url": "https://examplar.gumroad.com/l/ai103-complete",
+    "url": "https://examplar.gumroad.com/l/ai103-complete/EXAMPLAR30",
+    "price": "17 EUR",
+    "promotion": {
+      "label": "Launch offer",
+      "discountPercent": 30,
+      "code": "EXAMPLAR30",
+      "limited": true
+    },
     "blurb": "Passed the AI fundamentals? Level up to Azure AI Apps and Agents Developer with the AI-103 Complete pack."
   }
 }

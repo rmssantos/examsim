@@ -7,7 +7,8 @@
         connectionString: '__APPINSIGHTS_CONNECTION_STRING__',
         optOutKey: 'exam_analytics_opt_out',
         attributionKey: 'exam_analytics_attribution',
-        analyticsVersion: '1.4.0',
+        googleAdsClickIdsKey: 'exam_google_ads_click_ids',
+        analyticsVersion: '1.6.0',
         publicExamIds: Object.freeze(['ab730', 'ab731', 'ab620', 'sc900', 'az900', 'az104', 'saac03', 'clfc02', 'ai901', 'az305', 'az400', 'dp900', 'dp700', 'ai103', 'sc300'])
     });
 
@@ -21,6 +22,34 @@
         utm_content: 'campaign_content'
     });
     const campaignPropertyNames = new Set(Object.values(campaignParameters));
+    const googleAdsClickIdParameters = Object.freeze(['gclid', 'gbraid', 'wbraid']);
+    const gumroadPurchaseHost = 'examplar.gumroad.com';
+    const gumroadPurchasePath = /^\/l\/[^/]+(?:\/[^/]+)?\/?$/;
+    const commerceReferrerHosts = Object.freeze({
+        google: 'www.google.com',
+        googleads: 'www.google.com',
+        'google-ads': 'www.google.com',
+        google_ads: 'www.google.com',
+        reddit: 'www.reddit.com',
+        linkedin: 'www.linkedin.com',
+        bing: 'www.bing.com',
+        'microsoft-ads': 'www.bing.com',
+        microsoft_ads: 'www.bing.com',
+        facebook: 'www.facebook.com',
+        meta: 'www.facebook.com',
+        twitter: 'x.com',
+        x: 'x.com',
+        producthunt: 'www.producthunt.com',
+        'product-hunt': 'www.producthunt.com'
+    });
+    const purchasePlacements = new Set([
+        'homepage_modal',
+        'roadmap_modal',
+        'results_pro_upsell',
+        'results_recommended_pro',
+        'exam_landing'
+    ]);
+    const githubRepositoryPlacements = new Set(['results_end', 'guide_end']);
 
     function parseConnectionString(value) {
         return String(value || '').split(';').reduce((result, part) => {
@@ -251,6 +280,118 @@
         return referrerHost
             ? writeStoredAttribution({ referrer_host: referrerHost })
             : {};
+    }
+
+    function commerceReferrerUrl() {
+        const attribution = attributionProperties();
+        const source = attribution.campaign_source || attribution.acquisition_ref || '';
+        const mappedHost = Object.prototype.hasOwnProperty.call(commerceReferrerHosts, source)
+            ? commerceReferrerHosts[source]
+            : '';
+        const attributedHost = sanitizeReferrerHostname(attribution.referrer_host);
+        const hostname = mappedHost || attributedHost || 'examplar.app';
+        return `https://${hostname}`;
+    }
+
+    function sanitizeGoogleAdsClickId(value) {
+        const raw = String(value ?? '').trim();
+        return /^[A-Za-z0-9_-]{1,256}$/.test(raw) ? raw : '';
+    }
+
+    function sanitizeGoogleAdsClickIdRecord(value) {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+        return googleAdsClickIdParameters.reduce((result, parameter) => {
+            const sanitized = sanitizeGoogleAdsClickId(value[parameter]);
+            if (sanitized) result[parameter] = sanitized;
+            return result;
+        }, {});
+    }
+
+    function readStoredGoogleAdsClickIds() {
+        const raw = safeSessionStorageGet(CONFIG.googleAdsClickIdsKey);
+        if (!raw) return {};
+        try {
+            const clickIds = sanitizeGoogleAdsClickIdRecord(JSON.parse(raw));
+            if (Object.keys(clickIds).length === 0) {
+                safeSessionStorageRemove(CONFIG.googleAdsClickIdsKey);
+                return {};
+            }
+            const sanitized = JSON.stringify(clickIds);
+            if (sanitized !== raw) {
+                safeSessionStorageSet(CONFIG.googleAdsClickIdsKey, sanitized);
+            }
+            return clickIds;
+        } catch (_) {
+            safeSessionStorageRemove(CONFIG.googleAdsClickIdsKey);
+            return {};
+        }
+    }
+
+    function writeStoredGoogleAdsClickIds(value) {
+        const clickIds = sanitizeGoogleAdsClickIdRecord(value);
+        if (Object.keys(clickIds).length === 0) {
+            safeSessionStorageRemove(CONFIG.googleAdsClickIdsKey);
+            return {};
+        }
+        safeSessionStorageSet(CONFIG.googleAdsClickIdsKey, JSON.stringify(clickIds));
+        return clickIds;
+    }
+
+    function googleAdsClickIds() {
+        if (!isPublicSiteHost() || isOptedOut()) {
+            safeSessionStorageRemove(CONFIG.googleAdsClickIdsKey);
+            return {};
+        }
+
+        let params = null;
+        try {
+            params = new URL(window.location.href).searchParams;
+        } catch (_) {
+            // Malformed URLs can still inherit previously validated click IDs.
+        }
+
+        const hasExplicitClickId = Boolean(
+            params && googleAdsClickIdParameters.some(parameter => params.has(parameter))
+        );
+        if (!hasExplicitClickId) return readStoredGoogleAdsClickIds();
+
+        const clickIds = {};
+        googleAdsClickIdParameters.forEach((parameter) => {
+            const sanitized = sanitizeGoogleAdsClickId(params.get(parameter));
+            if (sanitized) clickIds[parameter] = sanitized;
+        });
+        return writeStoredGoogleAdsClickIds(clickIds);
+    }
+
+    function decorateGumroadUrl(value) {
+        if (!isPublicSiteHost() || isOptedOut()) {
+            safeSessionStorageRemove(CONFIG.attributionKey);
+            safeSessionStorageRemove(CONFIG.googleAdsClickIdsKey);
+            return null;
+        }
+
+        try {
+            const url = new URL(String(value || ''));
+            const hostname = url.hostname.toLowerCase();
+            if (
+                url.protocol !== 'https:'
+                || url.username
+                || url.password
+                || url.port
+                || hostname !== gumroadPurchaseHost
+                || !gumroadPurchasePath.test(url.pathname)
+            ) {
+                return null;
+            }
+            url.searchParams.set('referrer', commerceReferrerUrl());
+            googleAdsClickIdParameters.forEach(parameter => url.searchParams.delete(parameter));
+            Object.entries(googleAdsClickIds()).forEach(([parameter, value]) => {
+                url.searchParams.set(parameter, value);
+            });
+            return url.href;
+        } catch (_) {
+            return null;
+        }
     }
 
     function normalizeString(value, maxLength = 80) {
@@ -533,11 +674,22 @@
         return trackEvent('pro_modal_opened', getExamProperties(examId));
     }
 
-    function trackProPurchaseClicked(examId) {
-        return trackEvent('pro_purchase_clicked', {
+    function trackProPurchaseClicked(examId, details = {}) {
+        const properties = {
             ...getExamProperties(examId),
             store: 'gumroad'
-        });
+        };
+        const placement = String(details?.placement || '');
+        if (purchasePlacements.has(placement)) properties.placement = placement;
+        const sourceExam = getExamProperties(details?.sourceExam);
+        if (
+            details?.sourceExam
+            && sourceExam.exam_source === 'bundled'
+            && sourceExam.exam_id !== properties.exam_id
+        ) {
+            properties.source_exam_id = sourceExam.exam_id;
+        }
+        return trackEvent('pro_purchase_clicked', properties);
     }
 
     function trackProImportClicked(examId) {
@@ -556,6 +708,15 @@
         return trackEvent('pass_story_clicked', {
             ...getExamProperties(examId),
             placement: 'results'
+        });
+    }
+
+    function trackGithubRepositoryClicked(examId, placement) {
+        const normalizedPlacement = String(placement || '').trim().toLowerCase();
+        if (!githubRepositoryPlacements.has(normalizedPlacement)) return false;
+        return trackEvent('github_repository_clicked', {
+            ...getExamProperties(examId),
+            placement: normalizedPlacement
         });
     }
 
@@ -629,12 +790,28 @@
         });
     }
 
+    const originalPurchaseUrls = new WeakMap();
+    const decoratedPurchaseCtas = new Set();
+
+    function restorePurchaseUrl(cta) {
+        const originalUrl = originalPurchaseUrls.get(cta);
+        if (originalUrl) cta.href = originalUrl;
+        originalPurchaseUrls.delete(cta);
+        decoratedPurchaseCtas.delete(cta);
+    }
+
+    function restoreDecoratedPurchaseUrls() {
+        Array.from(decoratedPurchaseCtas).forEach(restorePurchaseUrl);
+    }
+
     function setOptOut(disabled) {
         const persisted = disabled
             ? safeLocalStorageSet(CONFIG.optOutKey, 'true')
             : safeLocalStorageRemove(CONFIG.optOutKey);
         if (disabled) {
             safeSessionStorageRemove(CONFIG.attributionKey);
+            safeSessionStorageRemove(CONFIG.googleAdsClickIdsKey);
+            restoreDecoratedPurchaseUrls();
         }
         if (persisted) updatePrivacyButtonState();
         return persisted;
@@ -684,7 +861,7 @@
         dialog.appendChild(title);
 
         const description = document.createElement('p');
-        description.textContent = 'The online version collects limited visit, campaign attribution, exam usage, and commercial interaction events. Study telemetry is limited to session start, one first-answer interaction per Study session, and completion aggregates. Study start and first-answer events contain only bounded exam/session context. Study completion telemetry sends session-level question, answered, and correct counts plus coarse accuracy and duration buckets. These aggregates are not linked to question identifiers or content; however, results from very small Study sessions may be inferable. Examplar does not send individual answer events, question IDs or text, options, answer state, or selected responses. Azure can add coarse location and client metadata. It does not collect imported files, filenames, names, emails, full referrer URLs, or a persistent visitor ID.';
+        description.textContent = 'The online version collects limited visit, campaign attribution, exam usage, and commercial interaction events, including GitHub repository CTA clicks. Study telemetry is limited to session start, one first-answer interaction per Study session, and completion aggregates. Study start and first-answer events contain only bounded exam/session context. Study completion telemetry sends session-level question, answered, and correct counts plus coarse accuracy and duration buckets. These aggregates are not linked to question identifiers or content; however, results from very small Study sessions may be inferable. Examplar does not send individual answer events, question IDs or text, options, answer state, or selected responses. Azure can add coarse location and client metadata. For Google Ads visits, bounded Google Ads click identifiers are kept only in the current tab, forwarded only with a Gumroad purchase link, and not added to Azure product telemetry. It does not collect imported files, filenames, names, emails, full referrer URLs, or a persistent visitor ID.';
         dialog.appendChild(description);
 
         const status = document.createElement('div');
@@ -780,25 +957,55 @@
         updatePrivacyButtonState();
     }
 
-    let landingCtaHandlerInstalled = false;
+    let ctaHandlerInstalled = false;
 
-    function installLandingCtaTracking() {
-        if (landingCtaHandlerInstalled) return;
-        landingCtaHandlerInstalled = true;
+    function installCtaTracking() {
+        if (ctaHandlerInstalled) return;
+        ctaHandlerInstalled = true;
         document.addEventListener('click', (event) => {
             const target = event.target;
             if (!target || typeof target.closest !== 'function') return;
-            const cta = target.closest('[data-analytics-event="landing_cta_clicked"]');
+            const cta = target.closest('[data-analytics-event]');
             if (!cta) return;
-            trackLandingCtaClicked(
-                cta.dataset?.analyticsExam,
-                cta.dataset?.analyticsAction
-            );
+            const analyticsEvent = cta.dataset?.analyticsEvent;
+            if (analyticsEvent === 'landing_cta_clicked') {
+                trackLandingCtaClicked(
+                    cta.dataset?.analyticsExam,
+                    cta.dataset?.analyticsAction
+                );
+                return;
+            }
+            if (analyticsEvent === 'github_repository_clicked') {
+                trackGithubRepositoryClicked(
+                    cta.dataset?.analyticsExam,
+                    cta.dataset?.analyticsPlacement
+                );
+                return;
+            }
+            if (analyticsEvent !== 'pro_purchase_clicked') return;
+
+            if (!originalPurchaseUrls.has(cta)) {
+                originalPurchaseUrls.set(cta, cta.getAttribute?.('href') || cta.href || '');
+            }
+            const originalUrl = originalPurchaseUrls.get(cta);
+            const decorated = decorateGumroadUrl(originalUrl);
+            if (decorated) {
+                cta.href = decorated;
+                decoratedPurchaseCtas.add(cta);
+                setTimeout(() => restorePurchaseUrl(cta), 0);
+            } else if (originalUrl) {
+                restorePurchaseUrl(cta);
+            }
+            trackProPurchaseClicked(cta.dataset?.analyticsExam, {
+                placement: cta.dataset?.analyticsPlacement,
+                sourceExam: cta.dataset?.analyticsSourceExam
+            });
         });
     }
 
     function init() {
-        installLandingCtaTracking();
+        googleAdsClickIds();
+        installCtaTracking();
         injectPrivacyButton();
         trackPageView();
     }
@@ -819,6 +1026,7 @@
         trackProImportClicked,
         trackProResultsCtaClicked,
         trackPassStoryClicked,
+        trackGithubRepositoryClicked,
         trackStudyStarted,
         trackStudyFirstAnswered,
         trackStudyCompleted,
@@ -840,6 +1048,9 @@
             privacyNotesUrl,
             attributionProperties,
             sanitizeAttributionValue,
+            googleAdsClickIds,
+            sanitizeGoogleAdsClickId,
+            decorateGumroadUrl,
             buildEnvelope,
             buildPageViewEnvelope
         })

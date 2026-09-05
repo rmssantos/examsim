@@ -2,7 +2,7 @@
   "id": "ai103",
   "name": "AI-103",
   "fullName": "Azure AI Apps and Agents Developer Associate",
-  "description": "Free 25-question preview of the AI-103 pack. Original scenario questions written from public Microsoft Learn docs; not real exam questions. Unlock the full pack for the complete set, detailed explanations, and study mode.",
+  "description": "Free AI-103 practice test with 25 original scenarios across Microsoft Foundry, RAG, and agents. Updated for the April 2026 objectives. No signup.",
   "duration": 50,
   "questionCount": 25,
   "totalQuestions": 25,
@@ -26,6 +26,15 @@
   "commercialStatus": "pro-preview",
   "preview": true,
   "contentOrigin": "original",
+  "landingPositioning": {
+    "headline": "Find the gaps before AI-103 finds them for you.",
+    "intro": "Practice the certification Microsoft built for Azure AI apps and agents. Start with a focused diagnostic, then work through 25 original scenarios covering Foundry, RAG, agent orchestration, evaluation, vision, language, and information extraction.",
+    "diagnosticCtaLabel": "Start free AI-103 diagnostic",
+    "fullCtaLabel": "Explore all 25 free questions",
+    "trustLine": "No account. No recalled exam content. Progress stays in your browser.",
+    "proofEyebrow": "AI-103 readiness trace",
+    "proofStatus": "Blueprint current"
+  },
   "contentReview": {
     "lastReviewed": "2026-06-12",
     "sourceOfTruth": "Microsoft Learn AI-103 study guide and Azure AI Foundry documentation",
@@ -183,11 +192,34 @@
       "url": "https://learn.microsoft.com/azure/ai-services/"
     }
   ],
+  "relatedGuides": [
+    {
+      "slug": "ai-102-to-ai-103",
+      "title": "AI-102 is retired: what changed in AI-103",
+      "description": "See what carries over, what is new, and where Foundry, RAG, and agents change your preparation."
+    },
+    {
+      "slug": "ai-103-study-plan",
+      "title": "A 30-day AI-103 readiness plan",
+      "description": "Turn the five objective domains into four focused weeks with clear readiness checks."
+    },
+    {
+      "slug": "ai-103-labs-and-foundry-practice",
+      "title": "AI-103 labs and Foundry practice",
+      "description": "Separate confirmed lab rules from guesswork, then practise the hands-on Foundry skills in the current blueprint."
+    }
+  ],
   "pro": {
     "title": "AI-103 Complete",
     "questions": 280,
     "price": "17 EUR",
-    "url": "https://examplar.gumroad.com/l/ai103-complete",
+    "url": "https://examplar.gumroad.com/l/ai103-complete/EXAMPLAR30",
+    "promotion": {
+      "label": "Launch offer",
+      "discountPercent": 30,
+      "code": "EXAMPLAR30",
+      "limited": true
+    },
     "highlights": [
       "280 original scenario questions across every exam objective",
       "Detailed explanation for the correct answer and every distractor",

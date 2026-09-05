@@ -236,8 +236,10 @@
 			statusPill +
 			(node.role === 'prerequisite' ? '<span class="rn-pill is-prereq">Prerequisite</span>' : '');
 		const primaryLabel = node.isPro ? PRO_LABEL[node.nodeState] : STATE_LABEL[node.nodeState];
+		const promotion = window.ExamApp.getPromotionOffer?.(node.meta && node.meta.pro);
 		const unlock = node.isPro
-			? '<button type="button" class="rn-cta action-btn ghost rn-unlock">Unlock full</button>'
+			? '<button type="button" class="rn-cta action-btn ghost rn-unlock">' +
+				(promotion ? escapeHtml(promotion.discountPercent + '% off · Unlock') : 'Unlock full') + '</button>'
 			: '';
 		// A passed-in-app node is done by achievement; only offer a manual tick when there is
 		// no passing attempt yet, so the control never contradicts a real result.
@@ -323,6 +325,16 @@
 	function onProKeydown(e) { if (e.key === 'Escape') closeProModal(); }
 	function openProModal(node) {
 		const pro = (node.meta && node.meta.pro) || {};
+		const promotion = window.ExamApp.getPromotionOffer?.(pro);
+		const promotionHtml = promotion
+			? '<div class="pro-modal-offer">' +
+				'<div class="offer-topline"><span class="offer-label">' + escapeHtml(promotion.label) + '</span>' +
+				'<strong class="offer-discount">' + escapeHtml(promotion.discountPercent + '% off') + '</strong></div>' +
+				'<div class="offer-prices"><span class="offer-price-old">' + escapeHtml(promotion.basePrice) + '</span>' +
+				'<span class="offer-price-arrow">→</span><strong class="offer-price-new">' + escapeHtml(promotion.offerPrice) + '</strong> + taxes</div>' +
+				'<div class="offer-meta">Use code <code class="offer-code">' + escapeHtml(promotion.code) + '</code>' +
+				(promotion.limited ? ' · Limited launch offer' : '') + '</div></div>'
+			: '';
 		closeProModal();
 		const overlay = document.createElement('div');
 		overlay.className = 'pro-modal-overlay';
@@ -333,11 +345,13 @@
 				'<button type="button" class="pro-modal-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>' +
 				'<h2 class="pro-modal-title">' + escapeHtml(pro.title || (name + ' Complete')) + '</h2>' +
 				'<p class="pro-modal-sub">You are viewing the free preview. Unlock the complete ' + escapeHtml(name) + ' pack.</p>' +
+				promotionHtml +
 				(Array.isArray(pro.highlights) && pro.highlights.length
 					? '<ul class="pro-modal-list">' + pro.highlights.map(h => '<li><i class="fas fa-check" aria-hidden="true"></i> ' + escapeHtml(h) + '</li>').join('') + '</ul>'
 					: '') +
-				'<a class="pro-modal-buy" href="' + escapeHtml(window.ExamApp.safeExternalUrl(pro.url) || '#') + '" target="_blank" rel="noopener noreferrer">' +
-					'<i class="fas fa-store" aria-hidden="true"></i> Get the full pack' + (pro.price ? ' (' + escapeHtml(pro.price) + ')' : '') + '</a>' +
+				'<a class="pro-modal-buy" href="' + escapeHtml(window.ExamApp.safeExternalUrl(pro.url) || '#') + '" target="_blank" rel="noopener" data-analytics-event="pro_purchase_clicked" data-analytics-exam="' + escapeHtml(node.id) + '" data-analytics-placement="roadmap_modal">' +
+					'<i class="fas fa-store" aria-hidden="true"></i> Get the full pack' +
+					(promotion ? ' — ' + escapeHtml(promotion.offerPrice) + ' + taxes' : (pro.price ? ' (' + escapeHtml(pro.price) + ')' : '')) + '</a>' +
 				'<div class="pro-modal-divider"></div>' +
 				'<p class="pro-modal-activate-text">Already purchased? Import your pack file and enter your license key on the homepage to activate it on this device.</p>' +
 				'<a class="pro-modal-import" href="' + escapeHtml((window.ExamApp?.router?.buildUrl?.('home')) || 'index.html') + '"><i class="fas fa-file-import" aria-hidden="true"></i> Import on the homepage</a>' +
@@ -345,9 +359,6 @@
 		document.body.appendChild(overlay);
 		overlay.addEventListener('click', (e) => { if (e.target === overlay) closeProModal(); });
 		overlay.querySelector('.pro-modal-close')?.addEventListener('click', closeProModal);
-		overlay.querySelector('.pro-modal-buy')?.addEventListener('click', () => {
-			window.ExamApp?.analytics?.trackEvent?.('roadmap_pro_purchase', { exam: node.id });
-		});
 		document.addEventListener('keydown', onProKeydown);
 		window.ExamApp?.analytics?.trackEvent?.('roadmap_pro_modal', { exam: node.id });
 	}

@@ -28,6 +28,54 @@ try {
     'Homepage startup must not download question dumps.'
   );
 
+  // Trusted paid previews must carry the launch offer from metadata all the
+  // way through the defensive homepage snapshot and into the purchase modal.
+  const az104Offer = page.locator('.exam-card[data-exam="az104"] .exam-card-offer');
+  assert.equal(await az104Offer.count(), 1, 'AZ-104 must show the launch offer on its card.');
+  assert.match(await az104Offer.innerText(), /30% off/i);
+  assert.match(await az104Offer.innerText(), /€19\.00/);
+  assert.match(await az104Offer.innerText(), /€13\.30/);
+  assert.match(await az104Offer.innerText(), /EXAMPLAR30/);
+  assert.match(await az104Offer.innerText(), /Limited launch offer/i);
+  assert.match(
+    await page.locator('.exam-card[data-exam="az104"] .exam-card-unlock').innerText(),
+    /€13\.30/,
+    'The card CTA must use the discounted price.'
+  );
+  await page.locator('.exam-card[data-exam="az104"] .exam-card-unlock').click();
+  await page.waitForSelector('#pro-modal-overlay');
+  assert.match(await page.locator('#pro-modal-overlay .pro-modal-offer').innerText(), /EXAMPLAR30/);
+  assert.match(await page.locator('#pro-modal-overlay .pro-modal-buy').innerText(), /€13\.30/);
+  assert.match(
+    await page.locator('#pro-modal-overlay .pro-modal-buy').getAttribute('href'),
+    /\/EXAMPLAR30$/,
+    'The purchase URL must auto-apply the launch code.'
+  );
+  await page.locator('#pro-modal-overlay .pro-modal-close').click();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobileOfferLayout = await page.locator('.exam-card[data-exam="az104"]').evaluate((card) => {
+    const offer = card.querySelector('.exam-card-offer');
+    const cardBox = card.getBoundingClientRect();
+    const offerBox = offer?.getBoundingClientRect();
+    return offerBox ? {
+      cardLeft: cardBox.left,
+      cardRight: cardBox.right,
+      offerLeft: offerBox.left,
+      offerRight: offerBox.right
+    } : null;
+  });
+  assert.ok(mobileOfferLayout, 'The mobile card must keep the promotion visible.');
+  assert.ok(mobileOfferLayout.offerLeft >= mobileOfferLayout.cardLeft - 1);
+  assert.ok(mobileOfferLayout.offerRight <= mobileOfferLayout.cardRight + 1);
+  await page.locator('.exam-card[data-exam="az104"] .exam-card-unlock').click();
+  const mobileModalWidth = await page.locator('#pro-modal-overlay .pro-modal').evaluate(
+    (dialog) => dialog.getBoundingClientRect().width
+  );
+  assert.ok(mobileModalWidth <= 390, 'The promotion modal must fit a phone viewport.');
+  await page.locator('#pro-modal-overlay .pro-modal-close').click();
+  await page.setViewportSize({ width: 1280, height: 720 });
+
   // Bundled exams start as metadata-only records. Validated labCount must expose
   // their free lab before dump.json loads, while packs without labs stay clean.
   for (const examId of ['az104', 'ab620']) {
@@ -283,8 +331,28 @@ try {
     const bundled = {
       source: 'bundled',
       trust: 'bundled',
-      pro: { title: 'Official', url: 'https://example.com/buy' },
-      recommendedPro: { title: 'Official', url: 'https://example.com/next' }
+      pro: {
+        title: 'Official',
+        url: 'https://example.com/buy/EXAMPLAR30',
+        price: '19 EUR',
+        promotion: {
+          label: 'Launch offer',
+          discountPercent: 30,
+          code: 'EXAMPLAR30',
+          limited: true
+        }
+      },
+      recommendedPro: {
+        title: 'Official',
+        url: 'https://example.com/next/EXAMPLAR30',
+        price: '17 EUR',
+        promotion: {
+          label: 'Launch offer',
+          discountPercent: 30,
+          code: 'EXAMPLAR30',
+          limited: true
+        }
+      }
     };
     return {
       importedPro: simulator.renderProUpsell(imported),
@@ -302,7 +370,13 @@ try {
   assert.equal(simulatorSinkResults.importedPro, '', 'Results pro CTA must reject imported metadata.');
   assert.equal(simulatorSinkResults.importedRecommended, '', 'Results recommendation CTA must reject imported metadata.');
   assert.match(simulatorSinkResults.bundledPro, /results-pro-cta/, 'Trusted bundled pro CTA must remain available.');
+  assert.match(simulatorSinkResults.bundledPro, /results-pro-offer/, 'Trusted results must show the launch offer.');
+  assert.match(simulatorSinkResults.bundledPro, /EXAMPLAR30/);
+  assert.match(simulatorSinkResults.bundledPro, /€13\.30/);
   assert.match(simulatorSinkResults.bundledRecommended, /recommended-pro-cta/, 'Trusted bundled recommendation must remain available.');
+  assert.match(simulatorSinkResults.bundledRecommended, /results-pro-offer/);
+  assert.match(simulatorSinkResults.bundledRecommended, /EXAMPLAR30/);
+  assert.match(simulatorSinkResults.bundledRecommended, /€11\.90/);
   assert.doesNotMatch(
     simulatorSinkResults.credentialMarkdown,
     /href=/,
@@ -693,6 +767,21 @@ try {
     const sim = window.ExamApp?.examSimulator || window.examSimulator;
     sim.finishExam(true);
   });
+  const githubResultCta = page.locator(
+    '#results-recommended-pro a[data-analytics-event="github_repository_clicked"][data-analytics-placement="results_end"]'
+  );
+  assert.equal(
+    await githubResultCta.count(),
+    1,
+    'A completed diagnostic must offer one post-value GitHub repository CTA.'
+  );
+  assert.equal(
+    await githubResultCta.getAttribute('href'),
+    'https://github.com/rmssantos/examsim',
+    'The post-result CTA must point to the public repository.'
+  );
+  assert.equal(await githubResultCta.getAttribute('target'), '_blank');
+  assert.equal(await githubResultCta.getAttribute('rel'), 'noopener noreferrer');
   await page.waitForFunction(() => {
     const progress = JSON.parse(localStorage.getItem('az900_progress') || '{"attempts":[]}');
     return progress.attempts.at(-1)?.sessionType === 'diagnostic';
@@ -830,6 +919,20 @@ try {
     fullRuntime,
     { activeCount: 40, sessionType: 'full', configuredCount: 40, duration: 45 },
     'Full practice must keep the normal AZ-900 count, type, and duration.'
+  );
+
+  // Study results can follow exam results in the same runtime. They must clear
+  // any stale exam-only upsell or repository CTA from the shared results slot.
+  await page.evaluate(() => {
+    const sim = window.ExamApp?.examSimulator || window.examSimulator;
+    const slot = document.getElementById('results-recommended-pro');
+    slot.innerHTML = '<a data-analytics-event="github_repository_clicked">stale CTA</a>';
+    sim.showStudyResults(100, 1, 0, 1, 1, 0);
+  });
+  assert.equal(
+    await page.locator('#results-recommended-pro').evaluate((slot) => slot.childElementCount),
+    0,
+    'Study results must clear stale exam-only calls to action.'
   );
 
   // The fixed privacy control must clear both navigation actions on mobile.
@@ -1045,6 +1148,11 @@ try {
 
   // Career roadmaps: seed local progress, then verify node states + up-next + structure.
   await page.goto(`${baseUrl}/roadmaps.html`, { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(
+    () => window.Roadmaps?.ready === true,
+    null,
+    { timeout: 8000 }
+  );
   await page.evaluate(async () => {
     const az900 = { attempts: [{ score: 92, passed: true }], bestScore: 92, totalPassed: 1 };
     const az104 = { attempts: [{ score: 40, passed: false }], bestScore: 40, totalPassed: 0 };
@@ -1139,10 +1247,18 @@ try {
 
   // Pro node: "Unlock full" opens the pro modal (highlights + Gumroad + import/license
   // instruction), instead of jumping straight to Gumroad.
+  assert.match(
+    await page.locator('.roadmap-node[data-pack="az400"] .rn-unlock').innerText(),
+    /30% off/i,
+    'Paid roadmap nodes must surface the launch discount.'
+  );
   await page.locator('.roadmap-node[data-pack="az400"] .rn-unlock').click();
   await page.waitForSelector('#pro-modal-overlay', { timeout: 2000 });
   const proBuyHref = await page.locator('#pro-modal-overlay .pro-modal-buy').getAttribute('href');
   assert.ok(proBuyHref && proBuyHref.includes('gumroad'), `Pro modal must link to Gumroad, got "${proBuyHref}".`);
+  assert.match(proBuyHref, /\/EXAMPLAR30$/, 'The roadmap purchase URL must auto-apply the launch code.');
+  assert.match(await page.locator('#pro-modal-overlay .pro-modal-offer').innerText(), /EXAMPLAR30/);
+  assert.match(await page.locator('#pro-modal-overlay .pro-modal-buy').innerText(), /€13\.30/);
   assert.equal(
     await page.locator('#pro-modal-overlay .pro-modal-activate-text').count(), 1,
     'Pro modal must include the import/license-key instruction (not a bare Gumroad jump).'
@@ -1180,8 +1296,8 @@ try {
   assert.ok(privacyBrandHref, 'The privacy logo must be a link to home.');
   assert.equal(privacyBrandHref, privacyHomeNavHref, 'Privacy logo must link to the same home target as the Home nav link.');
 
-  // SEO landing pages (hub + a generated exam page) wear the same control-room sticky bar.
-  for (const path of ['/exams/index.html', '/exams/az900/index.html']) {
+  // SEO landing pages (hubs + a generated exam page) wear the same control-room sticky bar.
+  for (const path of ['/exams/index.html', '/guides/index.html', '/exams/az900/index.html']) {
     await page.goto(`${baseUrl}${path}`, { waitUntil: 'domcontentloaded' });
     assert.equal(
       await page.locator('.cr-topbar').evaluate(el => getComputedStyle(el).position), 'sticky',
@@ -1192,6 +1308,53 @@ try {
       `${path} top bar must include the control-room nav links.`
     );
   }
+
+  // Full-bleed landing chrome must not create sideways scrolling when the
+  // vertical scrollbar reduces the layout viewport on a phone-sized screen.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`${baseUrl}/exams/ai103/index.html`, { waitUntil: 'domcontentloaded' });
+  const ai103MobileViewport = await page.evaluate(() => {
+    // Headless Chromium uses overlay scrollbars, so reserve a real gutter to
+    // reproduce desktop/mobile browsers where 100vw includes scrollbar width.
+    document.documentElement.style.scrollbarGutter = 'stable';
+    const topbar = document.querySelector('.cr-topbar').getBoundingClientRect();
+    return {
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      topbarLeft: topbar.left,
+      topbarRight: topbar.right
+    };
+  });
+  assert.ok(
+    ai103MobileViewport.topbarLeft >= -0.5
+      && ai103MobileViewport.topbarRight <= ai103MobileViewport.clientWidth + 0.5,
+    `AI-103 landing top bar must remain inside the mobile layout viewport: ${JSON.stringify(ai103MobileViewport)}`
+  );
+  assert.ok(
+    ai103MobileViewport.scrollWidth <= ai103MobileViewport.clientWidth,
+    `AI-103 landing must not scroll horizontally on mobile: ${JSON.stringify(ai103MobileViewport)}`
+  );
+
+  await page.goto(`${baseUrl}/guides/index.html`, { waitUntil: 'domcontentloaded' });
+  const guidesMobileViewport = await page.evaluate(() => {
+    document.documentElement.style.scrollbarGutter = 'stable';
+    const topbar = document.querySelector('.cr-topbar').getBoundingClientRect();
+    return {
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      topbarLeft: topbar.left,
+      topbarRight: topbar.right
+    };
+  });
+  assert.ok(
+    guidesMobileViewport.topbarLeft >= -0.5
+      && guidesMobileViewport.topbarRight <= guidesMobileViewport.clientWidth + 0.5,
+    `Guides hub top bar must remain inside the mobile layout viewport: ${JSON.stringify(guidesMobileViewport)}`
+  );
+  assert.ok(
+    guidesMobileViewport.scrollWidth <= guidesMobileViewport.clientWidth,
+    `Guides hub must not scroll horizontally on mobile: ${JSON.stringify(guidesMobileViewport)}`
+  );
 
   console.log('Browser smoke passed.');
 } finally {
