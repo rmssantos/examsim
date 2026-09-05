@@ -875,6 +875,8 @@ body.dragging-file .exam-library-section::after {
   gap: 0.35rem;
 }
 .exam-card-actions { display: flex; gap: 0.5rem; margin-top: 0.45rem; }
+.exam-card--online .exam-card-actions { flex-wrap: wrap; }
+.exam-card--online .exam-card-unlock { flex-basis: 100%; }
 .exam-card-start, .exam-card-study, .exam-card-unlock {
   flex: 1;
   display: inline-flex;

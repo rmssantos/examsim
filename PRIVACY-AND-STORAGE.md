@@ -1,5 +1,18 @@
 # Privacy and Data Storage
 
+This document covers the standalone local simulator in this repository. The
+separate paid online service uses accounts and personal licences and has its own
+storage policy. New online licences do not decrypt local packs and new purchases
+do not include offline downloads. Previous offline packs remain importable.
+
+The public local-edition deployment measures `online_exam_clicked` separately
+from legacy purchase/import events. It contains only a bundled exam ID, an
+allowlisted placement, and optionally the bundled source exam ID. A link click
+is not a confirmed sale or licence activation. Online destination links are not
+decorated with click identifiers, emails, licence keys, or local identifiers.
+Localhost, private hosts, file URLs, and analytics opt-out produce no such events.
+
+
 This document describes the data behavior of Examplar's public deployment and
 local/self-hosted use.
 

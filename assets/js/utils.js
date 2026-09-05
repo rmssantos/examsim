@@ -308,6 +308,7 @@ window.ExamApp.safeExternalUrl = function safeExternalUrl(value) {
 
 window.ExamApp.getPromotionOffer = function getPromotionOffer(pro) {
     if (!pro || typeof pro !== 'object') return null;
+    if (pro.delivery === 'online') return null;
     const promotion = pro.promotion;
     if (!promotion || typeof promotion !== 'object') return null;
 

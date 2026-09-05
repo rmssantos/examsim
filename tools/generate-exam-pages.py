@@ -364,6 +364,17 @@ def faq_pairs(meta: dict) -> list:
             else "The free preview is a sample; the full pack covers every objective."
         )
 
+    if pro.get("delivery") == "online":
+        free_answer = (
+            f"The {count}-question {code} preview is free and works without an account. "
+            "The complete exam is a separate paid online service requiring an account and "
+            "internet connection. No offline download. See the hosted service for current pricing."
+        )
+        count_answer = (
+            f"The local preview includes {count} questions. The online "
+            f"{pro.get('title', code + ' Complete')} includes {pro.get('questions')} questions."
+        )
+
     return [
         (f"Is the {code} practice exam free?", free_answer),
         (
@@ -378,9 +389,9 @@ def faq_pairs(meta: dict) -> list:
         ),
         (
             "Does my data stay private?",
-            "Questions, answers, imported content, and progress remain in your browser. "
+            "In this local simulator, questions, answers, imported content, and progress remain in your browser. "
             "The public site uses limited opt-out product telemetry; local and private "
-            "self-hosted use does not initialize analytics.",
+            "self-hosted use does not initialize analytics. The separate paid online service has its own account and storage policy.",
         ),
         (f"How many {code} questions are included?", count_answer),
     ]
@@ -465,6 +476,8 @@ def promotion_offer(pro: dict) -> dict | None:
     """Return normalized promotion display data, or None for malformed input."""
     if not isinstance(pro, dict) or not isinstance(pro.get("promotion"), dict):
         return None
+    if pro.get("delivery") == "online":
+        return None
     promotion = pro["promotion"]
     code = str(promotion.get("code") or "").strip()
     try:
@@ -509,6 +522,21 @@ def build_pro(meta: dict) -> str:
         highlights_html = f'    <ul class="pro-highlights">\n{items}\n    </ul>\n'
     else:
         highlights_html = ""
+    if pro.get("delivery") == "online":
+        return (
+            '    <section class="exam-pro" aria-labelledby="pro-h">\n'
+            f'      <h2 id="pro-h">{title} online</h2>\n'
+            f'      <p>Practise {qs_txt} with detailed explanations in the online service. '
+            'Requires an account and internet connection. No offline download; '
+            'an online licence does not activate a local pack. See the hosted service for current pricing.</p>\n'
+            f'{highlights_html}'
+            f'      <a class="pro-cta" href="{url}" rel="nofollow noopener" target="_blank" '
+            f'data-analytics-event="online_exam_clicked" data-analytics-exam="{esc(meta["id"])}" '
+            'data-analytics-placement="exam_landing">View complete exam online</a>\n'
+            '      <p>Previously bought an offline pack? Import that file with its original '
+            'decryption key in the local simulator.</p>\n'
+            '    </section>'
+        )
     price_html = f' One-time <span class="pro-price">{price}</span>.' if price and not promotion else ""
     if promotion:
         limited = " · Limited launch offer" if promotion["limited"] else ""
@@ -548,7 +576,7 @@ def build_jsonld(meta: dict) -> str:
     # Use one currency for both offers (the paid pack's) so structured-data
     # validators don't see a free USD offer next to a paid EUR one.
     pro = meta.get("pro") or {}
-    amount, currency = _parse_price(pro["price"]) if pro.get("price") else (None, "USD")
+    amount, currency = _parse_price(pro["price"]) if pro.get("price") and pro.get("delivery") != "online" else (None, "USD")
     offers = [{"@type": "Offer", "price": "0", "priceCurrency": currency, "category": "Free"}]
     if amount is not None:
         offers.append({
@@ -628,6 +656,8 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
             if full_pack
             else "Unlock the complete pack for detailed explanations and study mode."
         )
+        if (meta.get("pro") or {}).get("delivery") == "online":
+            unlock_txt = "The complete exam is a separate online service requiring an account and internet connection; no offline download."
         intro = (
             f"{preview_txt}Original, syllabus-aligned questions you can run in your browser, "
             f"with no account and offline access after the app is cached. {unlock_txt}"

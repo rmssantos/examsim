@@ -8,7 +8,7 @@
         optOutKey: 'exam_analytics_opt_out',
         attributionKey: 'exam_analytics_attribution',
         googleAdsClickIdsKey: 'exam_google_ads_click_ids',
-        analyticsVersion: '1.6.0',
+        analyticsVersion: '1.7.0',
         publicExamIds: Object.freeze(['ab730', 'ab731', 'ab620', 'sc900', 'az900', 'az104', 'saac03', 'clfc02', 'ai901', 'az305', 'az400', 'dp900', 'dp700', 'ai103', 'sc300'])
     });
 
@@ -692,6 +692,18 @@
         return trackEvent('pro_purchase_clicked', properties);
     }
 
+    function trackOnlineExamClicked(examId, details = {}) {
+        const properties = getExamProperties(examId);
+        if (properties.exam_source !== 'bundled' || !publicExamIds.has(properties.exam_id)) return false;
+        const placement = String(details?.placement || '');
+        if (purchasePlacements.has(placement) || placement === 'labs_empty') properties.placement = placement;
+        const sourceExam = getExamProperties(details?.sourceExam);
+        if (details?.sourceExam && sourceExam.exam_source === 'bundled' && publicExamIds.has(sourceExam.exam_id) && sourceExam.exam_id !== properties.exam_id) {
+            properties.source_exam_id = sourceExam.exam_id;
+        }
+        return trackEvent('online_exam_clicked', properties);
+    }
+
     function trackProImportClicked(examId) {
         return trackEvent('pro_import_clicked', getExamProperties(examId));
     }
@@ -861,7 +873,7 @@
         dialog.appendChild(title);
 
         const description = document.createElement('p');
-        description.textContent = 'The online version collects limited visit, campaign attribution, exam usage, and commercial interaction events, including GitHub repository CTA clicks. Study telemetry is limited to session start, one first-answer interaction per Study session, and completion aggregates. Study start and first-answer events contain only bounded exam/session context. Study completion telemetry sends session-level question, answered, and correct counts plus coarse accuracy and duration buckets. These aggregates are not linked to question identifiers or content; however, results from very small Study sessions may be inferable. Examplar does not send individual answer events, question IDs or text, options, answer state, or selected responses. Azure can add coarse location and client metadata. For Google Ads visits, bounded Google Ads click identifiers are kept only in the current tab, forwarded only with a Gumroad purchase link, and not added to Azure product telemetry. It does not collect imported files, filenames, names, emails, full referrer URLs, or a persistent visitor ID.';
+        description.textContent = 'The public local edition collects limited visit, campaign attribution, exam usage, and commercial interaction events, including GitHub repository CTA clicks and distinct online-exam link clicks. An online-exam link click does not confirm a sale or activation. Study telemetry is limited to session start, one first-answer interaction per Study session, and completion aggregates. Study start and first-answer events contain only bounded exam/session context. Study completion telemetry sends session-level question, answered, and correct counts plus coarse accuracy and duration buckets. These aggregates are not linked to question identifiers or content; however, results from very small Study sessions may be inferable. Examplar does not send individual answer events, question IDs or text, options, answer state, or selected responses. Azure can add coarse location and client metadata. For Google Ads visits, bounded Google Ads click identifiers are kept only in the current tab, forwarded only with a legacy Gumroad purchase link, and not added to Azure product telemetry. Stable online-exam links carry no click identifiers. It does not collect imported files, filenames, names, emails, full referrer URLs, or a persistent visitor ID.';
         dialog.appendChild(description);
 
         const status = document.createElement('div');
@@ -982,6 +994,10 @@
                 );
                 return;
             }
+            if (analyticsEvent === 'online_exam_clicked') {
+                trackOnlineExamClicked(cta.dataset?.analyticsExam, { placement: cta.dataset?.analyticsPlacement, sourceExam: cta.dataset?.analyticsSourceExam });
+                return;
+            }
             if (analyticsEvent !== 'pro_purchase_clicked') return;
 
             if (!originalPurchaseUrls.has(cta)) {
@@ -1024,6 +1040,7 @@
         trackProModalOpened,
         trackProPurchaseClicked,
         trackProImportClicked,
+        trackOnlineExamClicked,
         trackProResultsCtaClicked,
         trackPassStoryClicked,
         trackGithubRepositoryClicked,

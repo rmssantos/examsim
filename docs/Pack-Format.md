@@ -629,3 +629,15 @@ No breaking changes. All existing data formats are compatible.
 - [README.md](../README.md) - Main documentation
 - [PRIVACY-AND-STORAGE.md](../PRIVACY-AND-STORAGE.md) - Privacy and storage details
 - [HOW-TO-DISTRIBUTE.md](HOW-TO-DISTRIBUTE.md) - Distribution guide
+
+
+### Online offers in bundled metadata
+
+Trusted repository metadata can mark `pro` and `recommendedPro` with
+`"delivery": "online"`. This exact discriminator selects online service wording,
+suppresses embedded prices/promotions, and preserves a stable
+`https://examplar.app/exams/<exam-id>/` destination. Current prices are maintained
+by the hosted service. It does not grant access or replace legacy file import.
+The defensive homepage snapshot copies only the exact `online` value without
+invoking getters. Imported metadata cannot gain bundled provenance or commercial
+promotion privileges by supplying this field.

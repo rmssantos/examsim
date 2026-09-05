@@ -8,7 +8,7 @@
 
 Examplar is an open-source, local-first certification exam simulator. Practice
 in the browser with original questions, hands-on labs, and detailed review tools.
-No account is required, and your progress stays on your device.
+This repository is the standalone local edition: no account is required, and your progress stays on your device.
 
 **[Try Examplar](https://examplar.app/)** ·
 **[Browse practice exams](https://examplar.app/exams/)** ·
@@ -50,14 +50,33 @@ packs.
 
 No account is required.
 
+## Local Edition and Online Exams
+
+The free packs, editor, personal JSON/ZIP imports, and local progress work without
+an Examplar account. Local use does not send analytics. Keep the downloaded app
+and packs to practise independently of the hosted service.
+
+The **View complete exam online** links lead to the separate paid service at
+`https://examplar.app/exams/<exam-id>/`, where current prices and access conditions
+are maintained. New purchases require an account and internet connection. They
+do not include an offline download, and the personal online licence does not
+decrypt or activate a pack in this repository.
+
+Previous offline purchases still work: use **Import previous offline pack** in
+the exam information modal, or the normal file import, and enter the original
+pack decryption key when prompted. Do not enter a new online licence there.
+
+The hosted service has its own account, licensing, and storage policy. The local
+storage descriptions below apply to this repository's simulator.
+
 ## Privacy Model
 
 Questions, selected answers, imported content, images, progress, and editor
 changes remain in browser storage.
 
-The public deployment at `examplar.app` sends limited product telemetry to Azure
+When this local edition is deployed on an approved public host, it sends limited product telemetry to Azure
 Application Insights. This includes page views, coarse usage events, campaign
-labels, referrer hostname, and Azure-derived coarse client/location metadata.
+labels, referrer hostname, online-exam link clicks, and Azure-derived coarse client/location metadata. Online link clicks do not mean a purchase or activation occurred.
 Analytics can be disabled from the Privacy settings control.
 
 Analytics is not initialized on `localhost`, private self-hosted URLs, or
@@ -70,8 +89,8 @@ See [PRIVACY-AND-STORAGE.md](PRIVACY-AND-STORAGE.md) for the complete disclosure
 ### Public Site
 
 Open [examplar.app](https://examplar.app), select an exam, and start practicing.
-After the app shell is cached, previously installed pages and assets remain
-available offline.
+The hosted service offers free practice and account-based complete exams.
+Use the local edition below for independent offline practice.
 
 ### Local Server
 

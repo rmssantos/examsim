@@ -92,8 +92,9 @@
     const safeProUrl = trustedBundled && proUrl
       ? window.ExamApp.safeExternalUrl(proUrl)
       : null;
+    const online = metadata?.pro?.delivery === 'online';
     const upsell = safeProUrl
-      ? `<a class="btn btn-primary" href="${escapeHtml(safeProUrl)}" target="_blank" rel="noopener noreferrer">Get the full pack</a>`
+      ? `<a class="btn btn-primary" href="${escapeHtml(safeProUrl)}" target="_blank" rel="noopener noreferrer" data-analytics-event="${online ? 'online_exam_clicked' : 'pro_purchase_clicked'}" data-analytics-exam="${escapeHtml(metadata.id || '')}" data-analytics-placement="labs_empty">${online ? 'View complete exam online' : 'Get the full pack'}</a>${online ? '<p>Requires an account and internet connection. No offline download.</p>' : ''}`
       : '';
     workspace.innerHTML = `<div class="labs-empty"><p>${escapeHtml(message)}</p>${upsell}</div>`;
   }

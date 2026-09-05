@@ -1615,6 +1615,9 @@ class MultiExamSimulator {
         const questionTotal = Number(pro.questions);
         const fullCount = Number.isFinite(questionTotal) && questionTotal > 0 ? Math.round(questionTotal) : null;
         const scope = fullCount ? `${fullCount} questions` : 'the complete question set';
+        if (pro.delivery === 'online') {
+            return `<div class="recommended-pro results-pro-upsell"><strong>${title}</strong><p>Continue with ${scope} in the online service. Requires an account and internet connection. No offline download; an online licence does not unlock a local pack.</p><a class="results-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener" data-analytics-event="online_exam_clicked" data-analytics-exam="${this.escapeHtml(this.currentExam)}" data-analytics-placement="results_pro_upsell">View complete exam online</a></div>`;
+        }
         const promotion = window.ExamApp.getPromotionOffer?.(pro);
         const offer = promotion
             ? `<div class="results-pro-offer"><span class="results-pro-offer-label">${this.escapeHtml(promotion.label)} · ${this.escapeHtml(String(promotion.discountPercent))}% off</span><span class="results-pro-offer-prices"><s>${this.escapeHtml(promotion.basePrice)}</s> <span aria-hidden="true">→</span> <strong>${this.escapeHtml(promotion.offerPrice)}</strong> + taxes</span><span class="results-pro-offer-meta">Code <code>${this.escapeHtml(promotion.code)}</code>${promotion.limited ? ' · Limited launch offer' : ''}</span></div>`
@@ -1641,6 +1644,9 @@ class MultiExamSimulator {
         if (!url) return '';
         const title = this.escapeHtml(rec.title || 'Recommended pack');
         const blurb = this.escapeHtml(rec.blurb || '');
+        if (rec.delivery === 'online') {
+            return `<div class="recommended-pro"><strong>${title}</strong><p>${blurb}</p><p>Requires an account and internet connection. No offline download.</p><a class="recommended-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener" data-analytics-event="online_exam_clicked" data-analytics-exam="${this.escapeHtml(rec.examId || this.currentExam)}" data-analytics-source-exam="${this.escapeHtml(this.currentExam)}" data-analytics-placement="results_recommended_pro">View complete exam online</a></div>`;
+        }
         const promotion = window.ExamApp.getPromotionOffer?.(rec);
         const offer = promotion
             ? `<div class="results-pro-offer"><span class="results-pro-offer-label">${this.escapeHtml(promotion.label)} · ${this.escapeHtml(String(promotion.discountPercent))}% off</span><span class="results-pro-offer-prices"><s>${this.escapeHtml(promotion.basePrice)}</s> <span aria-hidden="true">→</span> <strong>${this.escapeHtml(promotion.offerPrice)}</strong> + taxes</span><span class="results-pro-offer-meta">Code <code>${this.escapeHtml(promotion.code)}</code>${promotion.limited ? ' · Limited launch offer' : ''}</span></div>`
