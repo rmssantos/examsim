@@ -4,6 +4,13 @@ This compatibility branch follows the AI-103 refresh and is not a production
 cutover. CNAME, Pages workflows, existing Gumroad products, and production DNS
 are deliberately unchanged.
 
+Integration order: merge dependency PR #108 and AI-103 PR #118 into `master`,
+then integrate PR #119 into `release/online-transition`, created from that
+updated `master`. This closes the compatibility PR while keeping its online
+offers staged for the coordinated launch. Pushes to the release branch do not
+trigger Pages deployment. Merge that release branch into `master` only after
+the checks below are satisfied; do not dispatch Pages manually from it earlier.
+
 Before publishing this branch:
 
 1. Finish the existing AI-103 content PR review and retain its validated preview.
