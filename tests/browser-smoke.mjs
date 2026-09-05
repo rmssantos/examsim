@@ -28,53 +28,73 @@ try {
     'Homepage startup must not download question dumps.'
   );
 
-  // Trusted paid previews must carry the launch offer from metadata all the
-  // way through the defensive homepage snapshot and into the purchase modal.
-  const az104Offer = page.locator('.exam-card[data-exam="az104"] .exam-card-offer');
-  assert.equal(await az104Offer.count(), 1, 'AZ-104 must show the launch offer on its card.');
-  assert.match(await az104Offer.innerText(), /30% off/i);
-  assert.match(await az104Offer.innerText(), /€19\.00/);
-  assert.match(await az104Offer.innerText(), /€13\.30/);
-  assert.match(await az104Offer.innerText(), /EXAMPLAR30/);
-  assert.match(await az104Offer.innerText(), /Limited launch offer/i);
-  assert.match(
-    await page.locator('.exam-card[data-exam="az104"] .exam-card-unlock').innerText(),
-    /€13\.30/,
-    'The card CTA must use the discounted price.'
-  );
-  await page.locator('.exam-card[data-exam="az104"] .exam-card-unlock').click();
-  await page.waitForSelector('#pro-modal-overlay');
-  assert.match(await page.locator('#pro-modal-overlay .pro-modal-offer').innerText(), /EXAMPLAR30/);
-  assert.match(await page.locator('#pro-modal-overlay .pro-modal-buy').innerText(), /€13\.30/);
-  assert.match(
-    await page.locator('#pro-modal-overlay .pro-modal-buy').getAttribute('href'),
-    /\/EXAMPLAR30$/,
-    'The purchase URL must auto-apply the launch code.'
-  );
-  await page.locator('#pro-modal-overlay .pro-modal-close').click();
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  const mobileOfferLayout = await page.locator('.exam-card[data-exam="az104"]').evaluate((card) => {
-    const offer = card.querySelector('.exam-card-offer');
-    const cardBox = card.getBoundingClientRect();
-    const offerBox = offer?.getBoundingClientRect();
-    return offerBox ? {
-      cardLeft: cardBox.left,
-      cardRight: cardBox.right,
-      offerLeft: offerBox.left,
-      offerRight: offerBox.right
-    } : null;
+  // Online offers survive trusted snapshots without changing local study/import.
+  for (const examId of ['ai103', 'ab620', 'sc300', 'dp700', 'az400', 'az305', 'saac03', 'az104']) {
+    const card = page.locator(`.exam-card[data-exam="${examId}"]`);
+    assert.equal(await card.locator('.exam-card-offer').count(), 0);
+    assert.equal(await card.locator('.exam-card-start').count(), 1);
+    assert.equal(await card.locator('.exam-card-study').count(), 1);
+    assert.match(await card.locator('.exam-card-unlock').innerText(), /View complete exam online/);
+    await card.locator('.exam-card-unlock').click();
+    const modal = page.locator('#pro-modal-overlay');
+    assert.match(await modal.innerText(), /account and internet connection/);
+    assert.match(await modal.innerText(), /No offline download/);
+    assert.match(await modal.locator('.pro-modal-import').innerText(), /previous offline pack/i);
+    assert.equal(await modal.locator('.pro-modal-buy').getAttribute('href'), `https://examplar.app/exams/${examId}/`);
+    assert.equal(await modal.locator('.pro-modal-buy').getAttribute('data-analytics-event'), 'online_exam_clicked');
+    assert.equal(await modal.locator('.pro-modal-offer').count(), 0);
+    await modal.locator('.pro-modal-close').click();
+  }
+  const deliveryBoundary = await page.evaluate(() => {
+    let getters = 0;
+    const hostile = { title: 'Hostile offer' };
+    Object.defineProperty(hostile, 'delivery', { get() { getters++; throw new Error('must not run'); } });
+    return {
+      hostile: window.homepage.getProSnapshot(hostile),
+      unknown: window.homepage.getProSnapshot({ delivery: 'https://evil.example' }),
+      recommendation: window.homepage.getRecommendedProSnapshot({ delivery: 'online' }),
+      getters
+    };
   });
-  assert.ok(mobileOfferLayout, 'The mobile card must keep the promotion visible.');
-  assert.ok(mobileOfferLayout.offerLeft >= mobileOfferLayout.cardLeft - 1);
-  assert.ok(mobileOfferLayout.offerRight <= mobileOfferLayout.cardRight + 1);
+  assert.equal(deliveryBoundary.getters, 0);
+  assert.equal(deliveryBoundary.hostile.delivery, undefined);
+  assert.equal(deliveryBoundary.unknown, null);
+  assert.equal(deliveryBoundary.recommendation.delivery, 'online');
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobileActions = await page.locator('.exam-card[data-exam="az104"]').evaluate(card => {
+    const start = card.querySelector('.exam-card-start').getBoundingClientRect();
+    const study = card.querySelector('.exam-card-study').getBoundingClientRect();
+    const online = card.querySelector('.exam-card-unlock').getBoundingClientRect();
+    return { freeBottom: Math.max(start.bottom, study.bottom), onlineTop: online.top,
+      right: card.getBoundingClientRect().right, onlineRight: online.right };
+  });
+  assert.ok(mobileActions.onlineTop >= mobileActions.freeBottom, 'Keep free study controls together above the online service CTA.');
+  assert.ok(mobileActions.onlineRight <= mobileActions.right, 'The online CTA must stay inside the mobile card.');
   await page.locator('.exam-card[data-exam="az104"] .exam-card-unlock').click();
   const mobileModalWidth = await page.locator('#pro-modal-overlay .pro-modal').evaluate(
     (dialog) => dialog.getBoundingClientRect().width
   );
-  assert.ok(mobileModalWidth <= 390, 'The promotion modal must fit a phone viewport.');
+  assert.ok(mobileModalWidth <= 390, 'The online modal must fit a phone viewport.');
   await page.locator('#pro-modal-overlay .pro-modal-close').click();
   await page.setViewportSize({ width: 1280, height: 720 });
+
+  const onlinePage = await context.newPage();
+  for (const examId of ['ai103', 'ab620', 'sc300', 'dp700', 'az400', 'az305', 'saac03', 'az104']) {
+    await onlinePage.goto(`${baseUrl}/exams/${examId}/`, { waitUntil: 'domcontentloaded' });
+    const offer = onlinePage.locator('.exam-pro');
+    assert.match(await offer.innerText(), /account and internet connection/);
+    assert.match(await offer.innerText(), /No offline download/);
+    assert.equal(await offer.locator('a.pro-cta').getAttribute('href'), `https://examplar.app/exams/${examId}/`);
+    assert.equal(await offer.locator('a.pro-cta').getAttribute('data-analytics-event'), 'online_exam_clicked');
+    assert.equal(await offer.locator('.pro-price, .pro-offer').count(), 0);
+  }
+  await onlinePage.goto(`${baseUrl}/labs.html?exam=az400`, { waitUntil: 'domcontentloaded' });
+  const onlineLabs = onlinePage.locator('.labs-empty');
+  await onlineLabs.locator('a').waitFor();
+  assert.match(await onlineLabs.innerText(), /account and internet connection/);
+  assert.equal(await onlineLabs.locator('a').getAttribute('href'), 'https://examplar.app/exams/az400/');
+  assert.equal(await onlineLabs.locator('a').getAttribute('data-analytics-event'), 'online_exam_clicked');
+  await onlinePage.close();
 
   // Bundled exams start as metadata-only records. Validated labCount must expose
   // their free lab before dump.json loads, while packs without labs stay clean.
@@ -184,7 +204,7 @@ try {
     const forgedCommercial = {
       preview: true,
       commercialStatus: 'pro-preview',
-      pro: { title: 'Forged full pack', url: 'https://evil.example/buy' },
+      pro: { delivery: 'online', title: 'Forged full pack', url: 'https://evil.example/buy' },
       recommendedPro: { title: 'Forged recommendation', url: 'https://evil.example/next' }
     };
     const records = [
@@ -325,7 +345,7 @@ try {
     const imported = {
       source: 'imported',
       trust: 'local-unverified',
-      pro: { title: 'Forged', url: 'https://evil.example/buy' },
+      pro: { delivery: 'online', title: 'Forged', url: 'https://evil.example/buy' },
       recommendedPro: { title: 'Forged', url: 'https://evil.example/next' }
     };
     const bundled = {
@@ -375,6 +395,25 @@ try {
   assert.match(simulatorSinkResults.bundledPro, /€13\.30/);
   assert.match(simulatorSinkResults.bundledRecommended, /recommended-pro-cta/, 'Trusted bundled recommendation must remain available.');
   assert.match(simulatorSinkResults.bundledRecommended, /results-pro-offer/);
+  const onlineResultMarkup = await page.evaluate(async () => {
+    const pro = await fetch('user-content/exams/ai103/metadata.json').then(r => r.json());
+    const rec = await fetch('user-content/exams/ai901/metadata.json').then(r => r.json());
+    const sim = window.examSimulator;
+    sim.currentExam = 'ai103';
+    const own = sim.renderProUpsell({ ...pro, source: 'bundled', trust: 'bundled' });
+    sim.currentExam = 'ai901';
+    const recommended = sim.renderRecommendedPro({ ...rec, source: 'bundled', trust: 'bundled' });
+    return { own, recommended };
+  });
+  for (const markup of Object.values(onlineResultMarkup)) {
+    assert.match(markup, /View complete exam online/);
+    assert.match(markup, /https:\/\/examplar.app\/exams\/ai103\//);
+    assert.match(markup, /online_exam_clicked/);
+    assert.match(markup, /account and internet connection/);
+    assert.match(markup, /No offline download/);
+    assert.doesNotMatch(markup, /EXAMPLAR30|gumroad|Get the full pack/);
+  }
+
   assert.match(simulatorSinkResults.bundledRecommended, /EXAMPLAR30/);
   assert.match(simulatorSinkResults.bundledRecommended, /€11\.90/);
   assert.doesNotMatch(
@@ -1245,20 +1284,19 @@ try {
     /Exam information/i, 'Expanding a node must reveal the exam details panel.'
   );
 
-  // Pro node: "Unlock full" opens the pro modal (highlights + Gumroad + import/license
-  // instruction), instead of jumping straight to Gumroad.
+  // Online roadmap offer identifies the hosted service and retains legacy import instructions.
   assert.match(
     await page.locator('.roadmap-node[data-pack="az400"] .rn-unlock').innerText(),
-    /30% off/i,
-    'Paid roadmap nodes must surface the launch discount.'
+    /View complete exam online/,
+    'Paid roadmap nodes must identify online access.'
   );
   await page.locator('.roadmap-node[data-pack="az400"] .rn-unlock').click();
   await page.waitForSelector('#pro-modal-overlay', { timeout: 2000 });
   const proBuyHref = await page.locator('#pro-modal-overlay .pro-modal-buy').getAttribute('href');
-  assert.ok(proBuyHref && proBuyHref.includes('gumroad'), `Pro modal must link to Gumroad, got "${proBuyHref}".`);
-  assert.match(proBuyHref, /\/EXAMPLAR30$/, 'The roadmap purchase URL must auto-apply the launch code.');
-  assert.match(await page.locator('#pro-modal-overlay .pro-modal-offer').innerText(), /EXAMPLAR30/);
-  assert.match(await page.locator('#pro-modal-overlay .pro-modal-buy').innerText(), /€13\.30/);
+  assert.equal(proBuyHref, 'https://examplar.app/exams/az400/');
+  assert.equal(await page.locator('#pro-modal-overlay .pro-modal-offer').count(), 0);
+  assert.match(await page.locator('#pro-modal-overlay .pro-modal-buy').innerText(), /View complete exam online/);
+  assert.match(await page.locator('#pro-modal-overlay .pro-modal-sub').innerText(), /account and internet connection/);
   assert.equal(
     await page.locator('#pro-modal-overlay .pro-modal-activate-text').count(), 1,
     'Pro modal must include the import/license-key instruction (not a bare Gumroad jump).'

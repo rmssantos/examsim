@@ -186,14 +186,7 @@
     "title": "AZ-104 Complete",
     "questions": 300,
     "labCount": 8,
-    "price": "19 EUR",
-    "url": "https://examplar.gumroad.com/l/az104-complete/EXAMPLAR30",
-    "promotion": {
-      "label": "Launch offer",
-      "discountPercent": 30,
-      "code": "EXAMPLAR30",
-      "limited": true
-    },
+    "url": "https://examplar.app/exams/az104/",
     "highlights": [
       "300+ original questions across every exam objective",
       "8 guided hands-on Azure CLI labs",
@@ -201,6 +194,7 @@
       "Study mode with spaced repetition and weak-area focus",
       "Coverage map so you see nothing is missing",
       "Free updates when the exam changes"
-    ]
+    ],
+    "delivery": "online"
   }
 }

@@ -113,14 +113,8 @@
   "recommendedPro": {
     "examId": "ai103",
     "title": "AI-103 Complete",
-    "url": "https://examplar.gumroad.com/l/ai103-complete/EXAMPLAR30",
-    "price": "17 EUR",
-    "promotion": {
-      "label": "Launch offer",
-      "discountPercent": 30,
-      "code": "EXAMPLAR30",
-      "limited": true
-    },
-    "blurb": "Passed the AI fundamentals? Level up to Azure AI Apps and Agents Developer with the AI-103 Complete pack."
+    "url": "https://examplar.app/exams/ai103/",
+    "blurb": "Passed the AI fundamentals? Level up to Azure AI Apps and Agents Developer with the AI-103 Complete pack.",
+    "delivery": "online"
   }
 }

@@ -44,21 +44,12 @@
         "name": "Examplar",
         "url": "https://examplar.app/"
       },
-      "offers": [
-        {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "EUR",
-          "category": "Free"
-        },
-        {
-          "@type": "Offer",
-          "price": "19",
-          "priceCurrency": "EUR",
-          "category": "Full pack",
-          "url": "https://examplar.gumroad.com/l/az104-complete/EXAMPLAR30"
-        }
-      ],
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "category": "Free"
+      },
       "hasCourseInstance": {
         "@type": "CourseInstance",
         "courseMode": "online",
@@ -96,7 +87,7 @@
           "name": "Is the AZ-104 practice exam free?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The 20-question AZ-104 preview is free, with no account. The complete 300-question pack is a one-time 19 EUR."
+            "text": "The 20-question AZ-104 preview is free and works without an account. The complete exam is a separate paid online service requiring an account and internet connection. No offline download. See the hosted service for current pricing."
           }
         },
         {
@@ -120,7 +111,7 @@
           "name": "Does my data stay private?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Questions, answers, imported content, and progress remain in your browser. The public site uses limited opt-out product telemetry; local and private self-hosted use does not initialize analytics."
+            "text": "In this local simulator, questions, answers, imported content, and progress remain in your browser. The public site uses limited opt-out product telemetry; local and private self-hosted use does not initialize analytics. The separate paid online service has its own account and storage policy."
           }
         },
         {
@@ -128,7 +119,7 @@
           "name": "How many AZ-104 questions are included?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The free preview includes 20 questions. The full AZ-104 Complete pack includes 300 questions with detailed explanations and study mode."
+            "text": "The local preview includes 20 questions. The online AZ-104 Complete includes 300 questions."
           }
         }
       ]
@@ -169,7 +160,7 @@
           <span class="landing-kicker"><i aria-hidden="true" class="fas fa-circle-check"></i> Free preview</span>
           <h1>AZ-104 Practice Exam</h1>
           <p class="landing-subhead">Microsoft Azure Administrator</p>
-          <p class="landing-intro">Free 20-question preview of Microsoft Azure Administrator. Original, syllabus-aligned questions you can run in your browser, with no account and offline access after the app is cached. Unlock the complete 300-question pack for detailed explanations and study mode.</p>
+          <p class="landing-intro">Free 20-question preview of Microsoft Azure Administrator. Original, syllabus-aligned questions you can run in your browser, with no account and offline access after the app is cached. The complete exam is a separate online service requiring an account and internet connection; no offline download.</p>
           <div class="hero-cta-row">
             <a class="landing-cta" href="../../exam.html?exam=az104&amp;session=diagnostic&amp;count=10" data-analytics-event="landing_cta_clicked" data-analytics-exam="az104" data-analytics-action="diagnostic"><i aria-hidden="true" class="fas fa-stethoscope"></i> Start 10-question diagnostic</a>
             <a class="landing-cta-ghost landing-cta-secondary" href="../../exam.html?exam=az104" data-analytics-event="landing_cta_clicked" data-analytics-exam="az104" data-analytics-action="full"><i aria-hidden="true" class="fas fa-play"></i> Start full preview</a>
@@ -250,13 +241,8 @@
       <p>Follow each lab's prerequisites, licensing notes, cost guidance, and clean-up actions. Your account, your cost: Examplar is not responsible for external service charges.</p>
     </section>
     <section class="exam-pro" aria-labelledby="pro-h">
-      <h2 id="pro-h">Get AZ-104 Complete</h2>
-      <p>Unlock all 300 questions with detailed explanations for every answer and study mode.</p>
-      <div class="pro-offer">
-        <div class="pro-offer-top"><span>Launch offer</span><strong>30% off</strong></div>
-        <div class="pro-offer-prices"><s>19.00 EUR</s><span aria-hidden="true">→</span><strong>13.30 EUR</strong> + taxes</div>
-        <div class="pro-offer-meta">Code <code>EXAMPLAR30</code> · Limited launch offer</div>
-      </div>
+      <h2 id="pro-h">AZ-104 Complete online</h2>
+      <p>Practise all 300 questions with detailed explanations in the online service. Requires an account and internet connection. No offline download; an online licence does not activate a local pack. See the hosted service for current pricing.</p>
     <ul class="pro-highlights">
       <li>300+ original questions across every exam objective</li>
       <li>8 guided hands-on Azure CLI labs</li>
@@ -265,13 +251,14 @@
       <li>Coverage map so you see nothing is missing</li>
       <li>Free updates when the exam changes</li>
     </ul>
-      <a class="pro-cta" href="https://examplar.gumroad.com/l/az104-complete/EXAMPLAR30" rel="nofollow noopener" target="_blank" data-analytics-event="pro_purchase_clicked" data-analytics-exam="az104" data-analytics-placement="exam_landing">Unlock the full pack — 13.30 EUR + taxes</a>
+      <a class="pro-cta" href="https://examplar.app/exams/az104/" rel="nofollow noopener" target="_blank" data-analytics-event="online_exam_clicked" data-analytics-exam="az104" data-analytics-placement="exam_landing">View complete exam online</a>
+      <p>Previously bought an offline pack? Import that file with its original decryption key in the local simulator.</p>
     </section>
     <section class="exam-section faq" aria-labelledby="faq-h">
       <h2 id="faq-h">Frequently asked questions</h2>
       <details class="faq-item">
         <summary>Is the AZ-104 practice exam free?</summary>
-        <p>The 20-question AZ-104 preview is free, with no account. The complete 300-question pack is a one-time 19 EUR.</p>
+        <p>The 20-question AZ-104 preview is free and works without an account. The complete exam is a separate paid online service requiring an account and internet connection. No offline download. See the hosted service for current pricing.</p>
       </details>
       <details class="faq-item">
         <summary>Are these real AZ-104 exam questions?</summary>
@@ -283,11 +270,11 @@
       </details>
       <details class="faq-item">
         <summary>Does my data stay private?</summary>
-        <p>Questions, answers, imported content, and progress remain in your browser. The public site uses limited opt-out product telemetry; local and private self-hosted use does not initialize analytics.</p>
+        <p>In this local simulator, questions, answers, imported content, and progress remain in your browser. The public site uses limited opt-out product telemetry; local and private self-hosted use does not initialize analytics. The separate paid online service has its own account and storage policy.</p>
       </details>
       <details class="faq-item">
         <summary>How many AZ-104 questions are included?</summary>
-        <p>The free preview includes 20 questions. The full AZ-104 Complete pack includes 300 questions with detailed explanations and study mode.</p>
+        <p>The local preview includes 20 questions. The online AZ-104 Complete includes 300 questions.</p>
       </details>
     </section>
     <section class="exam-section" aria-labelledby="more-h">

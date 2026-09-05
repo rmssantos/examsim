@@ -239,7 +239,7 @@
 		const promotion = window.ExamApp.getPromotionOffer?.(node.meta && node.meta.pro);
 		const unlock = node.isPro
 			? '<button type="button" class="rn-cta action-btn ghost rn-unlock">' +
-				(promotion ? escapeHtml(promotion.discountPercent + '% off · Unlock') : 'Unlock full') + '</button>'
+				(node.meta?.pro?.delivery === 'online' ? 'View complete exam online' : promotion ? escapeHtml(promotion.discountPercent + '% off · Unlock') : 'Unlock full') + '</button>'
 			: '';
 		// A passed-in-app node is done by achievement; only offer a manual tick when there is
 		// no passing attempt yet, so the control never contradicts a real result.
@@ -324,7 +324,9 @@
 	}
 	function onProKeydown(e) { if (e.key === 'Escape') closeProModal(); }
 	function openProModal(node) {
+		if (window.ExamApp.isBundledTrustedExam?.(node.meta) !== true) return;
 		const pro = (node.meta && node.meta.pro) || {};
+		const online = pro.delivery === 'online';
 		const promotion = window.ExamApp.getPromotionOffer?.(pro);
 		const promotionHtml = promotion
 			? '<div class="pro-modal-offer">' +
@@ -341,20 +343,20 @@
 		overlay.id = 'pro-modal-overlay';
 		const name = node.meta.name || node.id.toUpperCase();
 		overlay.innerHTML =
-			'<div class="pro-modal" role="dialog" aria-modal="true" aria-label="Unlock the full pack">' +
+			'<div class="pro-modal" role="dialog" aria-modal="true" aria-label="' + (online ? 'Complete exam online' : 'Unlock the full pack') + '">' +
 				'<button type="button" class="pro-modal-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>' +
 				'<h2 class="pro-modal-title">' + escapeHtml(pro.title || (name + ' Complete')) + '</h2>' +
-				'<p class="pro-modal-sub">You are viewing the free preview. Unlock the complete ' + escapeHtml(name) + ' pack.</p>' +
+				'<p class="pro-modal-sub">' + (online ? 'The complete exam is an online service. Requires an account and internet connection. No offline download; an online licence does not activate a local pack.' : 'You are viewing the free preview. Unlock the complete ' + escapeHtml(name) + ' pack.') + '</p>' +
 				promotionHtml +
 				(Array.isArray(pro.highlights) && pro.highlights.length
 					? '<ul class="pro-modal-list">' + pro.highlights.map(h => '<li><i class="fas fa-check" aria-hidden="true"></i> ' + escapeHtml(h) + '</li>').join('') + '</ul>'
 					: '') +
-				'<a class="pro-modal-buy" href="' + escapeHtml(window.ExamApp.safeExternalUrl(pro.url) || '#') + '" target="_blank" rel="noopener" data-analytics-event="pro_purchase_clicked" data-analytics-exam="' + escapeHtml(node.id) + '" data-analytics-placement="roadmap_modal">' +
-					'<i class="fas fa-store" aria-hidden="true"></i> Get the full pack' +
-					(promotion ? ' — ' + escapeHtml(promotion.offerPrice) + ' + taxes' : (pro.price ? ' (' + escapeHtml(pro.price) + ')' : '')) + '</a>' +
+				'<a class="pro-modal-buy" href="' + escapeHtml(window.ExamApp.safeExternalUrl(pro.url) || '#') + '" target="_blank" rel="noopener" data-analytics-event="' + (online ? 'online_exam_clicked' : 'pro_purchase_clicked') + '" data-analytics-exam="' + escapeHtml(node.id) + '" data-analytics-placement="roadmap_modal">' +
+					'<i class="fas fa-store" aria-hidden="true"></i> ' + (online ? 'View complete exam online' : 'Get the full pack') +
+					(online ? '' : promotion ? ' — ' + escapeHtml(promotion.offerPrice) + ' + taxes' : (pro.price ? ' (' + escapeHtml(pro.price) + ')' : '')) + '</a>' +
 				'<div class="pro-modal-divider"></div>' +
-				'<p class="pro-modal-activate-text">Already purchased? Import your pack file and enter your license key on the homepage to activate it on this device.</p>' +
-				'<a class="pro-modal-import" href="' + escapeHtml((window.ExamApp?.router?.buildUrl?.('home')) || 'index.html') + '"><i class="fas fa-file-import" aria-hidden="true"></i> Import on the homepage</a>' +
+				'<p class="pro-modal-activate-text">Previously bought an offline pack? Import that file with its original decryption key on the homepage. New online licences are activated on examplar.app using the purchase email.</p>' +
+				'<a class="pro-modal-import" href="' + escapeHtml((window.ExamApp?.router?.buildUrl?.('home')) || 'index.html') + '"><i class="fas fa-file-import" aria-hidden="true"></i> Import previous offline pack</a>' +
 			'</div>';
 		document.body.appendChild(overlay);
 		overlay.addEventListener('click', (e) => { if (e.target === overlay) closeProModal(); });
