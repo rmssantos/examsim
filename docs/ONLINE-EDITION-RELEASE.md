@@ -18,7 +18,7 @@ Before publishing this branch:
    simulator. Determine its optional public-demo address before changing CNAME.
    Review canonical URLs, sitemap, redirects, PWA scope/cache, approved telemetry
    hostnames, and the old landing URLs at that time.
-4. Preserve the historical AB-620 buyer's offline file/key and access to this
+4. Preserve historical offline buyers' existing files, keys and access to this
    standalone edition. Do not replace, revoke, or publish changes to historical
    merchant files or receipts as part of this public repository update.
 5. Verify the released local download offline, imported/legacy packs, all eight

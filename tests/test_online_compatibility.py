@@ -59,6 +59,10 @@ for(const [host, protocol, optOut] of [['examplar.app','https:',false],['localho
  handlers.click({target:{closest(){return cta}},preventDefault(){throw new Error('Online navigation must remain native')}});
  if(cta.href!==href)throw new Error('Online links must not carry identifiers');
  api.trackOnlineExamClicked('secret@example.com',{placement:'https://secret.example'});
+ ctx.window.userExams={'private-label-outside-catalogue':{source:'bundled',trust:'bundled'},az104:{source:'imported',trust:'local-unverified'}};
+ api.trackOnlineExamClicked('private-label-outside-catalogue');
+ api.trackOnlineExamClicked('ai103',{sourceExam:'private-label-outside-catalogue'});
+ api.trackOnlineExamClicked('az104');
  all.push(sent);
 }
 console.log(JSON.stringify(all));
@@ -67,13 +71,15 @@ console.log(JSON.stringify(all));
                                 capture_output=True, text=True)
         events = json.loads(result.stdout)
         self.assertIsInstance(events[0], list, 'online event API is missing')
-        self.assertEqual(1, len(events[0]))
+        self.assertEqual(2, len(events[0]))
         event = events[0][0]
         self.assertEqual('online_exam_clicked', event['name'])
         self.assertEqual('homepage_modal', event['properties']['placement'])
         self.assertEqual('ai901', event['properties']['source_exam_id'])
         self.assertNotIn('secret', json.dumps(event))
         self.assertNotIn('private', json.dumps(event))
+        self.assertNotIn('source_exam_id', events[0][1]['properties'])
+        self.assertNotIn('private-label-outside-catalogue', json.dumps(events))
         self.assertEqual([[], [], [], []], events[1:])
 
 

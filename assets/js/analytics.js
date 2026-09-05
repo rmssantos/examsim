@@ -694,11 +694,11 @@
 
     function trackOnlineExamClicked(examId, details = {}) {
         const properties = getExamProperties(examId);
-        if (properties.exam_source !== 'bundled') return false;
+        if (properties.exam_source !== 'bundled' || !publicExamIds.has(properties.exam_id)) return false;
         const placement = String(details?.placement || '');
         if (purchasePlacements.has(placement) || placement === 'labs_empty') properties.placement = placement;
         const sourceExam = getExamProperties(details?.sourceExam);
-        if (details?.sourceExam && sourceExam.exam_source === 'bundled' && sourceExam.exam_id !== properties.exam_id) {
+        if (details?.sourceExam && sourceExam.exam_source === 'bundled' && publicExamIds.has(sourceExam.exam_id) && sourceExam.exam_id !== properties.exam_id) {
             properties.source_exam_id = sourceExam.exam_id;
         }
         return trackEvent('online_exam_clicked', properties);
