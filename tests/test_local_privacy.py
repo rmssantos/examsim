@@ -1,5 +1,6 @@
 """The downloadable edition must not contain a configured telemetry client."""
 
+import json
 import re
 import unittest
 from pathlib import Path
@@ -9,6 +10,23 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LocalPrivacyTests(unittest.TestCase):
+    def test_every_landing_discloses_the_local_edition_without_legacy_telemetry_claims(self):
+        exam_ids = json.loads((ROOT / "user-content/exams/index.json").read_text(encoding="utf-8"))
+        for exam_id in exam_ids:
+            page = (ROOT / "exams" / exam_id / "index.html").read_text(encoding="utf-8")
+            with self.subTest(exam=exam_id):
+                self.assertNotIn("opt-out", page)
+                self.assertNotIn("uses limited", page)
+                self.assertIn("This local edition sends no analytics or telemetry", page)
+                scripts = re.findall(r'<script type="application/ld\+json">(.*?)</script>', page, re.S)
+                schemas = [json.loads(script) for script in scripts]
+                faq = next(node for schema in schemas for node in schema.get("@graph", [])
+                           if node.get("@type") == "FAQPage")
+                privacy = next(question["acceptedAnswer"]["text"] for question in faq["mainEntity"]
+                               if question["name"] == "Does my data stay private?")
+                self.assertIn("This local edition sends no analytics or telemetry", privacy)
+                self.assertIn("separate paid online service", privacy)
+
     def test_runtime_and_page_sources_have_no_telemetry_wiring(self):
         paths = list((ROOT / "assets/js").glob("*.js"))
         paths += list(ROOT.glob("*.html"))

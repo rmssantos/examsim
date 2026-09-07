@@ -390,8 +390,8 @@ def faq_pairs(meta: dict) -> list:
         (
             "Does my data stay private?",
             "In this local simulator, questions, answers, imported content, and progress remain in your browser. "
-            "The public site uses limited opt-out product telemetry; local and private "
-            "self-hosted use sends no analytics or telemetry. The separate paid online service has its own account and storage policy.",
+            "This local edition sends no analytics or telemetry on any hostname. "
+            "The separate paid online service has its own account and storage policy.",
         ),
         (f"How many {code} questions are included?", count_answer),
     ]
@@ -641,7 +641,7 @@ def render_exam_page(meta: dict, all_exams: list, template: str) -> str:
         intro = (
             f"Practice for {full} with original, syllabus-aligned questions. No account "
             "is required, and the app remains available offline after its files are cached. "
-            "The public site uses limited opt-out telemetry."
+            "This local edition sends no analytics or telemetry."
         )
     else:
         count = meta.get("totalQuestions") or meta.get("questionCount")
