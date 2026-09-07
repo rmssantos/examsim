@@ -494,13 +494,6 @@ class ContentAndReleaseMetadataTests(unittest.TestCase):
         self.assertEqual(set(stems), {47, 115})
         self.assertNotEqual(stems[47], stems[115])
 
-    def test_privacy_document_lists_every_public_analytics_exam(self):
-        analytics = (ROOT / "assets" / "js" / "analytics.js").read_text(encoding="utf-8")
-        public_ids = analytics.split("publicExamIds: Object.freeze([", 1)[1].split("])", 1)[0]
-        public_ids = [value.strip(" '\"\r\n") for value in public_ids.split(",")]
-        privacy = (ROOT / "PRIVACY-AND-STORAGE.md").read_text(encoding="utf-8").lower()
-        for exam_id in public_ids:
-            self.assertIn(f"`{exam_id}`", privacy)
 
     def test_live_pro_pack_metadata_excludes_internal_review_statuses(self):
         az104 = json.loads(

@@ -78,21 +78,15 @@ class AI103GuideTests(unittest.TestCase):
                 f'<link rel="canonical" href="https://examplar.app/guides/{slug}/">',
                 page,
             )
-            self.assertIn("assets/js/analytics.js", page)
-            self.assertEqual(page.count('data-analytics-event="landing_cta_clicked"'), 1)
+            self.assertNotIn("assets/js/analytics.js", page)
+            self.assertEqual(page.count('class="landing-cta"'), 1)
             self.assertIn(
                 f'exam.html?exam={guide["exam_id"]}&amp;session=diagnostic&amp;count=10',
                 page,
             )
             self.assertIn(guide["cta_label"], page)
             self.assertNotIn("real exam questions", page.lower())
-            self.assertEqual(
-                page.count('data-analytics-event="github_repository_clicked"'),
-                1,
-            )
             self.assertIn('href="https://github.com/rmssantos/examsim"', page)
-            self.assertIn('data-analytics-placement="guide_end"', page)
-            self.assertIn(f'data-analytics-exam="{guide["exam_id"]}"', page)
             self.assertIn('target="_blank" rel="noopener noreferrer"', page)
             self.assertIn("Found this guide useful?", page)
 

@@ -1,5 +1,4 @@
 import json
-import re
 import subprocess
 import sys
 import unittest
@@ -135,12 +134,6 @@ class PackRegistrySyncTests(unittest.TestCase):
             json.loads((ROOT / "user-content" / "exams" / "index.json").read_text(encoding="utf-8"))
         )
 
-    def test_analytics_public_exam_ids_match_index(self):
-        analytics = (ROOT / "assets" / "js" / "analytics.js").read_text(encoding="utf-8")
-        match = re.search(r"publicExamIds:\s*Object\.freeze\(\[(.*?)\]\)", analytics, re.S)
-        self.assertIsNotNone(match, "publicExamIds list not found in analytics.js")
-        ids = set(re.findall(r"'([^']+)'", match.group(1)))
-        self.assertEqual(ids, self.index, "analytics.js publicExamIds drifted from index.json")
 
     def test_gitignore_allowlists_every_indexed_pack(self):
         # user-content/exams/* ignores everything; each pack needs BOTH re-include lines:

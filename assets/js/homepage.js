@@ -1213,7 +1213,6 @@ unlockButton.appendChild(this.createIcon('fas fa-unlock'));
 unlockButton.appendChild(document.createTextNode(online ? ' View complete exam online' : promotion ? ` Unlock ${promotion.offerPrice} + taxes` : ' Unlock'));
 unlockButton.addEventListener('click', (e) => {
 e.stopPropagation();
-if (!online) window.ExamApp?.analytics?.trackProUnlockClicked?.(examId);
 this.showProModal(examId, examData);
 });
 if (online) actions.appendChild(studyButton);
@@ -1284,7 +1283,6 @@ const online = pro.delivery === 'online';
 const promotion = this.getPromotionOffer(pro);
 const returnFocus = (document.activeElement instanceof HTMLElement) ? document.activeElement : null;
 this.closeProModal();
-if (!online) window.ExamApp?.analytics?.trackProModalOpened?.(examId);
 
 const overlay = document.createElement('div');
 overlay.className = 'pro-modal-overlay';
@@ -1357,9 +1355,6 @@ buy.className = 'pro-modal-buy';
 buy.href = window.ExamApp.safeExternalUrl(pro.url) || '#';
 buy.target = '_blank';
 buy.rel = 'noopener';
-buy.setAttribute('data-analytics-event', online ? 'online_exam_clicked' : 'pro_purchase_clicked');
-buy.setAttribute('data-analytics-exam', examId);
-buy.setAttribute('data-analytics-placement', 'homepage_modal');
 buy.appendChild(this.createIcon('fas fa-store'));
 buy.appendChild(document.createTextNode(
 	online ? ' View complete exam online' : promotion ? ` Get the full pack — ${promotion.offerPrice} + taxes` : ' Get the full pack' + (pro.price ? ' (' + pro.price + ')' : '')
@@ -1381,7 +1376,6 @@ importBtn.className = 'pro-modal-import';
 importBtn.appendChild(this.createIcon('fas fa-file-import'));
 importBtn.appendChild(document.createTextNode(online ? ' Import previous offline pack' : ' Import & activate'));
 importBtn.addEventListener('click', () => {
-window.ExamApp?.analytics?.trackProImportClicked?.(examId);
 this.closeProModal();
 this.triggerFileImport();
 });
@@ -2266,7 +2260,6 @@ overlay.addEventListener('click', event => {
 	if (event.target === overlay) overlay.remove();
 });
 document.body.appendChild(overlay);
-window.ExamApp?.analytics?.trackEvent('attempt_history_opened');
 }
 
 createModalCloseButton(label, onClick) {
@@ -2413,10 +2406,6 @@ overlay.addEventListener('click', event => {
 	if (event.target === overlay) overlay.remove();
 });
 document.body.appendChild(overlay);
-window.ExamApp?.analytics?.trackAttemptReviewOpened?.(examId, {
-	hasQuestionDetails: true,
-	questionCount: attempt.questionResults.length
-});
 }
 
 createAttemptReviewItem(examId, result) {
@@ -2516,7 +2505,6 @@ const routeParams = { exam: examId, mode: 'study', focus: 'missed' };
 if (Array.isArray(attempt.modules) && attempt.modules.length > 0) {
 	routeParams.modules = JSON.stringify(attempt.modules);
 }
-window.ExamApp?.analytics?.trackStudyMissedStarted?.(examId, { questionCount: questionIds.length });
 const url = window.ExamApp.router?.buildUrl('study', routeParams)
 	|| `exam.html?${new URLSearchParams(routeParams).toString()}`;
 window.open(url, '_blank');
@@ -2721,16 +2709,11 @@ document.getElementById('hero-manage-exams')?.addEventListener('click', () => th
 
 async handleFiles(files) {
 for (const file of files) {
-window.ExamApp?.analytics?.trackImportStarted(file);
 try {
-	const imported = await this.importFile(file);
-	if (imported !== false) {
-		window.ExamApp?.analytics?.trackImportCompleted(file);
-	}
+	await this.importFile(file);
 } catch (error) {
 	this.hideImportProgress();
 	console.error(`Failed to import ${file.name}:`, error);
-	window.ExamApp?.analytics?.trackImportFailed(file, error.name || 'import_error');
 	window.showCustomAlert('Import Failed', `Failed to import ${file.name}: ${error.message}`, 'error');
 }
 }

@@ -65,24 +65,18 @@
         </section>
       </div>
 
-      <h2>Online analytics</h2>
-      <p>The public deployment sends limited product telemetry events to Azure Application Insights. Analytics is enabled by default and can be disabled from the Privacy settings control. Authorized maintainers can inspect event timestamps and coarse Azure-derived client and location metadata for operational analysis. Analytics is not initialized on localhost, private self-hosted URLs, or file URLs.</p>
-      <ul>
-        <li>Collected: page views, exam start/completion events, Study Mode session starts, one first-answer interaction per Study session, and completion aggregates, attempt review and missed-question study actions, import success/failure and coarse file size/type buckets, progress and editor import/export actions, unlock, pro modal, purchase-link, and import-activation counts, plus distinct online-exam link clicks (which do not confirm a purchase or activation), results-screen upsell and pass-story link counts, GitHub repository link counts from post-result and guide CTAs, generated landing-page CTA, configured session, and exam first-answer interaction counts, pass/fail and coarse score/duration buckets, simple sanitized labels from approved campaign parameters (<code>ref</code>, <code>utm_source</code>, <code>utm_medium</code>, <code>utm_campaign</code>, <code>utm_content</code>), and the external referrer hostname. Values resembling emails, URLs, or paths are discarded.</li>
-        <li>Sanitized campaign labels and the external referrer hostname are kept in <code>sessionStorage</code> for the current tab so later events can retain their acquisition context. A later URL with explicit campaign parameters replaces that tab record. It contains no visitor ID, timestamp, arbitrary query parameter, or full referrer URL. Opting out clears the tab attribution.</li>
-        <li>Azure Application Insights temporarily uses the sender IP to derive coarse country, region, and city information, then does not store the full IP address under the configured default behavior. Azure can also attach browser, operating system, device type, and device model metadata to telemetry.</li>
-        <li>Bundled exam labels are restricted to <code>ab730</code>, <code>ab731</code>, <code>ab620</code>, <code>sc900</code>, <code>az900</code>, <code>az104</code>, <code>saac03</code>, <code>clfc02</code>, <code>ai901</code>, <code>az305</code>, <code>az400</code>, <code>dp900</code>, <code>dp700</code>, <code>ai103</code>, and <code>sc300</code>. Every other exam is reported only as <code>imported</code>.</li>
-        <li>Study start and first-answer events contain only bounded exam/session context. Study completion telemetry sends session-level question, answered, and correct counts plus coarse accuracy and duration buckets. These aggregates are not linked to question identifiers or content; however, results from very small Study sessions may be inferable. Examplar does not send individual answer events, question IDs or text, options, answer state, or selected responses.</li>
-        <li>Not collected: full referrer URLs or paths, arbitrary query parameters, imported content, filenames, personal study records, persistent visitor IDs, names, or emails. The Study first-answer event is emitted once per Study session; exam first-answer events are bounded interaction counts too.</li>
-        <li>You can turn analytics off from the Privacy settings control on the online site.</li>
-        <li>The analytics workspace is configured with 30-day retention.</li>
-      </ul>
+      <h2>No analytics or telemetry</h2>
+      <p>This final local edition contains no telemetry client, tracking hooks, ingestion configuration, campaign storage, or ad-click forwarding on any hostname. Local progress statistics, attempt review, and missed-question study actions remain on your device. There is no analytics setting to opt out of.</p>
+      <p>Earlier downloads and historical commits retain their original behavior. Update the app files and reload to replace old cached assets. Legacy analytics preferences left by an old version are unused.</p>
 
-      <h2>External checkout</h2>
-      <p>Purchase links open Gumroad in a new tab. On that click, Examplar adds one coarse <code>referrer</code> domain so a later sale can be attributed to a channel: an allowlisted campaign source such as Google or Reddit, the sanitized external referrer hostname, or <code>examplar.app</code> when no source is available. For a Google Ads visit, Examplar also accepts the bounded click identifiers <code>gclid</code>, <code>gbraid</code>, and <code>wbraid</code>, keeps them in <code>sessionStorage</code> for the current tab, and forwards them only to the Gumroad purchase URL. They are not added to Azure product telemetry or persisted across tabs. Gumroad runs the Google Ads purchase tag on its receipt page to attribute a completed order and report its value, currency, and order ID; enhanced conversions are disabled, so Examplar does not configure that tag to send a buyer email. The incoming page URL, referrer path, campaign name/content, answers, progress, and email are not forwarded by Examplar. When analytics is disabled, stored campaign attribution and Google Ads click identifiers are cleared, and Examplar does not add the extra <code>referrer</code> parameter or Google Ads click identifiers to the checkout URL. The parameters are also not added outside the public site. Gumroad separately processes the buyer and payment details entered on its checkout.</p>
+      <h2>Network requests and external links</h2>
+      <p>The browser requests app files and pack resources from your local server. Imported content may reference external images. Following a study resource, GitHub link, or complete-exam link contacts that destination under its own privacy policy. Normal browser referrer rules apply; this edition does not append campaign identifiers, ad-click identifiers, emails, licence keys, answers, or local storage to links.</p>
+      <p>The separately maintained online service has its <a href="https://examplar.app/privacy-and-storage" target="_blank" rel="noopener noreferrer">own privacy policy</a>. A self-hosted server may keep access logs controlled by its operator.</p>
 
       <h2>Imports and editor changes</h2>
-      <p>Dragging an exam file into the app or saving changes in the editor updates only that browser profile. To publish corrections for everyone, export the corrected JSON and open a pull request or GitHub issue.</p>
+      <p>Dragging an exam file into the app or saving changes in the editor updates only that browser profile. Export the corrected JSON for backups or your own fork. This frozen repository remains available to download and does not accept new changes.</p>
+
+      <p>With <code>python server.py</code>, the editor can explicitly upload validated image files to the local pack folder. It does not upload question dumps. The server binds to loopback by default.</p>
 
       <h2>Offline behavior</h2>
       <p>After the app shell is cached, the simulator works offline for the pages and assets already installed by the service worker. This privacy page is cached so the footer link opens as a readable app page instead of downloading a raw file.</p>
@@ -93,8 +87,8 @@
       <h2>Storage locations</h2>
       <ul>
         <li><strong>IndexedDB:</strong> imported exam content, images, image metadata, progress, and recent attempt review summaries.</li>
-        <li><strong>localStorage:</strong> theme, analytics opt-out, exam activation settings, and legacy compatibility mirrors.</li>
-        <li><strong>sessionStorage:</strong> sanitized campaign attribution and bounded Google Ads click identifiers for the current browser tab on the public site.</li>
+        <li><strong>localStorage:</strong> theme, exam activation settings, and legacy compatibility mirrors.</li>
+        <li><strong>sessionStorage:</strong> short-lived local navigation and study selections.</li>
         <li><strong>Cache Storage:</strong> app shell files needed for offline use.</li>
       </ul>
 

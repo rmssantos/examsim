@@ -391,7 +391,7 @@ def faq_pairs(meta: dict) -> list:
             "Does my data stay private?",
             "In this local simulator, questions, answers, imported content, and progress remain in your browser. "
             "The public site uses limited opt-out product telemetry; local and private "
-            "self-hosted use does not initialize analytics. The separate paid online service has its own account and storage policy.",
+            "self-hosted use sends no analytics or telemetry. The separate paid online service has its own account and storage policy.",
         ),
         (f"How many {code} questions are included?", count_answer),
     ]
@@ -530,9 +530,7 @@ def build_pro(meta: dict) -> str:
             'Requires an account and internet connection. No offline download; '
             'an online licence does not activate a local pack. See the hosted service for current pricing.</p>\n'
             f'{highlights_html}'
-            f'      <a class="pro-cta" href="{url}" rel="nofollow noopener" target="_blank" '
-            f'data-analytics-event="online_exam_clicked" data-analytics-exam="{esc(meta["id"])}" '
-            'data-analytics-placement="exam_landing">View complete exam online</a>\n'
+            f'      <a class="pro-cta" href="{url}" rel="nofollow noopener" target="_blank">View complete exam online</a>\n'
             '      <p>Previously bought an offline pack? Import that file with its original '
             'decryption key in the local simulator.</p>\n'
             '    </section>'
@@ -560,9 +558,7 @@ def build_pro(meta: dict) -> str:
         f"study mode.{price_html}</p>\n"
         f"{offer_html}"
         f"{highlights_html}"
-        f'      <a class="pro-cta" href="{url}" rel="nofollow noopener" target="_blank" '
-        f'data-analytics-event="pro_purchase_clicked" data-analytics-exam="{esc(meta["id"])}" '
-        'data-analytics-placement="exam_landing">'
+        f'      <a class="pro-cta" href="{url}" rel="nofollow noopener" target="_blank">'
         f"{cta_label}</a>\n"
         "    </section>"
     )
@@ -764,7 +760,7 @@ def render_hub(all_exams: list) -> str:
   <meta name="theme-color" content="{THEME_COLOR}">
   <meta name="description" content="{esc(description)}">
   <link rel="canonical" href="{SITE}/exams/">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.applicationinsights.azure.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Examplar">
   <meta property="og:title" content="All practice exams | Examplar">
@@ -778,10 +774,8 @@ def render_hub(all_exams: list) -> str:
   <title>All practice exams | Examplar</title>
   <link rel="stylesheet" href="{root}assets/vendor/fontawesome/css/all.min.css">
   <link rel="stylesheet" href="{root}assets/css/exam-landing.css">
-  <link rel="stylesheet" href="{root}assets/css/analytics-privacy.css">
   <script src="{root}assets/js/legal-page.js" defer></script>
   <script src="{root}assets/js/utils.js" defer></script>
-  <script src="{root}assets/js/analytics.js" defer></script>
 </head>
 <body class="exam-landing">
   <header class="cr-topbar">
