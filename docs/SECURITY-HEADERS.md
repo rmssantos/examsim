@@ -1,13 +1,14 @@
-# Production security headers
+# Optional self-hosting security headers
 
 The HTML pages include a meta CSP so local and static use gets a baseline policy.
-The current GitHub Pages deployment does not configure HTTP response headers, so
-deployments behind a configurable production edge should add the headers below.
+This frozen repository has no GitHub Pages deployment. If you publish a fork
+behind your own configurable server, consider the headers below. The separate
+official online service manages its own response headers.
 
 ## Recommended baseline
 
 ```text
-Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.applicationinsights.azure.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
 Referrer-Policy: strict-origin-when-cross-origin
 X-Content-Type-Options: nosniff
 X-Frame-Options: DENY

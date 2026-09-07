@@ -1,3 +1,14 @@
+# Frozen local edition
+
+This repository is the final local snapshot as of 8 September 2026. It remains
+available to download and fork under its existing licence, but is no longer
+maintained and does not accept new issues or pull requests. Future development
+of the separate hosted service is maintained privately.
+
+The contributor and validation guidance below is retained for fork maintainers
+and as a historical record; references to submitting upstream changes describe
+the former workflow. Do not submit private content or personal data.
+
 # Contributing to Examplar
 
 Contributions are welcome for simulator code, accessibility, documentation,

@@ -1,5 +1,11 @@
 # Distributing Exam Packs
 
+> Frozen local edition: download the source ZIP and run `python server.py`
+> from the extracted folder. It includes the server and editor image endpoint.
+> The optional `_site` artifact contains only static files; serve it with your
+> own HTTP server, and expect no editor upload endpoint. This repository does
+> not deploy a public host or contain a telemetry client.
+
 Examplar separates the simulator from exam content. A pack can be imported into
 the public site, used locally, or installed in a self-hosted copy.
 

@@ -5,6 +5,9 @@ labels: [bug]
 body:
   - type: markdown
     attributes:
+      value: "This is the frozen local edition. Upstream issues are closed; this template remains for forks. Do not include private packs, licence keys, buyer details, or browser exports."
+  - type: markdown
+    attributes:
       value: |
         Thanks for helping improve Exam Simulator. Please do not attach proprietary exam packs, official exam dumps, private ZIP files, or personal browser storage exports.
 
@@ -54,7 +57,7 @@ body:
       options:
         - Local Python server
         - Static file:// mode
-        - GitHub Pages
+        - Self-hosted fork
         - Other
     validations:
       required: true
