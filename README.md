@@ -69,6 +69,12 @@ pack decryption key when prompted. Do not enter a new online licence there.
 The hosted service has its own account, licensing, and storage policy. The local
 storage descriptions below apply to this repository's simulator.
 
+The official `examplar.app` service is deployed separately. This repository does
+not configure that domain or publish to GitHub Pages. Its validation workflow
+still builds and tests the standalone static distribution. To prepare your own
+static host, run `python tools/build_pages_artifact.py --output _site` and serve
+`_site` under your own domain; configure that host’s routing and TLS separately.
+
 ## Privacy Model
 
 Questions, selected answers, imported content, images, progress, and editor
