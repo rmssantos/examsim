@@ -90,7 +90,8 @@ final snapshot; earlier Git history and old downloads retain their original beha
 
 The browser still requests app files from your local server. Following external
 study resources, GitHub, or online-exam links contacts that destination, which
-has its own privacy policy. Imported content can reference external images.
+has its own privacy policy. Pack images are loaded from local or same-origin
+files, or from IndexedDB.
 
 See [PRIVACY-AND-STORAGE.md](PRIVACY-AND-STORAGE.md) for the complete disclosure.
 

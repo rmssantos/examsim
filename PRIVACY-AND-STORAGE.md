@@ -37,9 +37,9 @@ edition does not read or forward them.
 
 ## Network requests and external links
 
-A local server supplies static app files and bundled packs. The app can fetch
-pack resources and images, including external images referenced by imported
-content. Vendored libraries and fonts do not need a runtime CDN.
+A local server supplies static app files and bundled packs. Pack images are
+loaded from local or same-origin files, or from IndexedDB. Vendored libraries
+and fonts do not need a runtime CDN.
 
 Following study resources, GitHub links, or **View complete exam online** opens
 the selected destination. The browser sends normal web requests and may send
