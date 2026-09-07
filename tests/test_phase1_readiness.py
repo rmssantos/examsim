@@ -349,10 +349,9 @@ class SupplyChainTests(unittest.TestCase):
                 for ref in refs:
                     self.assertRegex(ref, r"^[0-9a-f]{40}$")
 
-    def test_dependabot_is_configured_without_duplicate_codeql_workflow(self):
-        dependabot = (ROOT / ".github" / "dependabot.yml").read_text(encoding="utf-8")
-        self.assertIn("package-ecosystem: github-actions", dependabot)
-        self.assertIn("package-ecosystem: npm", dependabot)
+    def test_frozen_edition_has_no_upstream_dependency_update_schedule(self):
+        self.assertFalse((ROOT / ".github" / "dependabot.yml").exists())
+        self.assertTrue((ROOT / ".github" / "workflows" / "validate.yml").is_file())
         self.assertFalse(
             (ROOT / ".github" / "workflows" / "codeql.yml").exists(),
             "The repository uses GitHub CodeQL Default Setup; do not add a conflicting workflow.",

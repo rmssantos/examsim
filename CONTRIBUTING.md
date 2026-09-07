@@ -1,13 +1,18 @@
 # Frozen local edition
 
 This repository is the final local snapshot as of 8 September 2026. It remains
-available to download and fork under its existing licence, but is no longer
-maintained and does not accept new issues or pull requests. Future development
-of the separate hosted service is maintained privately.
+available to download and fork under its existing licence. The frozen code and
+content receive no further updates or upstream code pull requests. Future
+development of the separate hosted service is maintained privately. For online
+support, use the support links currently provided by the hosted service.
 
 The contributor and validation guidance below is retained for fork maintainers
 and as a historical record; references to submitting upstream changes describe
-the former workflow. Do not submit private content or personal data.
+the former workflow, not a commitment to maintain this snapshot. Do not submit
+private content or personal data.
+
+Fork maintainers own their dependency updates. The upstream Dependabot schedule
+is removed; retained validation and security-check guidance can be used by forks.
 
 # Contributing to Examplar
 

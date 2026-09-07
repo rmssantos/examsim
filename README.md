@@ -167,8 +167,8 @@ The editor can:
 - copy image files into a local pack when running through `server.py`.
 
 Browser edits affect only the current browser. Export changes to keep a backup
-or redistribute your own fork under the existing licence. This frozen repository
-does not accept new issues or pull requests.
+or redistribute your own fork under the existing licence. This frozen snapshot
+receives no further upstream code or content updates.
 
 ## Repository Layout
 

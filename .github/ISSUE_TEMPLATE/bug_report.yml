@@ -5,7 +5,7 @@ labels: [bug]
 body:
   - type: markdown
     attributes:
-      value: "This is the frozen local edition. Upstream issues are closed; this template remains for forks. Do not include private packs, licence keys, buyer details, or browser exports."
+      value: "This repository contains the frozen local code, which receives no further code or content updates. For online support, use the support links currently provided by the hosted service. Do not include private packs, licence keys, buyer details, or browser exports."
   - type: markdown
     attributes:
       value: |
