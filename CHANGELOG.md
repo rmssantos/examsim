@@ -23,6 +23,9 @@ Notable public changes are recorded here. Dates use `YYYY-MM-DD`.
 
 ### Changed
 
+- Retired this repository’s GitHub Pages deployment and official-domain binding;
+  local use, legacy offline imports, static builds, and validation remain available.
+
 - Balanced trusted exam sessions against their published objective-domain
   weights, so the 10-question AI-103 diagnostic now covers all five domains.
 - Refreshed the bundled AI-901 metadata for the April 15, 2026 two-domain

@@ -450,7 +450,7 @@ console.log(JSON.stringify({
             "deployment": "github_pages",
             "page": "home",
             "path": "/",
-            "analytics_version": "1.6.0",
+            "analytics_version": "1.7.0",
         }
         for event, specific in zip(events, expected_specific):
             with self.subTest(event=event["name"]):
@@ -545,7 +545,7 @@ console.log(JSON.stringify({
             "deployment": "github_pages",
             "page": "landing",
             "path": "/exams/sc900/",
-            "analytics_version": "1.6.0",
+            "analytics_version": "1.7.0",
         }
         self.assertEqual(
             events[0]["properties"],
@@ -645,7 +645,7 @@ console.log(JSON.stringify({
             "deployment": "github_pages",
             "page": "landing",
             "path": "/exams/sc900/",
-            "analytics_version": "1.6.0",
+            "analytics_version": "1.7.0",
             "exam_id": "sc900",
             "exam_source": "bundled",
         }

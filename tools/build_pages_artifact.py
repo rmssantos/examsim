@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the exact static artifact that may be published to GitHub Pages."""
+"""Build the standalone static distribution for local use or self-hosting."""
 
 import argparse
 import os
@@ -11,7 +11,6 @@ ROOT = Path(__file__).resolve().parents[1]
 
 PUBLIC_FILES = (
     "404.html",
-    "CNAME",
     "PRIVACY-AND-STORAGE.md",
     "editor.html",
     "exam.html",
@@ -109,7 +108,7 @@ def main():
         output = build(args.output)
     except ValueError as error:
         parser.error(str(error))
-    print(f"Built public Pages artifact at {output.relative_to(ROOT)}")
+    print(f"Built standalone static artifact at {output.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

@@ -517,6 +517,8 @@ getProSnapshot(value) {
 if (!value || typeof value !== 'object') return null;
 const snapshot = {};
 const stringLimit = this.metadataLimit('maxMetadataStringLength', 5000);
+const delivery = this.readOwnDataProperty(value, 'delivery');
+if (delivery.valid && delivery.found && delivery.value === 'online') snapshot.delivery = 'online';
 ['title', 'price', 'url'].forEach((field) => {
 	const result = this.readOwnDataProperty(value, field);
 	if (result.valid && result.found && typeof result.value === 'string') {
@@ -645,6 +647,8 @@ getRecommendedProSnapshot(value) {
 if (!value || typeof value !== 'object') return null;
 const snapshot = {};
 const stringLimit = this.metadataLimit('maxMetadataStringLength', 5000);
+const delivery = this.readOwnDataProperty(value, 'delivery');
+if (delivery.valid && delivery.found && delivery.value === 'online') snapshot.delivery = 'online';
 ['examId', 'title', 'url', 'blurb', 'price'].forEach((field) => {
 	const result = this.readOwnDataProperty(value, field);
 	if (result.valid && result.found && typeof result.value === 'string') {
@@ -1085,10 +1089,12 @@ const questionCount = metadata.questionCount || 45;
 const declaredTotalQuestions = Number(metadata.totalQuestions);
 const hasDeclaredTotalQuestions = Number.isFinite(declaredTotalQuestions) && Number.isInteger(declaredTotalQuestions) && declaredTotalQuestions > 0;
 const totalQuestions = hasDeclaredTotalQuestions ? declaredTotalQuestions : questionCount;
+const online = isBundledTrusted && metadata.pro?.delivery === 'online';
 const promotion = isBundledTrusted ? this.getPromotionOffer(metadata.pro) : null;
 
 const card = document.createElement('div');
 card.className = `exam-card ${this.getCardClass(examId)}`;
+if (online) card.classList.add('exam-card--online');
 card.dataset.exam = examId;
 // Keyboard parity for the clickable card body (it selects/previews the exam).
 card.tabIndex = 0;
@@ -1204,12 +1210,13 @@ const unlockButton = document.createElement('button');
 unlockButton.type = 'button';
 unlockButton.className = 'exam-card-unlock';
 unlockButton.appendChild(this.createIcon('fas fa-unlock'));
-unlockButton.appendChild(document.createTextNode(promotion ? ` Unlock ${promotion.offerPrice} + taxes` : ' Unlock'));
+unlockButton.appendChild(document.createTextNode(online ? ' View complete exam online' : promotion ? ` Unlock ${promotion.offerPrice} + taxes` : ' Unlock'));
 unlockButton.addEventListener('click', (e) => {
 e.stopPropagation();
-window.ExamApp?.analytics?.trackProUnlockClicked?.(examId);
+if (!online) window.ExamApp?.analytics?.trackProUnlockClicked?.(examId);
 this.showProModal(examId, examData);
 });
+if (online) actions.appendChild(studyButton);
 actions.appendChild(unlockButton);
 } else {
 actions.appendChild(studyButton);
@@ -1273,10 +1280,11 @@ if (!this.isBundledTrustedExam(examData)) {
 }
 const metadata = this.getExamMetadataSnapshot(examData);
 const pro = metadata.pro || {};
+const online = pro.delivery === 'online';
 const promotion = this.getPromotionOffer(pro);
 const returnFocus = (document.activeElement instanceof HTMLElement) ? document.activeElement : null;
 this.closeProModal();
-window.ExamApp?.analytics?.trackProModalOpened?.(examId);
+if (!online) window.ExamApp?.analytics?.trackProModalOpened?.(examId);
 
 const overlay = document.createElement('div');
 overlay.className = 'pro-modal-overlay';
@@ -1286,7 +1294,7 @@ const dialog = document.createElement('div');
 dialog.className = 'pro-modal';
 dialog.setAttribute('role', 'dialog');
 dialog.setAttribute('aria-modal', 'true');
-dialog.setAttribute('aria-label', 'Unlock the full pack');
+dialog.setAttribute('aria-label', online ? 'Complete exam online' : 'Unlock the full pack');
 
 const closeBtn = document.createElement('button');
 closeBtn.type = 'button';
@@ -1303,7 +1311,7 @@ dialog.appendChild(title);
 
 const sub = document.createElement('p');
 sub.className = 'pro-modal-sub';
-sub.textContent = `You are practicing the free preview. Unlock the complete ${metadata.name || 'exam'} pack.`;
+sub.textContent = online ? 'The complete exam is an online service. Requires an account and internet connection. No offline download; your online licence does not activate a local pack.' : `You are practicing the free preview. Unlock the complete ${metadata.name || 'exam'} pack.`;
 dialog.appendChild(sub);
 
 if (promotion) {
@@ -1349,12 +1357,12 @@ buy.className = 'pro-modal-buy';
 buy.href = window.ExamApp.safeExternalUrl(pro.url) || '#';
 buy.target = '_blank';
 buy.rel = 'noopener';
-buy.setAttribute('data-analytics-event', 'pro_purchase_clicked');
+buy.setAttribute('data-analytics-event', online ? 'online_exam_clicked' : 'pro_purchase_clicked');
 buy.setAttribute('data-analytics-exam', examId);
 buy.setAttribute('data-analytics-placement', 'homepage_modal');
 buy.appendChild(this.createIcon('fas fa-store'));
 buy.appendChild(document.createTextNode(
-	promotion ? ` Get the full pack — ${promotion.offerPrice} + taxes` : ' Get the full pack' + (pro.price ? ' (' + pro.price + ')' : '')
+	online ? ' View complete exam online' : promotion ? ` Get the full pack — ${promotion.offerPrice} + taxes` : ' Get the full pack' + (pro.price ? ' (' + pro.price + ')' : '')
 ));
 dialog.appendChild(buy);
 
@@ -1364,14 +1372,14 @@ dialog.appendChild(divider);
 
 const activateText = document.createElement('p');
 activateText.className = 'pro-modal-activate-text';
-activateText.textContent = 'Already purchased? Import your pack file and enter your license key to activate it on this device.';
+activateText.textContent = online ? 'Previously bought an offline pack? Import that file with its original decryption key. New online licences are activated on examplar.app using the purchase email.' : 'Already purchased? Import your pack file and enter your license key to activate it on this device.';
 dialog.appendChild(activateText);
 
 const importBtn = document.createElement('button');
 importBtn.type = 'button';
 importBtn.className = 'pro-modal-import';
 importBtn.appendChild(this.createIcon('fas fa-file-import'));
-importBtn.appendChild(document.createTextNode(' Import & activate'));
+importBtn.appendChild(document.createTextNode(online ? ' Import previous offline pack' : ' Import & activate'));
 importBtn.addEventListener('click', () => {
 window.ExamApp?.analytics?.trackProImportClicked?.(examId);
 this.closeProModal();

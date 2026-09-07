@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ProPackTests(unittest.TestCase):
-    def test_all_pro_packs_share_launch_promotion(self):
+    def test_all_pro_packs_are_online_only(self):
         exam_ids = (
             "ab620",
             "ai103",
@@ -26,12 +26,6 @@ class ProPackTests(unittest.TestCase):
             "saac03",
             "sc300",
         )
-        expected = {
-            "label": "Launch offer",
-            "discountPercent": 30,
-            "code": "EXAMPLAR30",
-            "limited": True,
-        }
 
         for exam_id in exam_ids:
             with self.subTest(exam_id=exam_id):
@@ -39,11 +33,12 @@ class ProPackTests(unittest.TestCase):
                     (ROOT / f"user-content/exams/{exam_id}/metadata.json").read_text(encoding="utf-8")
                 )
                 pro = meta["pro"]
-                self.assertEqual(pro.get("promotion"), expected)
-                self.assertTrue(pro["url"].startswith("https://examplar.gumroad.com/"))
-                self.assertIn("EXAMPLAR30", pro["url"])
+                self.assertEqual(pro.get("delivery"), "online")
+                self.assertNotIn("promotion", pro)
+                self.assertNotIn("price", pro)
+                self.assertEqual(pro["url"], f"https://examplar.app/exams/{exam_id}/")
 
-    def test_recommended_paid_packs_share_the_target_launch_offer(self):
+    def test_recommended_paid_packs_share_the_target_online_destination(self):
         source_ids = ("ai901", "clfc02", "dp900", "sc900")
 
         for source_id in source_ids:
@@ -59,8 +54,9 @@ class ProPackTests(unittest.TestCase):
                         encoding="utf-8"
                     )
                 )["pro"]
-                self.assertEqual(recommendation.get("price"), target["price"])
-                self.assertEqual(recommendation.get("promotion"), target["promotion"])
+                self.assertEqual(recommendation.get("delivery"), target["delivery"])
+                self.assertNotIn("price", recommendation)
+                self.assertNotIn("promotion", recommendation)
                 self.assertEqual(recommendation["url"], target["url"])
 
     def test_az104_is_a_preview_pack(self):

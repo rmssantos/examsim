@@ -45,7 +45,7 @@ class Ab620PackTests(unittest.TestCase):
         self.assertEqual(self.labs[0]["id"], "lab-ab620-create-agent")
         self.assertEqual(
             self.meta["pro"]["url"],
-            "https://examplar.gumroad.com/l/ab620-complete/EXAMPLAR30",
+            "https://examplar.app/exams/ab620/",
         )
 
     def test_objective_domains_match_current_study_guide(self):

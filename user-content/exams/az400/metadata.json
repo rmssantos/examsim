@@ -186,20 +186,14 @@
   "pro": {
     "title": "AZ-400 Complete",
     "questions": 280,
-    "price": "19 EUR",
-    "url": "https://examplar.gumroad.com/l/az400-complete/EXAMPLAR30",
-    "promotion": {
-      "label": "Launch offer",
-      "discountPercent": 30,
-      "code": "EXAMPLAR30",
-      "limited": true
-    },
+    "url": "https://examplar.app/exams/az400/",
     "highlights": [
       "280 original DevOps scenario questions across every exam objective",
       "Detailed explanation for the correct answer and every distractor",
       "Study mode with spaced repetition and weak-area focus",
       "Coverage map so you see nothing is missing",
       "Free updates when the exam changes"
-    ]
+    ],
+    "delivery": "online"
   }
 }

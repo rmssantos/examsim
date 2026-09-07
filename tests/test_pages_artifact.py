@@ -31,7 +31,6 @@ class PagesArtifactTests(unittest.TestCase):
         actual = {path.name for path in output.iterdir()}
         expected = {
             "404.html",
-            "CNAME",
             "PRIVACY-AND-STORAGE.md",
             "assets",
             "editor.html",
@@ -129,13 +128,12 @@ class PagesArtifactTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "symbolic link"):
                     build_pages_artifact.resolve_output(build_parent / "site")
 
-    def test_pages_workflow_builds_and_uploads_only_the_artifact(self):
-        workflow = (ROOT / ".github" / "workflows" / "deploy-pages.yml").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn("python tools/build_pages_artifact.py --output _site", workflow)
-        self.assertIn("path: _site", workflow)
-        self.assertNotIn("path: .\n", workflow)
+    def test_local_distribution_does_not_claim_or_deploy_the_official_domain(self):
+        self.assertFalse((ROOT / "CNAME").exists())
+        for workflow in (ROOT / ".github" / "workflows").glob("*.yml"):
+            text = workflow.read_text(encoding="utf-8")
+            self.assertNotIn("actions/deploy-pages@", text)
+            self.assertNotIn("pages: write", text)
 
     def test_validation_workflow_compiles_and_builds_the_artifact(self):
         workflow = (ROOT / ".github" / "workflows" / "validate.yml").read_text(
