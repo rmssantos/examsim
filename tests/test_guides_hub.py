@@ -37,7 +37,7 @@ class GuidesHubTests(unittest.TestCase):
         self.assertIn('<link rel="canonical" href="https://examplar.app/guides/">', page)
         self.assertIn('<meta property="og:url" content="https://examplar.app/guides/">', page)
         self.assertIn("<h1>AI-103 and AI-901 certification guides</h1>", page)
-        self.assertIn("assets/js/analytics.js", page)
+        self.assertNotIn("assets/js/analytics.js", page)
         self.assertNotIn("noindex", page.lower())
         self.assertIn("AI-103: Azure AI apps and agents", page)
         self.assertIn("AI-901: Azure AI Fundamentals", page)

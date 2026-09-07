@@ -41,7 +41,6 @@ try {
     assert.match(await modal.innerText(), /No offline download/);
     assert.match(await modal.locator('.pro-modal-import').innerText(), /previous offline pack/i);
     assert.equal(await modal.locator('.pro-modal-buy').getAttribute('href'), `https://examplar.app/exams/${examId}/`);
-    assert.equal(await modal.locator('.pro-modal-buy').getAttribute('data-analytics-event'), 'online_exam_clicked');
     assert.equal(await modal.locator('.pro-modal-offer').count(), 0);
     await modal.locator('.pro-modal-close').click();
   }
@@ -85,7 +84,6 @@ try {
     assert.match(await offer.innerText(), /account and internet connection/);
     assert.match(await offer.innerText(), /No offline download/);
     assert.equal(await offer.locator('a.pro-cta').getAttribute('href'), `https://examplar.app/exams/${examId}/`);
-    assert.equal(await offer.locator('a.pro-cta').getAttribute('data-analytics-event'), 'online_exam_clicked');
     assert.equal(await offer.locator('.pro-price, .pro-offer').count(), 0);
   }
   await onlinePage.goto(`${baseUrl}/labs.html?exam=az400`, { waitUntil: 'domcontentloaded' });
@@ -93,7 +91,6 @@ try {
   await onlineLabs.locator('a').waitFor();
   assert.match(await onlineLabs.innerText(), /account and internet connection/);
   assert.equal(await onlineLabs.locator('a').getAttribute('href'), 'https://examplar.app/exams/az400/');
-  assert.equal(await onlineLabs.locator('a').getAttribute('data-analytics-event'), 'online_exam_clicked');
   await onlinePage.close();
 
   // Bundled exams start as metadata-only records. Validated labCount must expose
@@ -408,7 +405,7 @@ try {
   for (const markup of Object.values(onlineResultMarkup)) {
     assert.match(markup, /View complete exam online/);
     assert.match(markup, /https:\/\/examplar.app\/exams\/ai103\//);
-    assert.match(markup, /online_exam_clicked/);
+    assert.doesNotMatch(markup, /data-analytics-/);
     assert.match(markup, /account and internet connection/);
     assert.match(markup, /No offline download/);
     assert.doesNotMatch(markup, /EXAMPLAR30|gumroad|Get the full pack/);
@@ -514,7 +511,6 @@ try {
     const manager = window.examManager;
     const homepage = window.homepage;
     const imageStorage = window.ExamApp.imageStorage || window.imageStorage;
-    const originalAnalytics = window.ExamApp.analytics;
     const originalImport = manager.importExam;
     const originalConfirm = window.showCustomConfirm;
     const originalNotification = homepage.showNotification;
@@ -522,8 +518,6 @@ try {
     const originalReplaceImages = imageStorage?.replaceExamImages;
     const importCalls = [];
     const confirmations = [];
-    const completed = [];
-    const failed = [];
     const notifications = [];
     let imageWrites = 0;
     let decision = false;
@@ -535,11 +529,6 @@ try {
     window.showCustomConfirm = async (...args) => {
       confirmations.push(args);
       return decision;
-    };
-    window.ExamApp.analytics = {
-      ...originalAnalytics,
-      trackImportCompleted: (file) => completed.push(file.name),
-      trackImportFailed: (file) => failed.push(file.name)
     };
     homepage.showNotification = (message) => notifications.push(message);
     if (imageStorage) {
@@ -625,8 +614,6 @@ try {
           options: args[3] || null
         })),
         confirmations: confirmations.length,
-        completed: completed.slice(),
-        failed: failed.slice(),
         notifications: notifications.slice(),
         imageWrites,
         cancelQuestion: window.userExams[cancelId]?.questions?.[0]?.question,
@@ -638,7 +625,6 @@ try {
     } finally {
       manager.importExam = originalImport;
       window.showCustomConfirm = originalConfirm;
-      window.ExamApp.analytics = originalAnalytics;
       homepage.showNotification = originalNotification;
       if (imageStorage && typeof originalStoreImage === 'function') {
         imageStorage.storeImageBlob = originalStoreImage;
@@ -666,12 +652,6 @@ try {
   assert.equal(collisionContract.confirmQuestion, 'new-confirm', 'Confirmation must replace a bundled preview with the imported complete pack.');
   assert.equal(collisionContract.confirmSource, 'imported', 'A confirmed replacement must retain imported provenance.');
   assert.equal(collisionContract.confirmTrust, 'local-unverified', 'A confirmed replacement must remain unverified.');
-  assert.deepEqual(
-    collisionContract.completed.sort(),
-    ['security-preview-confirm.json'],
-    'Only a completed replacement may emit import-completed analytics.'
-  );
-  assert.deepEqual(collisionContract.failed, [], 'User cancellation is not an import failure.');
   assert.equal(collisionContract.notifications.length, 1, 'Only the confirmed import may show a success notification.');
   assert.equal(collisionContract.imageWrites, 0, 'Cancelling a ZIP conflict must happen before any image write.');
   const callsByExam = collisionContract.importCalls.reduce((groups, call) => {
@@ -773,9 +753,9 @@ try {
   // the secondary CTA preserves the normal full-practice behavior.
   await page.goto(`${baseUrl}/exams/az900/index.html`, { waitUntil: 'domcontentloaded' });
   const diagnosticCta = page.locator(
-    'a[data-analytics-event="landing_cta_clicked"][data-analytics-action="diagnostic"]'
+    'a.landing-cta'
   );
-  assert.equal(await diagnosticCta.count(), 1, 'AZ-900 landing must expose one tracked diagnostic CTA.');
+  assert.equal(await diagnosticCta.count(), 1, 'AZ-900 landing must expose one diagnostic CTA.');
   assert.match(
     await diagnosticCta.getAttribute('href'),
     /exam\.html\?exam=az900&session=diagnostic&count=10$/,
@@ -807,7 +787,7 @@ try {
     sim.finishExam(true);
   });
   const githubResultCta = page.locator(
-    '#results-recommended-pro a[data-analytics-event="github_repository_clicked"][data-analytics-placement="results_end"]'
+    '#results-recommended-pro a.github-repository-link'
   );
   assert.equal(
     await githubResultCta.count(),
@@ -931,9 +911,9 @@ try {
 
   await page.goto(`${baseUrl}/exams/az900/index.html`, { waitUntil: 'domcontentloaded' });
   const fullCta = page.locator(
-    'a[data-analytics-event="landing_cta_clicked"][data-analytics-action="full"]'
+    'a.landing-cta-secondary'
   );
-  assert.equal(await fullCta.count(), 1, 'AZ-900 landing must expose one tracked full-practice CTA.');
+  assert.equal(await fullCta.count(), 1, 'AZ-900 landing must expose one full-practice CTA.');
   assert.match(
     await fullCta.getAttribute('href'),
     /exam\.html\?exam=az900$/,
@@ -965,7 +945,7 @@ try {
   await page.evaluate(() => {
     const sim = window.ExamApp?.examSimulator || window.examSimulator;
     const slot = document.getElementById('results-recommended-pro');
-    slot.innerHTML = '<a data-analytics-event="github_repository_clicked">stale CTA</a>';
+    slot.innerHTML = '<a class="github-repository-link">stale CTA</a>';
     sim.showStudyResults(100, 1, 0, 1, 1, 0);
   });
   assert.equal(
@@ -973,45 +953,6 @@ try {
     0,
     'Study results must clear stale exam-only calls to action.'
   );
-
-  // The fixed privacy control must clear both navigation actions on mobile.
-  // Localhost does not inject the public-site control, so add the same class
-  // that analytics.js uses and verify the real computed layout.
-  await page.setViewportSize({ width: 390, height: 844 });
-  const mobileControlBoxes = await page.evaluate(() => {
-    const privacy = document.createElement('button');
-    privacy.type = 'button';
-    privacy.className = 'analytics-privacy-button';
-    privacy.textContent = 'Privacy settings';
-    document.body.appendChild(privacy);
-    document.querySelector('.navigation-buttons')?.scrollIntoView({ block: 'end' });
-
-    const rect = (element) => {
-      const { left, top, right, bottom } = element.getBoundingClientRect();
-      return { left, top, right, bottom };
-    };
-    return {
-      privacy: rect(privacy),
-      previous: rect(document.getElementById('prev-btn')),
-      next: rect(document.getElementById('next-btn'))
-    };
-  });
-  const overlaps = (first, second) => first.left < second.right
-    && first.right > second.left
-    && first.top < second.bottom
-    && first.bottom > second.top;
-  assert.equal(
-    overlaps(mobileControlBoxes.privacy, mobileControlBoxes.previous),
-    false,
-    `Mobile Privacy settings must not overlap Previous: ${JSON.stringify(mobileControlBoxes)}`
-  );
-  assert.equal(
-    overlaps(mobileControlBoxes.privacy, mobileControlBoxes.next),
-    false,
-    `Mobile Privacy settings must not overlap Next: ${JSON.stringify(mobileControlBoxes)}`
-  );
-  await page.evaluate(() => document.querySelector('.analytics-privacy-button')?.remove());
-  await page.setViewportSize({ width: 1280, height: 720 });
 
   // Exam runtime regressions:
   //  - the results "Questions answered" stat must report answered/total, not the bank size;

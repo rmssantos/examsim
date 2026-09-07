@@ -212,7 +212,6 @@ class RuntimeReviewFixTests(unittest.TestCase):
                 isSafeExamId() { return true; },
                 sanitizeExamMetadata(value) { return value; },
                 warn() {},
-                analytics: { trackStorageMigration() {} },
                 addToRegistry() {},
                 STORAGE_KEYS: { exams: 'exam_registry' }
               }

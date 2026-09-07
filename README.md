@@ -1,4 +1,4 @@
-# Examplar
+# Examplar — frozen local edition
 
 <p align="center">
   <a href="https://examplar.app/">
@@ -8,10 +8,13 @@
 
 Examplar is an open-source, local-first certification exam simulator. Practice
 in the browser with original questions, hands-on labs, and detailed review tools.
-This repository is the standalone local edition: no account is required, and your progress stays on your device.
+This repository is the final standalone local edition, frozen on 8 September 2026.
+It remains available to download and fork. No account is required, and your
+progress stays on your device. Future development and content updates happen in
+the separately maintained online service; this snapshot receives no further updates.
 
-**[Try Examplar](https://examplar.app/)** ·
-**[Browse practice exams](https://examplar.app/exams/)** ·
+**[Download the source ZIP](https://github.com/rmssantos/examsim/archive/refs/heads/master.zip)** ·
+**[Separate online service](https://examplar.app/)** ·
 **[Read the privacy model](PRIVACY-AND-STORAGE.md)**
 
 > If Examplar helps you study or gives you ideas for your own local-first app,
@@ -80,23 +83,26 @@ static host, run `python tools/build_pages_artifact.py --output _site` and serve
 Questions, selected answers, imported content, images, progress, and editor
 changes remain in browser storage.
 
-When this local edition is deployed on an approved public host, it sends limited product telemetry to Azure
-Application Insights. This includes page views, coarse usage events, campaign
-labels, referrer hostname, online-exam link clicks, and Azure-derived coarse client/location metadata. Online link clicks do not mean a purchase or activation occurred.
-Analytics can be disabled from the Privacy settings control.
+This edition contains no analytics or telemetry client, ingestion configuration,
+tracking hooks, campaign storage, or ad-click forwarding, on any hostname.
+Local progress statistics remain available on your device. This applies to the
+final snapshot; earlier Git history and old downloads retain their original behavior.
 
-Analytics is not initialized on `localhost`, private self-hosted URLs, or
-`file://` URLs.
+The browser still requests app files from your local server. Following external
+study resources, GitHub, or online-exam links contacts that destination, which
+has its own privacy policy. Pack images are loaded from local or same-origin
+files, or from IndexedDB.
 
 See [PRIVACY-AND-STORAGE.md](PRIVACY-AND-STORAGE.md) for the complete disclosure.
 
 ## Quick Start
 
-### Public Site
+### Download
 
-Open [examplar.app](https://examplar.app), select an exam, and start practicing.
-The hosted service offers free practice and account-based complete exams.
-Use the local edition below for independent offline practice.
+Use **Code → Download ZIP** (or the ZIP link above), extract it, install Python 3.10 or newer,
+and open a terminal in the extracted folder. Run `python server.py`, then open
+`http://localhost:8000`. Keep that folder: it is the independent local app.
+No Node install or build step is required to use it.
 
 ### Local Server
 
@@ -137,7 +143,7 @@ Users can also import:
 - a ZIP containing the required question-data JSON, optional metadata, and
   optional images.
 
-ZIP import requires the public HTTPS site or the supported local HTTP server. It
+ZIP import requires a supported local HTTP server or a secure self-hosted origin. It
 does not run when `index.html` is opened directly as a `file://` URL.
 
 Imported packs and their progress are stored in that browser profile. They are
@@ -161,8 +167,9 @@ The editor can:
 - preview questions;
 - copy image files into a local pack when running through `server.py`.
 
-Browser edits affect only the current browser. To publish a correction, export
-the updated content and submit a pull request or GitHub issue.
+Browser edits affect only the current browser. Export changes to keep a backup
+or redistribute your own fork under the existing licence. This frozen snapshot
+receives no further upstream code or content updates.
 
 ## Repository Layout
 
@@ -234,7 +241,7 @@ Generated exam pages must stay synchronized with metadata:
 python tools/generate-exam-pages.py
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for retained fork-maintenance guidance.
 
 ## Security
 
@@ -242,7 +249,7 @@ Treat imported JSON, ZIP files, metadata, filenames, URLs, and browser storage
 as untrusted input. Security issues should be reported without attaching
 proprietary packs, credentials, or personal data.
 
-Production response-header guidance is documented in
+Optional self-hosting response-header guidance is documented in
 [docs/SECURITY-HEADERS.md](docs/SECURITY-HEADERS.md).
 
 ## License

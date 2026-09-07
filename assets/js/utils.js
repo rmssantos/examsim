@@ -166,8 +166,8 @@ window.ExamApp.canonicalizeQuestionId = function canonicalizeQuestionId(value) {
     return parsed.valid ? parsed.value : null;
 };
 
-// Hosts that serve the public deployment. Single source of truth shared by
-// analytics gating and local-only link hiding.
+// Former public hosts retain the existing local-tool visibility boundary.
+// This helper controls links only; the local edition has no telemetry client.
 window.ExamApp.PUBLIC_HOSTS = Object.freeze(['examplar.app', 'www.examplar.app', 'rmssantos.github.io']);
 window.ExamApp.isPublicSiteHost = function isPublicSiteHost(hostname = window.location.hostname) {
     return window.ExamApp.PUBLIC_HOSTS.includes(hostname);

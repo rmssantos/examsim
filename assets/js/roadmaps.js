@@ -290,7 +290,6 @@
 			e.stopPropagation();
 			const next = !node.manualDone;
 			setManualDone(node.id, next);
-			window.ExamApp?.analytics?.trackEvent?.('roadmap_mark_complete', { exam: node.id, done: next });
 			renderIndex();
 			renderPath();
 		});
@@ -351,7 +350,7 @@
 				(Array.isArray(pro.highlights) && pro.highlights.length
 					? '<ul class="pro-modal-list">' + pro.highlights.map(h => '<li><i class="fas fa-check" aria-hidden="true"></i> ' + escapeHtml(h) + '</li>').join('') + '</ul>'
 					: '') +
-				'<a class="pro-modal-buy" href="' + escapeHtml(window.ExamApp.safeExternalUrl(pro.url) || '#') + '" target="_blank" rel="noopener" data-analytics-event="' + (online ? 'online_exam_clicked' : 'pro_purchase_clicked') + '" data-analytics-exam="' + escapeHtml(node.id) + '" data-analytics-placement="roadmap_modal">' +
+				'<a class="pro-modal-buy" href="' + escapeHtml(window.ExamApp.safeExternalUrl(pro.url) || '#') + '" target="_blank" rel="noopener">' +
 					'<i class="fas fa-store" aria-hidden="true"></i> ' + (online ? 'View complete exam online' : 'Get the full pack') +
 					(online ? '' : promotion ? ' — ' + escapeHtml(promotion.offerPrice) + ' + taxes' : (pro.price ? ' (' + escapeHtml(pro.price) + ')' : '')) + '</a>' +
 				'<div class="pro-modal-divider"></div>' +
@@ -362,14 +361,12 @@
 		overlay.addEventListener('click', (e) => { if (e.target === overlay) closeProModal(); });
 		overlay.querySelector('.pro-modal-close')?.addEventListener('click', closeProModal);
 		document.addEventListener('keydown', onProKeydown);
-		window.ExamApp?.analytics?.trackEvent?.('roadmap_pro_modal', { exam: node.id });
 	}
 
 	function selectTrack(trackId) {
 		state.selectedTrackId = trackId;
 		renderIndex();
 		renderPath();
-		window.ExamApp?.analytics?.trackEvent?.('roadmap_track_select', { track: trackId });
 	}
 
 	async function init() {
@@ -403,7 +400,6 @@
 		renderIndex();
 		renderPath();
 		window.Roadmaps.ready = true;
-		window.ExamApp?.analytics?.trackEvent?.('roadmap_view', {});
 	}
 
 	window.Roadmaps = { ready: false, deriveNodeState, resolveEntry, selectTrack };

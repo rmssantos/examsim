@@ -26,14 +26,14 @@ def _load_generator():
 gen = _load_generator()
 
 
-class _AnalyticsElementParser(HTMLParser):
+class _CtaElementParser(HTMLParser):
     def __init__(self):
         super().__init__()
         self.tracked = []
 
     def handle_starttag(self, tag, attrs):
         attributes = dict(attrs)
-        if "data-analytics-event" in attributes:
+        if tag == "a" and set(attributes.get("class", "").split()) & {"landing-cta", "landing-cta-secondary", "pro-cta"}:
             self.tracked.append((tag, attributes))
 
 
@@ -410,7 +410,7 @@ class PricingTests(unittest.TestCase):
         page = self._render(SAMPLE_PRO)
 
         offer_start = page.index('class="pro-offer"')
-        purchase_cta = page.index('data-analytics-event="pro_purchase_clicked"')
+        purchase_cta = page.index('class="pro-cta"')
         offer = page[offer_start:purchase_cta]
         self.assertIn("<strong>13.30 EUR</strong> + taxes", offer)
         self.assertIn("Unlock the full pack — 13.30 EUR + taxes</a>", page)
@@ -442,46 +442,23 @@ class PricingTests(unittest.TestCase):
         self.assertEqual(currencies, {"EUR"})  # free + paid share the paid currency
 
 
-class AnalyticsWiringTests(unittest.TestCase):
+class LandingCtaTests(unittest.TestCase):
     def _render(self, meta):
         template = (ROOT / "tools" / "exam-page-template.html").read_text(encoding="utf-8")
         return gen.render_exam_page(meta, [meta], template)
 
-    def test_pages_load_analytics_with_csp_allowance(self):
-        # Landing pages are the SEO entry point; without the analytics client
-        # (and a CSP connect-src that permits ingestion) organic traffic is
-        # invisible. Mirror the allowance used by index.html.
-        for html_out in (self._render(SAMPLE), gen.render_hub([SAMPLE])):
-            self.assertIn("assets/js/analytics.js", html_out)
-            self.assertIn("assets/css/analytics-privacy.css", html_out)
-            self.assertIn(
-                "connect-src 'self' https://*.applicationinsights.azure.com", html_out
-            )
 
-    def test_pages_load_utils_before_analytics(self):
-        # analytics.js delegates host detection to window.ExamApp.isPublicSiteHost,
-        # which utils.js defines; without utils.js loaded first the client throws
-        # at init and the landing pages stay unmeasured.
-        for html_out in (self._render(SAMPLE), gen.render_hub([SAMPLE])):
-            self.assertIn("assets/js/utils.js", html_out)
-            self.assertLess(
-                html_out.index("assets/js/utils.js"),
-                html_out.index("assets/js/analytics.js"),
-            )
 
-    def test_analytics_classifies_landing_pages(self):
-        js = (ROOT / "assets" / "js" / "analytics.js").read_text(encoding="utf-8")
-        self.assertIn("'landing'", js)
 
-    def test_landing_has_exactly_two_tracked_diagnostic_and_full_ctas(self):
+    def test_landing_has_exactly_two_diagnostic_and_full_ctas(self):
         page = self._render(SAMPLE)
-        parser = _AnalyticsElementParser()
+        parser = _CtaElementParser()
         parser.feed(page)
 
         practice_ctas = [
             tracked
             for tracked in parser.tracked
-            if tracked[1]["data-analytics-event"] == "landing_cta_clicked"
+            if "pro-cta" not in tracked[1].get("class", "").split()
         ]
 
         self.assertEqual(len(practice_ctas), 2)
@@ -490,44 +467,44 @@ class AnalyticsWiringTests(unittest.TestCase):
         self.assertEqual(primary_tag, "a")
         self.assertEqual(secondary_tag, "a")
         self.assertEqual(primary["class"], "landing-cta")
-        self.assertEqual(primary["data-analytics-event"], "landing_cta_clicked")
-        self.assertEqual(primary["data-analytics-exam"], "sc900")
-        self.assertEqual(primary["data-analytics-action"], "diagnostic")
+
+
+
         self.assertEqual(
             primary["href"],
             "../../exam.html?exam=sc900&session=diagnostic&count=10",
         )
         self.assertIn("landing-cta-secondary", secondary["class"].split())
-        self.assertEqual(secondary["data-analytics-event"], "landing_cta_clicked")
-        self.assertEqual(secondary["data-analytics-exam"], "sc900")
-        self.assertEqual(secondary["data-analytics-action"], "full")
+
+
+
         self.assertEqual(secondary["href"], "../../exam.html?exam=sc900")
         self.assertIn("Start 10-question diagnostic", page)
         self.assertIn("Start full practice", page)
 
     def test_paid_preview_labels_the_secondary_cta_as_full_preview(self):
         page = self._render(SAMPLE_PRO)
-        parser = _AnalyticsElementParser()
+        parser = _CtaElementParser()
         parser.feed(page)
 
         secondary = parser.tracked[1][1]
-        self.assertEqual(secondary["data-analytics-action"], "full")
+
         self.assertEqual(secondary["href"], "../../exam.html?exam=az104")
 
-    def test_paid_landing_tracks_the_purchase_without_suppressing_referrer(self):
+    def test_paid_landing_keeps_the_purchase_destination(self):
         page = self._render(SAMPLE_PRO)
-        parser = _AnalyticsElementParser()
+        parser = _CtaElementParser()
         parser.feed(page)
         purchases = [
             attributes
             for _tag, attributes in parser.tracked
-            if attributes["data-analytics-event"] == "pro_purchase_clicked"
+            if "pro-cta" in attributes.get("class", "").split()
         ]
 
         self.assertEqual(len(purchases), 1)
         purchase = purchases[0]
-        self.assertEqual(purchase["data-analytics-exam"], "az104")
-        self.assertEqual(purchase["data-analytics-placement"], "exam_landing")
+
+
         self.assertEqual(
             purchase["href"],
             "https://examplar.gumroad.com/l/az104-complete/EXAMPLAR30",
@@ -537,37 +514,32 @@ class AnalyticsWiringTests(unittest.TestCase):
         self.assertIn("Start full preview", page)
         self.assertNotIn("Start full practice", page)
 
-    def test_lab_is_untracked_and_purchase_is_not_an_activation_cta(self):
+    def test_lab_and_purchase_are_separate_from_practice_ctas(self):
         meta = dict(
             SAMPLE_PRO,
             labCount=1,
             labTopics=["Configure a virtual network"],
         )
         page = self._render(meta)
-        parser = _AnalyticsElementParser()
+        parser = _CtaElementParser()
         parser.feed(page)
 
         activation = [
             attributes
             for _, attributes in parser.tracked
-            if attributes["data-analytics-event"] == "landing_cta_clicked"
+            if "exam.html?" in attributes.get("href", "")
         ]
         purchases = [
             attributes
             for _, attributes in parser.tracked
-            if attributes["data-analytics-event"] == "pro_purchase_clicked"
+            if "pro-cta" in attributes.get("class", "").split()
         ]
         self.assertEqual(len(activation), 2)
         self.assertEqual(len(purchases), 1)
-        self.assertEqual(
-            [attributes["data-analytics-action"] for attributes in activation],
-            ["diagnostic", "full"],
-        )
-        self.assertEqual(
-            [attributes["data-analytics-exam"] for attributes in activation],
-            ["az104", "az104"],
-        )
-        self.assertEqual(purchases[0]["data-analytics-exam"], "az104")
+        self.assertIn("session=diagnostic&count=10", activation[0]["href"])
+        self.assertEqual("../../exam.html?exam=az104", activation[1]["href"])
+        self.assertIn('href="../../labs.html?exam=az104"', page)
+
 
     def test_lab_copy_is_vendor_neutral_and_advertises_complete_count(self):
         meta = dict(

@@ -1,5 +1,20 @@
 # Changelog
 
+## Final local edition — 2026-09-08
+
+- Freeze the downloadable local simulator; future hosted development is separate.
+- Remove the telemetry implementation, tracking hooks, attribution forwarding,
+  configuration injector, and telemetry UI/styles from the final source.
+- Preserve local progress/statistics, free packs, imports, editor, PWA behavior,
+  and activation of previous offline purchases.
+- Keep explicit complete-exam links to the separate online service; retire
+  public hosting automation and retain existing licence and source history.
+- Clarify source ZIP startup, storage/backup limits, external requests, and forks.
+
+Entries below are historical. References to public hosting, telemetry, or
+upstream contributions describe those releases, not the final local edition.
+
+
 Notable public changes are recorded here. Dates use `YYYY-MM-DD`.
 
 ## Unreleased

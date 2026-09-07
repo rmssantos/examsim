@@ -178,8 +178,8 @@ class PublicMessagingTests(unittest.TestCase):
         text = (ROOT / "privacy-and-storage.html").read_text(encoding="utf-8")
         lowered = text.lower()
         self.assertNotIn("private dashboard", lowered)
-        self.assertIn("Authorized maintainers can inspect", text)
-        self.assertIn("analytics is enabled by default", lowered)
+        self.assertIn("No analytics or telemetry", text)
+        self.assertIn("local progress statistics", lowered)
         self.assertIn("attempt review", lowered)
         self.assertIn("missed-question study actions", lowered)
 
@@ -281,9 +281,9 @@ class PublicDocumentationTests(unittest.TestCase):
         self.assertNotIn("aggregate analytics", lowered)
         self.assertNotIn("data never leaves the browser", lowered)
         self.assertNotIn("fully offline", lowered)
-        self.assertIn("limited product telemetry", normalized)
-        self.assertIn("coarse country, region, and city", normalized)
-        self.assertIn("30-day retention", normalized)
+        self.assertIn("no analytics or telemetry client", normalized)
+        self.assertIn("external links", normalized)
+        self.assertIn("historical commits", normalized)
 
 
 if __name__ == "__main__":

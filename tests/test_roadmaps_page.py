@@ -61,7 +61,7 @@ class RoadmapsPageTests(unittest.TestCase):
         self.assertIn('id="roadmap-track-path"', HTML)
 
     def test_scripts_present(self):
-        for src in ("assets/js/utils.js", "assets/js/analytics.js",
+        for src in ("assets/js/utils.js",
                     "assets/js/exam-storage.js", "assets/js/roadmaps.js"):
             self.assertIn(src, HTML, f"{src} must be loaded")
 

@@ -49,5 +49,5 @@ Note: on PowerShell, `python -m unittest` may report exit code 1 even when outpu
 
 ### Content & privacy safety
 - Keep `.local/` planning notes, private ZIPs, and personal browser data out of commits.
-- When adding an exam pack, add its `.gitignore` allowlist pair (`!.../<id>/` and `!.../<id>/**`), register it in `index.json` and `analytics.js` `publicExamIds`, and confirm the validator's pack/question counts update.
+- When adding an exam pack, add its `.gitignore` allowlist pair (`!.../<id>/` and `!.../<id>/**`), register it in `index.json`, and confirm the validator's pack/question counts update.
 - Exclude work-in-progress or off-limits packs when instructed; if a pack is excluded, also remove it from `index.json` so the index never points to a missing pack.

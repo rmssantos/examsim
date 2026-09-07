@@ -129,8 +129,8 @@ class MultiExamSimulator {
         this.studySessionId = null;
         this.localIdCounter = 0;
         this.attemptReviewDetailLimit = 10;
-        this.firstAnswerTracked = false;
-        this.studyFirstAnswerTracked = false;
+
+
 
         this.init();
     }
@@ -1166,7 +1166,7 @@ class MultiExamSimulator {
         this.studyQueueSummary = null;
         this.studySessionResults = new Map();
         this.studySessionId = null;
-        this.firstAnswerTracked = false;
+
 
         // Update exam badge in header
         document.getElementById('current-exam-badge').textContent = this.examData[this.currentExam].name;
@@ -1188,10 +1188,6 @@ class MultiExamSimulator {
     this.setupKeyboardShortcuts();
     this.showQuestion(0);
 
-    window.ExamApp?.analytics?.trackExamStarted(this.currentExam, {
-        questionCount: this.activeQuestions.length,
-        sessionType: this.getSessionType()
-    });
 
         // Switch to exam screen
         this.showScreen('exam-screen');
@@ -1223,7 +1219,7 @@ class MultiExamSimulator {
         this.startTime = new Date();
         this.studySessionId = this.generateLocalId('study_session');
         this.studySessionResults = new Map();
-        this.studyFirstAnswerTracked = false;
+
 
         const examName = this.examData[this.currentExam].name;
         const badge = document.getElementById('current-exam-badge');
@@ -1252,7 +1248,6 @@ class MultiExamSimulator {
         this.showQuestion(0);
         this.showScreen('exam-screen');
 
-        window.ExamApp?.analytics?.trackStudyStarted(this.currentExam);
     }
 
     showQuestion(index) {
@@ -1616,7 +1611,7 @@ class MultiExamSimulator {
         const fullCount = Number.isFinite(questionTotal) && questionTotal > 0 ? Math.round(questionTotal) : null;
         const scope = fullCount ? `${fullCount} questions` : 'the complete question set';
         if (pro.delivery === 'online') {
-            return `<div class="recommended-pro results-pro-upsell"><strong>${title}</strong><p>Continue with ${scope} in the online service. Requires an account and internet connection. No offline download; an online licence does not unlock a local pack.</p><a class="results-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener" data-analytics-event="online_exam_clicked" data-analytics-exam="${this.escapeHtml(this.currentExam)}" data-analytics-placement="results_pro_upsell">View complete exam online</a></div>`;
+            return `<div class="recommended-pro results-pro-upsell"><strong>${title}</strong><p>Continue with ${scope} in the online service. Requires an account and internet connection. No offline download; an online licence does not unlock a local pack.</p><a class="results-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener">View complete exam online</a></div>`;
         }
         const promotion = window.ExamApp.getPromotionOffer?.(pro);
         const offer = promotion
@@ -1625,7 +1620,7 @@ class MultiExamSimulator {
         const price = promotion
             ? ` — ${this.escapeHtml(promotion.offerPrice)} + taxes`
             : (pro.price ? ` (${this.escapeHtml(String(pro.price))})` : '');
-        return `<div class="recommended-pro results-pro-upsell"><i class="fas fa-unlock" aria-hidden="true"></i> <strong>${title}</strong><p>You practiced the free preview. The full pack covers ${scope} with detailed explanations and free updates.</p>${offer}<a class="results-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener" data-analytics-event="pro_purchase_clicked" data-analytics-exam="${this.escapeHtml(this.currentExam)}" data-analytics-placement="results_pro_upsell">Get the full pack${price}</a></div>`;
+        return `<div class="recommended-pro results-pro-upsell"><i class="fas fa-unlock" aria-hidden="true"></i> <strong>${title}</strong><p>You practiced the free preview. The full pack covers ${scope} with detailed explanations and free updates.</p>${offer}<a class="results-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener">Get the full pack${price}</a></div>`;
     }
 
     // Ask for community support only after the learner has completed an exam.
@@ -1633,7 +1628,7 @@ class MultiExamSimulator {
         const url = this.safeUrl(PASS_STORY_DISCUSSION_URL);
         const repositoryUrl = this.safeUrl(GITHUB_REPOSITORY_URL);
         if (!url || !repositoryUrl) return '';
-        return `<div class="pass-story-invite"><span><i class="fas fa-star" aria-hidden="true"></i> Found this useful? <a class="github-repository-link" href="${this.escapeHtml(repositoryUrl)}" target="_blank" rel="noopener noreferrer" data-analytics-event="github_repository_clicked" data-analytics-exam="${this.escapeHtml(this.currentExam)}" data-analytics-placement="results_end">Star Examplar on GitHub</a></span><span class="community-divider" aria-hidden="true">·</span><span><i class="fas fa-trophy" aria-hidden="true"></i> Passed your real exam? <a class="pass-story-link" href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer">Share your story</a></span></div>`;
+        return `<div class="pass-story-invite"><span><i class="fas fa-star" aria-hidden="true"></i> Found this useful? <a class="github-repository-link" href="${this.escapeHtml(repositoryUrl)}" target="_blank" rel="noopener noreferrer">Star Examplar on GitHub</a></span><span class="community-divider" aria-hidden="true">·</span><span><i class="fas fa-trophy" aria-hidden="true"></i> Passed your real exam? <a class="pass-story-link" href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer">Share your story</a></span></div>`;
     }
 
     // Cross-sell a recommended paid pack on the results screen (e.g. CLF-C02 -> SAA-C03).
@@ -1645,15 +1640,14 @@ class MultiExamSimulator {
         const title = this.escapeHtml(rec.title || 'Recommended pack');
         const blurb = this.escapeHtml(rec.blurb || '');
         if (rec.delivery === 'online') {
-            return `<div class="recommended-pro"><strong>${title}</strong><p>${blurb}</p><p>Requires an account and internet connection. No offline download.</p><a class="recommended-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener" data-analytics-event="online_exam_clicked" data-analytics-exam="${this.escapeHtml(rec.examId || this.currentExam)}" data-analytics-source-exam="${this.escapeHtml(this.currentExam)}" data-analytics-placement="results_recommended_pro">View complete exam online</a></div>`;
+            return `<div class="recommended-pro"><strong>${title}</strong><p>${blurb}</p><p>Requires an account and internet connection. No offline download.</p><a class="recommended-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener">View complete exam online</a></div>`;
         }
         const promotion = window.ExamApp.getPromotionOffer?.(rec);
         const offer = promotion
             ? `<div class="results-pro-offer"><span class="results-pro-offer-label">${this.escapeHtml(promotion.label)} · ${this.escapeHtml(String(promotion.discountPercent))}% off</span><span class="results-pro-offer-prices"><s>${this.escapeHtml(promotion.basePrice)}</s> <span aria-hidden="true">→</span> <strong>${this.escapeHtml(promotion.offerPrice)}</strong> + taxes</span><span class="results-pro-offer-meta">Code <code>${this.escapeHtml(promotion.code)}</code>${promotion.limited ? ' · Limited launch offer' : ''}</span></div>`
             : '';
         const price = promotion ? ` — ${this.escapeHtml(promotion.offerPrice)} + taxes` : '';
-        const targetExam = rec.examId || this.currentExam;
-        return `<div class="recommended-pro"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> <strong>${title}</strong><p>${blurb}</p>${offer}<a class="recommended-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener" data-analytics-event="pro_purchase_clicked" data-analytics-exam="${this.escapeHtml(targetExam)}" data-analytics-source-exam="${this.escapeHtml(this.currentExam)}" data-analytics-placement="results_recommended_pro">View pack${price}</a></div>`;
+        return `<div class="recommended-pro"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> <strong>${title}</strong><p>${blurb}</p>${offer}<a class="recommended-pro-cta" href="${this.escapeHtml(url)}" target="_blank" rel="nofollow noopener">View pack${price}</a></div>`;
     }
 
     displayOptions(question) {
@@ -2115,18 +2109,6 @@ class MultiExamSimulator {
     }
 
     handleAnswerChanged() {
-        if (this.isStudyMode()) {
-            if (!this.studyFirstAnswerTracked) {
-                this.studyFirstAnswerTracked = true;
-                window.ExamApp?.analytics?.trackStudyFirstAnswered?.(this.currentExam);
-            }
-        } else if (!this.firstAnswerTracked) {
-            this.firstAnswerTracked = true;
-            window.ExamApp?.analytics?.trackExamFirstAnswered?.(this.currentExam, {
-                sessionType: this.getSessionType()
-            });
-        }
-
         // Any real interaction marks the current question as touched, so an
         // auto-initialized SEQUENCE order is not mistaken for a user attempt.
         this.touchedQuestions.add(this.currentQuestionIndex);
@@ -2593,12 +2575,6 @@ class MultiExamSimulator {
         this.showStudyResults(accuracy, correctCount, incorrectCount, reviewedCount, questions.length, timeSpent);
         this.showScreen('results-screen');
 
-        window.ExamApp?.analytics?.trackStudyCompleted(this.currentExam, {
-            questionCount: questions.length,
-            answeredCount: reviewedCount,
-            correctCount,
-            timeSpent
-        });
     }
 
     showStudyResults(accuracy, correct, incorrect, reviewed, total, timeSpent) {
@@ -2751,24 +2727,12 @@ class MultiExamSimulator {
         if (recSlot) {
             const upsell = this.renderProUpsell(recMeta);
             recSlot.innerHTML = (upsell || this.renderRecommendedPro(recMeta)) + this.renderPassStoryInvite();
-            const passStory = recSlot.querySelector('.pass-story-link');
-            if (passStory) {
-                passStory.addEventListener('click', () => {
-                    window.ExamApp?.analytics?.trackPassStoryClicked?.(this.currentExam);
-                });
-            }
+
         }
 
         // Save progress
         this.saveProgress(score, passed, timeSpent);
 
-        window.ExamApp?.analytics?.trackExamCompleted(this.currentExam, {
-            score,
-            passed,
-            timeSpent,
-            questionCount: total,
-            sessionType: this.getSessionType()
-        });
     }
 
     generateDetailedReview(page = 0) {
@@ -3317,7 +3281,6 @@ window.exportProgress = async function() {
         alert('Progress data exported successfully!');
     }
 
-    window.ExamApp?.analytics?.trackEvent('export_progress');
 };
 
 function showProgressModal(allProgress) {

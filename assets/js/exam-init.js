@@ -239,11 +239,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         selectedModules: isCustomModulePractice ? selectedModules : null,
         sessionType: sessionConfig.sessionType
       };
-      window.ExamApp?.analytics?.trackSessionConfigured?.(examId, {
-        sessionType: sessionConfig.sessionType,
-        questionCount,
-        durationMinutes: duration
-      });
 
       window.ExamApp.log(`✅ Loaded ${questions.length} questions for ${examId} (Session Target: ${questionCount}, Duration: ${duration} mins)`);
       if (isCustomModulePractice) {

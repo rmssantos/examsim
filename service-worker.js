@@ -2,7 +2,7 @@
 // Public release history is recorded in CHANGELOG.md. Bump the vX.Y below on any
 // deploy that changes cached assets;
 // tests/test_sprint1_readiness.py enforces the examsim-pwa-vX.Y format.
-const CACHE_VERSION = 'examsim-pwa-v6.15';
+const CACHE_VERSION = 'examsim-pwa-v6.16';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -20,7 +20,6 @@ const CORE_ASSETS = [
   './assets/js/router.js',
   './assets/js/pwa.js',
   './assets/js/utils.js',
-  './assets/js/analytics.js',
   './assets/js/exam-storage.js',
   './assets/js/secure-transfer.js',
   './assets/js/exam-loader.js',
@@ -45,7 +44,6 @@ const CORE_ASSETS = [
   './assets/vendor/fontawesome/webfonts/fa-brands-400.woff2',
   './assets/css/exam-v2.css',
   './assets/css/home-v2.css',
-  './assets/css/analytics-privacy.css',
   './assets/css/app-footer.css',
   './assets/css/legal-page.css',
   './assets/css/editor-styles.css',
@@ -80,7 +78,6 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/js/router.js',
   './assets/js/pwa.js',
   './assets/js/utils.js',
-  './assets/js/analytics.js',
   './assets/js/exam-storage.js',
   './assets/js/secure-transfer.js',
   './assets/js/exam-loader.js',
@@ -101,7 +98,6 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
   './assets/vendor/jszip/jszip.min.js',
   './assets/css/exam-v2.css',
   './assets/css/home-v2.css',
-  './assets/css/analytics-privacy.css',
   './assets/css/app-footer.css',
   './assets/css/legal-page.css',
   './assets/css/editor-styles.css',
@@ -112,10 +108,6 @@ const APP_SHELL_NETWORK_FIRST_ASSETS = [
 
 function sameOrigin(url) {
   return url.origin === self.location.origin;
-}
-
-function isAnalyticsRequest(url) {
-  return /applicationinsights\.azure\.com$/i.test(url.hostname);
 }
 
 function isAppShellNetworkFirstAsset(url) {
@@ -231,7 +223,7 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
-  if (!sameOrigin(url) || isAnalyticsRequest(url)) return;
+  if (!sameOrigin(url)) return;
   // Upload-session tokens are per local server process. Let the browser perform
   // a direct no-store fetch so Cache API entries can never outlive that process.
   if (url.pathname === '/__upload_session') return;

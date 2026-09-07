@@ -383,7 +383,6 @@
                         window.ExamApp.warn(
                             `Skipping invalid legacy migration for ${examId}`
                         );
-                        window.ExamApp.analytics?.trackStorageMigration?.('exam', 'failed');
                         return legacy;
                     }
                     const migrationOptions = canMigrateLabs
@@ -405,7 +404,6 @@
                         delete migratedLegacy.labs;
                     }
                     migratedLegacy.metadata = migratedMetadata;
-                    window.ExamApp.analytics?.trackStorageMigration?.('exam', 'success');
                     const migratedRecord = {
                         ...migratedLegacy,
                         source: 'imported',
@@ -416,7 +414,6 @@
                         || migratedRecord;
                 } catch (error) {
                     window.ExamApp.warn(`Failed to migrate ${examId} to IndexedDB:`, error);
-                    window.ExamApp.analytics?.trackStorageMigration?.('exam', this.isQuotaError(error) ? 'quota_error' : 'failed');
                 }
             }
             return legacy;
@@ -476,10 +473,8 @@
             if (legacy && options.migrateLegacy !== false) {
                 try {
                     await this.putProgress(examId, legacy);
-                    window.ExamApp.analytics?.trackStorageMigration?.('progress', 'success');
                 } catch (error) {
                     window.ExamApp.warn(`Failed to migrate ${examId} progress to IndexedDB:`, error);
-                    window.ExamApp.analytics?.trackStorageMigration?.('progress', this.isQuotaError(error) ? 'quota_error' : 'failed');
                 }
             }
             return legacy;
