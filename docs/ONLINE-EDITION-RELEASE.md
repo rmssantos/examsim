@@ -1,37 +1,47 @@
-# Public local edition release dependency
+# Public local edition and hosted-service cutover
 
-This compatibility branch follows the AI-103 refresh and is not a production
-cutover. CNAME, Pages workflows, existing Gumroad products, and production DNS
-are deliberately unchanged.
+The public repository remains the standalone simulator. Free packs, the editor,
+local imports, previous offline activation and browser-local progress remain
+available without an account. Complete-exam links use the stable official
+`https://examplar.app/exams/<exam-id>/` pages; prices and checkout destinations
+belong to the separately deployed online service.
 
-Integration order: merge dependency PR #108 and AI-103 PR #118 into `master`,
-then integrate PR #119 into `release/online-transition`, created from that
-updated `master`. This closes the compatibility PR while keeping its online
-offers staged for the coordinated launch. Pushes to the release branch do not
-trigger Pages deployment. Merge that release branch into `master` only after
-the checks below are satisfied; do not dispatch Pages manually from it earlier.
+PR #108 and AI-103 PR #118 are already integrated into `master`. Compatibility
+PR #119 is integrated into `release/online-transition`. The coordinated release
+also removes this repository's `CNAME` and GitHub Pages deployment workflow.
+Validation still builds and browser-tests the allowlisted static distribution;
+`python tools/build_pages_artifact.py --output _site` remains available for local
+use or self-hosting on a separately configured domain.
 
-Before publishing this branch:
+## Coordinated release order
 
-1. Finish the existing AI-103 content PR review and retain its validated preview.
-2. Deploy and validate hosted `/exams/<exam-id>/` pages for all eight online
-   offers: ai103, ab620, sc300, dp700, az400, az305, saac03, az104. Those pages must
-   show current conditions and pricing and lead to the new online products.
-   Until those hosted pages replace the current generated landings, the stable
-   links here can return to the same public page; do not release this transition
-   independently.
-3. Coordinate the Pages/custom-domain migration with the hosted site release.
-   Keep this GitHub repository public and preserve a working downloadable local
-   simulator. Determine its optional public-demo address before changing CNAME.
-   Review canonical URLs, sitemap, redirects, PWA scope/cache, approved telemetry
-   hostnames, and the old landing URLs at that time.
-4. Preserve historical offline buyers' existing files, keys and access to this
-   standalone edition. Do not replace, revoke, or publish changes to historical
-   merchant files or receipts as part of this public repository update.
-5. Verify the released local download offline, imported/legacy packs, all eight
-   stable online links, actual hosted checkout, and telemetry separation. New
-   online products remain unpublished until the coordinated merchant cutover.
+1. Complete the hosted application's code, security and migration checks. Keep
+   the prior public deployment, GitHub Pages settings and domain routing details
+   available for rollback.
+2. Prepare and validate all eight hosted exam pages: ai103, ab620, sc300, dp700,
+   az400, az305, saac03 and az104. Verify the correct new online products,
+   individual licences, current prices, campaigns and activation instructions.
+3. Disable this repository's existing Pages deployment workflow, reconcile its
+   Pages custom-domain assignment and move the official domain to the validated
+   hosted service. Preserve unrelated DNS and mail configuration. Do not dispatch
+   the old workflow during or after the switch.
+4. Once the new domain route serves the reviewed application, verify HTTPS,
+   canonical URLs, sitemap, existing landing URLs, redirects, analytics consent
+   and the upgrade from previously installed PWAs. Keep imported content and
+   progress intact. Open online sales only when purchases can be fulfilled.
+5. Merge the checked `release/online-transition` branch into `master` as part of
+   that same coordinated cutover. Confirm that the Pages workflow and `CNAME`
+   are absent and that later public pushes cannot replace the official service.
+6. Verify a fresh local download, free practice, imports and previous offline
+   activation, plus all eight stable links to the official online catalogue.
 
-Rollback is a coordinated restoration of the prior host/domain and storefront;
-keep the previous public deployment and private resource backups until the new
-route and purchase checks pass. This document does not authorize the switch.
+Historical buyers keep their existing merchant files, receipts, keys and local
+simulator access. This public release does not replace or revoke that delivery.
+New personal online licences require the hosted account and internet connection;
+they cannot decrypt old offline packs.
+
+Rollback must coordinate the application, domain and storefront. Close new
+checkout first if fulfilment is unavailable and preserve any purchases already
+made. Do not automatically republish an old Pages artifact or restore a database
+backup over newer buyer records. Restore only a compatible, deliberately reviewed
+combination of routing and application state.
